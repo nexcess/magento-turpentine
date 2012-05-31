@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Nexcessnet_Turpentine>
+            <active>true</active>
+            <codePool>local</codePool>
+        </Nexcessnet_Turpentine>
+    </modules>
+</config>

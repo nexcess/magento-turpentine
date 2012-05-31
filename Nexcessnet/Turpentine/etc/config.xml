@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Nexcessnet_Turpentine>
+            <version>0.0.1</version>
+        </Nexcessnet_Turpentine>
+    </modules>
+    <global>
+        <blocks>
+            <turpentine>
+                <class>Nexcessnet_Turpentine_Block</class>
+            </turpentine>
+        </blocks>
+        <helpers>
+            <turpentine>
+                <class>Nexcessnet_Turpentine_Helper</class>
+            </turpentine>
+        </helpers>
+    </global>
+    <adminhtml>
+        <menu>
+            <turpentine translate="title" module="turpentine">
+                <title>Turpentine</title>
+                <sort_order>100</sort_order>
+                <action>turpentine/admin</action>
+            </turpentine>
+        </menu>
+    </adminhtml>
+</config>
