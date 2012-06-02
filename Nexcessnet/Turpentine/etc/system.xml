@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<config>
+    <tabs>
+        <Nexcessnet_Turpentine translate="label" module="turpentine">
+            <label>Turpentine</label>
+            <sort_order>9000</sort_order>
+        </Nexcessnet_Turpentine>
+    </tabs>
+    <sections>
+        <turpentine_servers translate="label" module="turpentine">
+            <label>Varnish Servers</label>
+            <tab>Nexcessnet_Turpentine</tab>
+            <frontend_type>text</frontend_type> <!-- totally cargo cult -->
+            <sort_order>0</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <servers translate="label">
+                    <label>Varnish Servers</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>0</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <server_list>
+                            <label>Server List</label>
+                            <frontend_type>textarea</frontend_type>
+                            <frontend_note>Should be a list of HOST:PORT pairs, one per line</frontend_note>
+                            <sort_order>0</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </server_list>
+                    </fields>
+                </servers>
+            </groups>
+        </turpentine_servers>
+        <turpentine_control translate="label" module="turpentine">
+            <label>Cache Options</label>
+            <tab>Nexcessnet_Turpentine</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>10</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+        </turpentine_control>
+    </sections>
+</config>
