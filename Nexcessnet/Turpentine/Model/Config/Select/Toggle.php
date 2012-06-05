@@ -1,6 +1,6 @@
 <?php
 
-class Nexcessnet_Turpentine_Model_Toggle {
+class Nexcessnet_Turpentine_Model_Config_Select_Toggle {
     public function toOptionArray() {
         $helper = Mage::helper('turpentine');
         return array(

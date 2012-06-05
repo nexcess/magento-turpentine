@@ -8,6 +8,7 @@
     <default>
         <turpentine_servers>
             <servers>
+                <version>3.0.x</version>
                 <server_list>127.0.0.1:6082</server_list>
                 <config_file>{{root_dir}}/var/default.vcl</config_file>
             </servers>
@@ -86,6 +87,9 @@
                     <children>
                         <system>
                             <children>
+                                <turpentine translate="title" module="turpentine">
+                                    <title>Turpentine Varnish Management</title>
+                                </turpentine>
                                 <config>
                                     <children>
                                         <turpentine_servers translate="title" module="turpentine">
