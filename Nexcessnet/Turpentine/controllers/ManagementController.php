@@ -5,7 +5,7 @@ class Nexcessnet_Turpentine_ManagementController
 
     public function indexAction() {
         $this->loadLayout()
-            ->_addContent($this->getLayout()->createBlock('turpentine/management'))
+            ->_addContent($this->getLayout()->createBlock('turpentine/placeholder'))
             ->renderLayout();
     }
 }
