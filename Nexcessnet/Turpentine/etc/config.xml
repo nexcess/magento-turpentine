@@ -5,6 +5,32 @@
             <version>0.0.1</version>
         </Nexcessnet_Turpentine>
     </modules>
+    <default>
+        <turpentine_servers>
+            <servers>
+                <server_list>127.0.0.1:6082</server_list>
+                <config_file>{{root_dir}}/var/default.vcl</config_file>
+            </servers>
+            <debug>
+                <headers>0</headers>
+            </debug>
+        </turpentine_servers>
+        <turpentine_control>
+            <general>
+                <enable>1</enable>
+            </general>
+            <urls>
+                <url_whitelist>^/.*</url_whitelist>
+                <url_blacklist>^/(?:api|admin)/.*</url_blacklist>
+            </urls>
+            <params>
+                <get_params>__store,__SID</get_params>
+            </params>
+            <purging>
+                <auto_purge_actions></auto_purge_actions>
+            </purging>
+        </turpentine_control>
+    </default>
     <global>
         <blocks>
             <turpentine>
@@ -16,6 +42,11 @@
                 <class>Nexcessnet_Turpentine_Helper</class>
             </turpentine>
         </helpers>
+        <models>
+            <turpentine>
+                <class>Nexcessnet_Turpentine_Model</class>
+            </turpentine>
+        </models>
     </global>
     <admin>
         <routers>
@@ -30,28 +61,15 @@
     </admin>
     <adminhtml>
         <menu>
-            <turpentine translate="title" module="turpentine">
-                <title>Turpentine</title>
-                <sort_order>100</sort_order>
-                <action>turpentine/admin</action>
+            <system>
                 <children>
-                    <servers translate="title" module="turpentine">
-                        <title>Varnish Servers</title>
-                        <action>turpentine/admin_servers</action>
-                        <sort_order>0</sort_order>
-                    </servers>
-                    <control translate="title" module="turpentine">
-                        <title>Cache Control</title>
-                        <action>turpentine/admin_control</action>
-                        <sort_order>10</sort_order>
-                    </control>
-                    <purge translate="title" module="turpentine">
-                        <title>Cache Purging</title>
-                        <action>turpentine/admin_purge</action>
-                        <sort_order>100</sort_order>
-                    </purge>
+                    <turpentine translate="title" module="turpentine">
+                        <title>Varnish Management</title>
+                        <action>turpentine/manage</action>
+                        <sort_order>91</sort_order>
+                    </turpentine>
                 </children>
-            </turpentine>
+            </system>
         </menu>
         <acl>
             <resources>
@@ -62,10 +80,10 @@
                                 <config>
                                     <children>
                                         <turpentine_servers translate="title" module="turpentine">
-                                            <title>Turpentine Varnish Servers</title>
+                                            <title>Turpentine Varnish Options</title>
                                         </turpentine_servers>
                                         <turpentine_control translate="title" module="turpentine">
-                                            <title>Turpentine Cache Options</title>
+                                            <title>Turpentine Caching Options</title>
                                         </turpentine_control>
                                     </children>
                                 </config>

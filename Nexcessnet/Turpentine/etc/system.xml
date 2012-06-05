@@ -8,43 +8,186 @@
     </tabs>
     <sections>
         <turpentine_servers translate="label" module="turpentine">
-            <label>Varnish Servers</label>
-            <tab>Nexcessnet_Turpentine</tab>
-            <frontend_type>text</frontend_type> <!-- totally cargo cult -->
-            <sort_order>0</sort_order>
-            <show_in_default>1</show_in_default>
-            <show_in_website>1</show_in_website>
-            <show_in_store>1</show_in_store>
-            <groups>
-                <servers translate="label">
-                    <label>Varnish Servers</label>
-                    <frontend_type>text</frontend_type>
-                    <sort_order>0</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
-                    <fields>
-                        <server_list>
-                            <label>Server List</label>
-                            <frontend_type>textarea</frontend_type>
-                            <frontend_note>Should be a list of HOST:PORT pairs, one per line</frontend_note>
-                            <sort_order>0</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </server_list>
-                    </fields>
-                </servers>
-            </groups>
-        </turpentine_servers>
-        <turpentine_control translate="label" module="turpentine">
-            <label>Cache Options</label>
+            <label>Varnish Options</label>
             <tab>Nexcessnet_Turpentine</tab>
             <frontend_type>text</frontend_type>
             <sort_order>10</sort_order>
             <show_in_default>1</show_in_default>
             <show_in_website>1</show_in_website>
             <show_in_store>1</show_in_store>
+            <groups>
+                <servers translate="label" module="turpentine">
+                    <label>Servers</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <server_list translate="label" module="turpentine">
+                            <label>Server List</label>
+                            <frontend_type>textarea</frontend_type>
+                            <comment>Should be a list of HOST:PORT pairs of the Varnish management interfaces, one per line</comment>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </server_list>
+                        <config_file translate="label" module="turpentine">
+                            <label>Config File Location</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Specify where the Varnish VCL file should be saved</comment>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </config_file>
+                    </fields>
+                </servers>
+                <debug translate="label" module="turpentine">
+                    <label>Debugging</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <headers translate="label" module="turpentine">
+                            <label>Enable Debug Headers</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>turpentine/toggle</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </headers>
+                    </fields>
+                </debug>
+            </groups>
+        </turpentine_servers>
+        <turpentine_control translate="label" module="turpentine">
+            <label>Caching Options</label>
+            <tab>Nexcessnet_Turpentine</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>20</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <general translate="label" module="turpentine">
+                    <label>General Options</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <enable translate="label" module="turpentine">
+                            <label>Enable Caching</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>turpentine/toggle</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enable>
+                    </fields>
+                </general>
+                <ttls translate="lable" module="turpentine">
+                    <label>TTLs</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <default_ttl translate="label" module="turpentine">
+                            <label>Default TTL (seconds)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </default_ttl>
+                        <url_ttls translate="label" module="turpentine">
+                            <label>URL-based TTLs</label>
+                            <frontend_type>textarea</frontend_type>
+                            <comment>List of regex and TTL (in seconds) comma-separated pairs (one per line)</comment>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </url_ttls>
+                    </fields>
+                </ttls>
+                <urls translate="label" module="turpentine">
+                    <label>URL-based Caching</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>30</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <url_whitelist translate="label" module="turpentine">
+                            <label>URL Whitelist</label>
+                            <frontend_type>textarea</frontend_type>
+                            <comment>List of regexes (one per line) to include URLs for caching</comment>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </url_whitelist>
+                        <url_blacklist translate="label" module="turpentine">
+                            <label>URL Blacklist</label>
+                            <frontend_type>textarea</frontend_type>
+                            <comment>List of regexes (one per line) in exclude URLs from caching, applied after whitelist</comment>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </url_blacklist>
+                    </fields>
+                </urls>
+                <params translate="label" module="turpentine">
+                    <label>Parameter-based Caching</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>40</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <get_params translate="label" module="turpentine">
+                            <label>GET Parameters</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Comma-separated list of GET variables that prevent caching</comment>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </get_params>
+                    </fields>
+                </params>
+                <purging translate="label" module="turpentine">
+                    <label>Automatic Purging</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>50</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <auto_purge_actions translate="label" module="turpentine">
+                            <label>Automatic Purge Actions</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <can_be_empty>1</can_be_empty>
+                            <comment>Actions that should trigger an automatic cache purge</comment>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </auto_purge_actions>
+                    </fields>
+                </purging>
+            </groups>
         </turpentine_control>
     </sections>
 </config>
