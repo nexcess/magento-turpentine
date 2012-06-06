@@ -3,7 +3,7 @@
     <tabs>
         <Nexcessnet_Turpentine translate="label" module="turpentine">
             <label>Turpentine</label>
-            <sort_order>9000</sort_order>
+            <sort_order>999999</sort_order>
         </Nexcessnet_Turpentine>
     </tabs>
     <sections>
@@ -94,7 +94,7 @@
                         <enable translate="label" module="turpentine">
                             <label>Enable Caching</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>turpentine/toggle</source_model>
+                            <source_model>turpentine/config_select_toggle</source_model>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
