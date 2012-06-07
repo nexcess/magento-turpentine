@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<layout>
+    <turpentine_management_index>
+        <reference name="content">
+            <block type="turpentine/management"
+                name="management"
+                template="turpentine/varnish_management.phtml"></block>
+        </reference>
+    </turpentine_management_index>
+</layout>
