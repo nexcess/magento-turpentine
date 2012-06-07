@@ -62,7 +62,7 @@
                     <show_in_store>1</show_in_store>
                     <fields>
                         <headers translate="label" module="turpentine">
-                            <label>Enable Debug Headers</label>
+                            <label>Debug Headers</label>
                             <frontend_type>select</frontend_type>
                             <source_model>turpentine/config_select_toggle</source_model>
                             <sort_order>10</sort_order>
@@ -92,7 +92,7 @@
                     <show_in_store>1</show_in_store>
                     <fields>
                         <enable translate="label" module="turpentine">
-                            <label>Enable Caching</label>
+                            <label>Caching Status</label>
                             <frontend_type>select</frontend_type>
                             <source_model>turpentine/config_select_toggle</source_model>
                             <sort_order>10</sort_order>
@@ -113,6 +113,7 @@
                         <default_ttl translate="label" module="turpentine">
                             <label>Default TTL (seconds)</label>
                             <frontend_type>text</frontend_type>
+                            <validate>validate-greater-than-zero</validate>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>

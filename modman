@@ -2,3 +2,4 @@
 
 Nexcessnet_Turpentine.xml       app/etc/modules/
 Nexcessnet/Turpentine/*         app/code/local/Nexcessnet/Turpentine/
+turpentine/*                    app/design/adminhtml/default/turpentine/

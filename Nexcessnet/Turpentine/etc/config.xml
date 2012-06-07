@@ -78,13 +78,20 @@
         </menu>
         <routers>
             <Nexcessnet_Turpentine>
-                <use>standard</use>
+                <use>admin</use>
                 <args>
                     <module>Nexcessnet_Turpentine</module>
                     <frontName>turpentine</frontName>
                 </args>
             </Nexcessnet_Turpentine>
         </routers>
+        <layout>
+            <updates>
+                <turpentine module="turpentine">
+                    <file>turpentine.xml</file>
+                </turpentine>
+            </updates>
+        </layout>
         <acl>
             <resources>
                 <admin>

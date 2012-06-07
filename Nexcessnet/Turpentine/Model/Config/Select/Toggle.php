@@ -1,11 +1,5 @@
 <?php
 
-class Nexcessnet_Turpentine_Model_Config_Select_Toggle {
-    public function toOptionArray() {
-        $helper = Mage::helper('turpentine');
-        return array(
-            array( 'value' => true, 'label' => $helper->__( 'On' ) ),
-            array( 'value' => false, 'label' => $helper->__( 'Off' ) )
-        );
-    }
+class Nexcessnet_Turpentine_Model_Config_Select_Toggle
+    extends Mage_Adminhtml_Model_System_Config_Source_Enabledisable {
 }
