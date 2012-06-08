@@ -9,8 +9,7 @@ class Nexcessnet_Turpentine_ManagementController
         $this->loadLayout()
             ->_setActiveMenu('system/turpentine')
             ->_addContent($this->getLayout()
-                ->createBlock('adminhtml/template')
-                    ->setTemplate('turpentine/varnish_management.phtml'))
+                ->createBlock('turpentine/management'))
             ->renderLayout();
     }
 
@@ -26,6 +25,7 @@ class Nexcessnet_Turpentine_ManagementController
     public function flushPartialAction() {
         Mage::dispatchEvent('turpentine_varnish_flush_partial');
         //flush cache
+        $url = 'MISSING';
         $this->_getSession()->addSuccess(
             Mage::helper('turpentine')->__('The Varnish cache for (' .
                 $url . ') has been flushed.'));

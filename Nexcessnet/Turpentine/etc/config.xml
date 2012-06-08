@@ -7,6 +7,10 @@
     </modules>
     <default>
         <turpentine_servers>
+            <backend>
+                <backend_host>127.0.0.1</backend_host>
+                <backend_port>8080</backend_port>
+            </backend>
             <servers>
                 <version>3.0.x</version>
                 <server_list>127.0.0.1:6082</server_list>
