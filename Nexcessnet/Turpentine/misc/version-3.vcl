@@ -2,18 +2,11 @@
 
 ## Backends
 
-#{{backend}}
-backend default {
-  .host = "127.0.0.1";
-  .port = "80";
-}
+{{default_backend}}
 
 ## ACLs
 
-#{{acls}}
-acl purge_trusted {
-    "127.0.0.1";
-}
+{{purge_acl}}
 
 ## Custom Subroutines
 #https://www.varnish-cache.org/trac/wiki/VCLExampleNormalizeUserAgent

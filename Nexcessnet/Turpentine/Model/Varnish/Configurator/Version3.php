@@ -6,13 +6,16 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
     const VCL_TEMPLATE_FILE = 'version-3.vcl';
 
     public function generate() {
-        return $this->_formatTemplate( self::VCL_TEMPLATE_FILE,
-            $this->_getTemplateVars() );
+        $tplFile = $this->_getVclTemplateFilename( self::VCL_TEMPLATE_FILE );
+        $tpl = file_get_contents( $tplFile );
+        return $this->_formatTemplate( $tpl, $this->_getTemplateVars() );
     }
 
     protected function _getTemplateVars() {
         $vars = array(
             'admin_name'    => 'admin',
+            'default_backend'   => $this->_vcl_backend( 'default', 'localhost', '80' ),
+            'purge_acl'     => $this->_vcl_acl( 'purge_trusted', array( 'localhost' ) ),
         );
         foreach( $this->_getNormalizations() as $subr ) {
             $name = 'normalize_' . $subr;
