@@ -59,13 +59,13 @@
     </global>
     <admin>
         <routers>
-            <Nexcessnet_Turpentine>
-                <use>admin</use>
+            <adminhtml>
                 <args>
-                    <module>Nexcessnet_Turpentine</module>
-                    <frontName>turpentine</frontName>
+                    <modules>
+                        <turpentine after="Mage_Adminhtml">Nexcessnet_Turpentine</turpentine>
+                    </modules>
                 </args>
-            </Nexcessnet_Turpentine>
+            </adminhtml>
         </routers>
     </admin>
     <adminhtml>
@@ -74,21 +74,12 @@
                 <children>
                     <turpentine translate="title" module="turpentine">
                         <title>Varnish Management</title>
-                        <action>turpentine/management</action>
+                        <action>adminhtml/varnish_management</action>
                         <sort_order>91</sort_order>
                     </turpentine>
                 </children>
             </system>
         </menu>
-        <routers>
-            <Nexcessnet_Turpentine>
-                <use>admin</use>
-                <args>
-                    <module>Nexcessnet_Turpentine</module>
-                    <frontName>turpentine</frontName>
-                </args>
-            </Nexcessnet_Turpentine>
-        </routers>
         <layout>
             <updates>
                 <turpentine module="turpentine">

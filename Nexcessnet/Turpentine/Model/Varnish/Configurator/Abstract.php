@@ -34,6 +34,15 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
         return array( 'encoding', 'user_agent', 'host' );
     }
 
+    protected function _getAdminFrontname() {
+        if( Mage::getStoreConfig( 'admin/url/use_custom_path' ) ) {
+            return Mage::getStoreConfig( 'admin/url/custom_path' );
+        } else {
+            return Mage::getConfig()->getNode(
+                'admin/routers/adminhtml/args/frontName' );
+        }
+    }
+
     protected function _vcl_backend( $name, $host, $port ) {
         $tpl = <<<EOS
 backend {{name}} {

@@ -1,6 +1,6 @@
 <?php
 
-class Nexcessnet_Turpentine_ManagementController
+class Nexcessnet_Turpentine_Varnish_ManagementController
     extends Mage_Adminhtml_Controller_Action {
 
     public function indexAction() {

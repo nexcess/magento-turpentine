@@ -13,7 +13,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
 
     protected function _getTemplateVars() {
         $vars = array(
-            'admin_name'    => 'admin',
+            'admin_name'    => $this->_getAdminFrontname(),
             'default_backend'   => $this->_vcl_backend( 'default', 'localhost', '80' ),
             'purge_acl'     => $this->_vcl_acl( 'purge_trusted', array( 'localhost' ) ),
         );
