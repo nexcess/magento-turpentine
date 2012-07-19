@@ -11,29 +11,29 @@ backend default {
 ## ACLs
 
 #{{acls}}
-acl purge-trusted {
+acl purge_trusted {
     "127.0.0.1";
 }
 
 ## Custom Subroutines
 #https://www.varnish-cache.org/trac/wiki/VCLExampleNormalizeUserAgent
 sub normalize_user_agent {
-    if (req.http.user-agent ~ "MSIE") {
-        set req.http.X-UA = "msie";
-    } else if (req.http.user-agent ~ "Firefox") {
-        set req.http.X-UA = "firefox";
-    } else if (req.http.user-agent ~ "Safari") {
-        set req.http.X-UA = "safari";
-    } else if (req.http.user-agent ~ "Chrome") {
-        set req.http.X-UA = "chrome";
-    } else if (req.http.user-agent ~ "Opera Mini/") {
-        set req.http.X-UA = "opera-mini";
-    } else if (req.http.user-agent ~ "Opera Mobi/") {
-        set req.http.X-UA = "opera-mobile";
-    } else if (req.http.user-agent ~ "Opera") {
-        set req.http.X-UA = "opera";
+    if (req.http.User-Agent ~ "MSIE") {
+        set req.http.X-Normalized-User-Agent = "msie";
+    } else if (req.http.User-Agent ~ "Firefox") {
+        set req.http.X-Normalized-User-Agent = "firefox";
+    } else if (req.http.User-Agent ~ "Safari") {
+        set req.http.X-Normalized-User-Agent = "safari";
+    } else if (req.http.User-Agent ~ "Chrome") {
+        set req.http.X-Normalized-User-Agent = "chrome";
+    } else if (req.http.User-Agent ~ "Opera Mini/") {
+        set req.http.X-Normalized-User-Agent = "opera-mini";
+    } else if (req.http.User-Agent ~ "Opera Mobi/") {
+        set req.http.X-Normalized-User-Agent = "opera-mobile";
+    } else if (req.http.User-Agent ~ "Opera") {
+        set req.http.X-Normalized-User-Agent = "opera";
     } else {
-        set req.http.X-UA = "nomatch";
+        set req.http.X-Normalized-User-Agent = "nomatch";
     }
 }
 
@@ -51,6 +51,14 @@ sub normalize_encoding {
     }
 }
 
+sub normalize_host {
+    if (req.http.Host) {
+        if(req.http.Host !~ "^{{normalize_host_target}}$") {
+            set req.http.Host = "{{normalize_host_target}}";
+        }
+    }
+}
+
 ## Varnish Subroutines
 
 sub vcl_recv {
@@ -62,34 +70,42 @@ sub vcl_recv {
             set req.http.X-Forwarded-For = client.ip;
         }
     }
-    if (req.request == "PURGE") {
-        if (!client.ip ~ purge-trusted) {
+
+    # this will need to be changed to a custom verb (PURGE?) if Magento ever
+    # starts using DELETE
+    if (req.request == "DELETE") {
+        if (!client.ip ~ purge_trusted) {
             error 405 "Not Allowed";
         } else {
             ban_url(req.url);
             error 200 "Purged: " + req.url;
         }
     }
+
     if (req.request != "GET" &&
             req.request != "HEAD" &&
             req.request != "PUT" &&
             req.request != "POST" &&
             req.request != "TRACE" &&
-            req.request != "OPTIONS" &&
-            req.request != "DELETE") {
+            req.request != "OPTIONS") {
         /* Non-RFC2616 or CONNECT which is weird. */
         return (pipe);
     }
+
     if (req.request != "GET" && req.request != "HEAD") {
         /* We only deal with GET and HEAD by default */
         return (pass);
     }
+
     if (req.url ~ "^/(?:(?:index|litespeed)\.php/)?{{admin_name}}") {
         return (pass);
     }
 
-    call normalize_encoding;
-    call normalize_user_agent;
+    {{normalize_encoding}}
+
+    {{normalize_user_agent}}
+
+    {{normalize_host}}
 
     if (req.http.cookie ~ "varnish_nocache") {
         return (pass);
@@ -110,13 +126,13 @@ sub vcl_pipe {
 
 sub vcl_hash {
     hash_data(req.url);
-    if (req.http.host) {
-        hash_data(req.http.host);
+    if (req.http.Host) {
+        hash_data(req.http.Host);
     } else {
         hash_data(server.ip);
     }
-    if (req.http.X-UA) {
-        hash_data(req.http.X-UA);
+    if (req.http.X-Normalized-User-Agent) {
+        hash_data(req.http.X-Normalized-User-Agent);
     }
     if (req.http.Accept-Encoding) {
         hash_data(req.http.Accept-Encoding);
@@ -132,11 +148,17 @@ sub vcl_hash {
 #     return (fetch);
 # }
 #
+
 sub vcl_fetch {
-    if (beresp.http.Set-Cookie ~ "varnish_nocache=1") {
-        return (deliver);
+    if (beresp.http.Set-Cookie) {
+        if (beresp.http.Set-Cookie ~ "varnish_nocache=1") {
+            return (deliver);
+        } else {
+            unset beresp.http.Set-Cookie;
+        }
     }
 }
+
 # sub vcl_fetch {
 #     if (beresp.ttl <= 0s ||
 #         beresp.http.Set-Cookie ||
@@ -149,11 +171,15 @@ sub vcl_fetch {
 #     }
 #     return (deliver);
 # }
-#
-# sub vcl_deliver {
-#     return (deliver);
-# }
-#
+
+sub vcl_deliver {
+    if (obj.hits > 0) {
+        set resp.http.X-Varnish-Cache = "HIT: " + obj.hits;
+    } else {
+        resp.http.X-Varnish-Cache = "MISS";
+    }
+}
+
 # sub vcl_error {
 #     set obj.http.Content-Type = "text/html; charset=utf-8";
 #     set obj.http.Retry-After = "5";
