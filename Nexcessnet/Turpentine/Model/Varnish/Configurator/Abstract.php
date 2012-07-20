@@ -44,12 +44,16 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     }
 
     protected function _getNormalizeHostTarget() {
-        $baseUrl = parse_url( Mage::getStoreConfig( 'web/url/unsecure_base_url' ) );
+        $baseUrl = parse_url( Mage::getBaseUrl() );
         if( isset( $baseUrl['port'] ) ) {
             return sprintf( '%s:%d', $baseUrl['host'], $baseUrl['port'] );
         } else {
             return $baseUrl['host'];
         }
+    }
+
+    protected function _getUrlBase() {
+        return parse_url( Mage::getBaseUrl(), PHP_URL_PATH );
     }
 
     protected function _vcl_backend( $name, $host, $port ) {
@@ -84,7 +88,7 @@ EOS;
     protected function _getAllKeys() {
         $keyNames = array( 'default_backend', 'purge_acl', 'normalize_host_target',
             'admin_name', 'normalize_encoding', 'normalize_user_agent',
-            'normalize_host' );
+            'normalize_host', 'url_base', 'url_excludes' );
         $keys = array();
         foreach( $keyNames as $key ) {
             $keys[$key] = '';

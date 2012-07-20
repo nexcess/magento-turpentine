@@ -90,7 +90,7 @@ sub vcl_recv {
         return (pass);
     }
 
-    if (req.url ~ "^/(?:(?:index|litespeed)\.php/)?{{admin_name}}") {
+    if (req.url ~ "^{{url_base}}(?:(?:index|litespeed)\.php/)?(?:{{admin_name}}|{{url_excludes}})") {
         return (pass);
     }
 
@@ -143,18 +143,21 @@ sub vcl_hash {
 #
 
 sub vcl_fetch {
-    if (beresp.http.Set-Cookie) {
-        if (beresp.http.Set-Cookie ~ "varnish_nocache=1") {
-            return (deliver);
-        } else {
-            unset beresp.http.Set-Cookie;
-            unset beresp.http.Cache-Control;
-            unset beresp.http.Expires;
-            unset beresp.http.Pragma;
-            unset beresp.http.Cache;
-            unset beresp.http.Age;
-            set beresp.ttl = 5m;
-        }
+    set req.grace = 30s;
+
+    if (req.http.Cookie ~ "varnish_nocache" ||
+        beresp.http.Set-Cookie ~ "varnish_nocache") {
+        return (deliver);
+    } else if (beresp.http.X-Varnish-Bypass) {
+        return (deliver);
+    } else {
+        unset beresp.http.Set-Cookie;
+        unset beresp.http.Cache-Control;
+        unset beresp.http.Expires;
+        unset beresp.http.Pragma;
+        unset beresp.http.Cache;
+        unset beresp.http.Age;
+        set beresp.ttl = 5m;
     }
 }
 

@@ -19,6 +19,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
             'purge_acl'     =>
                 $this->_vcl_acl( 'purge_trusted', array( 'localhost' ) ),
             'normalize_host_target' => $this->_getNormalizeHostTarget(),
+            'url_base'      => $this->_getUrlBase(),
         );
         foreach( $this->_getNormalizations() as $subr ) {
             $name = 'normalize_' . $subr;
