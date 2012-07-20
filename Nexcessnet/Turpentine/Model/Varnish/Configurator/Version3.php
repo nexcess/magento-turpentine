@@ -14,13 +14,16 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
     protected function _getTemplateVars() {
         $vars = array(
             'admin_name'    => $this->_getAdminFrontname(),
-            'default_backend'   => $this->_vcl_backend( 'default', 'localhost', '80' ),
-            'purge_acl'     => $this->_vcl_acl( 'purge_trusted', array( 'localhost' ) ),
+            'default_backend'   =>
+                $this->_vcl_backend( 'default', 'localhost', '80' ),
+            'purge_acl'     =>
+                $this->_vcl_acl( 'purge_trusted', array( 'localhost' ) ),
+            'normalize_host_target' => $this->_getNormalizeHostTarget(),
         );
         foreach( $this->_getNormalizations() as $subr ) {
             $name = 'normalize_' . $subr;
             $vars[$name] = $this->_vcl_call( $name );
         }
-        return $vars;
+        return array_merge( $this->_getAllKeys(), $vars );
     }
 }

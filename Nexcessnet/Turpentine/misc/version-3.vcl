@@ -39,7 +39,7 @@ sub normalize_encoding {
             set req.http.Accept-Encoding = "deflate";
         } else {
             # unkown algorithm
-            remove req.http.Accept-Encoding;
+            unset req.http.Accept-Encoding;
         }
     }
 }
@@ -148,6 +148,12 @@ sub vcl_fetch {
             return (deliver);
         } else {
             unset beresp.http.Set-Cookie;
+            unset beresp.http.Cache-Control;
+            unset beresp.http.Expires;
+            unset beresp.http.Pragma;
+            unset beresp.http.Cache;
+            unset beresp.http.Age;
+            set beresp.ttl = 5m;
         }
     }
 }
@@ -169,7 +175,7 @@ sub vcl_deliver {
     if (obj.hits > 0) {
         set resp.http.X-Varnish-Cache = "HIT: " + obj.hits;
     } else {
-        resp.http.X-Varnish-Cache = "MISS";
+        set resp.http.X-Varnish-Cache = "MISS";
     }
 }
 

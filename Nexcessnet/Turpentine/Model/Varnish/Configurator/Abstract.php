@@ -31,7 +31,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     }
 
     protected function _getNormalizations() {
-        return array( 'encoding', 'user_agent', 'host' );
+        return array( 'encoding', 'user_agent' );
     }
 
     protected function _getAdminFrontname() {
@@ -40,6 +40,15 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
         } else {
             return Mage::getConfig()->getNode(
                 'admin/routers/adminhtml/args/frontName' );
+        }
+    }
+
+    protected function _getNormalizeHostTarget() {
+        $baseUrl = parse_url( Mage::getStoreConfig( 'web/url/unsecure_base_url' ) );
+        if( isset( $baseUrl['port'] ) ) {
+            return sprintf( '%s:%d', $baseUrl['host'], $baseUrl['port'] );
+        } else {
+            return $baseUrl['host'];
         }
     }
 
@@ -70,5 +79,16 @@ EOS;
             'hosts' => implode( PHP_EOL, array_map( $fmtHost, $hosts ) ),
         );
         return $this->_formatTemplate( $tpl, $vars );
+    }
+
+    protected function _getAllKeys() {
+        $keyNames = array( 'default_backend', 'purge_acl', 'normalize_host_target',
+            'admin_name', 'normalize_encoding', 'normalize_user_agent',
+            'normalize_host' );
+        $keys = array();
+        foreach( $keyNames as $key ) {
+            $keys[$key] = '';
+        }
+        return $keys;
     }
 }
