@@ -56,6 +56,22 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
         return parse_url( Mage::getBaseUrl(), PHP_URL_PATH );
     }
 
+    protected function _getUrlExcludes() {
+        return implode( '|', array_merge( array( $this->_getAdminFrontname(), 'api' ),
+            array_map( 'trim', explode( PHP_EOL,
+                Mage::getStoreConfig( 'turpentine_control/urls/url_blacklist' ) ) ) ) );
+    }
+
+    protected function _getUrlIncludes() {
+        return implode( '|', array_map( 'trim', explode( PHP_EOL,
+            Mage::getStoreConfig( 'turpentine_control/urls/url_whitelist' ) ) ) );
+    }
+
+    protected function _getGetExcludes() {
+        return implode( '|', array_map( 'trim', explode( ',',
+            Mage::getStoreConfig( 'turpentine_control/params/get_params' ) ) ) );
+    }
+
     protected function _vcl_backend( $name, $host, $port ) {
         $tpl = <<<EOS
 backend {{name}} {
@@ -87,8 +103,8 @@ EOS;
 
     protected function _getAllKeys() {
         $keyNames = array( 'default_backend', 'purge_acl', 'normalize_host_target',
-            'admin_name', 'normalize_encoding', 'normalize_user_agent',
-            'normalize_host', 'url_base', 'url_excludes' );
+            'normalize_encoding', 'normalize_user_agent', 'url_includes',
+            'normalize_host', 'url_base', 'url_excludes', 'get_excludes' );
         $keys = array();
         foreach( $keyNames as $key ) {
             $keys[$key] = '';

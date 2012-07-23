@@ -13,13 +13,17 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
 
     protected function _getTemplateVars() {
         $vars = array(
-            'admin_name'    => $this->_getAdminFrontname(),
             'default_backend'   =>
-                $this->_vcl_backend( 'default', 'localhost', '80' ),
+                $this->_vcl_backend( 'default',
+                    Mage::getStoreConfig( 'turpentine_servers/backend/backend_host' ),
+                    Mage::getStoreConfig( 'turpentine_servers/backend/backend_port' ) ),
             'purge_acl'     =>
                 $this->_vcl_acl( 'purge_trusted', array( 'localhost' ) ),
             'normalize_host_target' => $this->_getNormalizeHostTarget(),
             'url_base'      => $this->_getUrlBase(),
+            'url_excludes'  => $this->_getUrlExcludes(),
+            'url_includes'  => $this->_getUrlIncludes(),
+            'get_excludes'  => $this->_getGetExcludes(),
         );
         foreach( $this->_getNormalizations() as $subr ) {
             $name = 'normalize_' . $subr;

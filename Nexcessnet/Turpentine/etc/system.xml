@@ -167,7 +167,7 @@
                         <url_whitelist translate="label" module="turpentine">
                             <label>URL Whitelist</label>
                             <frontend_type>textarea</frontend_type>
-                            <comment>List of regexes (one per line) to include URLs for caching</comment>
+                            <comment>List of URL regexes to try to include in caching, one per line</comment>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -176,7 +176,7 @@
                         <url_blacklist translate="label" module="turpentine">
                             <label>URL Blacklist</label>
                             <frontend_type>textarea</frontend_type>
-                            <comment>List of regexes (one per line) in exclude URLs from caching, applied after whitelist</comment>
+                            <comment>List of site section URLs to exclude from caching, applied after whitelist. The admin section and API are automatically included</comment>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>

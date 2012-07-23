@@ -90,21 +90,27 @@ sub vcl_recv {
         return (pass);
     }
 
-    if (req.url ~ "^{{url_base}}(?:(?:index|litespeed)\.php/)?(?:{{admin_name}}|{{url_excludes}})") {
-        return (pass);
-    }
-
     {{normalize_encoding}}
-
     {{normalize_user_agent}}
-
     {{normalize_host}}
 
-    if (req.http.cookie ~ "varnish_nocache") {
-        return (pass);
+    if (req.url ~ "^{{url_base}}(?:(?:index|litespeed)\.php/)?(?:{{url_includes}})") {
+        if (req.url ~ "^{{url_base}}(?:(?:index|litespeed)\.php/)?(?:{{url_excludes}})") {
+            return (pass);
+        } else {
+            if (req.http.cookie ~ "varnish_nocache") {
+                return (pass);
+            } else {
+                if (req.url ~ "(?:[?&](?:{{get_excludes}})(?=[&=]|$))") {
+                    return (pass);
+                } else {
+                    unset req.http.Cookie;
+                    return (lookup);
+                }
+            }
+        }
     } else {
-        unset req.http.Cookie;
-        return (lookup);
+        return (pass);
     }
 }
 
