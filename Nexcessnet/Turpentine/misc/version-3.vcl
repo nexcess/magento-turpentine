@@ -94,24 +94,22 @@ sub vcl_recv {
     {{normalize_user_agent}}
     {{normalize_host}}
 
-    if (req.url ~ "^{{url_base}}(?:(?:index|litespeed)\.php/)?(?:{{url_includes}})") {
+    if (req.url ~ "^{{url_base}}(?:(?:index|litespeed)\.php/)?") {
         if (req.url ~ "^{{url_base}}(?:(?:index|litespeed)\.php/)?(?:{{url_excludes}})") {
-            return (pass);
-        } else {
-            if (req.http.cookie ~ "varnish_nocache") {
+            if (req.url !~ "^{{url_base}}(?:(?:index|litespeed)\.php/)?(?:{{url_includes}})") {
                 return (pass);
-            } else {
-                if (req.url ~ "(?:[?&](?:{{get_excludes}})(?=[&=]|$))") {
-                    return (pass);
-                } else {
-                    unset req.http.Cookie;
-                    return (lookup);
-                }
             }
         }
-    } else {
-        return (pass);
+        if (req.http.Cookie ~ "varnish_nocache") {
+            return (pass);
+        }
+        if (req.url ~ "(?:[?&](?:{{get_excludes}})(?=[&=]|$))") {
+            return (pass);
+        }
+        unset req.http.Cookie;
+        return (lookup);
     }
+    #else it's not part of magento so do default handling
 }
 
 sub vcl_pipe {
