@@ -96,9 +96,7 @@ sub vcl_recv {
 
     if (req.url ~ "^{{url_base}}(?:(?:index|litespeed)\.php/)?") {
         if (req.url ~ "^{{url_base}}(?:(?:index|litespeed)\.php/)?(?:{{url_excludes}})") {
-            if (req.url !~ "^{{url_base}}(?:(?:index|litespeed)\.php/)?(?:{{url_includes}})") {
-                return (pass);
-            }
+            return (pass);
         }
         if (req.http.Cookie ~ "varnish_nocache") {
             return (pass);
@@ -109,7 +107,8 @@ sub vcl_recv {
         unset req.http.Cookie;
         return (lookup);
     }
-    #else it's not part of magento so do default handling
+    # else it's not part of magento so do default handling (doesn't help
+    # things underneath magento but can't detect that)
 }
 
 sub vcl_pipe {
@@ -147,7 +146,7 @@ sub vcl_hash {
 #
 
 sub vcl_fetch {
-    set req.grace = 30s;
+    set req.grace = 15s;
 
     if (req.http.Cookie ~ "varnish_nocache" ||
         beresp.http.Set-Cookie ~ "varnish_nocache") {
@@ -161,7 +160,7 @@ sub vcl_fetch {
         unset beresp.http.Pragma;
         unset beresp.http.Cache;
         unset beresp.http.Age;
-        set beresp.ttl = 5m;
+        set beresp.ttl = {{default_ttl}}s;
     }
 }
 

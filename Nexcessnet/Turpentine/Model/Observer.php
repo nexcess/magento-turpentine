@@ -3,9 +3,7 @@
 class Nexcessnet_Turpentine_Model_Observer {
     public function disableVarnishCaching( $observer ) {
         $cookie = Mage::getModel( 'core/cookie' );
-        if( $cookie->get( 'varnish_nocache' ) !== '1' ) {
-            $cookie->set( 'varnish_nocache', '1' );
-        }
+        $cookie->set( 'varnish_nocache', '1' );
         Mage::dispatchEvent( 'turpentine_varnish_disable' );
     }
 

@@ -15,10 +15,16 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
 
     public function flushAllAction() {
         Mage::dispatchEvent('turpentine_varnish_flush_all');
-        //flush cache
-        $this->_getSession()
-            ->addSuccess(Mage::helper('turpentine')
-                ->__('The Varnish cache has been flushed.'));
+        $varnishctl = Mage::getModel( 'turpentine/varnish_admin' );
+        if( $varnishctl->flushAll( $this->_getConfigurator() ) ) {
+            $this->_getSession()
+                ->addSuccess(Mage::helper('turpentine')
+                    ->__('The Varnish cache has been flushed.'));
+            } else {
+                $this->_getSession()
+                    ->addError(Mage::helper('turpentine')
+                        ->__('Error flushing the Varnish cache.'));
+            }
         $this->_redirect('*/*');
     }
 
@@ -60,7 +66,7 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
         return $this;
     }
 
-    protected function _generateVcl() {
+    protected function _getConfigurator() {
         switch( Mage::getStoreConfig( 'turpentine_servers/servers/version' ) ) {
             case '2':
                 $cfgr = Mage::getModel( 'turpentine/varnish_configurator_version2' );
@@ -70,8 +76,11 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
                 $cfgr = Mage::getModel( 'turpentine/varnish_configurator_version3' );
                 break;
         }
-        $vcl = $cfgr->generate();
-        return $vcl;
+        return $cfgr;
+    }
+
+    protected function _generateVcl() {
+        return $this->_getConfigurator()->generate();
     }
 
     protected function _getVclFilename() {

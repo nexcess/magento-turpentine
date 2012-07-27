@@ -23,7 +23,9 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
         $needles = array_map( create_function( '$k', 'return "{{".$k."}}";' ),
             array_keys( $vars ) );
         $replacements = array_values( $vars );
-        return str_replace( $needles, $replacements, $template );
+        // do replacements, then delete unused template vars
+        return preg_replace( '~{{[^}]+}}~', '',
+            str_replace( $needles, $replacements, $template ) );
     }
 
     protected function _vcl_call( $subroutine ) {
@@ -52,8 +54,13 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
         }
     }
 
+    public function getUrlBase() {
+        return $this->_getUrlBase();
+    }
+
     protected function _getUrlBase() {
-        return parse_url( Mage::getBaseUrl(), PHP_URL_PATH );
+        return str_replace( 'index.php/', '',
+            parse_url( Mage::getBaseUrl(), PHP_URL_PATH ) );
     }
 
     protected function _getUrlExcludes() {
@@ -65,6 +72,10 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     protected function _getUrlIncludes() {
         return implode( '|', array_map( 'trim', explode( PHP_EOL,
             Mage::getStoreConfig( 'turpentine_control/urls/url_whitelist' ) ) ) );
+    }
+
+    protected function _getDefaultTtl() {
+        return trim( Mage::getStoreConfig( 'turpentine_control/ttls/default_ttl' ) );
     }
 
     protected function _getGetExcludes() {
@@ -99,16 +110,5 @@ EOS;
             'hosts' => implode( PHP_EOL, array_map( $fmtHost, $hosts ) ),
         );
         return $this->_formatTemplate( $tpl, $vars );
-    }
-
-    protected function _getAllKeys() {
-        $keyNames = array( 'default_backend', 'purge_acl', 'normalize_host_target',
-            'normalize_encoding', 'normalize_user_agent', 'url_includes',
-            'normalize_host', 'url_base', 'url_excludes', 'get_excludes' );
-        $keys = array();
-        foreach( $keyNames as $key ) {
-            $keys[$key] = '';
-        }
-        return $keys;
     }
 }

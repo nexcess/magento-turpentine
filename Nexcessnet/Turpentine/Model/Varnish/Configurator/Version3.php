@@ -24,11 +24,12 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
             'url_excludes'  => $this->_getUrlExcludes(),
             'url_includes'  => $this->_getUrlIncludes(),
             'get_excludes'  => $this->_getGetExcludes(),
+            'default_ttl'   => $this->_getDefaultTtl(),
         );
         foreach( $this->_getNormalizations() as $subr ) {
             $name = 'normalize_' . $subr;
             $vars[$name] = $this->_vcl_call( $name );
         }
-        return array_merge( $this->_getAllKeys(), $vars );
+        return $vars;
     }
 }
