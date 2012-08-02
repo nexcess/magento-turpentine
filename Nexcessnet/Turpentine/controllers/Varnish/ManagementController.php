@@ -20,21 +20,31 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
             $this->_getSession()
                 ->addSuccess(Mage::helper('turpentine')
                     ->__('The Varnish cache has been flushed.'));
-            } else {
-                $this->_getSession()
-                    ->addError(Mage::helper('turpentine')
-                        ->__('Error flushing the Varnish cache.'));
-            }
+        } else {
+            $this->_getSession()
+                ->addError(Mage::helper('turpentine')
+                    ->__('Error flushing the Varnish cache.'));
+        }
         $this->_redirect('*/*');
     }
 
     public function flushPartialAction() {
+        $postData = $this->getRequest()->getPost();
+        if( !isset( $postData['pattern'] ) ) {
+            Mage::throwException( $this->__( 'Missing URL post data' ) );
+        }
+        $pattern = $postData['pattern'];
         Mage::dispatchEvent('turpentine_varnish_flush_partial');
-        //flush cache
-        $url = 'MISSING';
-        $this->_getSession()->addSuccess(
-            Mage::helper('turpentine')->__('The Varnish cache for (' .
-                $url . ') has been flushed.'));
+        $varnishctl = Mage::getModel( 'turpentine/varnish_admin' );
+        if( $varnishctl->flushUrl( $this->_getConfigurator(), $pattern ) ) {
+            $this->_getSession()
+                ->addSuccess(Mage::helper('turpentine')
+                    ->__('The Varnish cache has been flushed for URLs matching: ' . $pattern ) );
+        } else {
+            $this->_getSession()
+                ->addError(Mage::helper('turpentine')
+                    ->__('Error flushing the Varnish cache.'));
+        }
         $this->_redirect('*/*');
     }
 

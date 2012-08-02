@@ -98,7 +98,7 @@ sub vcl_recv {
         if (req.url ~ "^{{url_base}}(?:(?:index|litespeed)\.php/)?(?:{{url_excludes}})") {
             return (pass);
         }
-        if (req.http.Cookie ~ "varnish_nocache") {
+        if (req.http.Cookie ~ "{{no_cache_cookies}}") {
             return (pass);
         }
         if (req.url ~ "(?:[?&](?:{{get_excludes}})(?=[&=]|$))") {
@@ -148,12 +148,16 @@ sub vcl_hash {
 sub vcl_fetch {
     set req.grace = 15s;
 
-    if (req.http.Cookie ~ "varnish_nocache" ||
-        beresp.http.Set-Cookie ~ "varnish_nocache") {
+    if (req.http.Cookie ~ "{{no_cache_cookies}}" ||
+        beresp.http.Set-Cookie ~ "{{no_cache_cookies}}") {
         return (deliver);
     } else if (beresp.http.X-Varnish-Bypass) {
-        return (deliver);
+        set beresp.ttl = 300s;
+        return (hit_for_pass);
     } else {
+        if({{debug_headers}}) {
+            set beresp.http.X-Varnish-Set-Cookie = beresp.http.Set-Cookie;
+        }
         unset beresp.http.Set-Cookie;
         unset beresp.http.Cache-Control;
         unset beresp.http.Expires;
@@ -177,11 +181,14 @@ sub vcl_fetch {
 #     return (deliver);
 # }
 
+#https://www.varnish-cache.org/trac/wiki/VCLExampleHitMissHeader
 sub vcl_deliver {
-    if (obj.hits > 0) {
-        set resp.http.X-Varnish-Cache = "HIT: " + obj.hits;
-    } else {
-        set resp.http.X-Varnish-Cache = "MISS";
+    if ({{debug_headers}}) {
+        if (obj.hits > 0) {
+            set resp.http.X-Varnish-Hits = "HIT: " + obj.hits;
+        } else {
+            set resp.http.X-Varnish-Hits = "MISS";
+        }
     }
 }
 

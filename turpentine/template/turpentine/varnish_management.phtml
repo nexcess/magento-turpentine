@@ -29,7 +29,7 @@
         <tr>
             <td>
                 <h3><?php echo Mage::helper('turpentine')
-                        ->__('Varnish Management') ?></h3>
+                        ->__('Varnish Cache Management') ?></h3>
             </td>
             <td class="form-buttons"></td>
          </tr>
@@ -56,10 +56,10 @@
         </td>
     </tr>
     <tr>
+        <form method="post" action="<?php echo $this->getFlushPartialUrl() ?>">
         <td class="scope-label">
             <button
-                onclick="setLocation('<?php echo $this->getFlushPartialUrl()?>')"
-                type="button"
+                type="submit"
                 class="scalable delete">
                 <span>
                     <span>
@@ -70,10 +70,35 @@
             </button>
         </td>
         <td class="scope-label">
+            <input
+                type="text"
+                name="pattern"
+                value=".*"
+                class="input-text"
+            </input>
+            <br/>
             <?php echo Mage::helper('turpentine')
-                ->__('Flush a specific URL pattern.')?>
+                ->__('Flush URLs that match a regular expression (relative to Magento base URL, cannot include backslashes)') ?>
         </td>
+         <input
+            name="form_key"
+            type="hidden"
+            value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+        </form>
     </tr>
+</table>
+<div class="content-header">
+    <table cellspacing="0">
+        <tr>
+            <td>
+                <h3><?php echo Mage::helper('turpentine')
+                        ->__('Varnish Config Management') ?></h3>
+            </td>
+            <td class="form-buttons"></td>
+         </tr>
+    </table>
+</div>
+<table class="form-list">
     <tr>
         <td class="scope-label">
             <button
