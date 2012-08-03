@@ -9,6 +9,7 @@
 {{purge_acl}}
 
 ## Custom Subroutines
+{{sub_normalize_user_agent}}
 #https://www.varnish-cache.org/trac/wiki/VCLExampleNormalizeUserAgent
 sub normalize_user_agent {
     if (req.http.User-Agent ~ "MSIE") {
@@ -30,6 +31,7 @@ sub normalize_user_agent {
     }
 }
 
+{{sub_normalize_encoding}}
 #https://www.varnish-cache.org/trac/wiki/VCLExampleNormalizeAcceptEncoding
 sub normalize_encoding {
     if (req.http.Accept-Encoding) {
@@ -44,6 +46,7 @@ sub normalize_encoding {
     }
 }
 
+{{sub_normalize_host}}
 sub normalize_host {
     if (req.http.Host) {
         if(req.http.Host !~ "^{{normalize_host_target}}$") {
@@ -98,11 +101,13 @@ sub vcl_recv {
         if (req.url ~ "^{{url_base}}(?:(?:index|litespeed)\.php/)?(?:{{url_excludes}})") {
             return (pass);
         }
-        if (req.http.Cookie ~ "{{no_cache_cookies}}") {
+        if (req.http.Cookie ~ "{{cookie_excludes}}") {
             return (pass);
         }
-        if (req.url ~ "(?:[?&](?:{{get_excludes}})(?=[&=]|$))") {
-            return (pass);
+        if ({{enable_get_excludes}}) {
+            if (req.url ~ "(?:[?&](?:{{get_excludes}})(?=[&=]|$))") {
+                return (pass);
+            }
         }
         unset req.http.Cookie;
         return (lookup);
@@ -148,8 +153,8 @@ sub vcl_hash {
 sub vcl_fetch {
     set req.grace = 15s;
 
-    if (req.http.Cookie ~ "{{no_cache_cookies}}" ||
-        beresp.http.Set-Cookie ~ "{{no_cache_cookies}}") {
+    if (req.http.Cookie ~ "{{cookie_excludes}}" ||
+        beresp.http.Set-Cookie ~ "{{cookie_excludes}}") {
         return (deliver);
     } else if (beresp.http.X-Varnish-Bypass) {
         set beresp.ttl = 300s;

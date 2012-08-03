@@ -5,12 +5,22 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
 
     const VCL_TEMPLATE_FILE = 'version-3.vcl';
 
+    /**
+     * Generate the Varnish 3.0-compatible VCL
+     *
+     * @return string
+     */
     public function generate() {
         $tplFile = $this->_getVclTemplateFilename( self::VCL_TEMPLATE_FILE );
         $tpl = file_get_contents( $tplFile );
         return $this->_formatTemplate( $tpl, $this->_getTemplateVars() );
     }
 
+    /**
+     * Build the list of template variables to apply to the VCL template
+     *
+     * @return array
+     */
     protected function _getTemplateVars() {
         $vars = array(
             'default_backend'   =>
@@ -22,7 +32,6 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
             'normalize_host_target' => $this->_getNormalizeHostTarget(),
             'url_base'      => $this->_getUrlBase(),
             'url_excludes'  => $this->_getUrlExcludes(),
-            'url_includes'  => $this->_getUrlIncludes(),
             'get_excludes'  => $this->_getGetExcludes(),
             'default_ttl'   => $this->_getDefaultTtl(),
             'no_cache_cookies'  => implode( '|', array_merge( array(
