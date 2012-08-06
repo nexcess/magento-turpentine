@@ -44,6 +44,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
             $resp = $client->request( $method );
             Zend_Uri::setConfig( array( 'allow_unwise' => false ) );
         }
+        Mage::dispatchEvent( 'varnish_cache_purge' );
         return $resp;
     }
 }
