@@ -151,7 +151,7 @@ sub vcl_hash {
 #
 
 sub vcl_fetch {
-    set req.grace = 15s;
+    set req.grace = {{grace_period}}s;
 
     if (req.http.Cookie ~ "{{cookie_excludes}}" ||
         beresp.http.Set-Cookie ~ "{{cookie_excludes}}") {
@@ -169,6 +169,7 @@ sub vcl_fetch {
         unset beresp.http.Pragma;
         unset beresp.http.Cache;
         unset beresp.http.Age;
+        {{url_ttls}}
         set beresp.ttl = {{default_ttl}}s;
     }
 }
