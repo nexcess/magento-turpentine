@@ -28,6 +28,15 @@ class Nexcessnet_Turpentine_Block_Management
     }
 
     /**
+     * Get the applyConfig URL
+     *
+     * @return string
+     */
+    public function getApplyConfigUrl() {
+        return $this->getUrl( '*/*/applyConfig' );
+    }
+
+    /**
      * Get the saveConfig URL
      *
      * @return string

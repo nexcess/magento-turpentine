@@ -5,7 +5,7 @@
  */
 class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
 
-    //from vcli.h
+    //possible command return codes, from vcli.h
     const CODE_SYNTAX       = 100;
     const CODE_UNKNOWN      = 101;
     const CODE_UNIMPL       = 102;
@@ -23,15 +23,18 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
     //worth the trouble to dynamically detect at runtime
     const CLI_CMD_LENGTH_LIMIT  = 8192;
 
+    /**
+     * VCL config versions, should match config select values
+     */
+    static protected $_VERSIONS = array( '2.1', '3.0' );
+
     protected $_varnishConn = null;
     protected $_host = '127.0.0.1';
     protected $_port = 6082;
     protected $_private = null;
     protected $_authSecret = null;
     protected $_timeout = 5;
-    protected $_version = '3.0';
-
-    static protected $_VERSIONS = array( '2.1', '3.0' );
+    protected $_version = null; //auto-detect
 
     public function __construct( array $options=array() ) {
         foreach( $options as $key => $value ) {
@@ -88,25 +91,56 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         return call_user_func_array( array( $this, '_command' ), $args );
     }
 
+    /**
+     * Set the Varnish host name/ip to connect to
+     *
+     * @param string $host hostname or ip
+     */
     public function setHost( $host ) {
+        $this->_close();
         $this->_host = $host;
+        return $this;
     }
 
+    /**
+     * Set the Varnish admin port
+     *
+     * @param int $port
+     */
     public function setPort( $port ) {
+        $this->_close();
         $this->_port = (int)$port;
+        return $this;
     }
 
-    public function setAuthSecret( $authSecret ) {
+    /**
+     * Set the Varnish admin auth secret, use null to indicate there isn't one
+     *
+     * @param string $authSecret
+     */
+    public function setAuthSecret( $authSecret=null ) {
         $this->_authSecret = $authSecret;
+        return $this;
     }
 
+    /**
+     * Set the timeout to connect to the varnish instance
+     *
+     * @param int $timeout
+     */
     public function setTimeout( $timeout ) {
         $this->_timeout = (int)$timeout;
         if( !is_null( $this->_varnishConn ) ) {
             stream_set_timeout( $this->_varnishConn, $this->_timeout );
         }
+        return $this;
     }
 
+    /**
+     * Explicitly set the version of the varnish instance we're connecting to
+     *
+     * @param string $version version from $_VERSIONS
+     */
     public function setVersion( $version ) {
         if( in_array( $version, self::$_VERSIONS ) ) {
             $this->_version = $version;
@@ -115,10 +149,20 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         }
     }
 
+    /**
+     * Check if we're connected to Varnish
+     *
+     * @return boolean
+     */
     public function isConnected() {
         return !is_null( $this->_varnishConn );
     }
 
+    /**
+     * Find out what version mode we're running in
+     *
+     * @return string
+     */
     public function getVersion() {
         if( is_null( $this->_version ) ) {
             $this->_version = $this->_determineVersion();
@@ -126,11 +170,19 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         return $this->_version;
     }
 
+    /**
+     * Stop the Varnish instance
+     */
     public function quit() {
         $this->_command( 'quit', self::CODE_CLOSE );
         $this->close();
     }
 
+    /**
+     * Check if Varnish has a child running or not
+     *
+     * @return boolean
+     */
     public function status() {
         $response = $this->_command( 'status' );
         if( !preg_match( '~Child in state (\w+)~', $response['text'], $match ) ) {
@@ -140,6 +192,11 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         }
     }
 
+    /**
+     * Stop the running child (if it is running)
+     *
+     * @return $this
+     */
     public function stop() {
         if( $this->status() ) {
             $this->_command( 'stop' );
@@ -147,59 +204,21 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         return $this;
     }
 
+    /**
+     * Start running the Varnish child
+     *
+     * @return $this
+     */
     public function start() {
         $this->_command( 'start' );
         return $this;
     }
-/*
-    public function stats() {
-        return $this->_command( 'stats' );
-    }
 
-    public function vcl_load( $configname, $filename ) {
-        return $this->_command( 'vcl.load', self::CODE_OK, $configname, $filename );
-    }
-
-    public function vcl_inline( $configname, $vclstring ) {
-        return $this->_command( 'vcl.inline', self::CODE_OK, $configname, $vclstring );
-    }
-
-    public function vcl_use( $configname ) {
-        return $this->_command( 'vcl.use', self::CODE_OK, $configname );
-    }
-
-    public function vcl_discard( $configname ) {
-        return $this->_command( 'vcl.discard', self::CODE_OK, $configname );
-    }
-
-    public function vcl_list() {
-        return $this->_command( 'vcl.list' );
-    }
-
-    public function vcl_show( $configname ) {
-        return $this->_command( 'vcl.show', self::CODE_OK, $configname );
-    }
-
-    public function purge_url( $regexp ) {
-        return $this->_command(x, self::CODE_OK, $regexp );
-    }
-
-    public function purge() {
-        return $this->_command(x, self::CODE_OK );
-    }
-
-    public function purge_list() {
-        return $this->_command( 'purge.list' );
-    }
-
-    public function param_show( $param ) {
-        return $this->_command( 'param.show', self::CODE_OK, $param );
-    }
-
-    public function param_set( $param, $value ) {
-        return $this->_command( 'param.set', self::CODE_OK, $param, $value );
-    }
-*/
+    /**
+     * Establish a connection to the configured Varnish instance
+     *
+     * @return array
+     */
     protected function _connect() {
         $this->_varnishConn = fsockopen( $this->_host, $this->_port, $errno,
             $errstr, $this->_timeout );
@@ -227,13 +246,25 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         return $banner;
     }
 
+    /**
+     * Close the connection (if we're connected)
+     *
+     * @return $this
+     */
     protected function _close() {
-        if( !is_null( $this->_varnishConn ) ) {
+        if( $this->isConnected() ) {
             fclose( $this->_varnishConn );
             $this->_varnishConn = null;
         }
+        return $this;
     }
 
+    /**
+     * Write data to the Varnish instance, a newline is automatically appended
+     *
+     * @param  string $data data to write
+     * @return $this
+     */
     protected function _write( $data ) {
         if( is_null( $this->_varnishConn ) ) {
             $this->_connect();
@@ -250,6 +281,11 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         return $this;
     }
 
+    /**
+     * Read a response from Varnish instance
+     *
+     * @return array tuple of the response (code, text)
+     */
     protected function _read() {
         $code = null;
         $len = -1;
@@ -281,6 +317,13 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         }
     }
 
+    /**
+     * [_command description]
+     * @param  string  $verb       command name
+     * @param  integer $okCode=200 code that indicates command was successful
+     * @param  string  ...         command args
+     * @return array
+     */
     protected function _command( $verb, $okCode=200 ) {
         $params = func_get_args();
         //remove $verb
@@ -307,6 +350,12 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         }
     }
 
+    /**
+     * Handle v2.1 <> v3.0 command compatibility
+     *
+     * @param  string $verb command to check
+     * @return string
+     */
     protected function _translateCommandMethod( $verb ) {
         $command = str_replace( '_', '.', $verb );
         switch( $this->getVersion() ) {
@@ -323,6 +372,11 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         return $command;
     }
 
+    /**
+     * Guess the Varnish version based on the availability of the 'banner' command
+     *
+     * @return string
+     */
     protected function _determineVersion() {
         $this->_write( 'banner' );
         $result = $this->_read();

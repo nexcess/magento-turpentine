@@ -102,6 +102,25 @@
     <tr>
         <td class="scope-label">
             <button
+                onclick="setLocation('<?php echo $this->getApplyConfigUrl()?>')"
+                type="button"
+                class="scalable save">
+                <span>
+                    <span>
+                        <span><?php echo Mage::helper('turpentine')
+                                ->__('Apply Varnish Config') ?></span>
+                    </span>
+                </span>
+            </button>
+        </td>
+        <td class="scope-label">
+            <?php echo Mage::helper('turpentine')
+                ->__('Try to apply config to the running Varnish instance')?>
+        </td>
+    </tr>
+    <tr>
+        <td class="scope-label">
+            <button
                 onclick="setLocation('<?php echo $this->getSaveConfigUrl()?>')"
                 type="button"
                 class="scalable save">

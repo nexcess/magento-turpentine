@@ -19,13 +19,6 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
             ->renderLayout();
     }
 
-    public function testAction() {
-        $socket = Mage::getModel( 'turpentine/varnish_admin_socket' );
-        $config = $this->_getConfigurator()->generate();
-        $configHash = hash( 'sha256', $config );
-        var_dump( $socket->vcl_inline( $configHash, $config ) );
-    }
-
     /**
      * Full flush action, flushes all Magento URLs in Varnish cache
      *
@@ -73,6 +66,30 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
     }
 
     /**
+     * Load the current VCL in varnish and activate it
+     *
+     * @return null
+     */
+    public function applyConfigAction() {
+        Mage::dispatchEvent('turpentine_varnish_apply_config');
+        $vcl = $this->_getConfigurator()->generate();
+        $vclName = hash( 'sha256', microtime() );
+        $socket = Mage::getModel( 'turpentine/varnish_admin_socket' );
+        try {
+            $socket->vcl_inline( $vclName, $vcl );
+            $socket->vcl_use( $vclName );
+            $this->_getSession()
+                ->addSuccess( Mage::helper( 'turpentine' )
+                    ->__( 'VCL successfully applied' ) );
+        } catch( Mage_Core_Exception $e ) {
+            $this->_getSession()
+                ->addError( Mage::helper( 'turpentine' )
+                    ->__( 'Failed to apply the VCL' ) );
+        }
+        $this->_redirect('*/*');
+    }
+
+    /**
      * Save the config to the configured file action
      *
      * @return null
@@ -80,7 +97,6 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
     public function saveConfigAction() {
         Mage::dispatchEvent('turpentine_varnish_save_config');
         $cfgr = $this->_getConfigurator();
-        $vcl = $cfgr->generate();
         $result = $cfgr->save( $cfgr->generate() );
         if( $result[0] ) {
             $this->_getSession()
@@ -119,10 +135,10 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
      */
     protected function _getConfigurator() {
         switch( Mage::getStoreConfig( 'turpentine_servers/servers/version' ) ) {
-            case '2':
+            case '2.1':
                 $cfgr = Mage::getModel( 'turpentine/varnish_configurator_version2' );
                 break;
-            case '3':
+            case '3.0':
             default:
                 $cfgr = Mage::getModel( 'turpentine/varnish_configurator_version3' );
                 break;

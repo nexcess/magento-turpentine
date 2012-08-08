@@ -119,13 +119,18 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
         }
     }
 
-    public function getUrlBase() {
-        return $this->_getUrlBase();
-    }
-
-    protected function _getUrlBase() {
-        return str_replace( 'index.php/', '',
-            parse_url( Mage::getBaseUrl(), PHP_URL_PATH ) );
+    /**
+     * Get the base url path regex
+     *
+     * ex: base_url: http://example.com/magento/
+     *     path_regex: /magento/(?:(?:index|litespeed)\.php/)?
+     *
+     * @return string
+     */
+    public function getBaseUrlPathRegex() {
+        return parse_url(
+                Mage::getStoreConfig( 'web/unsecure/base_url' ), PHP_URL_PATH ) .
+            '(?:(?:index|litespeed)\\.php/)?';
     }
 
     /**
