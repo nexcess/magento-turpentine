@@ -3,7 +3,7 @@
 /**
  * Based heavily on Tim Whitlock's VarnishAdminSocket.php from php-varnish
  */
-abstract class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
+class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
 
     //from vcli.h
     const CODE_SYNTAX       = 100;
@@ -19,6 +19,9 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
     const CODE_CLOSE        = 500;
 
     const READ_CHUNK_SIZE   = 1024;
+    //varnish default, can be changed at Varnish startup time but it's probably not
+    //worth the trouble to dynamically detect at runtime
+    const CLI_CMD_LENGTH_LIMIT  = 8192;
 
     protected $_varnishConn = null;
     protected $_host = '127.0.0.1';
@@ -26,11 +29,63 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
     protected $_private = null;
     protected $_authSecret = null;
     protected $_timeout = 5;
+    protected $_version = '3.0';
 
+    static protected $_VERSIONS = array( '2.1', '3.0' );
+
+    public function __construct( array $options=array() ) {
+        foreach( $options as $key => $value ) {
+            switch( $key ) {
+                case 'host':
+                    $this->setHost( $value );
+                    break;
+                case 'port':
+                    $this->setPort( $value );
+                    break;
+                case 'auth_secret':
+                    $this->setAuthSecret( $value );
+                    break;
+                case 'timeout':
+                    $this->setTimeout( $value );
+                    break;
+                case 'version':
+                    $this->setVersion( $version );
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Provide simple Varnish methods
+     *
+     * Methods provided:
+            help [command]
+            ping [timestamp]
+            auth response
+            banner
+            stats
+            vcl.load <configname> <filename>
+            vcl.inline <configname> <quoted_VCLstring>
+            vcl.use <configname>
+            vcl.discard <configname>
+            vcl.list
+            vcl.show <configname>
+            param.show [-l] [<param>]
+            param.set <param> <value>
+            purge.url <regexp>
+            purge <field> <operator> <arg> [&& <field> <oper> <arg>]...
+            purge.list
+     *
+     * @param  string $name method name
+     * @param  array $args method args
+     * @return array
+     */
     public function __call( $name, $args ) {
         array_unshift( $args, self::CODE_OK );
-        array_unshift( $args, str_replace( '_', '.', $name ) );
-        call_user_func_array( array( $this, '_command' ), $args );
+        array_unshift( $args, $this->_translateCommandMethod( $name ) );
+        return call_user_func_array( array( $this, '_command' ), $args );
     }
 
     public function setHost( $host ) {
@@ -38,7 +93,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
     }
 
     public function setPort( $port ) {
-        $this->_port = $port;
+        $this->_port = (int)$port;
     }
 
     public function setAuthSecret( $authSecret ) {
@@ -46,10 +101,29 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
     }
 
     public function setTimeout( $timeout ) {
-        $this->_timeout = $timeout;
+        $this->_timeout = (int)$timeout;
         if( !is_null( $this->_varnishConn ) ) {
             stream_set_timeout( $this->_varnishConn, $this->_timeout );
         }
+    }
+
+    public function setVersion( $version ) {
+        if( in_array( $version, self::$_VERSIONS ) ) {
+            $this->_version = $version;
+        } else {
+            Mage::throwException( 'Unsupported Varnish version: ' . $version );
+        }
+    }
+
+    public function isConnected() {
+        return !is_null( $this->_varnishConn );
+    }
+
+    public function getVersion() {
+        if( is_null( $this->_version ) ) {
+            $this->_version = $this->_determineVersion();
+        }
+        return $this->_version;
     }
 
     public function quit() {
@@ -77,7 +151,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         $this->_command( 'start' );
         return $this;
     }
-
+/*
     public function stats() {
         return $this->_command( 'stats' );
     }
@@ -125,13 +199,14 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
     public function param_set( $param, $value ) {
         return $this->_command( 'param.set', self::CODE_OK, $param, $value );
     }
-
+*/
     protected function _connect() {
         $this->_varnishConn = fsockopen( $this->_host, $this->_port, $errno,
             $errstr, $this->_timeout );
         if( !is_resource( $this->_varnishConn ) ) {
-            //raise magento exception
-            throw new Exception();
+            Mage::throwException( sprintf(
+                'Failed to connect to Varnish on %s:%d',
+                $this->_host, $this->_port ) );
         }
 
         stream_set_blocking( $this->_varnishConn, 1 );
@@ -145,7 +220,8 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
                 $this->_authSecret, $challenge ) );
             $banner = $this->_command( 'auth', self::CODE_OK, $response );
         } else if( $banner['code'] !== self::CODE_OK ) {
-            //throw exception
+            Mage::throwException( 'Varnish admin authentication failed: ' .
+                $banner['text'] );
         }
 
         return $banner;
@@ -162,10 +238,14 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         if( is_null( $this->_varnishConn ) ) {
             $this->_connect();
         }
-        $data .= PHP_EOL;
+        $data = rtrim( $data ) . PHP_EOL;
+        if( strlen( $data ) >= self::CLI_CMD_LENGTH_LIMIT ) {
+            Mage::throwException( 'Varnish data to write over length limit' );
+        }
         $byteCount = fputs( $this->_varnishConn, $data );
         if( $byteCount !== strlen( $data ) ) {
-            //write error, throw exception
+            Mage::throwException( sprintf( 'Varnish socket write error: %d != %d',
+                $byteCount, strlen( $data ) ) );
         }
         return $this;
     }
@@ -178,7 +258,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
             if( empty( $response ) ) {
                 $streamMeta = stream_get_meta_data( $this->_varnishConn );
                 if( $streamMeta['timed_out'] ) {
-                    //timeout, raise exception
+                    Mage::throwException( 'Varnish admin socket timeout' );
                 }
             }
             if( preg_match( '~^(\d{3}) (\d+)~', $response, $match ) ) {
@@ -189,7 +269,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         }
 
         if( is_null( $code ) ) {
-            //raise exception
+            Mage::throwException( 'Failed to read response code from Varnish' );
         } else {
             $response = array( 'code' => $code, 'text' => '' );
             while( !feof( $this->_varnishConn ) &&
@@ -208,15 +288,50 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         //remove $okCode (if it exists)
         array_shift( $params );
         $cleanedParams = array();
+        $useHereDoc = false;
         foreach( $params as $param ) {
-            $cleanedParams[] = '"' . addcslashes( $param, "\"\n" ) . '"';
+            $cp = addcslashes( $param, "\"\\" );
+            $cp = str_replace( PHP_EOL, '\n', $cp );
+            $cleanedParams[] = sprintf( '"%s"', $cp );
         }
-        $data = implode( ' ', array_merge( array( $verb ), $cleanedParams ) );
+        $data = implode( ' ', array_merge(
+            array( sprintf( '"%s"', $verb ) ),
+            $cleanedParams ) );
         $response = $this->_write( $data )->_read();
         if( $response['code'] !== $okCode && !is_null( $okCode ) ) {
-            //throw exception
+            Mage::throwException( sprintf(
+                "Got unexpected response code from Varnish: %d\n%s",
+                $response['code'], $response['text'] ) );
         } else {
             return $response;
+        }
+    }
+
+    protected function _translateCommandMethod( $verb ) {
+        $command = str_replace( '_', '.', $verb );
+        switch( $this->getVersion() ) {
+            case '2.1':
+                $command = str_replace( 'ban', 'purge', $command );
+                break;
+            case '3.0':
+                $command = str_replace( 'purge', 'ban', $command );
+                break;
+            default:
+                Mage::throwException( 'Unrecognized Varnish version: ' .
+                    $this->_version );
+        }
+        return $command;
+    }
+
+    protected function _determineVersion() {
+        $this->_write( 'banner' );
+        $result = $this->_read();
+        if( $result['code'] === self::CODE_OK ) {
+            return '3.0';
+        } elseif( $result['code'] === self::CODE_UNKNOWN ) {
+            return '2.1';
+        } else {
+            Mage::throwException( 'Unable to determine Varnish version' );
         }
     }
 }

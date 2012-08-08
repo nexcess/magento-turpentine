@@ -175,6 +175,31 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     }
 
     /**
+     * Remove empty and commented out lines from the generated VCL
+     *
+     * @param  string $dirtyVcl generated vcl
+     * @return string
+     */
+    protected function _cleanVcl( $dirtyVcl ) {
+        return implode( PHP_EOL,
+            array_filter(
+                explode( PHP_EOL, $dirtyVcl ),
+                array( $this, '_cleanVclHelper' )
+            )
+        );
+    }
+
+    /**
+     * Helper to filter out blank/commented lines for VCL cleaning
+     *
+     * @param  string $line
+     * @return bool
+     */
+    protected function _cleanVclHelper( $line ) {
+        return trim( $line ) && substr( trim( $line ), 0, 1 ) != '#';
+    }
+
+    /**
      * Format a VCL backend declaration
      *
      * @param  string $name name of the backend

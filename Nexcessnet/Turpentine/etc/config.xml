@@ -23,7 +23,7 @@
         <turpentine_control>
             <general>
                 <enable>1</enable>
-            </general>
+            </general>purge_list
             <ttls>
                 <default_ttl>3600</default_ttl>
                 <url_ttls>^/(?:index\.php/?)?$,300</url_ttls>

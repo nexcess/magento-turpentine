@@ -12,8 +12,9 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
      */
     public function generate() {
         $tplFile = $this->_getVclTemplateFilename( self::VCL_TEMPLATE_FILE );
-        $tpl = file_get_contents( $tplFile );
-        return $this->_formatTemplate( $tpl, $this->_getTemplateVars() );
+        $vcl = $this->_formatTemplate( file_get_contents( $tplFile ),
+            $this->_getTemplateVars() );
+        return $this->_cleanVcl( $vcl );
     }
 
     /**
@@ -34,10 +35,12 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
             'url_excludes'  => $this->_getUrlExcludes(),
             'get_excludes'  => $this->_getGetExcludes(),
             'default_ttl'   => $this->_getDefaultTtl(),
-            'no_cache_cookies'  => implode( '|', array_merge( array(
+            'enable_get_excludes'   => 'true',
+            'cookie_excludes'  => implode( '|', array_merge( array(
                 Mage::helper( 'turpentine' )->getNoCacheCookieName(),
                 'adminhtml' ) ) ),
             'debug_headers' => 'true',
+            'grace_period'  => '15',
         );
         foreach( $this->_getNormalizations() as $subr ) {
             $name = 'normalize_' . $subr;
