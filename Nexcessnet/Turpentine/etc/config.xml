@@ -12,21 +12,21 @@
                 <backend_port>8080</backend_port>
             </backend>
             <servers>
-                <version>3.0.x</version>
+                <version>Auto</version>
                 <server_list>127.0.0.1:6082</server_list>
                 <config_file>{{root_dir}}/var/default.vcl</config_file>
             </servers>
             <debug>
-                <headers>0</headers>
+                <headers>1</headers>
             </debug>
         </turpentine_servers>
         <turpentine_control>
             <general>
                 <enable>1</enable>
-            </general>purge_list
+            </general>
             <ttls>
                 <default_ttl>3600</default_ttl>
-                <url_ttls>^/(?:index\.php/?)?$,300</url_ttls>
+                <url_ttls>$,300</url_ttls>
             </ttls>
             <urls>
                 <url_whitelist>.*</url_whitelist>

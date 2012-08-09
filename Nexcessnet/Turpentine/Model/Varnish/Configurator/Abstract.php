@@ -32,6 +32,24 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     }
 
     /**
+     * Get the list of turpentine/varnish_admin_socket models configured in
+     * the server list
+     *
+     * @return array
+     */
+    public function getSockets() {
+        $sockets = array();
+        foreach( explode( PHP_EOL,
+                Mage::getStoreConfig( 'turpentine_servers/servers/server_list' ) )
+                as $server ) {
+            $parts = explode( ':', $server );
+            $sockets[] = Mage::getModel( 'turpentine/varnish_admin_socket',
+                array( 'host' => $parts[0], 'port' => $parts[1] ) );
+        }
+        return $sockets;
+    }
+
+    /**
      * Get the full path for a given template filename
      *
      * @param  string $baseFilename
@@ -128,7 +146,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     public function getBaseUrlPathRegex() {
-        return parse_url(
+        return '^' . parse_url(
                 Mage::getStoreConfig( 'web/unsecure/base_url' ), PHP_URL_PATH ) .
             '(?:(?:index|litespeed)\\.php/)?';
     }
@@ -152,12 +170,17 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getCookieExcludes() {
-        return implode( '|', array_merge( array(
-                Mage::helper( 'turpentine' )->getNoCacheCookieName(),
-            ),
-            array_map( 'trim', explode( PHP_EOL,
-                Mage::getStoreConfig( 'turpentine_control/excludes/cookies' ) ) )
-        ) );
+        $cookies = array(
+            Mage::helper( 'turpentine' )->getNoCacheCookieName(),
+            Mage::helper( 'turpentine' )->getAdminCookieName() );
+        $excludedCookies = array_map( 'trim', explode( PHP_EOL, trim(
+            Mage::getStoreConfig( 'turpentine_control/excludes/cookies' ) ) ) );
+        foreach( $excludedCookies as $cookie ) {
+            if( $cookie ) {
+                $cookies[] = $cookie;
+            }
+        }
+        return implode( '|', $cookies );
     }
 
     /**
@@ -170,11 +193,44 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     }
 
     /**
+     * Get the default backend configuration string
+     *
+     * @return string
+     */
+    protected function _getDefaultBackend() {
+        return $this->_vcl_backend( 'default',
+            Mage::getStoreConfig( 'turpentine_servers/backend/backend_host' ),
+            Mage::getStoreConfig( 'turpentine_servers/backend/backend_port' ) );
+    }
+
+    /**
+     * Get the grace period for vcl_fetch
+     *
+     * This is curently hardcoded to 15 seconds, will be configurable at some
+     * point
+     *
+     * @return string
+     */
+    protected function _getGracePeriod() {
+        return '15';
+    }
+
+    /**
+     * Get whether debug headers should be enabled or not
+     *
+     * @return string
+     */
+    protected function _getEnableDebugHeaders() {
+        return Mage::getStoreConfig( 'turpentine_servers/debug/headers' )
+            ? 'true' : 'false';
+    }
+
+    /**
      * Format the GET variable excludes for insertion in a regex
      *
      * @return string
      */
-    protected function _getGetExcludes() {
+    protected function _getGetParamExcludes() {
         return implode( '|', array_map( 'trim', explode( ',',
             Mage::getStoreConfig( 'turpentine_control/params/get_params' ) ) ) );
     }

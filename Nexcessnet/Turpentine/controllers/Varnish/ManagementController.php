@@ -72,16 +72,12 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
      */
     public function applyConfigAction() {
         Mage::dispatchEvent('turpentine_varnish_apply_config');
-        $vcl = $this->_getConfigurator()->generate();
-        $vclName = hash( 'sha256', microtime() );
-        $socket = Mage::getModel( 'turpentine/varnish_admin_socket' );
-        try {
-            $socket->vcl_inline( $vclName, $vcl );
-            $socket->vcl_use( $vclName );
+        $varnishctl = Mage::getModel( 'turpentine/varnish_admin' );
+        if( $varnishctl->applyConfig( $this->_getConfigurator() ) ) {
             $this->_getSession()
                 ->addSuccess( Mage::helper( 'turpentine' )
                     ->__( 'VCL successfully applied' ) );
-        } catch( Mage_Core_Exception $e ) {
+        } else {
             $this->_getSession()
                 ->addError( Mage::helper( 'turpentine' )
                     ->__( 'Failed to apply the VCL' ) );
@@ -131,16 +127,30 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
      * Get the appropriate configurator based on the specified Varnish version
      * in the Magento config
      *
+     * @param  string $version=null provide version string instead of pulling
+     *                              from config
      * @return Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract
      */
-    protected function _getConfigurator() {
-        switch( Mage::getStoreConfig( 'turpentine_servers/servers/version' ) ) {
+    protected function _getConfigurator( $version=null ) {
+        if( is_null( $version ) ) {
+            $version = Mage::getStoreConfig(
+                'turpentine_servers/servers/version' );
+        }
+        switch( $version ) {
             case '2.1':
                 $cfgr = Mage::getModel( 'turpentine/varnish_configurator_version2' );
                 break;
             case '3.0':
-            default:
                 $cfgr = Mage::getModel( 'turpentine/varnish_configurator_version3' );
+                break;
+            case 'auto':
+            default:
+                $hosts = explode( PHP_EOL,
+                    Mage::getStoreConfig( 'turpentine_servers/servers/server_list' ) );
+                list( $host, $port ) = explode( ':', $hosts[0] );
+                $socket = Mage::getModel( 'turpentine/varnish_admin_socket',
+                    array( 'host' => $host, 'port' => $port ) );
+                return $this->_getConfigurator( $socket->getVersion() );
                 break;
         }
         return $cfgr;

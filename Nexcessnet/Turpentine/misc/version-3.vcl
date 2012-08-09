@@ -4,10 +4,6 @@
 
 {{default_backend}}
 
-## ACLs
-
-{{purge_acl}}
-
 ## Custom Subroutines
 {{sub_normalize_user_agent}}
 #https://www.varnish-cache.org/trac/wiki/VCLExampleNormalizeUserAgent
@@ -67,22 +63,12 @@ sub vcl_recv {
         }
     }
 
-    # this will need to be changed to a custom verb (PURGE?) if Magento ever
-    # starts using DELETE
-    if (req.request == "DELETE") {
-        if (!client.ip ~ purge_trusted) {
-            error 405 "Not Allowed";
-        } else {
-            ban_url(req.url);
-            error 200 "Purged: " + req.url;
-        }
-    }
-
     if (req.request != "GET" &&
             req.request != "HEAD" &&
             req.request != "PUT" &&
             req.request != "POST" &&
             req.request != "TRACE" &&
+            req.request != "DELETE" &&
             req.request != "OPTIONS") {
         /* Non-RFC2616 or CONNECT which is weird. */
         return (pipe);
@@ -97,15 +83,15 @@ sub vcl_recv {
     {{normalize_user_agent}}
     {{normalize_host}}
 
-    if (req.url ~ "^{{url_base}}(?:(?:index|litespeed)\.php/)?") {
-        if (req.url ~ "^{{url_base}}(?:(?:index|litespeed)\.php/)?(?:{{url_excludes}})") {
+    if (req.url ~ "{{url_base_regex}}") {
+        if (req.url ~ "{{url_base_regex}}(?:{{url_excludes}})") {
             return (pass);
         }
         if (req.http.Cookie ~ "{{cookie_excludes}}") {
             return (pass);
         }
         if ({{enable_get_excludes}}) {
-            if (req.url ~ "(?:[?&](?:{{get_excludes}})(?=[&=]|$))") {
+            if (req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
                 return (pass);
             }
         }
@@ -157,7 +143,7 @@ sub vcl_fetch {
         beresp.http.Set-Cookie ~ "{{cookie_excludes}}") {
         return (deliver);
     } else if (beresp.http.X-Varnish-Bypass) {
-        set beresp.ttl = 300s;
+        set beresp.ttl = {{grace_period}}s;
         return (hit_for_pass);
     } else {
         if({{debug_headers}}) {

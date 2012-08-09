@@ -5,46 +5,66 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
     /**
      * Flush all Magento URLs in Varnish cache
      *
+     * @param  Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract $cfgr
      * @return bool
      */
-    public function flushAll() {
-        $url = Mage::getStoreConfig( 'web/unsecure/base_url' ) . '.*';
-        return $this->_doPurgeRequest( $url )->isSuccessful();
+    public function flushAll( $cfgr ) {
+        $success = true;
+        $pattern = $cfgr->getBaseUrlPathRegex() . '.*';
+        foreach( $cfgr->getSockets() as $socket ) {
+            try {
+                $socket->ban_url( $pattern );
+            } catch( Mage_Core_Exception $e ) {
+                $success = $success && false;
+                continue;
+            }
+            $success = $success && true;
+        }
+        return $success;
     }
 
     /**
      * Flush all Magento URLs matching the given (relative) regex
      *
+     * @param  Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract $cfgr
      * @param  string $pattern regex to match against URLs
      * @return bool
      */
-    public function flushUrl( $pattern ) {
-        $url = Mage::getStoreConfig( 'web/unsecure/base_url' ) . $pattern;
-        return $this->_doPurgeRequest( $url )->isSuccessful();
+    public function flushUrl( $cfgr, $subPattern ) {
+        $pattern = $cfgr->getBaseUrlPathRegex() . $subPattern;
+        $success = true;
+        foreach( $cfgr->getSockets() as $socket ) {
+            try {
+                $socket->ban_url( $pattern );
+            } catch( Mage_Core_Exception $e ) {
+                $success = $success && false;
+                continue;
+            }
+            $success = $success && true;
+        }
+        return $success;
     }
 
     /**
-     * Send a purge request to Varnish
+     * Generate and apply the config to the Varnish instances
      *
-     * @param  string $url             URL pattern to purge
-     * @param  string $method='DELETE' HTTP method to use for purge request
-     * @return Zend_Http_Response
+     * @param  Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract $cfgr
+     * @return bool
      */
-    protected function _doPurgeRequest( $url, $method='DELETE' ) {
-        // using zend client here instead of varien because the varien client
-        // wouldn't do DELETE requests
-        $client = new Zend_Http_Client();
-        if( Zend_Uri::check( $url ) ) {
-            $client->setUri( $url );
-            $resp = $client->request( $method );
-        } else {
-            //allow more regex chars in the URL
-            Zend_Uri::setConfig( array( 'allow_unwise' => true ) );
-            $client->setUri( $url );
-            $resp = $client->request( $method );
-            Zend_Uri::setConfig( array( 'allow_unwise' => false ) );
+    public function applyConfig( $cfgr ) {
+        $success = true;
+        $vcl = $cfgr->generate();
+        $vclname = hash( 'sha256', microtime() );
+        foreach( $cfgr->getSockets() as $socket ) {
+            try {
+                $socket->vcl_inline( $vclname, $vcl );
+                $socket->vcl_use( $vclname );
+            } catch( Mage_Core_Exception $e ) {
+                $success = $success && false;
+                continue;
+            }
+            $success = $success && true;
         }
-        Mage::dispatchEvent( 'varnish_cache_purge' );
-        return $resp;
+        return $success;
     }
 }
