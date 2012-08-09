@@ -128,6 +128,52 @@
                         </enable>
                     </fields>
                 </general>
+                <normalization translate="label" module="turpentine">
+                    <label>Normalization Options</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>15</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <encoding translate="label" module="turpentine">
+                            <label>Normalize Encoding</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>turpentine/config_select_toggle</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </encoding>
+                        <user_agent translate="label" module="turpentine">
+                            <label>Normalize User-Agent</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>turpentine/config_select_toggle</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </user_agent>
+                        <host translate="label" module="turpentine">
+                            <label>Normalize Host</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>turpentine/config_select_toggle</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </host>
+                        <host_target translate="label" module="turpentine">
+                            <label>Normalized Host Target</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-domain</validate>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </host_target>
+                    </fields>
+                </normalization>
                 <ttls translate="lable" module="turpentine">
                     <label>TTLs</label>
                     <frontend_type>text</frontend_type>
