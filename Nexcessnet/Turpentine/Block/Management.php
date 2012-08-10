@@ -5,7 +5,7 @@ class Nexcessnet_Turpentine_Block_Management
 
     public function __construct() {
         $this->_controller = 'management';
-        $this->setTemplate('turpentine/varnish_management.phtml');
+        $this->setTemplate( 'turpentine/varnish_management.phtml' );
         parent::__construct();
     }
 
@@ -15,7 +15,7 @@ class Nexcessnet_Turpentine_Block_Management
      * @return string
      */
     public function getFlushAllUrl() {
-        return $this->getUrl('*/*/flushAll');
+        return $this->getUrl( '*/*/flushAll' );
     }
 
     /**
@@ -24,7 +24,16 @@ class Nexcessnet_Turpentine_Block_Management
      * @return string
      */
     public function getFlushPartialUrl() {
-        return $this->getUrl('*/*/flushPartial');
+        return $this->getUrl( '*/*/flushPartial' );
+    }
+
+    /**
+     * Get the flushContentType URL
+     *
+     * @return string
+     */
+    public function getFlushContentTypeUrl() {
+        return $this->getUrl( '*/*/flushContentType' );
     }
 
     /**

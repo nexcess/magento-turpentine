@@ -26,8 +26,7 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
      */
     public function flushAllAction() {
         Mage::dispatchEvent('turpentine_varnish_flush_all');
-        $varnishctl = Mage::getModel( 'turpentine/varnish_admin' );
-        if( $varnishctl->flushAll( $this->_getConfigurator() ) ) {
+        if( Mage::getModel( 'turpentine/varnish_admin' )->flushAll() ) {
             $this->_getSession()
                 ->addSuccess(Mage::helper('turpentine')
                     ->__('The Varnish cache has been flushed.'));
@@ -52,11 +51,36 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
         }
         $pattern = $postData['pattern'];
         Mage::dispatchEvent('turpentine_varnish_flush_partial');
-        $varnishctl = Mage::getModel( 'turpentine/varnish_admin' );
-        if( $varnishctl->flushUrl( $this->_getConfigurator(), $pattern ) ) {
+        if( Mage::getModel( 'turpentine/varnish_admin' )
+                ->flushUrl( $pattern ) ) {
             $this->_getSession()
                 ->addSuccess(Mage::helper('turpentine')
                     ->__('The Varnish cache has been flushed for URLs matching: ' . $pattern ) );
+        } else {
+            $this->_getSession()
+                ->addError(Mage::helper('turpentine')
+                    ->__('Error flushing the Varnish cache.'));
+        }
+        $this->_redirect('*/*');
+    }
+
+    /**
+     * Flush objects by content type (ctype in POST)
+     *
+     * @return null
+     */
+    public function flushContentTypeAction() {
+        $postData = $this->getRequest()->getPost();
+        if( !isset( $postData['ctype'] ) ) {
+            Mage::throwException( $this->__( 'Missing URL post data' ) );
+        }
+        $ctype = $postData['ctype'];
+        Mage::dispatchEvent('turpentine_varnish_flush_content_type');
+        if( Mage::getModel( 'turpentine/varnish_admin' )
+                ->flushContentType( $ctype ) ) {
+            $this->_getSession()
+                ->addSuccess(Mage::helper('turpentine')
+                    ->__('The Varnish cache has been flushed for objects with content type: ' . $ctype ) );
         } else {
             $this->_getSession()
                 ->addError(Mage::helper('turpentine')
@@ -72,8 +96,7 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
      */
     public function applyConfigAction() {
         Mage::dispatchEvent('turpentine_varnish_apply_config');
-        $varnishctl = Mage::getModel( 'turpentine/varnish_admin' );
-        if( $varnishctl->applyConfig( $this->_getConfigurator() ) ) {
+        if( Mage::getModel( 'turpentine/varnish_admin' )->applyConfig() ) {
             $this->_getSession()
                 ->addSuccess( Mage::helper( 'turpentine' )
                     ->__( 'VCL successfully applied' ) );
@@ -92,7 +115,7 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
      */
     public function saveConfigAction() {
         Mage::dispatchEvent('turpentine_varnish_save_config');
-        $cfgr = $this->_getConfigurator();
+        $cfgr = Mage::getModel( 'turpentine/varnish_admin' )->getConfigurator();
         $result = $cfgr->save( $cfgr->generate() );
         if( $result[0] ) {
             $this->_getSession()
@@ -112,7 +135,9 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
      * @return $this
      */
     public function getConfigAction() {
-        $vcl = $this->_getConfigurator()->generate();
+        $vcl = Mage::getModel( 'turpentine/varnish_admin' )
+            ->getConfigurator()
+            ->generate();
         $this->getResponse()
             ->setHttpResponseCode( 200 )
             ->setHeader( 'Content-Type', 'text/plain', true )
@@ -121,39 +146,6 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
                 'attachment; filename=default.vcl' )
             ->setBody( $vcl );
         return $this;
-    }
-
-    /**
-     * Get the appropriate configurator based on the specified Varnish version
-     * in the Magento config
-     *
-     * @param  string $version=null provide version string instead of pulling
-     *                              from config
-     * @return Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract
-     */
-    protected function _getConfigurator( $version=null ) {
-        if( is_null( $version ) ) {
-            $version = Mage::getStoreConfig(
-                'turpentine_servers/servers/version' );
-        }
-        switch( $version ) {
-            case '2.1':
-                $cfgr = Mage::getModel( 'turpentine/varnish_configurator_version2' );
-                break;
-            case '3.0':
-                $cfgr = Mage::getModel( 'turpentine/varnish_configurator_version3' );
-                break;
-            case 'auto':
-            default:
-                $hosts = explode( PHP_EOL,
-                    Mage::getStoreConfig( 'turpentine_servers/servers/server_list' ) );
-                list( $host, $port ) = explode( ':', $hosts[0] );
-                $socket = Mage::getModel( 'turpentine/varnish_admin_socket',
-                    array( 'host' => $host, 'port' => $port ) );
-                return $this->_getConfigurator( $socket->getVersion() );
-                break;
-        }
-        return $cfgr;
     }
 
     /**

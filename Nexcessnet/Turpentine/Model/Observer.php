@@ -1,6 +1,6 @@
 <?php
 
-class Nexcessnet_Turpentine_Model_Observer {
+class Nexcessnet_Turpentine_Model_Observer extends Varien_Event_Observer {
     /**
      * disable varnish caching for the client by setting the no cache cookie (if
      * it's not already set)
@@ -46,6 +46,50 @@ class Nexcessnet_Turpentine_Model_Observer {
         if( !headers_sent() ) {
             header( 'X-Varnish-Bypass: 1', true );
             Mage::dispatchEvent( 'turpentine_varnish_bypass' );
+        }
+    }
+
+    /**
+     * Flush the URL associated with the event
+     *
+     * The event data should include a data_object that has a getUrlPath method
+     *
+     * @param  mixed $observer
+     * @return null
+     */
+    public function flushVarnishUrl( $observer ) {
+        $data = $observer->getData();
+        if( isset( $data['event'] ) ) {
+            $data = $data['event']->getData();
+            if( isset( $data['data_object'] ) ) {
+                if( Mage::getModel( 'turpentine/varnish_admin' )
+                        ->flushUrl( '.*' . $data['data_object']->getUrlPath() ) ) {
+                    Mage::getSingleton( 'core/session' )
+                        ->addSuccess( Mage::helper( 'turpentine' )
+                            ->__( 'Flushed object URL in Varnish.' ) );
+                } else {
+                    Mage::getSingleton( 'core/session' )
+                        ->addNotice( Mage::helper( 'turpentine' )
+                            ->__( 'Failed to flush object URL in Varnish.' ) );
+                }
+            }
+        }
+    }
+
+    /**
+     * Register auto-purge events
+     *
+     * @param  mixed $observer
+     * @return null
+     */
+    public function registerEvents( $observer ) {
+        $events = array_filter( array_map( 'trim', explode( PHP_EOL,
+            Mage::getStoreConfig(
+                'turpentine_control/purging/auto_purge_actions' ) ) ) );
+        foreach( $events as $event ) {
+            Mage::getModel( 'turpentine/mage_shim' )->addEventObserver(
+                'admin', $event, 'turpentine', 'model', get_class( $this ),
+                'flushVarnishUrl' );
         }
     }
 

@@ -262,7 +262,7 @@
                     <fields>
                         <auto_purge_actions translate="label" module="turpentine">
                             <label>Automatic Purge Actions</label>
-                            <frontend_type>multiselect</frontend_type>
+                            <frontend_type>textarea</frontend_type>
                             <can_be_empty>1</can_be_empty>
                             <comment>Actions that should trigger an automatic cache purge</comment>
                             <sort_order>10</sort_order>

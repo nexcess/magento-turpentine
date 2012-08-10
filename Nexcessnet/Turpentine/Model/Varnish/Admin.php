@@ -8,9 +8,21 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
      * @param  Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract $cfgr
      * @return bool
      */
-    public function flushAll( $cfgr ) {
+    public function flushAll() {
+        return $this->flushUrl( '.*' );
+    }
+
+    /**
+     * Flush all Magento URLs matching the given (relative) regex
+     *
+     * @param  Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract $cfgr
+     * @param  string $pattern regex to match against URLs
+     * @return bool
+     */
+    public function flushUrl( $subPattern ) {
+        $cfgr = $this->getConfigurator();
+        $pattern = $cfgr->getBaseUrlPathRegex() . $subPattern;
         $success = true;
-        $pattern = $cfgr->getBaseUrlPathRegex() . '.*';
         foreach( $cfgr->getSockets() as $socket ) {
             try {
                 $socket->ban_url( $pattern );
@@ -23,19 +35,11 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
         return $success;
     }
 
-    /**
-     * Flush all Magento URLs matching the given (relative) regex
-     *
-     * @param  Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract $cfgr
-     * @param  string $pattern regex to match against URLs
-     * @return bool
-     */
-    public function flushUrl( $cfgr, $subPattern ) {
-        $pattern = $cfgr->getBaseUrlPathRegex() . $subPattern;
+    public function flushContentType( $contentType ) {
         $success = true;
-        foreach( $cfgr->getSockets() as $socket ) {
+        foreach( $this->getConfigurator()->getSockets() as $socket ) {
             try {
-                $socket->ban_url( $pattern );
+                $socket->ban( 'obj.http.Content-type', '~', $contentType );
             } catch( Mage_Core_Exception $e ) {
                 $success = $success && false;
                 continue;
@@ -51,8 +55,9 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
      * @param  Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract $cfgr
      * @return bool
      */
-    public function applyConfig( $cfgr ) {
+    public function applyConfig() {
         $success = true;
+        $cfgr = $this->getConfigurator();
         $vcl = $cfgr->generate();
         $vclname = hash( 'sha256', microtime() );
         foreach( $cfgr->getSockets() as $socket ) {
@@ -66,5 +71,38 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
             $success = $success && true;
         }
         return $success;
+    }
+
+    /**
+     * Get the appropriate configurator based on the specified Varnish version
+     * in the Magento config
+     *
+     * @param  string $version=null provide version string instead of pulling
+     *                              from config
+     * @return Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract
+     */
+    public function getConfigurator( $version=null ) {
+        if( is_null( $version ) ) {
+            $version = Mage::getStoreConfig(
+                'turpentine_servers/servers/version' );
+        }
+        switch( $version ) {
+            case '2.1':
+                $cfgr = Mage::getModel( 'turpentine/varnish_configurator_version2' );
+                break;
+            case '3.0':
+                $cfgr = Mage::getModel( 'turpentine/varnish_configurator_version3' );
+                break;
+            case 'auto':
+            default:
+                $hosts = explode( PHP_EOL,
+                    Mage::getStoreConfig( 'turpentine_servers/servers/server_list' ) );
+                list( $host, $port ) = explode( ':', $hosts[0] );
+                $socket = Mage::getModel( 'turpentine/varnish_admin_socket',
+                    array( 'host' => $host, 'port' => $port ) );
+                return $this->getConfigurator( $socket->getVersion() );
+                break;
+        }
+        return $cfgr;
     }
 }

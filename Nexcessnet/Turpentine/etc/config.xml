@@ -35,16 +35,17 @@
             </ttls>
             <urls>
                 <url_whitelist>.*</url_whitelist>
-                <url_blacklist><![CDATA[wishlist.*
-catalog/product_compare.*
-checkout.*
-customer.*]]></url_blacklist>
+                <url_blacklist><![CDATA[wishlist/.*
+catalog/product_compare/.*
+checkout/cart/add/.*
+customer/.*
+cron\.php]]></url_blacklist>
             </urls>
             <params>
                 <get_params>__SID</get_params>
             </params>
             <purging>
-                <auto_purge_actions></auto_purge_actions>
+                <auto_purge_actions><![CDATA[catalog_product_save_after]]></auto_purge_actions>
             </purging>
         </turpentine_control>
     </default>
@@ -137,6 +138,14 @@ customer.*]]></url_blacklist>
                     </turpentine>
                 </observers>
             </controller_action_predispatch_wishlist>
+            <controller_front_init_before>
+                <observers>
+                    <turpentine>
+                        <class>turpentine/observer</class>
+                        <method>registerEvents</method>
+                    </turpentine>
+                </observers>
+            </controller_front_init_before>
         </events>
     </global>
     <admin>

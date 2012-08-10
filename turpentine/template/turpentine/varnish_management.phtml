@@ -29,7 +29,7 @@
         <tr>
             <td>
                 <h3><?php echo Mage::helper('turpentine')
-                        ->__('Varnish Cache Management') ?></h3>
+                        ->__('Cache Management') ?></h3>
             </td>
             <td class="form-buttons"></td>
          </tr>
@@ -64,7 +64,7 @@
                 <span>
                     <span>
                         <span><?php echo Mage::helper('turpentine')
-                                ->__('Flush URL') ?></span>
+                                ->__('Flush URL Pattern') ?></span>
                     </span>
                 </span>
             </button>
@@ -78,7 +78,38 @@
             </input>
             <br/>
             <?php echo Mage::helper('turpentine')
-                ->__('Flush URLs that match a regular expression (relative to Magento base URL, cannot include backslashes)') ?>
+                ->__('Flush URLs that match a regular expression (relative to Magento base URL)') ?>
+        </td>
+         <input
+            name="form_key"
+            type="hidden"
+            value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+        </form>
+    </tr>
+    <tr>
+        <form method="post" action="<?php echo $this->getFlushContentTypeUrl() ?>">
+        <td class="scope-label">
+            <button
+                type="submit"
+                class="scalable delete">
+                <span>
+                    <span>
+                        <span><?php echo Mage::helper('turpentine')
+                                ->__('Flush Content Type') ?></span>
+                    </span>
+                </span>
+            </button>
+        </td>
+        <td class="scope-label">
+            <input
+                type="text"
+                name="ctype"
+                value="text/html"
+                class="input-text"
+            </input>
+            <br/>
+            <?php echo Mage::helper('turpentine')
+                ->__('Flush cached objects with the given content (mime) type') ?>
         </td>
          <input
             name="form_key"
@@ -92,7 +123,7 @@
         <tr>
             <td>
                 <h3><?php echo Mage::helper('turpentine')
-                        ->__('Varnish Config Management') ?></h3>
+                        ->__('Config Management') ?></h3>
             </td>
             <td class="form-buttons"></td>
          </tr>
@@ -115,7 +146,7 @@
         </td>
         <td class="scope-label">
             <?php echo Mage::helper('turpentine')
-                ->__('Try to apply config to the running Varnish instance')?>
+                ->__('Update the VCL configuration on the running Varnish instances')?>
         </td>
     </tr>
     <tr>
@@ -142,7 +173,7 @@
             <button
                 onclick="setLocation('<?php echo $this->getGetConfigUrl()?>')"
                 type="button"
-                class="scalable save">
+                class="scalable">
                 <span>
                     <span>
                         <span><?php echo Mage::helper('turpentine')
