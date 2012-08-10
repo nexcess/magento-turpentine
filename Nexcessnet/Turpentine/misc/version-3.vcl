@@ -4,53 +4,6 @@
 
 {{default_backend}}
 
-## Custom Subroutines
-{{sub_normalize_user_agent}}
-#https://www.varnish-cache.org/trac/wiki/VCLExampleNormalizeUserAgent
-sub normalize_user_agent {
-    if (req.http.User-Agent ~ "MSIE") {
-        set req.http.X-Normalized-User-Agent = "msie";
-    } else if (req.http.User-Agent ~ "Firefox") {
-        set req.http.X-Normalized-User-Agent = "firefox";
-    } else if (req.http.User-Agent ~ "Safari") {
-        set req.http.X-Normalized-User-Agent = "safari";
-    } else if (req.http.User-Agent ~ "Chrome") {
-        set req.http.X-Normalized-User-Agent = "chrome";
-    } else if (req.http.User-Agent ~ "Opera Mini/") {
-        set req.http.X-Normalized-User-Agent = "opera-mini";
-    } else if (req.http.User-Agent ~ "Opera Mobi/") {
-        set req.http.X-Normalized-User-Agent = "opera-mobile";
-    } else if (req.http.User-Agent ~ "Opera") {
-        set req.http.X-Normalized-User-Agent = "opera";
-    } else {
-        set req.http.X-Normalized-User-Agent = "nomatch";
-    }
-}
-
-{{sub_normalize_encoding}}
-#https://www.varnish-cache.org/trac/wiki/VCLExampleNormalizeAcceptEncoding
-sub normalize_encoding {
-    if (req.http.Accept-Encoding) {
-        if (req.http.Accept-Encoding ~ "gzip") {
-            set req.http.Accept-Encoding = "gzip";
-        } else if (req.http.Accept-Encoding ~ "deflate") {
-            set req.http.Accept-Encoding = "deflate";
-        } else {
-            # unkown algorithm
-            unset req.http.Accept-Encoding;
-        }
-    }
-}
-
-{{sub_normalize_host}}
-sub normalize_host {
-    if (req.http.Host) {
-        if(req.http.Host !~ "^{{normalize_host_target}}$") {
-            set req.http.Host = "{{normalize_host_target}}";
-        }
-    }
-}
-
 ## Varnish Subroutines
 
 sub vcl_recv {
@@ -181,6 +134,19 @@ sub vcl_deliver {
         } else {
             set resp.http.X-Varnish-Hits = "MISS";
         }
+    } else {
+        #remove Varnish fingerprints
+        unset resp.http.X-Varnish;
+        unset resp.http.Via;
+        unset resp.http.X-Powered-By;
+        unset resp.http.Server;
+        unset resp.http.Age;
+    }
+}
+
+sub vcl_error {
+    if (!{{debug_headers}}) {
+        unset obj.http.Server;
     }
 }
 

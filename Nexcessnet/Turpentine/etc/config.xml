@@ -37,7 +37,7 @@
                 <url_whitelist>.*</url_whitelist>
                 <url_blacklist><![CDATA[wishlist
 catalog/product_compare
-checkout
+checkout.*
 customer]]></url_blacklist>
             </urls>
             <params>
@@ -113,6 +113,30 @@ customer]]></url_blacklist>
                     </turpentine>
                 </observers>
             </checkout_cart_add_product_complete>
+            <checkout_type_onepage_save_order>
+                <observers>
+                    <turpentine>
+                        <class>turpentine/observer</class>
+                        <method>disableVarnishCaching</method>
+                    </turpentine>
+                </observers>
+            </checkout_type_onepage_save_order>
+            <checkout_cart_product_add_before>
+                <observers>
+                    <turpentine>
+                        <class>turpentine/observer</class>
+                        <method>disableVarnishCaching</method>
+                    </turpentine>
+                </observers>
+            </checkout_cart_product_add_before>
+            <controller_action_predispatch_wishlist>
+                <observers>
+                    <turpentine>
+                        <class>turpentine/observer</class>
+                        <method>bypassVarnishCaching</method>
+                    </turpentine>
+                </observers>
+            </controller_action_predispatch_wishlist>
         </events>
     </global>
     <admin>

@@ -129,11 +129,17 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getNormalizeHostTarget() {
-        $baseUrl = parse_url( Mage::getBaseUrl() );
-        if( isset( $baseUrl['port'] ) ) {
-            return sprintf( '%s:%d', $baseUrl['host'], $baseUrl['port'] );
+        $configHost = trim( Mage::getStoreConfig(
+            'turpentine_control/normalization/host_target' ) );
+        if( $configHost ) {
+            return $configHost;
         } else {
-            return $baseUrl['host'];
+            $baseUrl = parse_url( Mage::getBaseUrl() );
+            if( isset( $baseUrl['port'] ) ) {
+                return sprintf( '%s:%d', $baseUrl['host'], $baseUrl['port'] );
+            } else {
+                return $baseUrl['host'];
+            }
         }
     }
 
@@ -302,5 +308,55 @@ EOS;
             'hosts' => implode( "\n    ", array_map( $fmtHost, $hosts ) ),
         );
         return $this->_formatTemplate( $tpl, $vars );
+    }
+
+    protected function _vcl_sub_normalize_user_agent() {
+        $tpl = <<<EOS
+if (req.http.User-Agent ~ "MSIE") {
+        set req.http.X-Normalized-User-Agent = "msie";
+    } else if (req.http.User-Agent ~ "Firefox") {
+        set req.http.X-Normalized-User-Agent = "firefox";
+    } else if (req.http.User-Agent ~ "Safari") {
+        set req.http.X-Normalized-User-Agent = "safari";
+    } else if (req.http.User-Agent ~ "Chrome") {
+        set req.http.X-Normalized-User-Agent = "chrome";
+    } else if (req.http.User-Agent ~ "Opera Mini/") {
+        set req.http.X-Normalized-User-Agent = "opera-mini";
+    } else if (req.http.User-Agent ~ "Opera Mobi/") {
+        set req.http.X-Normalized-User-Agent = "opera-mobile";
+    } else if (req.http.User-Agent ~ "Opera") {
+        set req.http.X-Normalized-User-Agent = "opera";
+    } else {
+        set req.http.X-Normalized-User-Agent = "nomatch";
+    }
+
+EOS;
+        return $tpl;
+    }
+
+    protected function _vcl_sub_normalize_encoding() {
+        $tpl = <<<EOS
+if (req.http.Accept-Encoding) {
+        if (req.http.Accept-Encoding ~ "gzip") {
+            set req.http.Accept-Encoding = "gzip";
+        } else if (req.http.Accept-Encoding ~ "deflate") {
+            set req.http.Accept-Encoding = "deflate";
+        } else {
+            # unkown algorithm
+            unset req.http.Accept-Encoding;
+        }
+    }
+
+EOS;
+        return $tpl;
+    }
+
+    protected function _vcl_sub_normalize_host() {
+        $tpl = <<<EOS
+set req.http.Host = "{{normalize_host_target}}";
+
+EOS;
+        return $this->_formatTemplate( $tpl, array(
+            'normalize_host_target' => $this->_getNormalizeHostTarget() ) );
     }
 }

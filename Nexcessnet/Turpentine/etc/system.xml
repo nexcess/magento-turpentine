@@ -13,32 +13,32 @@
             <frontend_type>text</frontend_type>
             <sort_order>10</sort_order>
             <show_in_default>1</show_in_default>
-            <show_in_website>1</show_in_website>
-            <show_in_store>1</show_in_store>
+            <show_in_website>0</show_in_website>
+            <show_in_store>0</show_in_store>
             <groups>
                 <backend translate="label" module="turpentine">
                     <label>Backend</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>5</sort_order>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <fields>
                         <backend_host translate="label" module="turpentine">
                             <label>Backend Host</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </backend_host>
                         <backend_port translate="label" module="turpentine">
                             <label>Backend Port</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </backend_port>
                     </fields>
                 </backend>
@@ -47,8 +47,8 @@
                     <frontend_type>text</frontend_type>
                     <sort_order>10</sort_order>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <fields>
                         <version translate="label" module="turpentine">
                             <label>Varnish Version</label>
@@ -56,8 +56,8 @@
                             <source_model>turpentine/config_select_version</source_model>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </version>
                         <server_list translate="label" module="turpentine">
                             <label>Server List</label>
@@ -65,8 +65,8 @@
                             <comment>Should be a list of HOST:PORT pairs of the Varnish management interfaces, one per line</comment>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </server_list>
                         <config_file translate="label" module="turpentine">
                             <label>Config File Location</label>
@@ -74,8 +74,8 @@
                             <comment>Specify where the Varnish VCL file should be saved</comment>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </config_file>
                     </fields>
                 </servers>
@@ -84,8 +84,8 @@
                     <frontend_type>text</frontend_type>
                     <sort_order>20</sort_order>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <fields>
                         <headers translate="label" module="turpentine">
                             <label>Debug Headers</label>
@@ -93,8 +93,8 @@
                             <source_model>turpentine/config_select_toggle</source_model>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </headers>
                     </fields>
                 </debug>
@@ -106,16 +106,16 @@
             <frontend_type>text</frontend_type>
             <sort_order>20</sort_order>
             <show_in_default>1</show_in_default>
-            <show_in_website>1</show_in_website>
-            <show_in_store>1</show_in_store>
+            <show_in_website>0</show_in_website>
+            <show_in_store>0</show_in_store>
             <groups>
                 <general translate="label" module="turpentine">
                     <label>General Options</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>10</sort_order>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <fields>
                         <enable translate="label" module="turpentine">
                             <label>Caching Status</label>
@@ -123,8 +123,8 @@
                             <source_model>turpentine/config_select_toggle</source_model>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </enable>
                     </fields>
                 </general>
@@ -133,54 +133,57 @@
                     <frontend_type>text</frontend_type>
                     <sort_order>15</sort_order>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <fields>
                         <encoding translate="label" module="turpentine">
                             <label>Normalize Encoding</label>
+                            <comment>Simplify the Accept-Encoding header recieved from clients</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>turpentine/config_select_toggle</source_model>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </encoding>
                         <user_agent translate="label" module="turpentine">
                             <label>Normalize User-Agent</label>
+                            <comment>Simplify the User-Agent header recieved from clients</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>turpentine/config_select_toggle</source_model>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </user_agent>
                         <host translate="label" module="turpentine">
                             <label>Normalize Host</label>
+                            <comment>Force requests to be for a specific domain name, will probably break most multi-store setups</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>turpentine/config_select_toggle</source_model>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </host>
                         <host_target translate="label" module="turpentine">
                             <label>Normalized Host Target</label>
+                            <comment>Domain to force requests to, defaults to the domain in the base URL</comment>
                             <frontend_type>text</frontend_type>
-                            <validate>validate-domain</validate>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </host_target>
                     </fields>
                 </normalization>
-                <ttls translate="lable" module="turpentine">
+                <ttls translate="label" module="turpentine">
                     <label>TTLs</label>
                     <frontend_type>text</frontend_type>
                     <sort_order>20</sort_order>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <fields>
                         <default_ttl translate="label" module="turpentine">
                             <label>Default TTL (seconds)</label>
@@ -188,8 +191,8 @@
                             <validate>validate-greater-than-zero</validate>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </default_ttl>
                         <url_ttls translate="label" module="turpentine">
                             <label>URL-based TTLs</label>
@@ -197,8 +200,8 @@
                             <comment>List of regex and TTL (in seconds) comma-separated pairs (one per line)</comment>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </url_ttls>
                     </fields>
                 </ttls>
@@ -207,8 +210,8 @@
                     <frontend_type>text</frontend_type>
                     <sort_order>30</sort_order>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <fields>
                         <url_whitelist translate="label" module="turpentine">
                             <label>URL Whitelist</label>
@@ -216,8 +219,8 @@
                             <comment>List of relative URLs to exempt from blacklist, one per line</comment>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </url_whitelist>
                         <url_blacklist translate="label" module="turpentine">
                             <label>URL Blacklist</label>
@@ -225,8 +228,8 @@
                             <comment>List of relative URLs to exclude from caching. The admin section and API are automatically included</comment>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </url_blacklist>
                     </fields>
                 </urls>
@@ -235,8 +238,8 @@
                     <frontend_type>text</frontend_type>
                     <sort_order>40</sort_order>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <fields>
                         <get_params translate="label" module="turpentine">
                             <label>GET Parameters</label>
@@ -244,8 +247,8 @@
                             <comment>Comma-separated list of GET variables that prevent caching</comment>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </get_params>
                     </fields>
                 </params>
@@ -254,8 +257,8 @@
                     <frontend_type>text</frontend_type>
                     <sort_order>50</sort_order>
                     <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
                     <fields>
                         <auto_purge_actions translate="label" module="turpentine">
                             <label>Automatic Purge Actions</label>
@@ -264,8 +267,8 @@
                             <comment>Actions that should trigger an automatic cache purge</comment>
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </auto_purge_actions>
                     </fields>
                 </purging>

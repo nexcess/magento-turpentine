@@ -35,9 +35,14 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
             'debug_headers' => $this->_getEnableDebugHeaders(),
             'grace_period'  => $this->_getGracePeriod(),
         );
-        foreach( $this->_getNormalizations() as $subr ) {
-            $name = 'normalize_' . $subr;
-            $vars[$name] = $this->_vcl_call( $name );
+        if( Mage::getStoreConfig( 'turpentine_control/normalization/encoding' ) ) {
+            $vars['normalize_encoding'] = $this->_vcl_sub_normalize_encoding();
+        }
+        if( Mage::getStoreConfig( 'turpentine_control/normalization/user_agent' ) ) {
+            $vars['normalize_user_agent'] = $this->_vcl_sub_normalize_user_agent();
+        }
+        if( Mage::getStoreConfig( 'turpentine_control/normalization/host' ) ) {
+            $vars['normalize_host'] = $this->_vcl_sub_normalize_host();
         }
         return $vars;
     }

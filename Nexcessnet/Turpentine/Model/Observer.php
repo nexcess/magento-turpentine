@@ -11,8 +11,12 @@ class Nexcessnet_Turpentine_Model_Observer {
     public function disableVarnishCaching( $observer ) {
         $cookieName = Mage::helper( 'turpentine/data' )->getNoCacheCookieName();
         if( !isset( $_COOKIE[$cookieName] ) ) {
-            $this->_removeSetCookieHeader();
+            $frontend = $this->_getCookieHeaderValue( 'frontend' );
+            $this->_removeHeader( 'Set-Cookie' );
             Mage::getModel( 'core/cookie' )->set( $cookieName, '1' );
+            if( !is_null( $frontend ) ) {
+                Mage::getModel( 'core/cookie' )->set( 'frontend', $frontend );
+            }
             Mage::dispatchEvent( 'turpentine_varnish_disable' );
         }
     }
@@ -26,8 +30,7 @@ class Nexcessnet_Turpentine_Model_Observer {
     public function enableVarnishCaching( $observer ) {
         $cookieName = Mage::helper( 'turpentine/data' )->getNoCacheCookieName();
         if( isset( $_COOKIE[$cookieName] ) ) {
-            Mage::getModel( 'core/cookie' )->delete(
-                Mage::helper( 'turpentine' )->getNoCacheCookieName() );
+            Mage::getModel( 'core/cookie' )->delete( $cookieName );
             Mage::dispatchEvent( 'turpentine_varnish_enable' );
         }
     }
@@ -46,23 +49,59 @@ class Nexcessnet_Turpentine_Model_Observer {
         }
     }
 
+    protected function _getCurrentHeaders() {
+        if( function_exists( 'headers_list' ) ) {
+            $headers = array();
+            foreach( headers_list() as $header ) {
+                list( $key, $value ) = explode( ':', $header );
+                $value = trim( $value );
+                if( isset( $headers[$key] ) && is_array( $headers[$key] ) ) {
+                    $headers[$key][] = $value;
+                } elseif( isset( $headers[$key] ) ) {
+                    $headers[$key] = array( $headers[$key], $value );
+                } else {
+                    $headers[$key] = $value;
+                }
+            }
+            return $headers;
+        } else {
+            return array();
+        }
+    }
+
+    protected function _getCookieHeaderValue( $cookieName ) {
+        $headers = $this->_getCurrentHeaders();
+        if( isset( $headers['Set-Cookie'] ) ) {
+            $parts = array_map( 'trim', explode( ';', $headers['Set-Cookie'] ) );
+            var_dump( $parts );
+            foreach( $parts as $part ) {
+                if( strpos( $part, $cookieName ) === 0 ) {
+                    list( $cn, $value ) = explode( '=', $part );
+                    return $value;
+                }
+            }
+        }
+        return null;
+    }
+
     /**
-     * Remove any existing Set-Cookie headers
+     * Remove the specified header
      *
-     * Varnish will only "see" the first Set-Cookie header, which is usually the
+     * Varnish will only "see" the first instance of a given header, which is
+     * problematic for the Set-Cookie header since it's usually the
      * frontend cookie. This method can be used to wipe it out so the no cache
      * cookie can be set and be visible to Varnish
      *
      * @return bool
      */
-    protected function _removeSetCookieHeader() {
+    protected function _removeHeader( $header ) {
         if( !headers_sent() ) {
             if( function_exists( 'header_remove' ) ) {
                 //only exists in 5.3+
-                header_remove( 'Set-Cookie' );
+                header_remove( $header );
             } else {
                 //seems to not work in 5.3+, just sets a blank Set-Cookie header
-                header( 'Set-Cookie:', true );
+                header( sprintf( '%s:', $header ), true );
             }
             return true;
         } else {
