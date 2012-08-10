@@ -35,10 +35,10 @@
             </ttls>
             <urls>
                 <url_whitelist>.*</url_whitelist>
-                <url_blacklist><![CDATA[wishlist
-catalog/product_compare
+                <url_blacklist><![CDATA[wishlist.*
+catalog/product_compare.*
 checkout.*
-customer]]></url_blacklist>
+customer.*]]></url_blacklist>
             </urls>
             <params>
                 <get_params>__SID</get_params>

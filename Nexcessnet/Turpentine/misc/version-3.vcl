@@ -99,9 +99,6 @@ sub vcl_fetch {
         set beresp.ttl = {{grace_period}}s;
         return (hit_for_pass);
     } else {
-        if({{debug_headers}}) {
-            set beresp.http.X-Varnish-Set-Cookie = beresp.http.Set-Cookie;
-        }
         unset beresp.http.Set-Cookie;
         unset beresp.http.Cache-Control;
         unset beresp.http.Expires;
