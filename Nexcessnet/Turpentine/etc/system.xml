@@ -200,7 +200,7 @@
                         <url_ttls translate="label" module="turpentine">
                             <label>URL-based TTLs</label>
                             <frontend_type>textarea</frontend_type>
-                            <comment>List of regex and TTL (in seconds) comma-separated pairs (one per line)</comment>
+                            <comment>List of regex (relative to Magento root) and TTL (in seconds) comma-separated pairs (one per line)</comment>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>

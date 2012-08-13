@@ -31,7 +31,6 @@
             </normalization>
             <ttls>
                 <default_ttl>3600</default_ttl>
-                <url_ttls>$,300</url_ttls>
                 <static_ttl>28800</static_ttl>
             </ttls>
             <urls>

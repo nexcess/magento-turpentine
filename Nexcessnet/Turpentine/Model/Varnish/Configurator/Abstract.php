@@ -256,6 +256,28 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
         return Mage::getStoreConfig( 'turpentine_control/ttls/static_ttl' );
     }
 
+    protected function _getUrlTtls() {
+        $str = array();
+        $configTtls = array_filter( array_map( 'trim', explode( PHP_EOL, trim(
+            Mage::getStoreConfig( 'turpentine_control/ttls/url_ttls' ) ) ) ) );
+        $ttls = array();
+        foreach( $configTtls as $line ) {
+            $ttls[] = explode( ',', trim( $line ) );
+        }
+        foreach( $ttls as $ttl ) {
+            $str[] = sprintf( 'if (bereq.url ~ "%s%s") { set beresp.ttl = %ds; }',
+                $this->getBaseUrlPathRegex(), $ttl[0], $ttl[1] );
+        }
+        $str = implode( ' else ', $str );
+        if( $str ) {
+            $str .= sprintf( ' else { set beresp.ttl = %ds; }',
+                $this->_getDefaultTtl() );
+        } else {
+            $str = sprintf( 'set beresp.ttl = %ds;', $this->_getDefaultTtl() );
+        }
+        return $str;
+    }
+
     /**
      * Remove empty and commented out lines from the generated VCL
      *

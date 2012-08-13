@@ -58,10 +58,9 @@ sub vcl_recv {
         if (req.http.Cookie ~ "{{cookie_excludes}}") {
             return (pass);
         }
-        if ({{enable_get_excludes}}) {
-            if (req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
-                return (pass);
-            }
+        if ({{enable_get_excludes}} &&
+                req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
+            return (pass);
         }
         unset req.http.Cookie;
         return (lookup);
@@ -119,7 +118,6 @@ sub vcl_fetch {
     } else {
         call remove_cache_headers;
         {{url_ttls}}
-        set beresp.ttl = {{default_ttl}}s;
     }
 }
 
