@@ -34,7 +34,6 @@
                 <static_ttl>28800</static_ttl>
             </ttls>
             <urls>
-                <url_whitelist>.*</url_whitelist>
                 <url_blacklist><![CDATA[wishlist/.*
 catalog/product_compare/.*
 checkout/cart/add/.*

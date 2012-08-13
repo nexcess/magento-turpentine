@@ -278,6 +278,11 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
         return $str;
     }
 
+    protected function _getEnableCaching() {
+        return Mage::getStoreConfig( 'turpentine_control/general/enable' )
+            ? 'true' : 'false';
+    }
+
     /**
      * Remove empty and commented out lines from the generated VCL
      *

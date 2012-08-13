@@ -119,6 +119,7 @@
                     <fields>
                         <enable translate="label" module="turpentine">
                             <label>Caching Status</label>
+                            <comment>Disabling this will make Varnish pass through all requests to the backend</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>turpentine/config_select_toggle</source_model>
                             <sort_order>10</sort_order>
@@ -225,15 +226,6 @@
                     <show_in_website>0</show_in_website>
                     <show_in_store>0</show_in_store>
                     <fields>
-                        <url_whitelist translate="label" module="turpentine">
-                            <label>URL Whitelist</label>
-                            <frontend_type>textarea</frontend_type>
-                            <comment>List of relative URLs to exempt from blacklist, one per line</comment>
-                            <sort_order>20</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </url_whitelist>
                         <url_blacklist translate="label" module="turpentine">
                             <label>URL Blacklist</label>
                             <frontend_type>textarea</frontend_type>

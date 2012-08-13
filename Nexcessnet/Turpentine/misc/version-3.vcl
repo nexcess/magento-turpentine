@@ -18,7 +18,7 @@ sub remove_cache_headers {
 
 sub vcl_recv {
     if (req.restarts == 0) {
-        if (req.http.x-forwarded-for) {
+        if (req.http.X-Forwarded-For) {
             set req.http.X-Forwarded-For =
                 req.http.X-Forwarded-For + ", " + client.ip;
         } else {
@@ -46,6 +46,10 @@ sub vcl_recv {
     {{normalize_user_agent}}
     {{normalize_host}}
 
+    #GCC should completely optimize any "false && <cond>" branches away, hopefully
+    if ({{enable_caching}}) {
+        return (pass);
+    }
     if (req.url ~ "{{url_base_regex}}") {
         if ({{force_cache_static}} &&
                 req.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
@@ -106,6 +110,7 @@ sub vcl_hash {
 sub vcl_fetch {
     set req.grace = {{grace_period}}s;
 
+    #GCC should optimize this entire branch away if static caching is disabled
     if ({{force_cache_static}} && bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
         call remove_cache_headers;
         set beresp.ttl = {{static_ttl}}s;
@@ -136,6 +141,7 @@ sub vcl_fetch {
 
 #https://www.varnish-cache.org/trac/wiki/VCLExampleHitMissHeader
 sub vcl_deliver {
+    #GCC should optimize this entire branch away if debug headers are disabled
     if ({{debug_headers}}) {
         if (obj.hits > 0) {
             set resp.http.X-Varnish-Hits = "HIT: " + obj.hits;
@@ -153,6 +159,7 @@ sub vcl_deliver {
 }
 
 sub vcl_error {
+    #GCC should optimize this entire branch away if debug headers are disabled
     if (!{{debug_headers}}) {
         unset obj.http.Server;
     }
