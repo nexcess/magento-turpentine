@@ -1,4 +1,4 @@
-## Nexcessnet_Turpentine Varnish v3 VCL Template
+## Nexcessnet_Turpentine Varnish v2 VCL Template
 
 ## Backends
 
