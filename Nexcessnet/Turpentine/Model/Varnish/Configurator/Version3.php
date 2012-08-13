@@ -34,6 +34,9 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
             'cookie_excludes'  => $this->_getCookieExcludes(),
             'debug_headers' => $this->_getEnableDebugHeaders(),
             'grace_period'  => $this->_getGracePeriod(),
+            'force_cache_static'    => $this->_getForceCacheStatic(),
+            'static_extensions' => $this->_getStaticExtensions(),
+            'static_ttl'    => $this->_getStaticTtl(),
         );
         if( Mage::getStoreConfig( 'turpentine_control/normalization/encoding' ) ) {
             $vars['normalize_encoding'] = $this->_vcl_sub_normalize_encoding();

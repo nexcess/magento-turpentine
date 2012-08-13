@@ -32,6 +32,7 @@
             <ttls>
                 <default_ttl>3600</default_ttl>
                 <url_ttls>$,300</url_ttls>
+                <static_ttl>28800</static_ttl>
             </ttls>
             <urls>
                 <url_whitelist>.*</url_whitelist>
@@ -44,6 +45,10 @@ cron\.php]]></url_blacklist>
             <params>
                 <get_params>__SID</get_params>
             </params>
+            <static>
+                <force_static>1</force_static>
+                <exts>css,js,jpe?g,png,gif</exts>
+            </static>
             <purging>
                 <auto_purge_actions><![CDATA[catalog_product_save_after]]></auto_purge_actions>
             </purging>

@@ -241,6 +241,21 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             Mage::getStoreConfig( 'turpentine_control/params/get_params' ) ) ) );
     }
 
+    protected function _getForceCacheStatic() {
+        return Mage::getStoreConfig( 'turpentine_control/static/force_static' )
+            ? 'true' : 'false';
+    }
+
+    protected function _getStaticExtensions() {
+        $exts = implode( '|', array_filter( array_map( 'trim', explode( ',',
+            Mage::getStoreConfig( 'turpentine_control/static/exts' ) ) ) ) );
+        return $exts;
+    }
+
+    protected function _getStaticTtl() {
+        return Mage::getStoreConfig( 'turpentine_control/ttls/static_ttl' );
+    }
+
     /**
      * Remove empty and commented out lines from the generated VCL
      *

@@ -4,6 +4,16 @@
 
 {{default_backend}}
 
+## Custom Subroutines
+sub remove_cache_headers {
+    unset beresp.http.Set-Cookie;
+    unset beresp.http.Cache-Control;
+    unset beresp.http.Expires;
+    unset beresp.http.Pragma;
+    unset beresp.http.Cache;
+    unset beresp.http.Age;
+}
+
 ## Varnish Subroutines
 
 sub vcl_recv {
@@ -37,6 +47,11 @@ sub vcl_recv {
     {{normalize_host}}
 
     if (req.url ~ "{{url_base_regex}}") {
+        if ({{force_cache_static}} &&
+                req.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
+            unset req.http.Cookie;
+            return (lookup);
+        }
         if (req.url ~ "{{url_base_regex}}(?:{{url_excludes}})") {
             return (pass);
         }
@@ -52,7 +67,7 @@ sub vcl_recv {
         return (lookup);
     }
     # else it's not part of magento so do default handling (doesn't help
-    # things underneath magento but can't detect that)
+    # things underneath magento but we can't detect that)
 }
 
 sub vcl_pipe {
@@ -92,19 +107,17 @@ sub vcl_hash {
 sub vcl_fetch {
     set req.grace = {{grace_period}}s;
 
-    if (req.http.Cookie ~ "{{cookie_excludes}}" ||
+    if ({{force_cache_static}} && bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
+        call remove_cache_headers;
+        set beresp.ttl = {{static_ttl}}s;
+    } else if (req.http.Cookie ~ "{{cookie_excludes}}" ||
         beresp.http.Set-Cookie ~ "{{cookie_excludes}}") {
         return (deliver);
     } else if (beresp.http.X-Varnish-Bypass) {
         set beresp.ttl = {{grace_period}}s;
         return (hit_for_pass);
     } else {
-        unset beresp.http.Set-Cookie;
-        unset beresp.http.Cache-Control;
-        unset beresp.http.Expires;
-        unset beresp.http.Pragma;
-        unset beresp.http.Cache;
-        unset beresp.http.Age;
+        call remove_cache_headers;
         {{url_ttls}}
         set beresp.ttl = {{default_ttl}}s;
     }
