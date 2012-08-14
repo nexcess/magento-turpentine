@@ -20,7 +20,7 @@ sub vcl_recv {
     if (req.restarts == 0) {
         if (req.http.X-Forwarded-For) {
             set req.http.X-Forwarded-For =
-                req.http.X-Forwarded-For + ", " + client.ip;
+                req.http.X-Forwarded-For ", " client.ip;
         } else {
             set req.http.X-Forwarded-For = client.ip;
         }
@@ -144,7 +144,7 @@ sub vcl_deliver {
     #GCC should optimize this entire branch away if debug headers are disabled
     if ({{debug_headers}}) {
         if (obj.hits > 0) {
-            set resp.http.X-Varnish-Hits = "HIT: " + obj.hits;
+            set resp.http.X-Varnish-Hits = "HIT: " obj.hits;
         } else {
             set resp.http.X-Varnish-Hits = "MISS";
         }
