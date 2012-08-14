@@ -239,7 +239,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
     public function _init() {
         if( is_null( $this->_version ) ) {
             $meta = stream_get_meta_data( $this->_varnishConn );
-            var_dump( $meta );
+            var_dump( $meta, feof( $this->_varnishConn ) );
         } elseif( $this->_version == '3.0' ) {
             $banner = $this->_read();
             if( $banner['code'] === self::CODE_AUTH ) {
