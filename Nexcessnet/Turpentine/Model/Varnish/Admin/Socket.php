@@ -224,8 +224,8 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
             $errstr, $this->_timeout );
         if( !is_resource( $this->_varnishConn ) ) {
             Mage::throwException( sprintf(
-                'Failed to connect to Varnish on %s:%d',
-                $this->_host, $this->_port ) );
+                'Failed to connect to Varnish on [%s:%d]: %d %s',
+                $this->_host, $this->_port, $errno, $errstr ) );
         }
 
         stream_set_blocking( $this->_varnishConn, 1 );
@@ -237,11 +237,18 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
     }
 
     public function _init() {
-        if( is_null( $this->_version ) ) {
-            $meta = stream_get_meta_data( $this->_varnishConn );
-            var_dump( $meta, feof( $this->_varnishConn ) );
-        } elseif( $this->_version == '3.0' ) {
-            $banner = $this->_read();
+        if( $this->_version != '2.1' ) {
+            try {
+                $banner = $this->_read();
+            } catch( Exception $e ) {
+                //timeout probably, means this is v2.1
+                if( is_null( $this->_version ) ) {
+                    $this->_version = '2.1';
+                    return;
+                } else {
+                    throw $e;
+                }
+            }
             if( $banner['code'] === self::CODE_AUTH ) {
                 $challenge = substr( $banner['text'], 0, 32 );
                 $response = hash( 'sha256', sprintf( "%s\n%s%s\n", $challenge,
@@ -251,8 +258,6 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
                 Mage::throwException( 'Varnish admin authentication failed: ' .
                     $banner['text'] );
             }
-        } else { //2.1
-            //do nothing
         }
     }
 
