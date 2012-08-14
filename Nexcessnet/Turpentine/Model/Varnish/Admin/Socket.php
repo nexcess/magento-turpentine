@@ -229,22 +229,18 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         }
 
         stream_set_blocking( $this->_varnishConn, 1 );
-        stream_set_timeout( $this->_varnishConn, $this->_timeout );
 
-        $this->_init();
-
-        return !is_null( $this->_varnishConn );
-    }
-
-    public function _init() {
         if( $this->_version != '2.1' ) {
             try {
+                stream_set_timeout( $this->_varnishConn, 2 );
                 $banner = $this->_read();
             } catch( Exception $e ) {
+                $meta = stream_get_meta_data( $this->_varnishConn );
                 //timeout probably, means this is v2.1
-                if( is_null( $this->_version ) ) {
+                if( $meta['timed_out'] && is_null( $this->_version ) ) {
                     $this->_version = '2.1';
-                    return;
+                    $this->_varnishConn = null;
+                    return false;
                 } else {
                     throw $e;
                 }
@@ -259,6 +255,9 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
                     $banner['text'] );
             }
         }
+
+        stream_set_timeout( $this->_varnishConn, $this->_timeout );
+        return !is_null( $this->_varnishConn );
     }
 
     /**
