@@ -74,7 +74,7 @@ sub vcl_recv {
 }
 
 sub vcl_pipe {
-    set req.http.connection = "close";
+    set req.http.Connection = "close";
     return (pipe);
 }
 

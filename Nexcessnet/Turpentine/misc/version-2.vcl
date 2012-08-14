@@ -6,12 +6,12 @@
 
 ## Custom Subroutines
 sub remove_cache_headers {
-    unset beresp.http.Set-Cookie;
-    unset beresp.http.Cache-Control;
-    unset beresp.http.Expires;
-    unset beresp.http.Pragma;
-    unset beresp.http.Cache;
-    unset beresp.http.Age;
+    remove beresp.http.Set-Cookie;
+    remove beresp.http.Cache-Control;
+    remove beresp.http.Expires;
+    remove beresp.http.Pragma;
+    remove beresp.http.Cache;
+    remove beresp.http.Age;
 }
 
 ## Varnish Subroutines
@@ -50,13 +50,13 @@ sub vcl_recv {
     set req.http.X-Opt-Force-Static-Caching = "{{force_cache_static}}";
     set req.http.X-Opt-Enable-Get-Excludes = "{{enable_get_excludes}}";
 
-    if (req.http.X-Opt-Enable-Caching == "true") {
+    if (req.http.X-Opt-Enable-Caching !~ "true") {
         return (pass);
     }
     if (req.url ~ "{{url_base_regex}}") {
-        if (req.http.X-Opt-Force-Static-Caching == "true" &&
+        if (req.http.X-Opt-Force-Static-Caching ~ "true" &&
                 req.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
-            unset req.http.Cookie;
+            remove req.http.Cookie;
             return (lookup);
         }
         if (req.url ~ "{{url_base_regex}}(?:{{url_excludes}})") {
@@ -65,11 +65,11 @@ sub vcl_recv {
         if (req.http.Cookie ~ "{{cookie_excludes}}") {
             return (pass);
         }
-        if (req.http.X-Opt-Enable-Get-Excludes == "true" &&
+        if (req.http.X-Opt-Enable-Get-Excludes ~ "true" &&
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
             return (pass);
         }
-        unset req.http.Cookie;
+        remove req.http.Cookie;
         return (lookup);
     }
     # else it's not part of magento so do default handling (doesn't help
@@ -77,7 +77,7 @@ sub vcl_recv {
 }
 
 sub vcl_pipe {
-    set req.http.connection = "close";
+    set req.http.Connection = "close";
     return (pipe);
 }
 
@@ -86,17 +86,17 @@ sub vcl_pipe {
 # }
 
 sub vcl_hash {
-    hash_data(req.url);
+    set req.hash += req.url;
     if (req.http.Host) {
-        hash_data(req.http.Host);
+        set req.hash += req.http.Host;
     } else {
-        hash_data(server.ip);
+        set req.hash += server.ip;
     }
     if (req.http.X-Normalized-User-Agent) {
-        hash_data(req.http.X-Normalized-User-Agent);
+        set req.hash += req.http.X-Normalized-User-Agent;
     }
     if (req.http.Accept-Encoding) {
-        hash_data(req.http.Accept-Encoding);
+        set req.hash += req.http.Accept-Encoding;
     }
     return (hash);
 }
@@ -113,9 +113,10 @@ sub vcl_hash {
 sub vcl_fetch {
     set req.grace = {{grace_period}}s;
 
-    if (req.http.X-Opt-Force-Static-Caching == "true" &&
+    if (req.http.X-Opt-Force-Static-Caching ~ "true" &&
             bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
         call remove_cache_headers;
+        set beresp.cacheable = true;
         set beresp.ttl = {{static_ttl}}s;
     } else if (req.http.Cookie ~ "{{cookie_excludes}}" ||
         beresp.http.Set-Cookie ~ "{{cookie_excludes}}") {
@@ -125,6 +126,7 @@ sub vcl_fetch {
         return (pass);
     } else {
         call remove_cache_headers;
+        set beresp.cacheable = true;
         {{url_ttls}}
     }
 }
@@ -145,7 +147,7 @@ sub vcl_fetch {
 #https://www.varnish-cache.org/trac/wiki/VCLExampleHitMissHeader
 sub vcl_deliver {
     set resp.http.X-Opt-Debug-Headers = "{{debug_headers}}";
-    if (resp.http.X-Opt-Debug-Headers == "true") {
+    if (resp.http.X-Opt-Debug-Headers ~ "true") {
         if (obj.hits > 0) {
             set resp.http.X-Varnish-Hits = "HIT: " obj.hits;
         } else {
@@ -153,17 +155,17 @@ sub vcl_deliver {
         }
     } else {
         #remove Varnish fingerprints
-        unset resp.http.X-Varnish;
-        unset resp.http.Via;
-        unset resp.http.X-Powered-By;
-        unset resp.http.Server;
-        unset resp.http.Age;
+        remove resp.http.X-Varnish;
+        remove resp.http.Via;
+        remove resp.http.X-Powered-By;
+        remove resp.http.Server;
+        remove resp.http.Age;
     }
-    unset resp.http.X-Opt-Debug-Headers;
+    remove resp.http.X-Opt-Debug-Headers;
 }
 
 sub vcl_error {
-    unset obj.http.Server;
+    remove obj.http.Server;
 }
 
 # sub vcl_error {
