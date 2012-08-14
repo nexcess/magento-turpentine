@@ -19,6 +19,14 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
             ->renderLayout();
     }
 
+    public function testAction() {
+        $socket = Mage::getModel( 'turpentine/varnish_admin_socket' );
+        $socket->setHost( '127.0.0.1' );
+        $socket->setPort( 6082 );
+        var_dump( $socket->vcl_list() );
+        exit();
+    }
+
     /**
      * Full flush action, flushes all Magento URLs in Varnish cache
      *
