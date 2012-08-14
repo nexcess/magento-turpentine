@@ -47,7 +47,7 @@ sub vcl_recv {
     {{normalize_host}}
 
     #GCC should completely optimize any "false && <cond>" branches away, hopefully
-    if ({{enable_caching}}) {
+    if (!{{enable_caching}}) {
         return (pass);
     }
     if (req.url ~ "{{url_base_regex}}") {

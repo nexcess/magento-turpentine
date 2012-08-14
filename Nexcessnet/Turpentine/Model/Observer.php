@@ -93,6 +93,12 @@ class Nexcessnet_Turpentine_Model_Observer extends Varien_Event_Observer {
         }
     }
 
+    /**
+     * Get the current list of headers PHP intends to send to the client as a key
+     * => value array
+     *
+     * @return array
+     */
     protected function _getCurrentHeaders() {
         if( function_exists( 'headers_list' ) ) {
             $headers = array();
@@ -113,6 +119,12 @@ class Nexcessnet_Turpentine_Model_Observer extends Varien_Event_Observer {
         }
     }
 
+    /**
+     * Get the value of a header that PHP intends to send to the client
+     *
+     * @param  string $cookieName
+     * @return string
+     */
     protected function _getCookieHeaderValue( $cookieName ) {
         $headers = $this->_getCurrentHeaders();
         if( isset( $headers['Set-Cookie'] ) ) {

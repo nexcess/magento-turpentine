@@ -91,6 +91,11 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         return call_user_func_array( array( $this, '_command' ), $args );
     }
 
+    /**
+     * Get the set host for this instance
+     *
+     * @return string
+     */
     public function getHost() {
         return $this->_host;
     }
@@ -106,6 +111,11 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         return $this;
     }
 
+    /**
+     * Get the port set for this instance
+     *
+     * @return int
+     */
     public function getPort() {
         return $this->_port;
     }
@@ -232,13 +242,15 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
             $errstr, $this->_timeout );
         if( !is_resource( $this->_varnishConn ) ) {
             Mage::throwException( sprintf(
-                'Failed to connect to Varnish on [%s:%d]: %d %s',
+                'Failed to connect to Varnish on [%s:%d]: (%d) %s',
                 $this->_host, $this->_port, $errno, $errstr ) );
         }
 
         stream_set_blocking( $this->_varnishConn, 1 );
         stream_set_timeout( $this->_varnishConn, $this->_timeout );
 
+        //varnish 2.0 doesn't spit out a banner on connection, this will need
+        //to be changed if 2.0 support is ever added
         $banner = $this->_read();
         if( $banner['code'] === self::CODE_AUTH ) {
             $challenge = substr( $banner['text'], 0, 32 );
@@ -250,7 +262,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
                 $banner['text'] );
         }
 
-        return !is_null( $this->_varnishConn );
+        return $this->isConnected();
     }
 
     /**
@@ -386,10 +398,13 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
      */
     protected function _determineVersion() {
         $resp = $this->_write( 'help' )->_read();
-        if( strpos( 'ban.url', $resp['text'] ) !== false ) {
+        if( strpos( $resp['text'], 'ban.url' ) !== false ) {
             return '3.0';
-        } else {
+        } elseif( strpos( $resp['text'], 'purge.url' ) !== false &&
+                strpos( $resp['text'], 'banner' ) ) {
             return '2.1';
+        } else {
+            Mage::throwException( 'Unable to determine instance version' );
         }
     }
 }

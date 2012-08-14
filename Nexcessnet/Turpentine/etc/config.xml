@@ -9,10 +9,10 @@
         <turpentine_servers>
             <backend>
                 <backend_host>127.0.0.1</backend_host>
-                <backend_port>8080</backend_port>
+                <backend_port>80</backend_port>
             </backend>
             <servers>
-                <version>Auto</version>
+                <version>auto</version>
                 <server_list>127.0.0.1:6082</server_list>
                 <config_file>{{root_dir}}/var/default.vcl</config_file>
             </servers>

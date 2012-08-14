@@ -6,7 +6,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version2
     const VCL_TEMPLATE_FILE = 'version-2.vcl';
 
     /**
-     * Generate the Varnish 3.0-compatible VCL
+     * Generate the Varnish 2.1-compatible VCL
      *
      * @return string
      */

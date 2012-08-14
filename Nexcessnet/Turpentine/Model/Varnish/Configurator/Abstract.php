@@ -1,6 +1,7 @@
 <?php
 
 abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
+    protected $_sockets = null;
     public function __construct( $options=array() ) {
 
     }
@@ -38,15 +39,18 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return array
      */
     public function getSockets() {
-        $sockets = array();
-        foreach( explode( PHP_EOL,
-                Mage::getStoreConfig( 'turpentine_servers/servers/server_list' ) )
-                as $server ) {
-            $parts = explode( ':', $server );
-            $sockets[] = Mage::getModel( 'turpentine/varnish_admin_socket',
-                array( 'host' => $parts[0], 'port' => $parts[1] ) );
+        if( is_null( $this->_sockets ) ) {
+            $sockets = array();
+            $servers = array_filter( array_map( 'trim', explode( PHP_EOL,
+                Mage::getStoreConfig( 'turpentine_servers/servers/server_list' ) ) ) );
+            foreach( $servers as $server ) {
+                $parts = explode( ':', $server );
+                $sockets[] = Mage::getModel( 'turpentine/varnish_admin_socket',
+                    array( 'host' => $parts[0], 'port' => $parts[1] ) );
+            }
+            $this->_sockets = $sockets;
         }
-        return $sockets;
+        return $this->_sockets;
     }
 
     /**
@@ -241,21 +245,41 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             Mage::getStoreConfig( 'turpentine_control/params/get_params' ) ) ) );
     }
 
+    /**
+     * Get the Force Static Caching option
+     *
+     * @return string
+     */
     protected function _getForceCacheStatic() {
         return Mage::getStoreConfig( 'turpentine_control/static/force_static' )
             ? 'true' : 'false';
     }
 
+    /**
+     * Format the list of static cache extensions
+     *
+     * @return string
+     */
     protected function _getStaticExtensions() {
         $exts = implode( '|', array_filter( array_map( 'trim', explode( ',',
             Mage::getStoreConfig( 'turpentine_control/static/exts' ) ) ) ) );
         return $exts;
     }
 
+    /**
+     * Get the static caching TTL
+     *
+     * @return string
+     */
     protected function _getStaticTtl() {
         return Mage::getStoreConfig( 'turpentine_control/ttls/static_ttl' );
     }
 
+    /**
+     * Format the by-url TTL value list
+     *
+     * @return string
+     */
     protected function _getUrlTtls() {
         $str = array();
         $configTtls = array_filter( array_map( 'trim', explode( PHP_EOL, trim(
@@ -278,6 +302,11 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
         return $str;
     }
 
+    /**
+     * Get the Enable Caching value
+     *
+     * @return string
+     */
     protected function _getEnableCaching() {
         return Mage::getStoreConfig( 'turpentine_control/general/enable' )
             ? 'true' : 'false';
@@ -352,6 +381,11 @@ EOS;
         return $this->_formatTemplate( $tpl, $vars );
     }
 
+    /**
+     * Get the User-Agent normalization sub routine
+     *
+     * @return string
+     */
     protected function _vcl_sub_normalize_user_agent() {
         $tpl = <<<EOS
 if (req.http.User-Agent ~ "MSIE") {
@@ -376,6 +410,11 @@ EOS;
         return $tpl;
     }
 
+    /**
+     * Get the Accept-Encoding normalization sub routine
+     *
+     * @return string
+     */
     protected function _vcl_sub_normalize_encoding() {
         $tpl = <<<EOS
 if (req.http.Accept-Encoding) {
@@ -393,6 +432,11 @@ EOS;
         return $tpl;
     }
 
+    /**
+     * Get the Host normalization sub routine
+     *
+     * @return string
+     */
     protected function _vcl_sub_normalize_host() {
         $tpl = <<<EOS
 set req.http.Host = "{{normalize_host_target}}";
