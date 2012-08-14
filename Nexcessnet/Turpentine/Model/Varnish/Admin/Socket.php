@@ -231,19 +231,29 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         stream_set_blocking( $this->_varnishConn, 1 );
         stream_set_timeout( $this->_varnishConn, $this->_timeout );
 
-        $banner = $this->_read();
+        $this->_init();
 
-        if( $banner['code'] === self::CODE_AUTH ) {
-            $challenge = substr( $banner['text'], 0, 32 );
-            $response = hash( 'sha256', sprintf( "%s\n%s%s\n", $challenge,
-                $this->_authSecret, $challenge ) );
-            $banner = $this->_command( 'auth', self::CODE_OK, $response );
-        } else if( $banner['code'] !== self::CODE_OK ) {
-            Mage::throwException( 'Varnish admin authentication failed: ' .
-                $banner['text'] );
+        return !is_null( $this->_varnishConn );
+    }
+
+    public function _init() {
+        if( is_null( $this->_version ) ) {
+            $meta = stream_get_meta_data( $this->_varnishConn );
+            var_dump( $meta );
+        } elseif( $this->_version == '3.0' ) {
+            $banner = $this->_read();
+            if( $banner['code'] === self::CODE_AUTH ) {
+                $challenge = substr( $banner['text'], 0, 32 );
+                $response = hash( 'sha256', sprintf( "%s\n%s%s\n", $challenge,
+                    $this->_authSecret, $challenge ) );
+                $banner = $this->_command( 'auth', self::CODE_OK, $response );
+            } else if( $banner['code'] !== self::CODE_OK ) {
+                Mage::throwException( 'Varnish admin authentication failed: ' .
+                    $banner['text'] );
+            }
+        } else { //2.1
+            //do nothing
         }
-
-        return $banner;
     }
 
     /**
