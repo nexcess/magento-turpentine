@@ -119,7 +119,7 @@ sub vcl_fetch {
         return (deliver);
     } else if (beresp.http.X-Varnish-Bypass) {
         set beresp.ttl = {{grace_period}}s;
-        return (hit_for_pass);
+        return (pass);
     } else {
         call remove_cache_headers;
         {{url_ttls}}

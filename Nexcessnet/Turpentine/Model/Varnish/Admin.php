@@ -56,21 +56,22 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
      * @return bool
      */
     public function applyConfig() {
-        $success = true;
+        $result = array();
         $cfgr = $this->getConfigurator();
         $vcl = $cfgr->generate();
         $vclname = hash( 'sha256', microtime() );
         foreach( $cfgr->getSockets() as $socket ) {
+            $socketName = sprintf( '%s:%d', $socket->getHost(), $socket->getPort() );
             try {
                 $socket->vcl_inline( $vclname, $vcl );
                 $socket->vcl_use( $vclname );
             } catch( Mage_Core_Exception $e ) {
-                $success = $success && false;
+                $result[$socketName] = $e;
                 continue;
             }
-            $success = $success && true;
+            $result[$socketName] = true;
         }
-        return $success;
+        return $result;
     }
 
     /**

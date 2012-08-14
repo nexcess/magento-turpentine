@@ -108,14 +108,18 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
      */
     public function applyConfigAction() {
         Mage::dispatchEvent('turpentine_varnish_apply_config');
-        if( Mage::getModel( 'turpentine/varnish_admin' )->applyConfig() ) {
-            $this->_getSession()
-                ->addSuccess( Mage::helper( 'turpentine' )
-                    ->__( 'VCL successfully applied' ) );
-        } else {
-            $this->_getSession()
-                ->addError( Mage::helper( 'turpentine' )
-                    ->__( 'Failed to apply the VCL' ) );
+        $result = Mage::getModel( 'turpentine/varnish_admin' )->applyConfig();
+        foreach( $result as $name => $value ) {
+            if( $value === true ) {
+                $this->_getSession()
+                    ->addSuccess( Mage::helper( 'turpentine' )
+                        ->__( 'VCL successfully applied to ' . $name ) );
+            } else {
+                $this->_getSession()
+                    ->addError( Mage::helper( 'turpentine' )
+                        ->__( sprintf( 'Failed to apply the VCL to %s: %s',
+                            $name, $value ) ) );
+            }
         }
         $this->_redirect('*/*');
     }
