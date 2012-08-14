@@ -229,34 +229,19 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         }
 
         stream_set_blocking( $this->_varnishConn, 1 );
+        stream_set_timeout( $this->_varnishConn, $this->_timeout );
 
-        if( $this->_version != '2.1' ) {
-            try {
-                stream_set_timeout( $this->_varnishConn, 2 );
-                $banner = $this->_read();
-            } catch( Exception $e ) {
-                $meta = stream_get_meta_data( $this->_varnishConn );
-                //timeout probably, means this is v2.1
-                if( $meta['timed_out'] && is_null( $this->_version ) ) {
-                    $this->_version = '2.1';
-                    $this->_varnishConn = null;
-                    return $this->_connect();
-                } else {
-                    throw $e;
-                }
-            }
-            if( $banner['code'] === self::CODE_AUTH ) {
-                $challenge = substr( $banner['text'], 0, 32 );
-                $response = hash( 'sha256', sprintf( "%s\n%s%s\n", $challenge,
-                    $this->_authSecret, $challenge ) );
-                $banner = $this->_command( 'auth', self::CODE_OK, $response );
-            } else if( $banner['code'] !== self::CODE_OK ) {
-                Mage::throwException( 'Varnish admin authentication failed: ' .
-                    $banner['text'] );
-            }
+        $banner = $this->_read();
+        if( $banner['code'] === self::CODE_AUTH ) {
+            $challenge = substr( $banner['text'], 0, 32 );
+            $response = hash( 'sha256', sprintf( "%s\n%s%s\n", $challenge,
+                $this->_authSecret, $challenge ) );
+            $banner = $this->_command( 'auth', self::CODE_OK, $response );
+        } else if( $banner['code'] !== self::CODE_OK ) {
+            Mage::throwException( 'Varnish admin authentication failed: ' .
+                $banner['text'] );
         }
 
-        stream_set_timeout( $this->_varnishConn, $this->_timeout );
         return !is_null( $this->_varnishConn );
     }
 
@@ -392,14 +377,11 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
      * @return string
      */
     protected function _determineVersion() {
-        $this->_write( 'banner' );
-        $result = $this->_read();
-        if( $result['code'] === self::CODE_OK ) {
+        $resp = $this->_write( 'help' )->_read();
+        if( strpos( 'ban.url', $resp['text'] ) !== false ) {
             return '3.0';
-        } elseif( $result['code'] === self::CODE_UNKNOWN ) {
-            return '2.1';
         } else {
-            Mage::throwException( 'Unable to determine Varnish version' );
+            return '2.1';
         }
     }
 }
