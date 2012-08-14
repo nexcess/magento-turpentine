@@ -46,12 +46,15 @@ sub vcl_recv {
     {{normalize_user_agent}}
     {{normalize_host}}
 
-    set req.http.X-Varnish-Opt-Enable-Caching = "{{enable_caching}}";
-    if (req.http.X-Varnish-Opt-Enable-Caching == "true") {
+    set req.http.X-Opt-Enable-Caching = "{{enable_caching}}";
+    set req.http.X-Opt-Force-Static-Caching = "{{force_cache_static}}";
+    set req.http.X-Opt-Enable-Get-Excludes = "{{enable_get_excludes}}";
+
+    if (req.http.X-Opt-Enable-Caching == "true") {
         return (pass);
     }
     if (req.url ~ "{{url_base_regex}}") {
-        if ({{force_cache_static}} &&
+        if (req.http.X-Opt-Force-Static-Caching == "true" &&
                 req.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
             unset req.http.Cookie;
             return (lookup);
@@ -62,7 +65,7 @@ sub vcl_recv {
         if (req.http.Cookie ~ "{{cookie_excludes}}") {
             return (pass);
         }
-        if ({{enable_get_excludes}} &&
+        if (req.http.X-Opt-Enable-Get-Excludes == "true" &&
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
             return (pass);
         }
@@ -110,8 +113,8 @@ sub vcl_hash {
 sub vcl_fetch {
     set req.grace = {{grace_period}}s;
 
-    #GCC should optimize this entire branch away if static caching is disabled
-    if ({{force_cache_static}} && bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
+    if (req.http.X-Opt-Force-Static-Caching == "true" &&
+            bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
         call remove_cache_headers;
         set beresp.ttl = {{static_ttl}}s;
     } else if (req.http.Cookie ~ "{{cookie_excludes}}" ||
@@ -141,8 +144,8 @@ sub vcl_fetch {
 
 #https://www.varnish-cache.org/trac/wiki/VCLExampleHitMissHeader
 sub vcl_deliver {
-    #GCC should optimize this entire branch away if debug headers are disabled
-    if ({{debug_headers}}) {
+    set resp.http.X-Opt-Debug-Headers = "{{debug_headers}}";
+    if (resp.http.X-Opt-Debug-Headers == "true") {
         if (obj.hits > 0) {
             set resp.http.X-Varnish-Hits = "HIT: " obj.hits;
         } else {
@@ -156,13 +159,11 @@ sub vcl_deliver {
         unset resp.http.Server;
         unset resp.http.Age;
     }
+    unset resp.http.X-Opt-Debug-Headers;
 }
 
 sub vcl_error {
-    #GCC should optimize this entire branch away if debug headers are disabled
-    if (!{{debug_headers}}) {
-        unset obj.http.Server;
-    }
+    unset obj.http.Server;
 }
 
 # sub vcl_error {
