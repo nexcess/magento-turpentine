@@ -91,6 +91,10 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         return call_user_func_array( array( $this, '_command' ), $args );
     }
 
+    public function getHost() {
+        return $this->_host;
+    }
+
     /**
      * Set the Varnish host name/ip to connect to
      *
@@ -100,6 +104,10 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         $this->_close();
         $this->_host = $host;
         return $this;
+    }
+
+    public function getPort() {
+        return $this->_port;
     }
 
     /**
