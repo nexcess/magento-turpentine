@@ -240,7 +240,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
                 if( $meta['timed_out'] && is_null( $this->_version ) ) {
                     $this->_version = '2.1';
                     $this->_varnishConn = null;
-                    return false;
+                    return $this->_connect();
                 } else {
                     throw $e;
                 }
