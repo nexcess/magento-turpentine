@@ -66,7 +66,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
                 $socket->vcl_inline( $vclname, $vcl );
                 $socket->vcl_use( $vclname );
             } catch( Mage_Core_Exception $e ) {
-                $result[$socketName] = $e;
+                $result[$socketName] = $e->getMessage();
                 continue;
             }
             $result[$socketName] = true;
