@@ -46,8 +46,8 @@ sub vcl_recv {
     {{normalize_user_agent}}
     {{normalize_host}}
 
-    #GCC should completely optimize any "false && <cond>" branches away, hopefully
-    if ("{{enable_caching}}" == "true") {
+    set req.http.X-Varnish-Opt-Enable-Caching = "{{enable_caching}}";
+    if (req.http.X-Varnish-Opt-Enable-Caching == "true") {
         return (pass);
     }
     if (req.url ~ "{{url_base_regex}}") {
