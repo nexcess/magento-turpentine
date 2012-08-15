@@ -129,7 +129,6 @@ class Nexcessnet_Turpentine_Model_Observer extends Varien_Event_Observer {
         $headers = $this->_getCurrentHeaders();
         if( isset( $headers['Set-Cookie'] ) ) {
             $parts = array_map( 'trim', explode( ';', $headers['Set-Cookie'] ) );
-            var_dump( $parts );
             foreach( $parts as $part ) {
                 if( strpos( $part, $cookieName ) === 0 ) {
                     list( $cn, $value ) = explode( '=', $part );
