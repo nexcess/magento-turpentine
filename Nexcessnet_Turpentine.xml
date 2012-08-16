@@ -3,7 +3,7 @@
     <modules>
         <Nexcessnet_Turpentine>
             <active>true</active>
-            <codePool>local</codePool>
+            <codePool>community</codePool>
         </Nexcessnet_Turpentine>
     </modules>
 </config>

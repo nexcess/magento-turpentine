@@ -1,6 +1,6 @@
 ## Nexcess.net Turpentine (Varnish) Extension
 
 Nexcessnet_Turpentine.xml       app/etc/modules/
-Nexcessnet/Turpentine/*         app/code/local/Nexcessnet/Turpentine/
+Nexcessnet/Turpentine/*         app/code/community/Nexcessnet/Turpentine/
 turpentine/layout/turpentine.xml    app/design/adminhtml/default/default/layout/turpentine.xml
 turpentine/template/turpentine/     app/design/adminhtml/default/default/template/turpentine/
