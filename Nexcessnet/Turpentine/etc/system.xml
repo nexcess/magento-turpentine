@@ -2,17 +2,17 @@
 <!--
     Nexcess.net Turpentine Extension for Magento
     Copyright (C) 2012  Nexcess.net L.L.C.
-    
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
     (at your option) any later version.
-    
+
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-    
+
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -326,6 +326,26 @@
                         </auto_purge_actions>
                     </fields>
                 </purging>
+                <cache_cookie translate="label" module="turpentine">
+                    <label>Cache Cookie Control</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>60</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <cache_disable_actions translate="label" module="turpentine">
+                            <label>Cache Disabling Events</label>
+                            <frontend_type>textarea</frontend_type>
+                            <can_be_empty>1</can_be_empty>
+                            <comment>Events that should trigger the cache disabling cookie to be set</comment>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </cache_disable_actions>
+                    </fields>
+                </cache_cookie>
             </groups>
         </turpentine_control>
     </sections>
