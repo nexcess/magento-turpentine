@@ -3,7 +3,7 @@
 Turpentine is a Magento extension to improve Magento's compatibility with
 [Varnish](https://www.varnish-cache.org/), a very-fast caching reverse-proxy. By
 default, Varnish doesn't cache requests with cookies and Magento sends the
-__frontend__ cookie with every request causing a (near) zero hit-rate for Varnish's cache.
+*frontend* cookie with every request causing a (near) zero hit-rate for Varnish's cache.
 Turpentine provides Varnish configuration files (VCLs) to work with Magento and
 modifies Magento's behaviour to significantly improve the cache hit rate.
 
@@ -29,18 +29,15 @@ modifies Magento's behaviour to significantly improve the cache hit rate.
 ## Installation
 
  1. Install Varnish
-
   * Ensure that any Varnish instances that will be used have the management
   interface (-T option) enabled and are accessible from the web server(s) that
   Magento is running on.
 
  2. Install this Extension
-
   * [modman](https://github.com/colinmollenhour/modman) or MagentoConnect can
   be used (once this extension is actually on MagentoConnect)
 
  3. Configure the Varnish instance(s) and backend
-
   * The default is to connect to the Varnish management interface on localhost:6082
   and the backend on localhost:80 which will may not need to be changed for testing
   * Once the testing is complete and you're ready to go live, you can change backend
