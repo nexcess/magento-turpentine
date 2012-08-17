@@ -15,15 +15,17 @@ modifies Magento's behaviour to significantly improve the cache hit rate.
  - Able to apply new Varnish VCL (configurations) on the fly, without
  restarting/changing Varnish's config files
  - Cache purging by URL and content type
- - Exclude URL paths, Request Parameters (__SID, __store, etc), cookies from caching
+ - Exclude URL paths, request parameters (__SID, __store, etc), and/or cookies
+ from caching
  - Configure cache TTL by URL
- - Ability to force static asset caching even after an action that disables
- caching for a client
+ - Ability to force static asset (css, js, etc) caching even after an action
+ that disables caching for a client
  - Supports multiple Varnish instances for clustered usage
 
 ## Requirements
 
- - Magento Community Edition 1.6+ (earlier versions may work but have not been tested)
+ - Magento Community Edition 1.6+ (earlier versions may work but have not been
+ tested) or Magento Enterprise Edition 1.11+ (very little EE testing has been done)
  - Varnish 2.1+
 
 ## Installation
@@ -38,6 +40,8 @@ modifies Magento's behaviour to significantly improve the cache hit rate.
   be used (once this extension is actually on MagentoConnect)
 
  3. Configure the Varnish instance(s) and backend
+  * If you installed via modman, you will need to allow template symlinks in
+  Magento under System > Configuration > Developer > Allow Symlinks
   * The default is to connect to the Varnish management interface on localhost:6082
   and the backend on localhost:80 which will may not need to be changed for testing
   * Once the testing is complete and you're ready to go live, you can change backend
@@ -45,6 +49,6 @@ modifies Magento's behaviour to significantly improve the cache hit rate.
 
 ## Known Issues
 
- - Logging and Statistics will show all requests as coming from the same IP address
+ - Logging and statistics will show all requests as coming from the same IP address
  (usually localhost/127.0.0.1). It should be possible to work around this using
  Apache's [mod_remoteip](http://httpd.apache.org/docs/trunk/mod/mod_remoteip.html)
