@@ -41,7 +41,7 @@ modifies Magento's behaviour to significantly improve the cache hit rate.
 
  3. Configure the Varnish instance(s) and backend
   * If you installed via modman, you will need to allow template symlinks in
-  Magento under System > Configuration > Developer > Allow Symlinks
+  Magento under ``System > Configuration > Developer > Allow Symlinks``
   * The default is to connect to the Varnish management interface on localhost:6082
   and the backend on localhost:80 which will may not need to be changed for testing
   * Once the testing is complete and you're ready to go live, you can change backend
