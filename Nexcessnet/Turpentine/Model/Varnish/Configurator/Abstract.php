@@ -62,7 +62,8 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             $sockets = array();
             $servers = array_filter( array_map( 'trim', explode( PHP_EOL,
                 Mage::getStoreConfig( 'turpentine_servers/servers/server_list' ) ) ) );
-            $key = Mage::getStoreConfig( 'turpentine_servers/servers/auth_key' );
+            $key = str_replace( '\n', "\n",
+                Mage::getStoreConfig( 'turpentine_servers/servers/auth_key' ) );
             foreach( $servers as $server ) {
                 $parts = explode( ':', $server );
                 $socket = Mage::getModel( 'turpentine/varnish_admin_socket',

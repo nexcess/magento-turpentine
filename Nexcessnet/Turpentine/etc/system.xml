@@ -89,7 +89,7 @@
                         <auth_key translate="label" module="turpentine">
                             <label>Varnish Authentication Key</label>
                             <frontend_type>text</frontend_type>
-                            <comment>Authentication key for Varnish CLI access</comment>
+                            <comment>Authentication key for Varnish CLI access. This should be the exact contents of the secret file (if used), newlines can be written as \n</comment>
                             <sort_order>25</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
