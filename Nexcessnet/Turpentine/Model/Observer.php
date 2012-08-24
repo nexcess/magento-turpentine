@@ -115,7 +115,7 @@ class Nexcessnet_Turpentine_Model_Observer extends Varien_Event_Observer {
                 'turpentine_control/cache_cookie/cache_disable_actions' ) ) ) );
         foreach( $cacheDisableEvents as $event ) {
             Mage::getModel( 'turpentine/mage_shim' )->addEventObserver(
-                'admin', $event, 'turpentine', 'model', get_class( $this ),
+                'global', $event, 'turpentine', 'model', get_class( $this ),
                 'disableVarnishCaching' );
         }
     }
