@@ -69,13 +69,13 @@ cron\.php]]></url_blacklist>
                 <auto_purge_actions><![CDATA[catalog_product_save_after]]></auto_purge_actions>
             </purging>
             <cache_cookie>
-                <cache_disabling_events><![CDATA[customer_login
+                <cache_disable_actions><![CDATA[customer_login
 wishlist_add_item
 wishlist_add_product
 customer_register_success
 checkout_cart_add_product_complete
 checkout_type_onepage_save_order
-checkout_cart_product_add_before]]></cache_disabling_events>
+checkout_cart_product_add_before]]></cache_disable_actions>
             </cache_cookie>
         </turpentine_control>
     </default>
