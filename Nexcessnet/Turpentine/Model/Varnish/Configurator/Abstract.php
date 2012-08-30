@@ -127,15 +127,6 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     }
 
     /**
-     * Get the list of normalizations to apply
-     *
-     * @return array
-     */
-    protected function _getNormalizations() {
-        return array( 'encoding', 'user_agent' );
-    }
-
-    /**
      * Get the Magento admin frontname
      *
      * This is just the plain string, not in URL format. ex:

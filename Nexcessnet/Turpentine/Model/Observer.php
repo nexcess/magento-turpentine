@@ -1,23 +1,23 @@
 <?php
 
-/** 
+/**
  * Nexcess.net Turpentine Extension for Magento
  * Copyright (C) 2012  Nexcess.net L.L.C.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */ 
+ */
 
 class Nexcessnet_Turpentine_Model_Observer extends Varien_Event_Observer {
     /**
@@ -102,13 +102,21 @@ class Nexcessnet_Turpentine_Model_Observer extends Varien_Event_Observer {
      * @return null
      */
     public function registerEvents( $observer ) {
-        $events = array_filter( array_map( 'trim', explode( PHP_EOL,
+        $autoPurgeEvents = array_filter( array_map( 'trim', explode( PHP_EOL,
             Mage::getStoreConfig(
                 'turpentine_control/purging/auto_purge_actions' ) ) ) );
-        foreach( $events as $event ) {
+        foreach( $autoPurgeEvents as $event ) {
             Mage::getModel( 'turpentine/mage_shim' )->addEventObserver(
                 'admin', $event, 'turpentine', 'model', get_class( $this ),
                 'flushVarnishUrl' );
+        }
+        $cacheDisableEvents = array_filter( array_map( 'trim', explode( PHP_EOL,
+            Mage::getStoreConfig(
+                'turpentine_control/cache_cookie/cache_disable_actions' ) ) ) );
+        foreach( $cacheDisableEvents as $event ) {
+            Mage::getModel( 'turpentine/mage_shim' )->addEventObserver(
+                'global', $event, 'turpentine', 'model', get_class( $this ),
+                'disableVarnishCaching' );
         }
     }
 
