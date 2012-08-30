@@ -39,7 +39,11 @@ modifies Magento's behaviour to significantly improve the cache hit rate.
   * [modman](https://github.com/colinmollenhour/modman) or MagentoConnect can
   be used (once this extension is actually on MagentoConnect)
 
- 3. Configure the Varnish instance(s) and backend
+ 3. Disable the "No Cookies" page
+  * Set "Redirect to CMS-page if Cookies are Disabled" to "No" under ``System >
+  Configuration > Web > Browser Capabilites Detection``
+
+ 4. Configure the Varnish instance(s) and backend
   * If you installed via modman, you will need to allow template symlinks in
   Magento under ``System > Configuration > Developer > Allow Symlinks``
   * The default is to connect to the Varnish management interface on localhost:6082
