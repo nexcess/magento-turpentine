@@ -66,8 +66,12 @@ sub vcl_recv {
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
             return (pass);
         }
-        unset req.http.Cookie;
-        return (lookup);
+        if (req.http.Cookie && req.http.Cookie ~ "frontend=") {
+            unset req.http.Cookie;
+            return (lookup);
+        } else {
+            return (pass);
+        }
     }
     # else it's not part of magento so do default handling (doesn't help
     # things underneath magento but we can't detect that)
@@ -121,8 +125,10 @@ sub vcl_fetch {
         set beresp.ttl = {{grace_period}}s;
         return (hit_for_pass);
     } else {
-        call remove_cache_headers;
-        {{url_ttls}}
+        if (req.http.Cookie && req.http.Cookie ~ "frontend=") {
+            call remove_cache_headers;
+            {{url_ttls}}
+        }
     }
 }
 
