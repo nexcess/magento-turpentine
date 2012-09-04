@@ -67,6 +67,7 @@ sub vcl_recv {
             return (pass);
         }
         if (req.http.Cookie && req.http.Cookie ~ "frontend=") {
+            set req.http.X-Varnish-Cookie = req.http.Cookie;
             unset req.http.Cookie;
             return (lookup);
         } else {
@@ -125,7 +126,7 @@ sub vcl_fetch {
         set beresp.ttl = {{grace_period}}s;
         return (hit_for_pass);
     } else {
-        if (req.http.Cookie && req.http.Cookie ~ "frontend=") {
+        if (req.http.X-Varnish-Cookie) {
             call remove_cache_headers;
             {{url_ttls}}
         }
