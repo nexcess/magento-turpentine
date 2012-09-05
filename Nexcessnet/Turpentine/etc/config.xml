@@ -76,6 +76,7 @@ customer_register_success
 checkout_cart_add_product_complete
 checkout_type_onepage_save_order
 checkout_cart_product_add_before]]></cache_disable_actions>
+            <set_initial_cookie>1</set_initial_cookie>
             </cache_cookie>
         </turpentine_control>
     </default>

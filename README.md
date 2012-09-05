@@ -30,26 +30,7 @@ modifies Magento's behaviour to significantly improve the cache hit rate.
 
 ## Installation
 
- 1. Install Varnish
-  * Ensure that any Varnish instances that will be used have the management
-  interface (-T option) enabled and are accessible from the web server(s) that
-  Magento is running on.
-
- 2. Install this Extension
-  * [modman](https://github.com/colinmollenhour/modman) or MagentoConnect can
-  be used (once this extension is actually on MagentoConnect)
-
- 3. Disable the "No Cookies" page
-  * Set "Redirect to CMS-page if Cookies are Disabled" to "No" under ``System >
-  Configuration > Web > Browser Capabilites Detection``
-
- 4. Configure the Varnish instance(s) and backend
-  * If you installed via modman, you will need to allow template symlinks in
-  Magento under ``System > Configuration > Developer > Allow Symlinks``
-  * The default is to connect to the Varnish management interface on localhost:6082
-  and the backend on localhost:80 which will may not need to be changed for testing
-  * Once the testing is complete and you're ready to go live, you can change backend
-  setting and then change the web server's listening port
+See the [Installation](/nexcess/magento-turpentine/wiki/Installation) page.
 
 ## Known Issues
 

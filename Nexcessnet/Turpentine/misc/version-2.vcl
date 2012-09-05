@@ -49,6 +49,7 @@ sub vcl_recv {
     set req.http.X-Opt-Enable-Caching = "{{enable_caching}}";
     set req.http.X-Opt-Force-Static-Caching = "{{force_cache_static}}";
     set req.http.X-Opt-Enable-Get-Excludes = "{{enable_get_excludes}}";
+    set req.http.X-Opt-Set-Initial-Cookie = "{{set_initial_cookie}}";
 
     if (req.http.X-Opt-Enable-Caching !~ "true") {
         return (pass);
@@ -69,12 +70,17 @@ sub vcl_recv {
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
             return (pass);
         }
-        if (req.http.Cookie && req.http.Cookie ~ "frontend=") {
-            set req.http.X-Varnish-Cookie = req.http.Cookie;
+        if (req.http.X-Opt-Set-Initial-Cookie ~ "true") {
+            if (req.http.Cookie && req.http.Cookie ~ "frontend=") {
+                set req.http.X-Varnish-Cookie = req.http.Cookie;
+                remove req.http.Cookie;
+                return (lookup);
+            } else {
+                return (pass);
+            }
+        } else {
             remove req.http.Cookie;
             return (lookup);
-        } else {
-            return (pass);
         }
     }
     # else it's not part of magento so do default handling (doesn't help
@@ -130,7 +136,13 @@ sub vcl_fetch {
         set beresp.ttl = {{grace_period}}s;
         return (pass);
     } else {
-        if (req.http.X-Varnish-Cookie) {
+        if (req.http.X-Opt-Set-Initial-Cookie ~ "true") {
+            if (req.http.X-Varnish-Cookie) {
+                call remove_cache_headers;
+                set beresp.cacheable = true;
+                {{url_ttls}}
+            }
+        } else {
             call remove_cache_headers;
             set beresp.cacheable = true;
             {{url_ttls}}

@@ -328,6 +328,12 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             ? 'true' : 'false';
     }
 
+    protected function _getSetInitialCookie() {
+        return Mage::getStoreConfig(
+                'turpentine_control/cache_cookie/set_initial_cookie' )
+            ? 'true' : 'false';
+    }
+
     /**
      * Remove empty and commented out lines from the generated VCL
      *
