@@ -357,7 +357,7 @@
                             <label>Set Initial Cookie</label>
                             <frontend_type>select</frontend_type>
                             <source_model>turpentine/config_select_toggle</source_model>
-                            <comment>Pass the first request for a visitor through to the backend so the frontend cookie is set. If this is disabled, the "Redirect to no-cookies" page must also be disabled</comment>
+                            <comment>Pass the first request for a visitor through to the backend so the frontend cookie is set.</comment>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
