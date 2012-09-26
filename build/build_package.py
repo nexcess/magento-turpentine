@@ -100,6 +100,8 @@ class Magento_Packager(object):
     def _build_package_dom(self, pkg_dom, connect_dom, config_dom, module_dom):
         ext_name = connect_dom.find('name').text
         now = datetime.datetime.now()
+        commit_hash = self._get_git_hash()
+        self._logger.debug('Using commit hash: %s', commit_hash)
         extension = {
             'name': ext_name,
             'version': config_dom.find('modules/%s/version' % ext_name).text,
@@ -117,7 +119,7 @@ class Magento_Packager(object):
             'compatibile': None,
             'dependencies': None,
             '__packager': '%s v%s' % (__title__, __version__),
-            '__commit_hash': self._get_git_hash(),
+            '__commit_hash': commit_hash,
         }
         for key, value in extension.iteritems():
             tag = ElementTree.SubElement(pkg_dom, key)
