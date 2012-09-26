@@ -1,4 +1,33 @@
 #!/usr/bin/env python2.7
+# -*- coding: utf-8 -*-
+
+# Nexcess.net Turpentine Extension for Magento
+# Copyright (C) 2012  Nexcess.net L.L.C.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+"""Script to generate Magento Extension package files
+
+Run as: build_package.py <package_description.xml>
+"""
+
+__title__       = 'build_package.py'
+__version__     = '0.0.2'
+__author__      = 'Alex Headley <aheadley@nexcess.net>'
+__license__     = 'GPLv2'
+__copyright__   = 'Copyright (C) 2012  Nexcess.net L.L.C.'
 
 import os
 import xml.etree.ElementTree as ElementTree
@@ -16,10 +45,13 @@ class Magento_Packager(object):
         'mageetc':          'app/etc',
     }
 
-    def __init__(self, base_dir):
+    def __init__(self, base_dir, debug=False):
         self._base_dir = base_dir
         self._logger = logging.getLogger(self.__class__.__name__)
-        self._logger.setLevel(logging.DEBUG)
+        if debug:
+            self._logger.setLevel(logging.DEBUG)
+        else:
+            self._logger.setLevel(logging.INFO)
         self._logger.debug('Packager init with base dir: %s', self._base_dir)
 
     def build_package_xml(self, connect_file):
@@ -46,7 +78,7 @@ class Magento_Packager(object):
 
         return pkg_dom
 
-    def build_tarball(self, pkg_xml, tarball_name=None):
+    def build_tarball(self, pkg_xml, tarball_name=None, keep_pkg_xml=False):
         if tarball_name is None:
             tarball_name = '%s/build/%s-%s.tgz' % (self._base_dir,
                 pkg_xml.findtext('./name'), pkg_xml.findtext('./version'))
@@ -59,8 +91,9 @@ class Magento_Packager(object):
         with tarfile.open(tarball_name, 'w:gz') as tarball:
             tarball.add('app')
             tarball.add('package.xml')
-        self._logger.debug('Finished writing tarball')
-        os.unlink('package.xml')
+        self._logger.info('Finished writing tarball')
+        if not keep_pkg_xml:
+            os.unlink('package.xml')
         os.chdir(cdir)
         return tarball_name
 
@@ -83,6 +116,7 @@ class Magento_Packager(object):
             'contents': None,
             'compatibile': None,
             'dependencies': None,
+            '__packager': '%s v%s' % (__title__, __version__),
         }
         for key, value in extension.iteritems():
             tag = ElementTree.SubElement(pkg_dom, key)
@@ -208,15 +242,24 @@ class Magento_Packager(object):
         self._logger.debug('Using extension module file: %s', fn)
         return ElementTree.parse(fn)
 
-def main(args):
-    if len(args) < 2:
-        logging.error('Missing package file argument')
-    else:
-        pkgr = Magento_Packager(os.path.dirname(os.path.dirname(os.path.abspath(args[0]))))
-        pkg_xml = pkgr.build_package_xml(args[1])
-        tarball = pkgr.build_tarball(pkg_xml)
+def main(base_path, pkg_desc_file, skip_tarball=False, tarball=None, keep_package_xml=False,
+        debug=False, **kwargs):
+    pkgr = Magento_Packager(base_path, debug=debug)
+    pkg_xml = pkgr.build_package_xml(pkg_desc_file)
+    if not skip_tarball:
+        pkgr.build_tarball(pkg_xml, tarball_name=tarball,
+            keep_pkg_xml=keep_package_xml)
 
 if __name__ == '__main__':
     import sys
+    import optparse
     logging.basicConfig()
-    main(sys.argv)
+    parser = optparse.OptionParser()
+    parser.add_option('-d', '--debug', action='store_true',
+        default=os.environ.get('MPKG_DEV', False))
+    parser.add_option('-p', '--keep-package-xml', action='store_true', default=False)
+    parser.add_option('-t', '--tarball', action='store', default=None)
+    parser.add_option('-T', '--skip-tarball', action='store_true', default=False)
+    opts, args = parser.parse_args()
+    base_path = os.path.dirname(os.path.dirname(os.path.abspath(sys.argv[0])))
+    main(base_path, args[0], **vars(opts))
