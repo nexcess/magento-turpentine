@@ -117,6 +117,7 @@ class Magento_Packager(object):
             'compatibile': None,
             'dependencies': None,
             '__packager': '%s v%s' % (__title__, __version__),
+            '__commit_hash': self._get_git_hash(),
         }
         for key, value in extension.iteritems():
             tag = ElementTree.SubElement(pkg_dom, key)
@@ -241,6 +242,25 @@ class Magento_Packager(object):
         fn = os.path.join(self._base_dir, 'app/code', codepool, ns, ext, 'etc', 'config.xml')
         self._logger.debug('Using extension module file: %s', fn)
         return ElementTree.parse(fn)
+
+    def _get_git_hash(self):
+        """Get the current git commit hash
+
+        Blatently stolen from:
+        https://github.com/overviewer/Minecraft-Overviewer/blob/master/overviewer_core/util.py#L40
+        """
+        try:
+            with open(os.path.join(self._base_dir, '.git', 'HEAD'), 'r') as head_file:
+                ref = head_file.read().strip()
+            if ref[:5] == 'ref: ':
+                with open(os.path.join(self._base_dir, '.git', ref[5:]), 'r') as commit_file:
+                    return commit_file.read().strip()
+            else:
+                return ref[5:]
+        except Exception as err:
+            self._logger.warning('Couldnt read the git commit hash: %s :: %s',
+                err.__class__.__name__, err)
+            return 'UNKNOWN'
 
 def main(base_path, pkg_desc_file, skip_tarball=False, tarball=None, keep_package_xml=False,
         debug=False, **kwargs):
