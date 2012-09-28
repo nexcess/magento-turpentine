@@ -13,12 +13,15 @@
    <notes>Supports Magento v1.6 and later</notes>
    <authors>
       <name>
+         <name>Chris Wells</name>
          <name>Alex Headley</name>
       </name>
       <user>
+         <user>nexcess_net</user>
          <user>aheadley_nex</user>
       </user>
       <email>
+         <email>clwells@nexcess.net</email>
          <email>aheadley@nexcess.net</email>
       </email>
    </authors>
