@@ -41,6 +41,7 @@ class Magento_Packager(object):
     TARGET_DIRS = {
         'magelocal':        'app/code/local',
         'magecommunity':    'app/code/community',
+        'magecore':         'app/code/core',
         'magedesign':       'app/design',
         'mageetc':          'app/etc',
     }
@@ -134,14 +135,14 @@ class Magento_Packager(object):
         return pkg_dom
 
     def _build_authors_tag(self, authors_tag, connect_dom):
-        for i, author_name in enumerate(el.text for el in connect_dom.findall('authors/name/name')):
+        for i, _ in enumerate(connect_dom.findall('authors/name/name')):
             author_tag = ElementTree.SubElement(authors_tag, 'author')
             name_tag = ElementTree.SubElement(author_tag, 'name')
-            name_tag.text = author_name
+            name_tag.text = list(connect_dom.findall('authors/name/name'))[i].text
             user_tag = ElementTree.SubElement(author_tag, 'user')
-            user_tag.text = [connect_dom.findtext('authors/user/user')][i]
+            user_tag.text = list(connect_dom.findall('authors/user/user'))[i].text
             email_tag = ElementTree.SubElement(author_tag, 'email')
-            email_tag.text = [connect_dom.findtext('authors/email/email')][i]
+            email_tag.text = list(connect_dom.findall('authors/email/email'))[i].text
             self._logger.info('Added author %s (%s) <%s>', name_tag.text,
                 user_tag.text, email_tag.text)
         return authors_tag
