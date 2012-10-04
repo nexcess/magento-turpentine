@@ -4,6 +4,8 @@
 
 {{default_backend}}
 
+{{admin_backend}}
+
 ## Custom Subroutines
 sub remove_cache_headers {
     unset beresp.http.Set-Cookie;
@@ -48,6 +50,10 @@ sub vcl_recv {
 
     #GCC should completely optimize any "false && <cond>" branches away, hopefully
     if (!{{enable_caching}}) {
+        return (pass);
+    }
+    if (req.url ~ "{{url_base_regex}}{{admin_frontname}}") {
+        set req.backend = admin;
         return (pass);
     }
     if (req.url ~ "{{url_base_regex}}") {

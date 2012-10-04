@@ -44,6 +44,8 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
     protected function _getTemplateVars() {
         $vars = array(
             'default_backend'   => $this->_getDefaultBackend(),
+            'admin_backend'     => $this->_getAdminBackend(),
+            'admin_frontname'   => $this->_getAdminFrontname(),
             'normalize_host_target' => $this->_getNormalizeHostTarget(),
             'url_base_regex'    => $this->getBaseUrlPathRegex(),
             'url_excludes'  => $this->_getUrlExcludes(),

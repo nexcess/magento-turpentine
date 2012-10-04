@@ -224,9 +224,25 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getDefaultBackend() {
+        $default_options = array(
+            'first_byte_timeout'    => '300s',
+            'between_bytes_timeout' => '300s',
+        );
         return $this->_vcl_backend( 'default',
             Mage::getStoreConfig( 'turpentine_servers/backend/backend_host' ),
-            Mage::getStoreConfig( 'turpentine_servers/backend/backend_port' ) );
+            Mage::getStoreConfig( 'turpentine_servers/backend/backend_port' ),
+            $default_options );
+    }
+
+    protected function _getAdminBackend() {
+        $admin_options = array(
+            'first_byte_timeout'    => '21600s',
+            'between_bytes_timeout' => '21600s',
+        );
+        return $this->_vcl_backend( 'admin',
+            Mage::getStoreConfig( 'turpentine_servers/backend/backend_host' ),
+            Mage::getStoreConfig( 'turpentine_servers/backend/backend_port' ),
+            $admin_options );
     }
 
     /**
@@ -367,19 +383,24 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @param  string $port backend port
      * @return string
      */
-    protected function _vcl_backend( $name, $host, $port ) {
+    protected function _vcl_backend( $name, $host, $port, $options=array() ) {
         $tpl = <<<EOS
 backend {{name}} {
     .host = "{{host}}";
     .port = "{{port}}";
-}
+
 EOS;
         $vars = array(
             'host'  => $host,
             'port'  => $port,
             'name'  => $name,
         );
-        return $this->_formatTemplate( $tpl, $vars );
+        $str = $this->_formatTemplate( $tpl, $vars );
+        foreach( $options as $key => $value ) {
+            $str .= sprintf( '   .%s = %s;', $key, $value ) . PHP_EOL;
+        }
+        $str .= '}' . PHP_EOL;
+        return $str;
     }
 
     /**
