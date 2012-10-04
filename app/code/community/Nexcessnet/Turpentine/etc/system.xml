@@ -53,11 +53,32 @@
                         <backend_port translate="label" module="turpentine">
                             <label>Backend Port</label>
                             <frontend_type>text</frontend_type>
+                            <validate>validate-greater-than-zero</validate>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </backend_port>
+                        <frontend_timeout translate="label" module="turpentine">
+                            <label>Frontend Timeout</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-greater-than-zero</validate>
+                            <sort_order>30</sort_order>
+                            <comment>Timeout in seconds for Varnish to get a response from Magento's frontend</comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </frontend_timeout>
+                        <admin_timeout translate="label" module="turpentine">
+                            <label>Admin Timeout</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-greater-than-zero</validate>
+                            <sort_order>40</sort_order>
+                            <comment>Timeout in seconds for Varnish to get a response from Magento's backend</comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </admin_timeout>
                     </fields>
                 </backend>
                 <servers translate="label" module="turpentine">

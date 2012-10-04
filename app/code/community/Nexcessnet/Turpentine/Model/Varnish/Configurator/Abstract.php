@@ -224,9 +224,10 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getDefaultBackend() {
+        $timeout = Mage::getStoreConfig( 'turpentine_servers/backend/frontend_timeout' );
         $default_options = array(
-            'first_byte_timeout'    => '300s',
-            'between_bytes_timeout' => '300s',
+            'first_byte_timeout'    => $timeout . 's',
+            'between_bytes_timeout' => $timeout . 's',
         );
         return $this->_vcl_backend( 'default',
             Mage::getStoreConfig( 'turpentine_servers/backend/backend_host' ),
@@ -235,9 +236,10 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     }
 
     protected function _getAdminBackend() {
+        $timeout = Mage::getStoreConfig( 'turpentine_servers/backend/admin_timeout' );
         $admin_options = array(
-            'first_byte_timeout'    => '21600s',
-            'between_bytes_timeout' => '21600s',
+            'first_byte_timeout'    => $timeout . 's',
+            'between_bytes_timeout' => $timeout . 's',
         );
         return $this->_vcl_backend( 'admin',
             Mage::getStoreConfig( 'turpentine_servers/backend/backend_host' ),

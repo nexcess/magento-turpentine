@@ -28,6 +28,8 @@
             <backend>
                 <backend_host>127.0.0.1</backend_host>
                 <backend_port>80</backend_port>
+                <frontend_timeout>300</frontend_timeout>
+                <admin_timeout>21600</admin_timeout>
             </backend>
             <servers>
                 <version>auto</version>
