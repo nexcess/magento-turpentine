@@ -20,9 +20,28 @@
  */
 
 abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
-    protected $_sockets = null;
-    public function __construct( $options=array() ) {
+    static public function getFromSocket( $socket ) {
+        switch( $socket->getVersion() ) {
+            case '3.0':
+                return Mage::getModel(
+                    'turpentine/varnish_configurator_version3',
+                        array( 'socket' => $socket ) );
+            case '2.1':
+                return Mage::getModel(
+                    'turpentine/varnish_configurator_version2',
+                        array( 'socket' => $socket ) );
+            default:
+                Mage::throwException( 'Unsupported Varnish version' );
+        }
+    }
 
+    protected $_socket = null;
+    protected $_options = array(
+        'vcl_template'  => null,
+    );
+
+    public function __construct( $options=array() ) {
+        $this->_options = array_merge( $this->_options, $options );
     }
 
     abstract public function generate();
@@ -49,33 +68,6 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             return array( false, $err );
         }
         return array( true, null );
-    }
-
-    /**
-     * Get the list of turpentine/varnish_admin_socket models configured in
-     * the server list
-     *
-     * @return array
-     */
-    public function getSockets() {
-        if( is_null( $this->_sockets ) ) {
-            $sockets = array();
-            $servers = array_filter( array_map( 'trim', explode( PHP_EOL,
-                Mage::getStoreConfig( 'turpentine_servers/servers/server_list' ) ) ) );
-            $key = str_replace( '\n', "\n",
-                Mage::getStoreConfig( 'turpentine_servers/servers/auth_key' ) );
-            foreach( $servers as $server ) {
-                $parts = explode( ':', $server );
-                $socket = Mage::getModel( 'turpentine/varnish_admin_socket',
-                    array( 'host' => $parts[0], 'port' => $parts[1] ) );
-                if( $key ) {
-                    $socket->setAuthSecret( $key );
-                }
-                $sockets[] = $socket;
-            }
-            $this->_sockets = $sockets;
-        }
-        return $this->_sockets;
     }
 
     /**
