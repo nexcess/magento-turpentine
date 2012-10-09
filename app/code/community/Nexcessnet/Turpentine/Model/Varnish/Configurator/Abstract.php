@@ -256,7 +256,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getGracePeriod() {
-        return '15';
+        return Mage::getStoreConfig( 'turpentine_control/ttls/grace_period' );
     }
 
     /**

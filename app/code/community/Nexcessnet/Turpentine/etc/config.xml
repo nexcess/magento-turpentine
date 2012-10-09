@@ -52,6 +52,7 @@
             <ttls>
                 <default_ttl>3600</default_ttl>
                 <static_ttl>28800</static_ttl>
+                <grace_period>30</grace_period>
             </ttls>
             <urls>
                 <url_blacklist><![CDATA[wishlist/.*

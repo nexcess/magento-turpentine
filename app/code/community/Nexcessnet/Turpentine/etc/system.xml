@@ -264,6 +264,16 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </static_ttl>
+                        <grace_period translate="label" module="turpentine">
+                            <label>Grace Period (seconds)</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Peroid for which Varnish will deliver expired cached pages while waiting for the cached page to be renewed</comment>
+                            <validate>validate-greater-than-zero</validate>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </grace_period>
                     </fields>
                 </ttls>
                 <urls translate="label" module="turpentine">
