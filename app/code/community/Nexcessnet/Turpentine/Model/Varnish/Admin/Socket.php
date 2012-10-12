@@ -132,6 +132,15 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
     }
 
     /**
+     * Get the connection string for this socket (<host>:<port>)
+     *
+     * @return string
+     */
+    public function getConnectionString() {
+        return sprintf( '%s:%d', $this->getHost(), $this->getPort() );
+    }
+
+    /**
      * Get the set host for this instance
      *
      * @return string
