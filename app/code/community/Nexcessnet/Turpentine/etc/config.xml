@@ -98,6 +98,15 @@ checkout_cart_product_add_before]]></cache_disable_actions>
                 <class>Nexcessnet_Turpentine_Model</class>
             </turpentine>
         </models>
+        <cache>
+            <types>
+                <turpentine_esi_blocks>
+                    <label>Varnish ESI</label>
+                    <description>Varnish ESI blocks</description>
+                    <tags>TURPENTINE_ESI_BLOCKS</tags>
+                </turpentine_esi_blocks>
+            </types>
+        </cache>
         <events>
             <customer_logout>
                 <observers>
@@ -125,6 +134,24 @@ checkout_cart_product_add_before]]></cache_disable_actions>
             </controller_front_init_before>
         </events>
     </global>
+    <frontend>
+        <routers>
+            <turpentine>
+                <use>standard</use>
+                <args>
+                    <module>Nexcessnet_Turpentine</module>
+                    <frontName>turpentine</frontName>
+                </args>
+            </turpentine>
+        </routers>
+        <layout>
+            <updates>
+                <turpentine module="turpentine">
+                    <file>block_esi.xml</file>
+                </turpentine>
+            </updates>
+        </layout>
+    </frontend>
     <admin>
         <routers>
             <adminhtml>
@@ -151,6 +178,7 @@ checkout_cart_product_add_before]]></cache_disable_actions>
         <layout>
             <updates>
                 <turpentine module="turpentine">
+                    <file>block_esi.xml</file>
                     <file>turpentine.xml</file>
                 </turpentine>
             </updates>
