@@ -50,22 +50,4 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
         return Mage::getModel( 'core/cookie' )->get(
             $this->getNoCacheCookieName() );
     }
-
-    public function getVarnishSockets() {
-        $sockets = array();
-        $servers = array_filter( array_map( 'trim', explode( PHP_EOL,
-            Mage::getStoreConfig( 'turpentine_servers/servers/server_list' ) ) ) );
-        $key = str_replace( '\n', "\n",
-            Mage::getStoreConfig( 'turpentine_servers/servers/auth_key' ) );
-        foreach( $servers as $server ) {
-            $parts = explode( ':', $server );
-            $socket = Mage::getModel( 'turpentine/varnish_admin_socket',
-                array( 'host' => $parts[0], 'port' => $parts[1] ) );
-            if( $key ) {
-                $socket->setAuthSecret( $key );
-            }
-            $sockets[] = $socket;
-        }
-        return $sockets;
-    }
 }

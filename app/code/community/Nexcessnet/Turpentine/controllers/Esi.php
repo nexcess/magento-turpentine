@@ -8,8 +8,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
     public function getBlockAction() {
         $blockDataId = $this->getRequest()->getParam( 'blockDataId' );
         $cache = Mage::app()->getCache();
-        if( $blockData = $cache->load( $blockDataId ) ) {
-            $blockData = unserialize( $blockData );
+        if( $blockData = unserialize( $cache->load( $blockDataId ) ) ) {
             if( $registryData = $blockData->getRegistry() ) {
                 foreach( $registryData as $registryItem ) {
                     if( $registryItem['key'] ) {
