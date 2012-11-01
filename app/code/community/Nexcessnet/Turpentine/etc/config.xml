@@ -87,6 +87,16 @@ checkout_cart_product_add_before]]></cache_disable_actions>
             <turpentine>
                 <class>Nexcessnet_Turpentine_Block</class>
             </turpentine>
+            <core>
+                <rewrite>
+                    <!--
+                    Rewritten because it doesn't use a template we can replace
+                        with an ESI include tag, just dumps out a block of
+                        hard-coded HTML
+                    -->
+                    <messages>Nexcessnet_Turpentine_Block_Core_Messages</messages>
+                </rewrite>
+            </core>
         </blocks>
         <helpers>
             <turpentine>
@@ -103,7 +113,7 @@ checkout_cart_product_add_before]]></cache_disable_actions>
                 <turpentine_esi_blocks>
                     <label>Varnish ESI</label>
                     <description>Varnish ESI blocks</description>
-                    <tags>TURPENTINE_ESI_BLOCKS</tags>
+                    <tags>TURPENTINE_ESI_BLOCK</tags>
                 </turpentine_esi_blocks>
             </types>
         </cache>
