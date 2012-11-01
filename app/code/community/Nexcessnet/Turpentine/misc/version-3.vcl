@@ -125,6 +125,7 @@ sub vcl_hash {
 
 sub vcl_fetch {
     set req.grace = {{grace_period}}s;
+    unset beresp.http.Vary;
 
     #GCC should optimize this entire branch away if static caching is disabled
     if ({{force_cache_static}} && bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
@@ -147,6 +148,7 @@ sub vcl_fetch {
             {{url_ttls}}
         }
     }
+    return (deliver);
 }
 
 # sub vcl_fetch {

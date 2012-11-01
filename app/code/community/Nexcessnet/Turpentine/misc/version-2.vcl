@@ -129,6 +129,7 @@ sub vcl_hash {
 
 sub vcl_fetch {
     set req.grace = {{grace_period}}s;
+    remove beresp.http.Vary;
 
     if (req.http.X-Opt-Force-Static-Caching ~ "true" &&
             bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
@@ -154,6 +155,7 @@ sub vcl_fetch {
             {{url_ttls}}
         }
     }
+    return (deliver);
 }
 
 # sub vcl_fetch {
