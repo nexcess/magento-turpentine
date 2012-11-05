@@ -25,20 +25,20 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
     }
 
     public function getBlockAction() {
-        if( !Mage::helper( 'turpentine/esi' )->getEsiEnabled() ) {
-            Mage::throwException( 'ESI includes are not enabled' );
-        }
-        $esiDataId = $this->getRequest()->getParam( 'id' );
+        Mage::helper( 'turpentine/esi' )->ensureEsiEnabled();
+        $esiDataId = $this->getRequest()->getParam(
+            Mage::helper( 'turpentine/esi' )->getEsiDataIdParam() );
         $cache = Mage::app()->getCache();
         if( $esiData = @unserialize( $cache->load( $esiDataId ) ) ) {
             if( $registry = $esiData->getRegistry() ) {
+                //restore the cached registry
                 foreach( $registry as $key => $value ) {
                     Mage::register( $key, $value );
                 }
             }
         } else {
-            //block data not in the cache, figure out how to regenerate and
-            // cache it, or throw exception for now
+            //block data not in the cache
+            //TODO: figure out how to regenerate and cache it
             Mage::throwException( 'Block data missing from cache for ID: ' .
                 $esiDataId );
         }
@@ -63,11 +63,12 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             $layout->generateBlocks();
 
             if( $block = $layout->getBlock( $esiData->getNameInLayout() ) ) {
+                //disable ESI flag on the block to avoid infinite loop
                 $block->setEsi( false );
                 $this->getResponse()->setBody( $block->toHtml() );
                 break;
             }
-            //is this line really needed?
+            //TODO: is this line really needed?
             Mage::app()->removeCache( $layout->getUpdate()->getCacheId() );
             $layout->getUpdate()->removeHandle( $handleName );
             $layout->getUpdate()->resetUpdates();
@@ -75,19 +76,17 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
     }
 
     public function getMessagesAction() {
-        if( !Mage::helper( 'turpentine/esi' )->getEsiEnabled() ) {
-            Mage::throwException( 'ESI includes are not enabled' );
-        }
+        Mage::helper( 'turpentine/esi' )->ensureEsiEnabled();
         $responseHtml = '';
         foreach( array( 'catalog/session', 'checkout/session' ) as $className ) {
             if( $session = Mage::getSingleton( $className ) ) {
                 $this->loadLayout();
                 $messageBlock = $this->getLayout()->getMessagesBlock();
                 $messageBlock->addMessages( $session->getMessages( true ) );
-
+                //avoiding the infinite ESI loop again
                 $messageBlock->setEsi( false );
                 if( $messageHtml = $messageBlock->toHtml() ) {
-                    //set no cache flag
+                    //TODO: set no cache flag
                     $responseHtml .= $messageHtml;
                 }
             }

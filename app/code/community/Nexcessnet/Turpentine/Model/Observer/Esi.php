@@ -20,6 +20,10 @@
  */
 
 class Nexcessnet_Turpentine_Model_Observer_Esi {
+    public function prepareHttpResponse( $eventObject ) {
+        if( Mage::getSingleton( 'turpentine/'))
+    }
+
     public function injectEsi( $eventObject ) {
         $blockObject = $eventObject->getBlock();
 
@@ -43,7 +47,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi {
             $esiData->setUrl( Mage::getUrl( 'turpentine/esi/getBlock', array(
                 'cacheType'     => $esiData->getCacheType(),
                 'ttl'           => $esiData->getTtl(),
-                'id'          => $esiDataHash, //hash
+                Mage::helper( 'turpentine/esi' )->getEsiDataIdParam()
+                                => $esiDataHash, //hash
             ) ) );
 
             $tags = array(
@@ -57,7 +62,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi {
             $blockObject->setEsiData( $esiData );
 
             //flag request for ESI processing
-            Mage::dispatchEvent( 'turpentine_esi_trigger' );
+            Mage::getSingleton( 'turpentine/sentinel' )->setEsiFlag( true );
         }
     }
 
@@ -85,6 +90,9 @@ class Nexcessnet_Turpentine_Model_Observer_Esi {
             case 'per-client':
                 $ttlKey = 'turpentine_esi/ttl/per_client';
                 break;
+            case default:
+                Mage::throwException( 'Invalid block cache_type: ' .
+                    $esiOptions['cache_type'] );
         }
         $esiData->setCacheType( $esiOptions['cache_type'] );
         if( array_key_exists( 'ttl', $esiOptions ) ) {
@@ -100,6 +108,10 @@ class Nexcessnet_Turpentine_Model_Observer_Esi {
     protected function _getEsiDataHash( $esiData ) {
         $hashData = $esiData->toArray();
         sort( $hashData );
-        return sha1( serialize( $hashData ) );
+        return sha1( $this->_getHashSalt() . serialize( $hashData ) );
+    }
+
+    protected function _getHashSalt() {
+        return Mage::getStoreConfig( 'turpentine_servers/servers/auth_key' ) . ':';
     }
 }
