@@ -33,15 +33,18 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             if( $registry = $esiData->getRegistry() ) {
                 //restore the cached registry
                 foreach( $registry as $key => $value ) {
-                    Mage::register( $key, $value );
+                    Mage::register( $key, $value, true );
                 }
             }
         } else {
             //block data not in the cache
             //TODO: figure out how to regenerate and cache it
-            Mage::throwException( 'Block data missing from cache for ID: ' .
-                $esiDataId );
+            Mage::throwException( sprintf(
+                'Block data missing from cache for ID: %s',
+                $esiDataId ) );
         }
+        //this may all need to be moved up into the if block above, depending
+        //on whether it ends up being possible to regenerate block data
         $layout = Mage::getSingleton( 'core/layout' );
         $design = Mage::getSingleton( 'core/design_package' )
             ->setPackageName( $esiData->getDesignPackage() )
@@ -68,13 +71,19 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 $this->getResponse()->setBody( $block->toHtml() );
                 break;
             }
-            //TODO: is this line really needed?
+            //TODO: are these lines really needed?
             Mage::app()->removeCache( $layout->getUpdate()->getCacheId() );
             $layout->getUpdate()->removeHandle( $handleName );
             $layout->getUpdate()->resetUpdates();
         }
     }
 
+    /**
+     * Action to retrieve flash messages, needed if using getBlockAction + esi
+     * template doesn't end up working
+     *
+     * @return null
+     */
     public function getMessagesAction() {
         Mage::helper( 'turpentine/esi' )->ensureEsiEnabled();
         $responseHtml = '';

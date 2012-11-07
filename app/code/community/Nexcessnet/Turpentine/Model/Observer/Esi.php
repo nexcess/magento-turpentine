@@ -20,10 +20,55 @@
  */
 
 class Nexcessnet_Turpentine_Model_Observer_Esi {
-    public function prepareHttpResponse( $eventObject ) {
-        if( Mage::getSingleton( 'turpentine/'))
+
+    /**
+     * [setFlagHeaders description]
+     * @param [type] $eventObject [description]
+     */
+    public function setFlagHeaders( $eventObject ) {
+        $response = $eventObject->getResponse();
+        $sentinel = Mage::getSingleton( 'turpentine/sentinel' );
+        if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() &&
+                $sentinel->getCacheFlag() ) {
+            $response->setHeader( 'X-Turpentine-Cache', '1' );
+        }
+        if( Mage::helper( 'turpentine/esi' )->getEsiEnabled() &&
+                $sentinel->getEsiFlag() ) {
+            $response->setHeader( 'X-Turpentine-Esi', '1' );
+        }
     }
 
+    /**
+     * Allows disabling page-caching by setting the cache flag on a block
+     *
+     *     <turpentine_cache_flag value="0" />
+     *
+     * @param  [type] $eventObject [description]
+     * @return [type]
+     */
+    public function checkCacheFlag( $eventObject ) {
+        if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
+            $layout = $eventObject->getLayout();
+            $layoutXml = $layout->getUpdate()->asSimplexml();
+            foreach( $layoutXml->xpath( '//turpentine_cache_flag' ) as $node ) {
+                foreach( $node->attributes() as $attr => $value ) {
+                    if( $attr == 'value' ) {
+                        if( !$value ) {
+                            Mage::getSingleton( 'turpentine/sentinel' )
+                                ->setCacheFlag( false );
+                            return; //only need to set the flag once
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * [injectEsi description]
+     * @param  [type] $eventObject [description]
+     * @return [type]
+     */
     public function injectEsi( $eventObject ) {
         $blockObject = $eventObject->getBlock();
 
@@ -31,12 +76,13 @@ class Nexcessnet_Turpentine_Model_Observer_Esi {
                 $blockObject instanceof Mage_Core_Block_Template &&
                 $esiOptions = $blockObject->getEsi() ) {
 
+            //change the block's template to the stripped down ESI tag
             $blockObject->setTemplate( 'turpentine/esi.phtml' );
             $esiData = $this->_getEsiData( $blockObject, $esiOptions );
             //get this now so we don't include stuff added later
             $esiDataHash = $this->_getEsiDataHash( $esiData );
-
-            if( array_key_exists( 'registry_keys', $esiOptions ) ) {
+            $esiData->setDebugId( $this->_getEsiDebugId( $esiDataHash ) );
+            if( isset( $esiOptions['registry_keys'] ) ) {
                 $keys = array_map( 'trim',
                     explode( ',', $esiOptions['registry_keys'] ) );
                 $registry = array_combine(
@@ -48,7 +94,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi {
                 'cacheType'     => $esiData->getCacheType(),
                 'ttl'           => $esiData->getTtl(),
                 Mage::helper( 'turpentine/esi' )->getEsiDataIdParam()
-                                => $esiDataHash, //hash
+                                => $esiDataHash,
             ) ) );
 
             $tags = array(
@@ -63,7 +109,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi {
 
             //flag request for ESI processing
             Mage::getSingleton( 'turpentine/sentinel' )->setEsiFlag( true );
-        }
+        } // else handle the block like normal and cache it inline with the page
     }
 
     protected function _getEsiData( $blockObject, $esiOptions ) {
@@ -80,38 +126,42 @@ class Nexcessnet_Turpentine_Model_Observer_Esi {
         $esiData->setNameInLayout( $blockObject->getNameInLayout() );
         switch( $esiOptions['cache_type'] ) {
             case 'global':
-                $ttlKey = 'turpentine_esi/ttl/per_global';
+                $ttlKey = 'turpentine_vcl/ttls/esi_global';
                 break;
             case 'per-page':
-                $ttlKey = 'turpentine_esi/ttl/per_page';
+                $ttlKey = 'turpentine_vcl/ttls/esi_per_page';
                 $esiData->setParentUrl( Mage::app()->getRequest()
                     ->getRequestString() );
                 break;
             case 'per-client':
-                $ttlKey = 'turpentine_esi/ttl/per_client';
+                $ttlKey = 'turpentine_vcl/ttls/esi_per_client';
                 break;
             case default:
                 Mage::throwException( 'Invalid block cache_type: ' .
                     $esiOptions['cache_type'] );
         }
         $esiData->setCacheType( $esiOptions['cache_type'] );
-        if( array_key_exists( 'ttl', $esiOptions ) ) {
+        if( isset( $esiOptions['ttl'] ) ) {
             $esiData->setTtl( $esiOptions['ttl'] );
         } else {
             $esiData->setTtl( Mage::getStoreConfig( $ttlKey ) );
         }
         $esiData->setBlockType( get_class( $blockObject ) );
-
         return $esiData;
+    }
+
+    protected function _getEsiDebugId( $esiDataHash ) {
+        return sha1( $this->_getHashSalt() . $esiDataHash . microtime() )
     }
 
     protected function _getEsiDataHash( $esiData ) {
         $hashData = $esiData->toArray();
-        sort( $hashData );
+        ksort( $hashData );
         return sha1( $this->_getHashSalt() . serialize( $hashData ) );
     }
 
     protected function _getHashSalt() {
-        return Mage::getStoreConfig( 'turpentine_servers/servers/auth_key' ) . ':';
+        return Mage::helper( 'core' )->encrypt(
+            Mage::getStoreConfig( 'turpentine_varnish/servers/auth_key' ) );
     }
 }

@@ -1,0 +1,231 @@
+<?xml version="1.0"?>
+<!--
+    Nexcess.net Turpentine Extension for Magento
+    Copyright (C) 2012  Nexcess.net L.L.C.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+-->
+<layout version="0.1.0">
+    <default>
+        <!-- The cart sidebar is cached on a per-client basis -->
+        <reference name="cart_sidebar">
+            <action method="setEsi">
+                <params>
+                    <cache_type>per-client</cache_type>
+                </params>
+            </action>
+        </reference>
+
+        <!--
+        TopLinks could be cached globaly, but in a "out of the box" magento,
+        one of the links contains the number of cart items. As this information
+        is different for each client, we need to cache it on a per-client basis.
+        -->
+        <reference name="top.links">
+            <action method="setEsi">
+                <params>
+                    <cache_type>per-client</cache_type>
+                </params>
+            </action>
+        </reference>
+
+        <!-- Global messages are cached on a per-client basis -->
+        <reference name="global_messages">
+            <action method="setEsi">
+                <params>
+                    <cache_type>per-client</cache_type>
+                </params>
+            </action>
+        </reference>
+        <reference name="messages">
+            <action method="setEsi">
+                <params>
+                    <cache_type>per-client</cache_type>
+                </params>
+            </action>
+        </reference>
+    </default>
+
+    <!-- Checkout -->
+
+    <!-- We cache the checkout cart page on a per-client basis -->
+    <checkout_cart_index>
+        <reference name="checkout.cart">
+            <action method="setEsi">
+                <params>
+                    <cache_type>per-client</cache_type>
+                </params>
+            </action>
+        </reference>
+    </checkout_cart_index>
+
+    <!-- We never cache anything in the checkout funnel -->
+    <checkout_onepage_index>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_index>
+
+    <checkout_onepage_progress>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_progress>
+
+    <checkout_onepage_paymentmethod>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_paymentmethod>
+
+    <checkout_onepage_shippingmethod>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_shippingmethod>
+
+    <checkout_onepage_additional>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_additional>
+
+    <checkout_onepage_review>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_review>
+
+    <checkout_onepage_success>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_success>
+
+    <checkout_onepage_failure>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_failure>
+
+    <!-- End Checkout -->
+
+    <!-- Customer Account -->
+
+    <customer_account>
+        <turpentine_cache_flag value="0"/>
+    </customer_account>
+
+    <customer_logged_in>
+    </customer_logged_in>
+
+    <customer_logged_out>
+    </customer_logged_out>
+
+    <customer_account_login>
+    </customer_account_login>
+
+    <customer_account_logoutsuccess>
+    </customer_account_logoutsuccess>
+
+    <customer_account_create>
+    </customer_account_create>
+
+    <customer_account_forgotpassword>
+    </customer_account_forgotpassword>
+
+    <customer_account_resetpassword>
+    </customer_account_resetpassword>
+
+    <customer_account_confirmation>
+    </customer_account_confirmation>
+
+    <customer_account_edit>
+        <action method="setEsi">
+            <params>
+                <cache_type>per-client</cache_type>
+            </params>
+        </action>
+    </customer_account_edit>
+
+    <customer_account_index>
+        <!--
+        Due to "stupid line 43" in Mage_Customer_Block_Form_Register we can't
+        do a setEsi on the entire customer_account_dashboard so we do it for
+        every single sub-blocks.
+        If you want, you can override Mage_Customer_Block_Form_Register and
+        comment line 43. Then you'll be able to uncomment the 7 lines below.
+        -->
+        <!--
+        <reference name="customer_account_dashboard">
+            <action method="setEsi">
+                <params>
+                    <cache_type>per-client</cache_type>
+                </params>
+            </action>
+        </reference>
+        -->
+
+        <reference type="customer/account_dashboard_hello">
+            <action method="setEsi">
+                <params>
+                    <cache_type>per-client</cache_type>
+                </params>
+            </action>
+        </reference>
+        <reference name="customer_account_dashboard_newsletter">
+            <action method="setEsi">
+                <params>
+                    <cache_type>per-client</cache_type>
+                </params>
+            </action>
+        </reference>
+        <reference name="customer_account_dashboard_address" >
+            <action method="setEsi">
+                <params>
+                    <cache_type>per-client</cache_type>
+                </params>
+            </action>
+        </reference>
+        <reference name="customer_account_dashboard_info1">
+            <action method="setEsi">
+                <params>
+                    <cache_type>per-client</cache_type>
+                </params>
+            </action>
+        </reference>
+        <reference name="customer_account_dashboard_info2" >
+            <action method="setEsi">
+                <params>
+                    <cache_type>per-client</cache_type>
+                </params>
+            </action>
+        </reference>
+    </customer_account_index>
+
+    <customer_address_index>
+        <turpentine_cache_flag value="0"/>
+    </customer_address_index>
+
+    <customer_address_form>
+        <reference name="customer_address_edit">
+            <action method="setEsi">
+                <params>
+                    <cache_type>per-client</cache_type>
+                </params>
+            </action>
+        </reference>
+    </customer_address_form>
+
+    <!-- End Customer Account -->
+
+    <!-- Sales -->
+
+    <sales_order_history>
+        <reference name="sales.order.history">
+            <action method="setEsi">
+                <params>
+                    <cache_type>per-client</cache_type>
+                </params>
+            </action>
+        </reference>
+    </sales_order_history>
+
+    <!-- End Sales -->
+</layout>

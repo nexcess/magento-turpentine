@@ -24,26 +24,26 @@
         </Nexcessnet_Turpentine>
     </modules>
     <default>
-        <turpentine_servers>
-            <backend>
-                <backend_host>127.0.0.1</backend_host>
-                <backend_port>80</backend_port>
-                <frontend_timeout>300</frontend_timeout>
-                <admin_timeout>21600</admin_timeout>
-            </backend>
+        <turpentine_varnish>
+            <general>
+                <enable_varnish>1</enable_varnish>
+                <enable_esi>1</enable_esi>
+                <varnish_debug>1</varnish_debug>
+                <esi_debug>1</esi_debug>
+            </general>
             <servers>
                 <version>auto</version>
                 <server_list>127.0.0.1:6082</server_list>
                 <config_file>{{root_dir}}/var/default.vcl</config_file>
             </servers>
-            <debug>
-                <headers>1</headers>
-            </debug>
-        </turpentine_servers>
-        <turpentine_control>
-            <general>
-                <enable>1</enable>
-            </general>
+        </turpentine_varnish>
+        <turpentine_vcl>
+            <backend>
+                <backend_host>127.0.0.1</backend_host>
+                <backend_port>8080</backend_port>
+                <frontend_timeout>300</frontend_timeout>
+                <admin_timeout>21600</admin_timeout>
+            </backend>
             <normalization>
                 <encoding>1</encoding>
                 <user_agent>1</user_agent>
@@ -52,6 +52,9 @@
             <ttls>
                 <default_ttl>3600</default_ttl>
                 <static_ttl>28800</static_ttl>
+                <esi_global>3600</esi_global>
+                <esi_per_page>3600</esi_per_page>
+                <esi_per_client>300</esi_per_client>
             </ttls>
             <urls>
                 <url_blacklist><![CDATA[wishlist/.*
@@ -80,7 +83,7 @@ checkout_type_onepage_save_order
 checkout_cart_product_add_before]]></cache_disable_actions>
             <set_initial_cookie>1</set_initial_cookie>
             </cache_cookie>
-        </turpentine_control>
+        </turpentine_vcl>
     </default>
     <global>
         <blocks>
@@ -91,8 +94,9 @@ checkout_cart_product_add_before]]></cache_disable_actions>
                 <rewrite>
                     <!--
                     Rewritten because it doesn't use a template we can replace
-                        with an ESI include tag, just dumps out a block of
-                        hard-coded HTML
+                    with an ESI include tag, just dumps out a block of
+                    hard-coded HTML
+                    See EsiController::getMessagesAction
                     -->
                     <messages>Nexcessnet_Turpentine_Block_Core_Messages</messages>
                 </rewrite>
@@ -118,6 +122,33 @@ checkout_cart_product_add_before]]></cache_disable_actions>
             </types>
         </cache>
         <events>
+            <!-- ESI Events -->
+            <core_block_abstract_to_html_before>
+                <observers>
+                    <turpentine>
+                        <class>turpentine/observer_esi</class>
+                        <method>injectEsi</method>
+                    </turpentine>
+                </observers>
+            </core_block_abstract_to_html_before>
+            <http_response_send_before>
+                <observers>
+                    <turpentine>
+                        <class>turpentine/observer_esi</class>
+                        <method>setFlagHeaders</method>
+                    </turpentine>
+                </observers>
+            </http_response_send_before>
+            <controller_action_layout_generate_blocks_after>
+                <observers>
+                    <turpentine>
+                        <class>turpentine/observer_esi</class>
+                        <method>checkCacheFlag</method>
+                    </turpentine>
+                </observers>
+            </controller_action_layout_generate_blocks_after>
+
+            <!-- Varnish Events -->
             <customer_logout>
                 <observers>
                     <turpentine>
@@ -157,7 +188,7 @@ checkout_cart_product_add_before]]></cache_disable_actions>
         <layout>
             <updates>
                 <turpentine module="turpentine">
-                    <file>block_esi.xml</file>
+                    <file>turpentine_esi.xml</file>
                 </turpentine>
             </updates>
         </layout>
@@ -188,7 +219,6 @@ checkout_cart_product_add_before]]></cache_disable_actions>
         <layout>
             <updates>
                 <turpentine module="turpentine">
-                    <file>block_esi.xml</file>
                     <file>turpentine.xml</file>
                 </turpentine>
             </updates>
@@ -204,10 +234,10 @@ checkout_cart_product_add_before]]></cache_disable_actions>
                                 </turpentine>
                                 <config>
                                     <children>
-                                        <turpentine_servers translate="title" module="turpentine">
+                                        <turpentine_varnish translate="title" module="turpentine">
                                             <title>Turpentine Varnish Options</title>
                                         </turpentine_servers>
-                                        <turpentine_control translate="title" module="turpentine">
+                                        <turpentine_vcl translate="title" module="turpentine">
                                             <title>Turpentine Caching Options</title>
                                         </turpentine_control>
                                     </children>

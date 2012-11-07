@@ -25,11 +25,127 @@
         </Nexcessnet_Turpentine>
     </tabs>
     <sections>
-        <turpentine_servers translate="label" module="turpentine">
+        <turpentine_varnish translate="label" module="turpentine">
             <label>Varnish Options</label>
             <tab>Nexcessnet_Turpentine</tab>
             <frontend_type>text</frontend_type>
             <sort_order>10</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>0</show_in_website>
+            <show_in_store>0</show_in_store>
+            <groups>
+                <general translate="label" module="turpentine">
+                    <label>General Options</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <enable_varnish translate="label" module="turpentine">
+                            <label>Enable Varnish Caching</label>
+                            <comment>Disabling this will make Varnish pass through all requests to the backend</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>turpentine/config_select_toggle</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </enable_varnish>
+                        <enable_esi translate="label" module="turpentine">
+                            <label>Enable Varnish ESI</label>
+                            <comment>Disabling this will remove the hole-punch functionality</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>turpentine/config_select_toggle</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <enable_varnish>1</enable_varnish>
+                            </depends>
+                        </enable_esi>
+                        <varnish_debug translate="label" module="turpentine">
+                            <label>Enable Varnish Debug Info</label>
+                            <comment>This should be disabled on production sites to prevent information leakage</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>turpentine/config_select_toggle</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <enable_varnish>1</enable_varnish>
+                            </depends>
+                        </varnish_debug>
+                        <esi_debug translate="label" module="turpentine">
+                            <label>Enable ESI Debug Info</label>
+                            <comment>This should be disabled on production sites to prevent information leakage</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>turpentine/config_select_toggle</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <enable_esi>1</enable_esi>
+                            </depends>
+                        </esi_debug>
+                    </fields>
+                </general>
+                <servers translate="label" module="turpentine">
+                    <label>Servers</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <version translate="label" module="turpentine">
+                            <label>Varnish Version</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>turpentine/config_select_version</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </version>
+                        <server_list translate="label" module="turpentine">
+                            <label>Server List</label>
+                            <frontend_type>textarea</frontend_type>
+                            <comment>Should be a list of HOST:PORT pairs of the Varnish management interfaces, one per line</comment>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </server_list>
+                        <auth_key translate="label" module="turpentine">
+                            <label>Varnish Authentication Key</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Authentication key for Varnish CLI access. This should be the exact contents of the secret file (if used), newlines can be written as \n</comment>
+                            <sort_order>25</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </auth_key>
+                        <config_file translate="label" module="turpentine">
+                            <label>Config File Location</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Specify where the Varnish VCL file should be saved</comment>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </config_file>
+                    </fields>
+                </servers>
+            </groups>
+        </turpentine_varnish>
+        <turpentine_vcl translate="label" module="turpentine">
+            <label>Caching Options</label>
+            <tab>Nexcessnet_Turpentine</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>20</sort_order>
             <show_in_default>1</show_in_default>
             <show_in_website>0</show_in_website>
             <show_in_store>0</show_in_store>
@@ -81,102 +197,6 @@
                         </admin_timeout>
                     </fields>
                 </backend>
-                <servers translate="label" module="turpentine">
-                    <label>Servers</label>
-                    <frontend_type>text</frontend_type>
-                    <sort_order>10</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>0</show_in_website>
-                    <show_in_store>0</show_in_store>
-                    <fields>
-                        <version translate="label" module="turpentine">
-                            <label>Varnish Version</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>turpentine/config_select_version</source_model>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </version>
-                        <server_list translate="label" module="turpentine">
-                            <label>Server List</label>
-                            <frontend_type>textarea</frontend_type>
-                            <comment>Should be a list of HOST:PORT pairs of the Varnish management interfaces, one per line</comment>
-                            <sort_order>20</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </server_list>
-                        <auth_key translate="label" module="turpentine">
-                            <label>Varnish Authentication Key</label>
-                            <frontend_type>text</frontend_type>
-                            <comment>Authentication key for Varnish CLI access. This should be the exact contents of the secret file (if used), newlines can be written as \n</comment>
-                            <sort_order>25</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </auth_key>
-                        <config_file translate="label" module="turpentine">
-                            <label>Config File Location</label>
-                            <frontend_type>text</frontend_type>
-                            <comment>Specify where the Varnish VCL file should be saved</comment>
-                            <sort_order>30</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </config_file>
-                    </fields>
-                </servers>
-                <debug translate="label" module="turpentine">
-                    <label>Debugging</label>
-                    <frontend_type>text</frontend_type>
-                    <sort_order>20</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>0</show_in_website>
-                    <show_in_store>0</show_in_store>
-                    <fields>
-                        <headers translate="label" module="turpentine">
-                            <label>Debug Headers</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>turpentine/config_select_toggle</source_model>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </headers>
-                    </fields>
-                </debug>
-            </groups>
-        </turpentine_servers>
-        <turpentine_control translate="label" module="turpentine">
-            <label>Caching Options</label>
-            <tab>Nexcessnet_Turpentine</tab>
-            <frontend_type>text</frontend_type>
-            <sort_order>20</sort_order>
-            <show_in_default>1</show_in_default>
-            <show_in_website>0</show_in_website>
-            <show_in_store>0</show_in_store>
-            <groups>
-                <general translate="label" module="turpentine">
-                    <label>General Options</label>
-                    <frontend_type>text</frontend_type>
-                    <sort_order>10</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>0</show_in_website>
-                    <show_in_store>0</show_in_store>
-                    <fields>
-                        <enable translate="label" module="turpentine">
-                            <label>Caching Status</label>
-                            <comment>Disabling this will make Varnish pass through all requests to the backend</comment>
-                            <frontend_type>select</frontend_type>
-                            <source_model>turpentine/config_select_toggle</source_model>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </enable>
-                    </fields>
-                </general>
                 <normalization translate="label" module="turpentine">
                     <label>Normalization Options</label>
                     <frontend_type>text</frontend_type>
@@ -238,7 +258,7 @@
                     <show_in_store>0</show_in_store>
                     <fields>
                         <default_ttl translate="label" module="turpentine">
-                            <label>Default TTL (seconds)</label>
+                            <label>Default Page TTL (seconds)</label>
                             <frontend_type>text</frontend_type>
                             <validate>validate-greater-than-zero</validate>
                             <sort_order>10</sort_order>
@@ -264,6 +284,34 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </static_ttl>
+                        <esi_global translate="label" module="turpentine">
+                            <label>ESI Global TTL (seconds)</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-greater-than-zero</validate>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </esi_global>
+                        <esi_per_page translate="label" module="turpentine">
+                            <label>ESI Per-page TTL (seconds)</label>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-greater-than-zero</validate>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </esi_per_page>
+                        <esi_per_client translate="label" module="turpentine">
+                            <label>ESI Per-client TTL (seconds)</label>
+                            <comment>This should be set relatively low to keep from using large amounts of the available cache storage</comment>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-greater-than-zero</validate>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </esi_per_client>
                     </fields>
                 </ttls>
                 <urls translate="label" module="turpentine">
@@ -387,6 +435,6 @@
                     </fields>
                 </cache_cookie>
             </groups>
-        </turpentine_control>
+        </turpentine_vcl>
     </sections>
 </config>
