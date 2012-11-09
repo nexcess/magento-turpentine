@@ -62,13 +62,13 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
             'enable_caching'    => $this->_getEnableCaching(),
             'set_initial_cookie'    => $this->_getSetInitialCookie(),
         );
-        if( Mage::getStoreConfig( 'turpentine_control/normalization/encoding' ) ) {
+        if( Mage::getStoreConfig( 'turpentine_vcl/normalization/encoding' ) ) {
             $vars['normalize_encoding'] = $this->_vcl_sub_normalize_encoding();
         }
-        if( Mage::getStoreConfig( 'turpentine_control/normalization/user_agent' ) ) {
+        if( Mage::getStoreConfig( 'turpentine_vcl/normalization/user_agent' ) ) {
             $vars['normalize_user_agent'] = $this->_vcl_sub_normalize_user_agent();
         }
-        if( Mage::getStoreConfig( 'turpentine_control/normalization/host' ) ) {
+        if( Mage::getStoreConfig( 'turpentine_vcl/normalization/host' ) ) {
             $vars['normalize_host'] = $this->_vcl_sub_normalize_host();
         }
         return $vars;

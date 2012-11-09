@@ -50,6 +50,7 @@
                 <host>0</host>
             </normalization>
             <ttls>
+                <grace_period>15</grace_period>
                 <default_ttl>3600</default_ttl>
                 <static_ttl>28800</static_ttl>
                 <esi_global>3600</esi_global>
@@ -149,26 +150,18 @@ checkout_cart_product_add_before]]></cache_disable_actions>
             </controller_action_layout_generate_blocks_after>
 
             <!-- Varnish Events -->
-            <customer_logout>
+            <http_response_send_before>
                 <observers>
                     <turpentine>
-                        <class>turpentine/observer</class>
-                        <method>enableVarnishCaching</method>
+                        <class>turpentine/observer_varnish</class>
+                        <method>setCacheFlagHeader</method>
                     </turpentine>
                 </observers>
-            </customer_logout>
-            <controller_action_predispatch_wishlist>
-                <observers>
-                    <turpentine>
-                        <class>turpentine/observer</class>
-                        <method>bypassVarnishCaching</method>
-                    </turpentine>
-                </observers>
-            </controller_action_predispatch_wishlist>
+            </http_response_send_before>
             <controller_front_init_before>
                 <observers>
                     <turpentine>
-                        <class>turpentine/observer</class>
+                        <class>turpentine/observer_varnish</class>
                         <method>registerEvents</method>
                     </turpentine>
                 </observers>
@@ -236,10 +229,10 @@ checkout_cart_product_add_before]]></cache_disable_actions>
                                     <children>
                                         <turpentine_varnish translate="title" module="turpentine">
                                             <title>Turpentine Varnish Options</title>
-                                        </turpentine_servers>
+                                        </turpentine_varnish>
                                         <turpentine_vcl translate="title" module="turpentine">
                                             <title>Turpentine Caching Options</title>
-                                        </turpentine_control>
+                                        </turpentine_vcl>
                                     </children>
                                 </config>
                             </children>

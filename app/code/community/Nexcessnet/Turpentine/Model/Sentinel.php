@@ -40,11 +40,8 @@ class Nexcess_Turpentine_Model_Sentinel extends Mage_Core_Model_Abstract {
      * @param bool $value=null turn flag on or off, null flips value
      */
     public function setCacheFlag( $value=null ) {
-        if( is_null( $value ) ) {
-            return $this->_cacheFlag = !$this->_cacheFlag;
-        } else {
-            return $this->_cacheFlag = (bool)$value;
-        }
+        return $this->_cacheFlag = (
+            is_null( $value ) ? !$this->_cacheFlag : (bool)$value );
     }
 
     /**
@@ -62,11 +59,8 @@ class Nexcess_Turpentine_Model_Sentinel extends Mage_Core_Model_Abstract {
      * @param bool $value=null turn flag on or off, null flips value
      */
     public function setEsiFlag( $value=null ) {
-        if( is_null( $value ) ) {
-            return $this->_esiFlag = !$this->_esiFlag;
-        } else {
-            return $this->_esiFlag = (bool)$value;
-        }
+        return $this->_esiFlag = (
+            is_null( $value ) ? !$this->_esiFlag : (bool)$value );
     }
 
     /**

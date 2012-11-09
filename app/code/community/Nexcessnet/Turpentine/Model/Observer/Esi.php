@@ -19,22 +19,21 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-class Nexcessnet_Turpentine_Model_Observer_Esi {
+class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
 
     /**
-     * [setFlagHeaders description]
+     * Check the ESI flag and set the ESI header if needed
+     *
+     * Events: http_response_send_before
+     *
      * @param [type] $eventObject [description]
      */
     public function setFlagHeaders( $eventObject ) {
         $response = $eventObject->getResponse();
         $sentinel = Mage::getSingleton( 'turpentine/sentinel' );
-        if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() &&
-                $sentinel->getCacheFlag() ) {
-            $response->setHeader( 'X-Turpentine-Cache', '1' );
-        }
-        if( Mage::helper( 'turpentine/esi' )->getEsiEnabled() &&
-                $sentinel->getEsiFlag() ) {
-            $response->setHeader( 'X-Turpentine-Esi', '1' );
+        if( Mage::helper( 'turpentine/esi' )->getEsiEnabled() ) {
+            $response->setHeader( 'X-Turpentine-Esi',
+                $sentinel->getEsiFlag() ? '1' : '0' );
         }
     }
 
@@ -42,6 +41,9 @@ class Nexcessnet_Turpentine_Model_Observer_Esi {
      * Allows disabling page-caching by setting the cache flag on a block
      *
      *     <turpentine_cache_flag value="0" />
+     *
+     *
+     * Events: controller_action_layout_generate_blocks_after
      *
      * @param  [type] $eventObject [description]
      * @return [type]
@@ -65,7 +67,10 @@ class Nexcessnet_Turpentine_Model_Observer_Esi {
     }
 
     /**
-     * [injectEsi description]
+     * Cache block content then replace with ESI template
+     *
+     * Events: core_block_abstract_to_html_before
+     *
      * @param  [type] $eventObject [description]
      * @return [type]
      */
@@ -136,7 +141,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi {
             case 'per-client':
                 $ttlKey = 'turpentine_vcl/ttls/esi_per_client';
                 break;
-            case default:
+            default:
                 Mage::throwException( 'Invalid block cache_type: ' .
                     $esiOptions['cache_type'] );
         }
@@ -151,7 +156,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi {
     }
 
     protected function _getEsiDebugId( $esiDataHash ) {
-        return sha1( $this->_getHashSalt() . $esiDataHash . microtime() )
+        return sha1( $this->_getHashSalt() . $esiDataHash . microtime() );
     }
 
     protected function _getEsiDataHash( $esiData ) {

@@ -21,8 +21,6 @@
 
 class Nexcessnet_Turpentine_Model_Varnish_Admin {
 
-    protected $_configurator = null;
-
     /**
      * Flush all Magento URLs in Varnish cache
      *

@@ -8,12 +8,15 @@
 
 ## Custom Subroutines
 sub remove_cache_headers {
-    unset beresp.http.Set-Cookie;
     unset beresp.http.Cache-Control;
     unset beresp.http.Expires;
     unset beresp.http.Pragma;
     unset beresp.http.Cache;
     unset beresp.http.Age;
+}
+
+sub remove_double_slashes {
+    set req.url = regsub(req.url, "(.*)//(.*)", "\1/\2");
 }
 
 ## Varnish Subroutines
@@ -41,20 +44,26 @@ sub vcl_recv {
 
     if (req.request != "GET" && req.request != "HEAD") {
         /* We only deal with GET and HEAD by default */
-        return (pass);
+        return (pipe);
     }
+
+    call remove_double_slashes;
 
     {{normalize_encoding}}
     {{normalize_user_agent}}
     {{normalize_host}}
 
     #GCC should completely optimize any "false && <cond>" branches away, hopefully
-    if (!{{enable_caching}}) {
-        return (pass);
+    if (!{{enable_caching}} || req.http.Authorization) {
+        return (pipe);
     }
     if (req.url ~ "{{url_base_regex}}{{admin_frontname}}") {
         set req.backend = admin;
-        return (pass);
+        return (pipe);
+    }
+    if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock" &&
+            req.esi_level < 1) {
+        error 403 "External ESI requests are not allowed";
     }
     if (req.url ~ "{{url_base_regex}}") {
         if ({{force_cache_static}} &&
@@ -65,25 +74,11 @@ sub vcl_recv {
         if (req.url ~ "{{url_base_regex}}(?:{{url_excludes}})") {
             return (pass);
         }
-        if (req.http.Cookie ~ "{{cookie_excludes}}") {
-            return (pass);
-        }
         if ({{enable_get_excludes}} &&
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
             return (pass);
         }
-        if ({{set_initial_cookie}}) {
-            if (req.http.Cookie && req.http.Cookie ~ "frontend=") {
-                set req.http.X-Varnish-Cookie = req.http.Cookie;
-                unset req.http.Cookie;
-                return (lookup);
-            } else {
-                return (pass);
-            }
-        } else {
-            unset req.http.Cookie;
-            return (lookup);
-        }
+        return (lookup);
     }
     # else it's not part of magento so do default handling (doesn't help
     # things underneath magento but we can't detect that)
@@ -111,6 +106,11 @@ sub vcl_hash {
     if (req.http.Accept-Encoding) {
         hash_data(req.http.Accept-Encoding);
     }
+    if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock.*cacheType/per-client") {
+        if (req.http.Cookie ~ "frontend") {
+            hash_data(regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1"));
+        }
+    }
     return (hash);
 }
 
@@ -126,25 +126,27 @@ sub vcl_hash {
 sub vcl_fetch {
     set req.grace = {{grace_period}}s;
 
-    #GCC should optimize this entire branch away if static caching is disabled
-    if ({{force_cache_static}} && bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
-        call remove_cache_headers;
-        set beresp.ttl = {{static_ttl}}s;
-    } else if (req.http.Cookie ~ "{{cookie_excludes}}" ||
-        beresp.http.Set-Cookie ~ "{{cookie_excludes}}") {
-        return (deliver);
-    } else if (beresp.http.X-Varnish-Bypass) {
+    if (beresp.status != 200 && beresp.status != 404) {
         set beresp.ttl = {{grace_period}}s;
         return (hit_for_pass);
     } else {
-        if ({{set_initial_cookie}}) {
-            if (req.http.X-Varnish-Cookie) {
+        if (beresp.http.X-Turpentine-Esi ~ "1") {
+            set beresp.do_esi = true;
+        }
+        set beresp.do_gzip = true;
+        if (beresp.http.X-Turpentine-Cache ~ "0") {
+            set beresp.ttl = 0s;
+            return (hit_for_pass);
+        } else {
+            if ({{force_cache_static}} &&
+                    bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
+                call remove_cache_headers;
+                set beresp.ttl = {{static_ttl}}s;
+            } else {
                 call remove_cache_headers;
                 {{url_ttls}}
             }
-        } else {
-            call remove_cache_headers;
-            {{url_ttls}}
+            return (deliver);
         }
     }
 }
@@ -171,6 +173,7 @@ sub vcl_deliver {
         } else {
             set resp.http.X-Varnish-Hits = "MISS";
         }
+        set resp.http.X-Varnish-EsiLevel = req.esi_level;
     } else {
         #remove Varnish fingerprints
         unset resp.http.X-Varnish;
@@ -178,6 +181,8 @@ sub vcl_deliver {
         unset resp.http.X-Powered-By;
         unset resp.http.Server;
         unset resp.http.Age;
+        unset resp.http.X-Turpentine-Cache;
+        unset resp.http.X-Turpentine-Esi;
     }
 }
 
