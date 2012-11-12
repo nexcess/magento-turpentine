@@ -23,7 +23,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     const ESI_DATA_ID_PARAM     = 'esiId';
 
     public function getEsiEnabled() {
-        return Mage::helper( 'turpentine/data' )->getVarnishEnabled() &&
+        return Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() &&
             Mage::getStoreConfig( 'turpentine_varnish/general/enable_esi' );
     }
 
