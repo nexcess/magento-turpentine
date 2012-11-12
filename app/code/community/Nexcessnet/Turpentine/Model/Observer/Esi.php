@@ -32,6 +32,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $response = $eventObject->getResponse();
         $sentinel = Mage::getSingleton( 'turpentine/sentinel' );
         if( Mage::helper( 'turpentine/esi' )->getEsiEnabled() ) {
+            Mage::log( 'Setting ESI flag to: ' . $sentinel->getEsiFlag() );
             $response->setHeader( 'X-Turpentine-Esi',
                 $sentinel->getEsiFlag() ? '1' : '0' );
         }
@@ -108,6 +109,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 'TURPENTINE_ESI_BLOCKTYPE_' . $esiData->getBlockType(),
                 'TURPENTINE_ESI_BLOCKNAME_' . $esiData->getNameInLayout(),
             );
+            Mage::log( 'Saving ESI block: ' . $esiDataHash );
             Mage::app()->getCache()->save( serialize( $esiData ),
                 $esiDataHash, $tags, null );
             $blockObject->setEsiData( $esiData );
@@ -129,26 +131,26 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $esiData->setDesignPackage( Mage::getDesign()->getPackageName() );
         $esiData->setDesignTheme( Mage::getDesign()->getTheme( 'layout' ) );
         $esiData->setNameInLayout( $blockObject->getNameInLayout() );
-        switch( $esiOptions['cache_type'] ) {
-            case 'global':
-                $ttlKey = 'turpentine_vcl/ttls/esi_global';
-                break;
-            case 'per-page':
-                $ttlKey = 'turpentine_vcl/ttls/esi_per_page';
-                $esiData->setParentUrl( Mage::app()->getRequest()
-                    ->getRequestString() );
-                break;
-            case 'per-client':
-                $ttlKey = 'turpentine_vcl/ttls/esi_per_client';
-                break;
-            default:
-                Mage::throwException( 'Invalid block cache_type: ' .
-                    $esiOptions['cache_type'] );
-        }
         $esiData->setCacheType( $esiOptions['cache_type'] );
         if( isset( $esiOptions['ttl'] ) ) {
             $esiData->setTtl( $esiOptions['ttl'] );
         } else {
+            switch( $esiOptions['cache_type'] ) {
+                case 'global':
+                    $ttlKey = 'turpentine_vcl/ttls/esi_global';
+                    break;
+                case 'per-page':
+                    $ttlKey = 'turpentine_vcl/ttls/esi_per_page';
+                    $esiData->setParentUrl( Mage::app()->getRequest()
+                        ->getRequestString() );
+                    break;
+                case 'per-client':
+                    $ttlKey = 'turpentine_vcl/ttls/esi_per_client';
+                    break;
+                default:
+                    Mage::throwException( 'Invalid block cache_type: ' .
+                        $esiOptions['cache_type'] );
+            }
             $esiData->setTtl( Mage::getStoreConfig( $ttlKey ) );
         }
         $esiData->setBlockType( get_class( $blockObject ) );

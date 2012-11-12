@@ -1,5 +1,9 @@
 ## Nexcessnet_Turpentine Varnish v3 VCL Template
 
+## Imports
+
+import std;
+
 ## Backends
 
 {{default_backend}}
@@ -71,9 +75,11 @@ sub vcl_recv {
             unset req.http.Cookie;
             return (lookup);
         }
+        /*
         if (req.url ~ "{{url_base_regex}}(?:{{url_excludes}})") {
             return (pass);
         }
+        */
         if ({{enable_get_excludes}} &&
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
             return (pass);
@@ -135,13 +141,16 @@ sub vcl_fetch {
         }
         set beresp.do_gzip = true;
         if (beresp.http.X-Turpentine-Cache ~ "0") {
-            set beresp.ttl = 0s;
+            set beresp.ttl = {{grace_period}}s;
             return (hit_for_pass);
         } else {
             if ({{force_cache_static}} &&
                     bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
                 call remove_cache_headers;
                 set beresp.ttl = {{static_ttl}}s;
+            } elseif (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/.*") {
+                call remove_cache_headers;
+                set beresp.ttl = std.duration(regsub(req.url, ".*/ttl/([0-9]+)/.*", "\1s"), 3600s);
             } else {
                 call remove_cache_headers;
                 {{url_ttls}}

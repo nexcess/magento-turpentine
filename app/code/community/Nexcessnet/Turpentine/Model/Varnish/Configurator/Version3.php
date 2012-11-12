@@ -52,7 +52,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
             'get_param_excludes'    => $this->_getGetParamExcludes(),
             'default_ttl'   => $this->_getDefaultTtl(),
             'enable_get_excludes'   => ($this->_getGetParamExcludes() ? 'true' : 'false'),
-            'cookie_excludes'  => $this->_getCookieExcludes(),
+            //'cookie_excludes'  => $this->_getCookieExcludes(),
             'debug_headers' => $this->_getEnableDebugHeaders(),
             'grace_period'  => $this->_getGracePeriod(),
             'force_cache_static'    => $this->_getForceCacheStatic(),
@@ -60,7 +60,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
             'static_ttl'    => $this->_getStaticTtl(),
             'url_ttls'      => $this->_getUrlTtls(),
             'enable_caching'    => $this->_getEnableCaching(),
-            'set_initial_cookie'    => $this->_getSetInitialCookie(),
+            //'set_initial_cookie'    => $this->_getSetInitialCookie(),
         );
         if( Mage::getStoreConfig( 'turpentine_vcl/normalization/encoding' ) ) {
             $vars['normalize_encoding'] = $this->_vcl_sub_normalize_encoding();

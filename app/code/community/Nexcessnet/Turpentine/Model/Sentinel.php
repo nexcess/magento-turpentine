@@ -19,7 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-class Nexcess_Turpentine_Model_Sentinel extends Mage_Core_Model_Abstract {
+class Nexcessnet_Turpentine_Model_Sentinel extends Mage_Core_Model_Abstract {
     /**
      * Use cache flag
      *

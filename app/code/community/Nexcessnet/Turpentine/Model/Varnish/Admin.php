@@ -43,7 +43,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
         foreach( Mage::helper( 'turpentine/varnish' )->getSockets() as $socket ) {
             $socketName = $socket->getConnectionString();
             try {
-                $socket->ban_url( $pattern );
+                $socket->ban_url( $subPattern );
             } catch( Mage_Core_Exception $e ) {
                 $result[$socketName] = $e->getMessage();
                 continue;

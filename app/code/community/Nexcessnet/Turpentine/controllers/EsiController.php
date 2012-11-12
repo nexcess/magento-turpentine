@@ -30,6 +30,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             Mage::helper( 'turpentine/esi' )->getEsiDataIdParam() );
         $cache = Mage::app()->getCache();
         if( $esiData = @unserialize( $cache->load( $esiDataId ) ) ) {
+            Mage::log( 'Loading ESI block: ' . $esiDataId );
             if( $registry = $esiData->getRegistry() ) {
                 //restore the cached registry
                 foreach( $registry as $key => $value ) {
@@ -58,7 +59,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         $handleNames = $layoutXml->xpath( sprintf(
             '//block[@name=\'%s\']/ancestor::node()[last()-2]',
             $esiData->getNameInLayout() ) );
-        foreach( $handles as $handle ) {
+        foreach( $handleNames as $handle ) {
             $handleName = $handle->getName();
             $layout->getUpdate()->addHandle( $handleName );
             $layout->getUpdate()->load();

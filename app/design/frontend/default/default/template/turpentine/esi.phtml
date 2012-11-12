@@ -20,16 +20,18 @@
  */
 
 $esiData = array(
-    'link'      => sprintf( '<!--esi <esi:include src="%s" /> -->',
+    'link'      => sprintf( '<esi:remove>ESI processing not enabled</esi:remove><!--esi <esi:include src="%s" /> -->',
         $this->getEsiData()->getUrl() ),
     'debugId'   => $this->getEsiData()->getDebugId(),
-    'debugEnabled'  => Mage::helper( 'turpentine/esi' )->getDebugEnabled(),
+    'debugEnabled'  => Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled(),
 );
 
 if( $esiData['debugEnabled'] ) {
-    echo sprintf( '<!-- ESI START [%s] -->', $esiData['debugId'] ) . PHP_EOL;
+    echo sprintf( '<!-- ESI START [%s:%s] -->', $this->getNameInLayout(),
+        $esiData['debugId'] ) . PHP_EOL;
 }
 echo $esiData['link'] . PHP_EOL;
 if( $esiData['debugEnabled'] ) {
-    echo sprintf( '<!-- ESI END [%s] -->', $esiData['debugId'] ) . PHP_EOL;
+    echo sprintf( '<!-- ESI END [%s:%s] -->', $this->getNameInLayout(),
+        $esiData['debugId'] ) . PHP_EOL;
 }

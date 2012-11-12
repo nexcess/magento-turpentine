@@ -152,10 +152,10 @@ checkout_cart_product_add_before]]></cache_disable_actions>
             <!-- Varnish Events -->
             <http_response_send_before>
                 <observers>
-                    <turpentine>
+                    <turpentine_varnish>
                         <class>turpentine/observer_varnish</class>
                         <method>setCacheFlagHeader</method>
-                    </turpentine>
+                    </turpentine_varnish>
                 </observers>
             </http_response_send_before>
         </events>
