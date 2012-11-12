@@ -158,14 +158,6 @@ checkout_cart_product_add_before]]></cache_disable_actions>
                     </turpentine>
                 </observers>
             </http_response_send_before>
-            <controller_front_init_before>
-                <observers>
-                    <turpentine>
-                        <class>turpentine/observer_varnish</class>
-                        <method>registerEvents</method>
-                    </turpentine>
-                </observers>
-            </controller_front_init_before>
         </events>
     </global>
     <frontend>
