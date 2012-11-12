@@ -66,20 +66,20 @@ sub vcl_recv {
         return (pipe);
     }
     if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock" &&
-            req.esi_level < 1) {
+            req.esi_level == 0) {
         error 403 "External ESI requests are not allowed";
     }
     if (req.url ~ "{{url_base_regex}}") {
+        if (req.http.Cookie ~ "frontend=") {
+            set req.http.X-Varnish-Cookie = req.http.Cookie;
+        } else {
+            return (pass);
+        }
         if ({{force_cache_static}} &&
                 req.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
             unset req.http.Cookie;
             return (lookup);
         }
-        /*
-        if (req.url ~ "{{url_base_regex}}(?:{{url_excludes}})") {
-            return (pass);
-        }
-        */
         if ({{enable_get_excludes}} &&
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
             return (pass);
@@ -95,9 +95,14 @@ sub vcl_pipe {
     return (pipe);
 }
 
-# sub vcl_pass {
-#     return (pass);
-# }
+sub vcl_pass {
+    if (req.esi_level == 0 && req.http.X-Varnish-Cookie) {
+        unset req.http.Cookie;
+    } elsif (req.esi_level > 0 && req.http.X-Varnish-Cookie) {
+        set req.http.Cookie = req.http.X-Varnish-Cookie;
+    }
+    return (pass);
+}
 
 sub vcl_hash {
     hash_data(req.url);
@@ -112,8 +117,8 @@ sub vcl_hash {
     if (req.http.Accept-Encoding) {
         hash_data(req.http.Accept-Encoding);
     }
-    if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock.*cacheType/per-client") {
-        if (req.http.Cookie ~ "frontend") {
+    if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/.*") {
+        if (req.url ~ "/cacheType/per-client/" && req.http.Cookie ~ "frontend") {
             hash_data(regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1"));
         }
     }
@@ -136,6 +141,18 @@ sub vcl_fetch {
         set beresp.ttl = {{grace_period}}s;
         return (hit_for_pass);
     } else {
+        if(beresp.http.Set-Cookie) {
+            set beresp.http.X-Varnish-Set-Cookie = beresp.http.Set-Cookie;
+            unset beresp.http.Set-Cookie;
+        }
+        if (req.http.Cookie !~ "frontend=") {
+            set beresp.http.X-Varnish-Use-Set-Cookie = "1";
+        }
+/*
+        if (req.http.Cookie ~ "frontend=") {
+            unset beresp.http.Set-Cookie;
+        }
+*/
         if (beresp.http.X-Turpentine-Esi ~ "1") {
             set beresp.do_esi = true;
         }
@@ -144,6 +161,7 @@ sub vcl_fetch {
             set beresp.ttl = {{grace_period}}s;
             return (hit_for_pass);
         } else {
+            unset beresp.http.Vary;
             if ({{force_cache_static}} &&
                     bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
                 call remove_cache_headers;
@@ -155,9 +173,9 @@ sub vcl_fetch {
                 call remove_cache_headers;
                 {{url_ttls}}
             }
-            return (deliver);
         }
     }
+    return (deliver);
 }
 
 # sub vcl_fetch {
@@ -175,13 +193,16 @@ sub vcl_fetch {
 
 #https://www.varnish-cache.org/trac/wiki/VCLExampleHitMissHeader
 sub vcl_deliver {
+    if (resp.http.X-Varnish-Use-Set-Cookie) {
+        set resp.http.Set-Cookie = resp.http.X-Varnish-Set-Cookie;
+        unset resp.http.X-Varnish-Set-Cookie;
+        unset resp.http.X-Varnish-Use-Set-Cookie;
+    } else {
+        unset resp.http.X-Varnish-Set-Cookie;
+    }
     #GCC should optimize this entire branch away if debug headers are disabled
     if ({{debug_headers}}) {
-        if (obj.hits > 0) {
-            set resp.http.X-Varnish-Hits = "HIT: " + obj.hits;
-        } else {
-            set resp.http.X-Varnish-Hits = "MISS";
-        }
+        set resp.http.X-Varnish-Hits = obj.hits;
         set resp.http.X-Varnish-EsiLevel = req.esi_level;
     } else {
         #remove Varnish fingerprints

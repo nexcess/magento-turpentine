@@ -146,6 +146,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                     break;
                 case 'per-client':
                     $ttlKey = 'turpentine_vcl/ttls/esi_per_client';
+                    //TODO: may need to set session id like parent url
                     break;
                 default:
                     Mage::throwException( 'Invalid block cache_type: ' .
