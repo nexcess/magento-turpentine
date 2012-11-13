@@ -18,8 +18,30 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 -->
 <layout version="0.1.0">
+    <!--
+    Editing XML files sucks, I want to move this to the configuration
+    interface once I think of a good way to without losing functionality
+    and ease-of-use.
+
+    Maybe something like:
+        in turpentine_varnish/esi/blocks:
+            $BLOCK_NAME[,$CACHE_TYPE[,$TTL[,$REGISTRY_KEYS]]]
+        with $REGISTRY_KEYS being separated by | (pipe)
+        ex: header,per-client,300,key1|key2|key3
+    -->
     <default>
-        <!-- The cart sidebar is cached on a per-client basis -->
+        <!--
+        A default Magento site includes a logged in user's name in the welcome
+        message and the number of items in the shopping cart so it must be
+        cached per-client.
+        -->
+        <reference name="header">
+            <action method="setEsi">
+                <params>
+                    <cache_type>per-client</cache_type>
+                </params>
+            </action>
+        </reference>
         <reference name="cart_sidebar">
             <action method="setEsi">
                 <params>
@@ -27,13 +49,21 @@
                 </params>
             </action>
         </reference>
-
-        <!--
-        TopLinks could be cached globaly, but in a "out of the box" magento,
-        one of the links contains the number of cart items. As this information
-        is different for each client, we need to cache it on a per-client basis.
-        -->
-        <reference name="top.links">
+        <reference name="catalog.compare.sidebar">
+            <action method="setEsi">
+                <params>
+                    <cache_type>per-client</cache_type>
+                </params>
+            </action>
+        </reference>
+        <reference name="right.reports.product.viewed">
+            <action method="setEsi">
+                <params>
+                    <cache_type>per-client</cache_type>
+                </params>
+            </action>
+        </reference>
+        <reference name="right.reports.product.viewed">
             <action method="setEsi">
                 <params>
                     <cache_type>per-client</cache_type>
@@ -41,7 +71,7 @@
             </action>
         </reference>
 
-        <!-- Global messages are cached on a per-client basis -->
+        <!-- Messages are cached on a per-client basis -->
         <reference name="global_messages">
             <action method="setEsi">
                 <params>
@@ -112,28 +142,28 @@
         <turpentine_cache_flag value="0"/>
     </customer_account>
 
-    <customer_logged_in>
-    </customer_logged_in>
-
-    <customer_logged_out>
-    </customer_logged_out>
-
     <customer_account_login>
+        <turpentine_cache_flag value="0"/>
     </customer_account_login>
 
     <customer_account_logoutsuccess>
+        <turpentine_cache_flag value="0"/>
     </customer_account_logoutsuccess>
 
     <customer_account_create>
+        <turpentine_cache_flag value="0"/>
     </customer_account_create>
 
     <customer_account_forgotpassword>
+        <turpentine_cache_flag value="0"/>
     </customer_account_forgotpassword>
 
     <customer_account_resetpassword>
+        <turpentine_cache_flag value="0"/>
     </customer_account_resetpassword>
 
     <customer_account_confirmation>
+        <turpentine_cache_flag value="0"/>
     </customer_account_confirmation>
 
     <customer_account_edit>
@@ -161,8 +191,7 @@
             </action>
         </reference>
         -->
-
-        <reference type="customer/account_dashboard_hello">
+        <reference type="customer_account_dashboard_hello">
             <action method="setEsi">
                 <params>
                     <cache_type>per-client</cache_type>

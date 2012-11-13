@@ -54,17 +54,18 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
     }
 
     /**
-     * Flush all cached objects with the given content type
+     * Flush according to Varnish expression
      *
-     * @param  string $contentType
+     * @param  mixed ...
      * @return array
      */
-    public function flushContentType( $contentType ) {
+    public function flushExpression() {
+        $args = func_get_args();
         $result = array();
         foreach( Mage::helper( 'turpentine/varnish' )->getSockets() as $socket ) {
             $socketName = $socket->getConnectionString();
             try {
-                $socket->ban( 'obj.http.Content-type', '~', $contentType );
+                call_user_func_array( array( $socket, 'ban' ), $args );
             } catch( Mage_Core_Exception $e ) {
                 $result[$socketName] = $e->getMessage();
                 continue;
@@ -72,6 +73,17 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
             $result[$socketName] = true;
         }
         return $result;
+    }
+
+    /**
+     * Flush all cached objects with the given content type
+     *
+     * @param  string $contentType
+     * @return array
+     */
+    public function flushContentType( $contentType ) {
+        return $this->flushExpression(
+            'obj.http.Content-Type', '~', $contentType );
     }
 
     /**

@@ -39,24 +39,26 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
     }
 
     /**
-     * Allows disabling page-caching by setting the cache flag on a block
+     * Allows disabling page-caching by setting the cache flag on a controller
      *
+     *   <customer_account>
      *     <turpentine_cache_flag value="0" />
-     *
+     *   </customer_account>
      *
      * Events: controller_action_layout_generate_blocks_after
      *
      * @param  [type] $eventObject [description]
-     * @return [type]
+     * @return null
      */
     public function checkCacheFlag( $eventObject ) {
         if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
-            $layout = $eventObject->getLayout();
-            $layoutXml = $layout->getUpdate()->asSimplexml();
+            Mage::log( 'Checking Varnish cache flag' );
+            $layoutXml = $eventObject->getLayout()->getUpdate()->asSimplexml();
             foreach( $layoutXml->xpath( '//turpentine_cache_flag' ) as $node ) {
                 foreach( $node->attributes() as $attr => $value ) {
                     if( $attr == 'value' ) {
-                        if( !$value ) {
+                        if( !(string)$value ) {
+                            Mage::log( 'Disabling Varnish cache for request' );
                             Mage::getSingleton( 'turpentine/sentinel' )
                                 ->setCacheFlag( false );
                             return; //only need to set the flag once
@@ -68,7 +70,50 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
     }
 
     /**
+     * On controller redirects, check the target URL and set to home page
+     * if it would otherwise go to a getBlock URL
+     *
+     * @param  [type] $eventObject [description]
+     * @return [type]
+     */
+    public function checkRedirectUrl( $eventObject ) {
+        $url = $eventObject->getTransport()->getUrl();
+        $getBlockUrlPattern = sprintf( '~%s~',
+            preg_quote( Mage::getUrl( 'turpentine/esi/getBlock' ), '~' ) );
+        if( preg_match( $getBlockUrlPattern, $url ) ) {
+            $eventObject->getTransport()->setUrl(
+                Mage::getBaseUrl() );
+        }
+    }
+
+    /**
      * Cache block content then replace with ESI template
+     *
+     * TODO: this could possible be sped up by checking if the block is already
+     * in the cache
+     *
+     * ESI blocks can be designated by adding to:
+     *     app/design/frontend/default/default/layout/turpentine_esi_custom.xml
+     *
+     *     <layout version="0.1.0">
+     *         <$CONTROLLER_NAME>
+     *             <reference name="$BLOCK_NAME">
+     *                 <action method="setEsi">
+     *                     <params>
+     *                         <cache_type>per-client</cache_type>
+     *                         <ttl>120</ttl>
+     *                         <registry_keys>$KEY1,$KEY2</registry_keys>
+     *                     </params>
+     *                 </action>
+     *             </reference>
+     *         </$CONTROLLER_NAME>
+     *     </layout>
+     *
+     * The params are optional. Valid cache_types are:
+     *     global, per-page, and per-client
+     * TTLs are in seconds, registry_keys should be a comma-separated list of
+     * keys to preserve in the cache, that will be needed to do the actual
+     * rendering of the block.
      *
      * Events: core_block_abstract_to_html_before
      *
@@ -77,17 +122,27 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      */
     public function injectEsi( $eventObject ) {
         $blockObject = $eventObject->getBlock();
-
+        /* very spammy and slow, but useful for debugging
+        if( $blockObject instanceof Mage_Core_Block_Template ) {
+            Mage::log( 'BLOCK: ' . $blockObject->getNameInLayout() );
+        }
+        */
         if( Mage::helper( 'turpentine/esi' )->getEsiEnabled() &&
                 $blockObject instanceof Mage_Core_Block_Template &&
                 $esiOptions = $blockObject->getEsi() ) {
-
-            //change the block's template to the stripped down ESI tag
+            if( Mage::app()->getStore()->getCode() == 'admin' ) {
+                //admin blocks are not allowed to be cached for now
+                Mage::log( 'Erroneous attempt to ESI inject adminhtml block: ' .
+                    $blockObject->getNameInLayout(), Zend_Log::WARN );
+                return;
+            }
+            //change the block's template to the stripped down ESI template
             $blockObject->setTemplate( 'turpentine/esi.phtml' );
             $esiData = $this->_getEsiData( $blockObject, $esiOptions );
             //get this now so we don't include stuff added later
             $esiDataHash = $this->_getEsiDataHash( $esiData );
             $esiData->setDebugId( $this->_getEsiDebugId( $esiDataHash ) );
+            //save the requested registry keys
             if( isset( $esiOptions['registry_keys'] ) ) {
                 $keys = array_map( 'trim',
                     explode( ',', $esiOptions['registry_keys'] ) );
@@ -108,8 +163,12 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 'TURPENTINE_ESI_CACHETYPE_' . $esiData->getCacheType(),
                 'TURPENTINE_ESI_BLOCKTYPE_' . $esiData->getBlockType(),
                 'TURPENTINE_ESI_BLOCKNAME_' . $esiData->getNameInLayout(),
+                'TURPENTINE_ESI_CLIENTID_' . Mage::getSingleton( 'core/session',
+                    array( 'name' => 'frontend' ) )
+                    ->getSessionId(),
             );
-            Mage::log( 'Saving ESI block: ' . $esiDataHash );
+            Mage::log( sprintf( 'Saving ESI block: %s -> %s',
+                $esiData->getNameInLayout(), $esiDataHash ) );
             Mage::app()->getCache()->save( serialize( $esiData ),
                 $esiDataHash, $tags, null );
             $blockObject->setEsiData( $esiData );
@@ -119,6 +178,13 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         } // else handle the block like normal and cache it inline with the page
     }
 
+    /**
+     * Generate ESI data used in hash
+     *
+     * @param  Mage_Core_Block_Template $blockObject
+     * @param  array $esiOptions
+     * @return Varien_Object
+     */
     protected function _getEsiData( $blockObject, $esiOptions ) {
         $esiOptions = array_merge(
             array(
@@ -127,6 +193,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             $esiOptions );
 
         $esiData = new Varien_Object();
+        //store stuff used in the hash
         $esiData->setStoreId( Mage::app()->getStore()->getId() );
         $esiData->setDesignPackage( Mage::getDesign()->getPackageName() );
         $esiData->setDesignTheme( Mage::getDesign()->getTheme( 'layout' ) );
@@ -158,16 +225,33 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         return $esiData;
     }
 
+    /**
+     * Generate the block debug ID to identify ESI blocks in output
+     *
+     * @param  string $esiDataHash ESI block hash
+     * @return string
+     */
     protected function _getEsiDebugId( $esiDataHash ) {
         return sha1( $this->_getHashSalt() . $esiDataHash . microtime() );
     }
 
+    /**
+     * Generate the block hash for cache ID
+     *
+     * @param  Varien_Object $esiData
+     * @return string
+     */
     protected function _getEsiDataHash( $esiData ) {
         $hashData = $esiData->toArray();
         ksort( $hashData );
         return sha1( $this->_getHashSalt() . serialize( $hashData ) );
     }
 
+    /**
+     * Get the salt used for generating hashes
+     *
+     * @return string
+     */
     protected function _getHashSalt() {
         return Mage::helper( 'core' )->encrypt(
             Mage::getStoreConfig( 'turpentine_varnish/servers/auth_key' ) );

@@ -24,6 +24,11 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         return $this->getBlockAction();
     }
 
+    /**
+     * Spit out the rendered block from the cached data
+     *
+     * @return [type]
+     */
     public function getBlockAction() {
         Mage::helper( 'turpentine/esi' )->ensureEsiEnabled();
         $esiDataId = $this->getRequest()->getParam(
@@ -77,30 +82,5 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             $layout->getUpdate()->removeHandle( $handleName );
             $layout->getUpdate()->resetUpdates();
         }
-    }
-
-    /**
-     * Action to retrieve flash messages, needed if using getBlockAction + esi
-     * template doesn't end up working
-     *
-     * @return null
-     */
-    public function getMessagesAction() {
-        Mage::helper( 'turpentine/esi' )->ensureEsiEnabled();
-        $responseHtml = '';
-        foreach( array( 'catalog/session', 'checkout/session' ) as $className ) {
-            if( $session = Mage::getSingleton( $className ) ) {
-                $this->loadLayout();
-                $messageBlock = $this->getLayout()->getMessagesBlock();
-                $messageBlock->addMessages( $session->getMessages( true ) );
-                //avoiding the infinite ESI loop again
-                $messageBlock->setEsi( false );
-                if( $messageHtml = $messageBlock->toHtml() ) {
-                    //TODO: set no cache flag
-                    $responseHtml .= $messageHtml;
-                }
-            }
-        }
-        $this->getResponse()->setBody( $responseHtml );
     }
 }

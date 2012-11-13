@@ -58,11 +58,7 @@
                 <esi_per_client>300</esi_per_client>
             </ttls>
             <urls>
-                <url_blacklist><![CDATA[wishlist/.*
-catalog/product_compare/.*
-checkout/cart/add/.*
-customer/.*
-cron\.php]]></url_blacklist>
+                <url_blacklist><![CDATA[cron\.php]]></url_blacklist>
             </urls>
             <params>
                 <get_params>__SID</get_params>
@@ -71,19 +67,6 @@ cron\.php]]></url_blacklist>
                 <force_static>1</force_static>
                 <exts>css,js,jpe?g,png,gif</exts>
             </static>
-            <purging>
-                <auto_purge_actions><![CDATA[catalog_product_save_after]]></auto_purge_actions>
-            </purging>
-            <cache_cookie>
-                <cache_disable_actions><![CDATA[customer_login
-wishlist_add_item
-wishlist_add_product
-customer_register_success
-checkout_cart_add_product_complete
-checkout_type_onepage_save_order
-checkout_cart_product_add_before]]></cache_disable_actions>
-            <set_initial_cookie>1</set_initial_cookie>
-            </cache_cookie>
         </turpentine_vcl>
     </default>
     <global>
@@ -97,7 +80,6 @@ checkout_cart_product_add_before]]></cache_disable_actions>
                     Rewritten because it doesn't use a template we can replace
                     with an ESI include tag, just dumps out a block of
                     hard-coded HTML
-                    See EsiController::getMessagesAction
                     -->
                     <messages>Nexcessnet_Turpentine_Block_Core_Messages</messages>
                 </rewrite>
@@ -123,41 +105,186 @@ checkout_cart_product_add_before]]></cache_disable_actions>
             </types>
         </cache>
         <events>
+            <!-- Varnish Events -->
+            <http_response_send_before>
+                <observers>
+                    <turpentine_varnish_http_response_send_before>
+                        <class>turpentine/observer_varnish</class>
+                        <method>setCacheFlagHeader</method>
+                    </turpentine_varnish_http_response_send_before>
+                </observers>
+            </http_response_send_before>
+
             <!-- ESI Events -->
             <core_block_abstract_to_html_before>
                 <observers>
-                    <turpentine>
+                    <turpentine_esi_core_block_abstract_to_html_before>
+                        <type>singleton</type>
                         <class>turpentine/observer_esi</class>
                         <method>injectEsi</method>
-                    </turpentine>
+                    </turpentine_esi_core_block_abstract_to_html_before>
                 </observers>
             </core_block_abstract_to_html_before>
             <http_response_send_before>
                 <observers>
-                    <turpentine>
+                    <turpentine_esi_http_response_send_before>
                         <class>turpentine/observer_esi</class>
                         <method>setFlagHeaders</method>
-                    </turpentine>
+                    </turpentine_esi_http_response_send_before>
                 </observers>
             </http_response_send_before>
             <controller_action_layout_generate_blocks_after>
                 <observers>
-                    <turpentine>
+                    <turpentine_esi_controller_action_layout_generate_blocks_after>
                         <class>turpentine/observer_esi</class>
                         <method>checkCacheFlag</method>
-                    </turpentine>
+                    </turpentine_esi_controller_action_layout_generate_blocks_after>
                 </observers>
             </controller_action_layout_generate_blocks_after>
-
-            <!-- Varnish Events -->
-            <http_response_send_before>
+            <!--
+            Magento sometimes sees the last URL as being the
+            turpentine/esi/getBlock url, and then redirects to it which is not
+            good. We need to check and intercept it if it happens
+            -->
+            <controller_response_redirect>
                 <observers>
-                    <turpentine_varnish>
-                        <class>turpentine/observer_varnish</class>
-                        <method>setCacheFlagHeader</method>
-                    </turpentine_varnish>
+                    <turpentine_esi_controller_response_redirect>
+                        <class>turpentine/observer_esi</class>
+                        <method>checkRedirectUrl</method>
+                    </turpentine_esi_controller_response_redirect>
                 </observers>
-            </http_response_send_before>
+            </controller_response_redirect>
+
+            <!-- ESI cache clear events -->
+            <checkout_cart_add_product_complete>
+                <observers>
+                    <turpentine_esi_checkout_cart_add_product_complete>
+                        <type>singleton</type>
+                        <class>turpentine/observer_ban</class>
+                        <method>banClientEsiCache</method>
+                    </turpentine_esi_checkout_cart_add_product_complete>
+                </observers>
+            </checkout_cart_add_product_complete>
+            <checkout_cart_after_save>
+                <observers>
+                    <turpentine_esi_checkout_cart_after_save>
+                        <type>singleton</type>
+                        <class>turpentine/observer_ban</class>
+                        <method>banClientEsiCache</method>
+                    </turpentine_esi_checkout_cart_after_save>
+                </observers>
+            </checkout_cart_after_save>
+            <checkout_onepage_controller_success_action>
+                <observers>
+                    <turpentine_esi_checkout_onepage_controller_success_action>
+                        <type>singleton</type>
+                        <class>turpentine/observer_ban</class>
+                        <method>banClientEsiCache</method>
+                    </turpentine_esi_checkout_onepage_controller_success_action>
+                </observers>
+            </checkout_onepage_controller_success_action>
+            <controller_action_postdispatch_checkout_cart_couponpost>
+                <observers>
+                    <turpentine_esi_controller_action_postdispatch_checkout_cart_couponpost>
+                        <type>singleton</type>
+                        <class>turpentine/observer_ban</class>
+                        <method>banClientEsiCache</method>
+                    </turpentine_esi_controller_action_postdispatch_checkout_cart_couponpost>
+                </observers>
+            </controller_action_postdispatch_checkout_cart_couponpost>
+            <core_session_abstract_add_message>
+                <observers>
+                    <turpentine_esi_core_session_abstract_add_message>
+                        <type>singleton</type>
+                        <class>turpentine/observer_ban</class>
+                        <method>banClientEsiCache</method>
+                    </turpentine_esi_core_session_abstract_add_message>
+                </observers>
+            </core_session_abstract_add_message>
+            <catalog_product_compare_add_product>
+                <observers>
+                    <turpentine_esi_catalog_product_compare_add_product>
+                        <type>singleton</type>
+                        <class>turpentine/observer_ban</class>
+                        <method>banClientEsiCache</method>
+                    </turpentine_esi_catalog_product_compare_add_product>
+                </observers>
+            </catalog_product_compare_add_product>
+            <sales_quote_save_after>
+                <observers>
+                    <turpentine_esi_sales_quote_save_after>
+                        <type>singleton</type>
+                        <class>turpentine/observer_ban</class>
+                        <method>banClientEsiCache</method>
+                    </turpentine_esi_sales_quote_save_after>
+                </observers>
+            </sales_quote_save_after>
+
+            <!-- Varnish cache clear events -->
+            <catalog_product_save_commit_after>
+                <observers>
+                    <turpentine_varnish_catalog_product_save_commit_after>
+                        <class>turpentine/observer_ban</class>
+                        <method>banProductPageCache</method>
+                    </turpentine_varnish_catalog_product_save_commit_after>
+                </observers>
+            </catalog_product_save_commit_after>
+            <catalog_category_save_commit_after>
+                <observers>
+                    <turpentine_varnish_catalog_category_save_commit_after>
+                        <class>turpentine/observer_ban</class>
+                        <method>banCategoryCache</method>
+                    </turpentine_varnish_catalog_category_save_commit_after>
+                </observers>
+            </catalog_category_save_commit_after>
+            <clean_media_cache_after>
+                <observers>
+                    <turpentine_varnish_clean_media_cache_after>
+                        <class>turpentine/observer_ban</class>
+                        <method>banMediaCache</method>
+                    </turpentine_varnish_clean_media_cache_after>
+                </observers>
+            </clean_media_cache_after>
+            <clean_catalog_images_cache_after>
+                <observers>
+                    <turpentine_varnish_clean_catalog_images_cache_after>
+                        <class>turpentine/observer_ban</class>
+                        <method>banCatalogImagesCache</method>
+                    </turpentine_varnish_clean_catalog_images_cache_after>
+                </observers>
+            </clean_catalog_images_cache_after>
+            <cms_page_save_commit_after>
+                <observers>
+                    <turpentine_varnish_cms_page_save_commit_after>
+                        <class>turpentine/observer_ban</class>
+                        <method>banCmsPageCache</method>
+                    </turpentine_varnish_cms_page_save_commit_after>
+                </observers>
+            </cms_page_save_commit_after>
+            <adminhtml_cache_flush_all>
+                <observers>
+                    <turpentine_varnish_adminhtml_cache_flush_all>
+                        <class>turpentine/observer_ban</class>
+                        <method>banAllCache</method>
+                    </turpentine_varnish_adminhtml_cache_flush_all>
+                </observers>
+            </adminhtml_cache_flush_all>
+            <adminhtml_cache_refresh_type>
+                <observers>
+                    <turpentine_varnish_adminhtml_cache_refresh_type>
+                        <class>turpentine/observer_ban</class>
+                        <method>banAllCache</method>
+                    </turpentine_varnish_adminhtml_cache_refresh_type>
+                </observers>
+            </adminhtml_cache_refresh_type>
+            <cataloginventory_stock_item_save_after>
+                <observers>
+                    <turpentine_varnish_cataloginventory_stock_item_save_after>
+                        <class>turpentine/observer_ban</class>
+                        <method>banProductPageCacheCheckStock</method>
+                    </turpentine_varnish_cataloginventory_stock_item_save_after>
+                </observers>
+             </cataloginventory_stock_item_save_after>
         </events>
     </global>
     <frontend>
@@ -172,9 +299,19 @@ checkout_cart_product_add_before]]></cache_disable_actions>
         </routers>
         <layout>
             <updates>
-                <turpentine module="turpentine">
+                <!--
+                This file should never be edited by a user since it will
+                be overwritten on extension updates
+                -->
+                <turpentine_esi module="turpentine">
                     <file>turpentine_esi.xml</file>
-                </turpentine>
+                </turpentine_esi>
+                <!--
+                The user should instead edit this file, creating it if needed
+                -->
+                <turpentine_esi_custom module="turpentine">
+                    <file>turpentine_esi_custom.xml</file>
+                </turpentine_esi_custom>
             </updates>
         </layout>
     </frontend>

@@ -38,31 +38,4 @@ class Nexcessnet_Turpentine_Model_Observer_Varnish extends Varien_Event_Observer
                 $sentinel->getCacheFlag() ? '1' : '0' );
         }
     }
-
-    /**
-     * Flush the URL associated with the event
-     *
-     * The event data should include a data_object that has a getUrlPath method
-     *
-     * @param  mixed $eventObject
-     * @return null
-     */
-    public function flushVarnishUrl( $eventObject ) {
-        $data = $eventObject->getData();
-        if( isset( $data['event'] ) ) {
-            $data = $data['event']->getData();
-            if( isset( $data['data_object'] ) ) {
-                if( Mage::getModel( 'turpentine/varnish_admin' )
-                        ->flushUrl( '.*' . $data['data_object']->getUrlPath() ) ) {
-                    Mage::getSingleton( 'core/session' )
-                        ->addSuccess( Mage::helper( 'turpentine' )
-                            ->__( 'Flushed object URL in Varnish.' ) );
-                } else {
-                    Mage::getSingleton( 'core/session' )
-                        ->addNotice( Mage::helper( 'turpentine' )
-                            ->__( 'Failed to flush object URL in Varnish.' ) );
-                }
-            }
-        }
-    }
 }
