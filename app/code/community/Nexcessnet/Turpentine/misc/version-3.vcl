@@ -21,7 +21,7 @@ sub remove_cache_headers {
 }
 
 sub remove_double_slashes {
-    set req.url = regsub(req.url, "(.*)//(.*)", "\1/\2");
+    set req.url = regsub(req.url, "(.*)//+(.*)", "\1/\2");
 }
 
 ## Varnish Subroutines
@@ -80,6 +80,9 @@ sub vcl_recv {
                 req.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
             unset req.http.Cookie;
             return (lookup);
+        }
+        if (req.url ~ "{{url_base_regex}}(?:{{url_excludes}})") {
+            return (pass);
         }
         if ({{enable_get_excludes}} &&
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
@@ -142,7 +145,7 @@ sub vcl_fetch {
         set beresp.ttl = {{grace_period}}s;
         return (hit_for_pass);
     } else {
-        if(beresp.http.Set-Cookie) {
+        if (beresp.http.Set-Cookie) {
             set beresp.http.X-Varnish-Set-Cookie = beresp.http.Set-Cookie;
             unset beresp.http.Set-Cookie;
         }
@@ -153,7 +156,7 @@ sub vcl_fetch {
             set beresp.do_esi = true;
         }
         set beresp.do_gzip = true;
-        if (beresp.http.X-Turpentine-Cache ~ "0") {
+        if (beresp.http.X-Turpentine-Cache ~ "1") {
             set beresp.ttl = {{grace_period}}s;
             return (hit_for_pass);
         } else {
@@ -171,7 +174,7 @@ sub vcl_fetch {
                         "^.*?frontend=([^;]*);*.*$", "\1");
                 }
                 set beresp.ttl = std.duration(regsub(req.url,
-                    ".*/ttl/([0-9]+)/.*", "\1s"), 3600s);
+                    ".*/ttl/([0-9]+)/.*", "\1s"), 300s);
             } else {
                 call remove_cache_headers;
                 {{url_ttls}}
@@ -203,12 +206,5 @@ sub vcl_deliver {
         unset resp.http.X-Turpentine-Cache;
         unset resp.http.X-Turpentine-Esi;
         unset resp.http.X-Varnish-Session;
-    }
-}
-
-sub vcl_error {
-    #GCC should optimize this entire branch away if debug headers are disabled
-    if (!{{debug_headers}}) {
-        unset obj.http.Server;
     }
 }

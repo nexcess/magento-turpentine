@@ -30,6 +30,7 @@
                 <enable_esi>1</enable_esi>
                 <varnish_debug>1</varnish_debug>
                 <esi_debug>1</esi_debug>
+                <block_debug>0</block_debug>
             </general>
             <servers>
                 <version>auto</version>

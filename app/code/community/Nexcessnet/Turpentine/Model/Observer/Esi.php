@@ -122,11 +122,11 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      */
     public function injectEsi( $eventObject ) {
         $blockObject = $eventObject->getBlock();
-        /* very spammy and slow, but useful for debugging
-        if( $blockObject instanceof Mage_Core_Block_Template ) {
-            Mage::log( 'BLOCK: ' . $blockObject->getNameInLayout() );
+        if( (bool)Mage::getStoreConfig(
+                'turpentine_varnish/general/block_debug' ) ) {
+            Mage::log( 'Checking ESI block candidate: ' .
+                $blockObject->getNameInLayout() );
         }
-        */
         if( Mage::helper( 'turpentine/esi' )->getEsiEnabled() &&
                 $blockObject instanceof Mage_Core_Block_Template &&
                 $esiOptions = $blockObject->getEsi() ) {
@@ -188,7 +188,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
     protected function _getEsiData( $blockObject, $esiOptions ) {
         $esiOptions = array_merge(
             array(
-                'cache_type'    => 'global',
+                'cache_type'    => 'per-client',
             ),
             $esiOptions );
 

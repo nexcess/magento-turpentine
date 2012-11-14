@@ -20,7 +20,8 @@
  */
 
 $esiData = array(
-    'link'      => sprintf( '<esi:remove>ESI processing not enabled</esi:remove><!--esi <esi:include src="%s" /> -->',
+    'link'      => sprintf( '<esi:remove>ESI processing not enabled</esi:remove>
+            <!--esi <esi:include src="%s" /> -->',
         $this->getEsiData()->getUrl() ),
     'debugId'   => $this->getEsiData()->getDebugId(),
     'debugEnabled'  => Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled(),

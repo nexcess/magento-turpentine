@@ -44,7 +44,8 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             }
         } else {
             //block data not in the cache
-            //TODO: figure out how to regenerate and cache it
+            //TODO: figure out how to regenerate and cache it or do something
+            //besides just throwing an exception
             Mage::throwException( sprintf(
                 'Block data missing from cache for ID: %s',
                 $esiDataId ) );
@@ -75,9 +76,9 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 //disable ESI flag on the block to avoid infinite loop
                 $block->setEsi( false );
                 $this->getResponse()->setBody( $block->toHtml() );
-                break;
+                return;
             }
-            //TODO: are these lines really needed?
+            //reset for next loop
             Mage::app()->removeCache( $layout->getUpdate()->getCacheId() );
             $layout->getUpdate()->removeHandle( $handleName );
             $layout->getUpdate()->resetUpdates();

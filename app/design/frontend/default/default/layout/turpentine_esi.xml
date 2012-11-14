@@ -63,7 +63,7 @@
                 </params>
             </action>
         </reference>
-        <reference name="right.reports.product.viewed">
+        <reference name="right.reports.product.compared">
             <action method="setEsi">
                 <params>
                     <cache_type>per-client</cache_type>
