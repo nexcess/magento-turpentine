@@ -111,4 +111,10 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
         }
         return $result;
     }
+
+    public function getConfigurator() {
+        $sockets = Mage::helper( 'turpentine/varnish' )->getSockets();
+        $cfgr = Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract::getFromSocket( $sockets[0] );
+        return $cfgr;
+    }
 }
