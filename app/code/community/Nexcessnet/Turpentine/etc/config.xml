@@ -44,6 +44,7 @@
                 <backend_port>8080</backend_port>
                 <frontend_timeout>300</frontend_timeout>
                 <admin_timeout>21600</admin_timeout>
+                <crawlers>127.0.0.1</crawlers>
             </backend>
             <normalization>
                 <encoding>1</encoding>

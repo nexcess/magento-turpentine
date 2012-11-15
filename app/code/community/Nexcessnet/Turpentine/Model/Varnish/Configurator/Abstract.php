@@ -319,6 +319,21 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     }
 
     /**
+     * Get the regex formatted list of crawler IPs
+     *
+     * @return string
+     */
+    protected function _getCrawlerIps() {
+        return implode( '|',
+            array_filter( array_map( 'preg_quote', array_map( 'trim',
+                explode( ',', trim(
+                    Mage::getStoreConfig( 'turpentine_vcl/backend/crawlers' )
+                ) )
+            ) ) )
+        ); //this probably makes lisp programmers really uncomfortable
+    }
+
+    /**
      * Remove empty and commented out lines from the generated VCL
      *
      * @param  string $dirtyVcl generated vcl

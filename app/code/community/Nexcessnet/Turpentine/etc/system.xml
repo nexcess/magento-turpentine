@@ -195,6 +195,15 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </admin_timeout>
+                        <crawlers translate="label" module="turpentine">
+                            <label>Crawler IP Addresses</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>50</sort_order>
+                            <comment>Comma-separated list of IPs to serve cached pages to on initial visit</comment>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </crawlers>
                     </fields>
                 </backend>
                 <normalization translate="label" module="turpentine">
