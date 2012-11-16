@@ -21,21 +21,8 @@
 
 class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages {
     protected function _toHtml() {
-        if( $this->getEsi() ) {
-            //commented out alternate way to do message ESI
-/*
-            $timestamp = microtime( true );
-            $esiStr = <<<EOS
-<!-- ESI Messages Start: %f -->
-<!--esi <esi:include src="%s" /> -->
-<!-- ESI Messages End: %f -->
-
-EOS
-            return sprintf( $esiStr, $timestamp,
-                Mage::getUrl( 'turpentine/esi/getMessages',
-                    array( 'cacheType' => 'per-client' ) ),
-                $timestamp );
-*/
+        if( Mage::helper( 'turpentine/esi' )->getEsiEnabled() &&
+                $this->getEsi() ) {
             return $this->renderView();
         } else {
             return parent::_toHtml();

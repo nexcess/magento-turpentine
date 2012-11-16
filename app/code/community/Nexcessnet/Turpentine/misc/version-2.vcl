@@ -10,6 +10,10 @@ import std;
 
 {{admin_backend}}
 
+## ACLs
+
+{{crawler_acl}}
+
 ## Custom Subroutines
 sub remove_cache_headers {
     remove beresp.http.Set-Cookie;
@@ -77,7 +81,13 @@ sub vcl_recv {
         if (req.http.Cookie ~ "frontend=") {
             set req.http.X-Varnish-Cookie = req.http.Cookie;
         } else {
-            return (pass);
+            if (client.ip ~ crawler_acl) {
+                set req.http.Cookie = "frontend=no-session";
+                set req.http.X-Varnish-Cookie = req.http.Cookie;
+            } else {
+                # this option is only supported on v2.1.4+
+                set req.hash_always_miss = true;
+            }
         }
         if (req.http.X-Opt-Force-Static-Caching ~ "true" &&
                 req.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
@@ -135,11 +145,15 @@ sub vcl_hash {
 # sub vcl_hit {
 #     return (deliver);
 # }
-#
-# sub vcl_miss {
-#     return (fetch);
-# }
-#
+
+sub vcl_miss {
+    if (req.esi_level == 0 && req.http.X-Varnish-Cookie) {
+        unset req.http.Cookie;
+    } else if (req.esi_level > 0 && req.http.X-Varnish-Cookie) {
+        set req.http.Cookie = req.http.X-Varnish-Cookie;
+    }
+    return (fetch);
+}
 
 sub vcl_fetch {
     set req.grace = {{grace_period}}s;
@@ -152,24 +166,26 @@ sub vcl_fetch {
             set beresp.http.X-Varnish-Set-Cookie = beresp.http.Set-Cookie;
             remove beresp.http.Set-Cookie;
         }
-        if (req.http.Cookie !~ "frontend=") {
+        if (req.esi_level == 0 &&
+                req.http.X-Varnish-Cookie !~ "frontend=" &&
+                client.ip !~ crawler_acl) {
             set beresp.http.X-Varnish-Use-Set-Cookie = "1";
         }
         if (beresp.http.X-Turpentine-Esi ~ "1") {
             set beresp.do_esi = true;
         }
         set beresp.do_gzip = true;
-        if (beresp.http.X-Turpentine-Cache !~ "1") {
+        if (beresp.http.X-Turpentine-Cache ~ "0") {
             set beresp.cacheable = false;
             set beresp.ttl = {{grace_period}}s;
             return (pass);
         } else {
+            set beresp.cacheable = true;
             #TODO: only remove the User-Agent field from this if it exists
             remove beresp.http.Vary;
             if (req.http.X-Opt-Force-Static-Caching ~ "true" &&
                     bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
                 call remove_cache_headers;
-                set beresp.cacheable = true;
                 set beresp.ttl = {{static_ttl}}s;
             } else if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/.*") {
                 call remove_cache_headers;
@@ -180,10 +196,8 @@ sub vcl_fetch {
                 }
                 set beresp.ttl = std.duration(regsub(req.url,
                     ".*/ttl/([0-9]+)/.*","\1s"), 300s);
-                set beresp.cacheable = true;
             } else {
                 call remove_cache_headers;
-                set beresp.cacheable = true;
                 {{url_ttls}}
             }
         }
@@ -195,10 +209,6 @@ sub vcl_fetch {
 sub vcl_deliver {
     if (resp.http.X-Varnish-Use-Set-Cookie) {
         set resp.http.Set-Cookie = resp.http.X-Varnish-Set-Cookie;
-        remove resp.http.X-Varnish-Set-Cookie;
-        remove resp.http.X-Varnish-Use-Set-Cookie;
-    } else {
-        remove resp.http.X-Varnish-Set-Cookie;
     }
     set resp.http.X-Opt-Debug-Headers = "{{debug_headers}}";
     if (resp.http.X-Opt-Debug-Headers ~ "true") {
@@ -213,6 +223,8 @@ sub vcl_deliver {
         remove resp.http.X-Turpentine-Cache;
         remove resp.http.X-Turpentine-Esi;
         remove resp.http.X-Varnish-Session;
+        remove resp.http.X-Varnish-Set-Cookie;
+        remove resp.http.X-Varnish-Use-Set-Cookie;
     }
     remove resp.http.X-Opt-Debug-Headers;
 }

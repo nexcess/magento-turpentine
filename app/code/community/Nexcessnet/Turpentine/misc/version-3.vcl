@@ -10,6 +10,10 @@ import std;
 
 {{admin_backend}}
 
+## ACLs
+
+{{crawler_acl}}
+
 ## Custom Subroutines
 
 sub remove_cache_headers {
@@ -74,7 +78,7 @@ sub vcl_recv {
         if (req.http.Cookie ~ "frontend=") {
             set req.http.X-Varnish-Cookie = req.http.Cookie;
         } else {
-            if (req.http.X-Forwarded-For ~ "\b(?:{{crawler_ips}})\b" ) {
+            if (client.ip ~ crawler_acl ) {
                 set req.http.Cookie = "frontend=no-session";
                 set req.http.X-Varnish-Cookie = req.http.Cookie;
             } else {
@@ -160,7 +164,7 @@ sub vcl_fetch {
         }
         if (req.esi_level == 0 &&
                 req.http.X-Varnish-Cookie !~ "frontend=" &&
-                req.http.X-Forwarded-For !~ "\b{{crawler_ips}}\b") {
+                client.ip !~ crawler_acl) {
             set beresp.http.X-Varnish-Use-Set-Cookie = "1";
         }
         if (beresp.http.X-Turpentine-Esi ~ "1") {

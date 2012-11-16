@@ -323,13 +323,8 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getCrawlerIps() {
-        $ips = Mage::helper( 'turpentine/data' )->cleanExplode( ',',
+        return Mage::helper( 'turpentine/data' )->cleanExplode( ',',
             Mage::getStoreConfig( 'turpentine_vcl/backend/crawlers' ) );
-        if( !$ips ) {
-            //the regex breaks if this is empty currently
-            $ips[] = preg_quote( '255.255.255.255' );
-        }
-        return implode( '|', $ips );
     }
 
     /**

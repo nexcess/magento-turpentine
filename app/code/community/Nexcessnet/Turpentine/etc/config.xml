@@ -28,8 +28,8 @@
             <general>
                 <enable_varnish>1</enable_varnish>
                 <enable_esi>1</enable_esi>
-                <varnish_debug>1</varnish_debug>
-                <esi_debug>1</esi_debug>
+                <varnish_debug>0</varnish_debug>
+                <esi_debug>0</esi_debug>
                 <block_debug>0</block_debug>
             </general>
             <servers>
@@ -48,7 +48,7 @@
             </backend>
             <normalization>
                 <encoding>1</encoding>
-                <user_agent>1</user_agent>
+                <user_agent>0</user_agent>
                 <host>0</host>
             </normalization>
             <ttls>
