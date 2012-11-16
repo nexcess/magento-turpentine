@@ -32,10 +32,12 @@ class Nexcessnet_Turpentine_Model_Observer_Varnish extends Varien_Event_Observer
         $response = $eventObject->getResponse();
         $sentinel = Mage::getSingleton( 'turpentine/sentinel' );
         if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
-            Mage::log( 'Setting Varnish cache flag header to: ' .
-                $sentinel->getCacheFlag() );
             $response->setHeader( 'X-Turpentine-Cache',
                 $sentinel->getCacheFlag() ? '1' : '0' );
+            if( Mage::helper( 'turpentine/varnish' )->getVarnishDebugEnabled() ) {
+                Mage::log( 'Set Varnish cache flag header to: ' .
+                    ( $sentinel->getCacheFlag() ? '1' : '0' ) );
+            }
         }
     }
 }

@@ -74,7 +74,12 @@ sub vcl_recv {
         if (req.http.Cookie ~ "frontend=") {
             set req.http.X-Varnish-Cookie = req.http.Cookie;
         } else {
-            return (pass);
+            if (req.http.X-Forwarded-For ~ "\b(?:{{crawler_ips}})\b" ) {
+                set req.http.Cookie = "frontend=no-session";
+                set req.http.X-Varnish-Cookie = req.http.Cookie;
+            } else {
+                set req.hash_always_miss = true;
+            }
         }
         if ({{force_cache_static}} &&
                 req.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
@@ -132,11 +137,15 @@ sub vcl_hash {
 # sub vcl_hit {
 #     return (deliver);
 # }
-#
-# sub vcl_miss {
-#     return (fetch);
-# }
-#
+
+sub vcl_miss {
+    if (req.esi_level == 0 && req.http.X-Varnish-Cookie) {
+        unset req.http.Cookie;
+    } elsif (req.esi_level > 0 && req.http.X-Varnish-Cookie) {
+        set req.http.Cookie = req.http.X-Varnish-Cookie;
+    }
+    return (fetch);
+}
 
 sub vcl_fetch {
     set req.grace = {{grace_period}}s;
@@ -149,14 +158,16 @@ sub vcl_fetch {
             set beresp.http.X-Varnish-Set-Cookie = beresp.http.Set-Cookie;
             unset beresp.http.Set-Cookie;
         }
-        if (req.http.Cookie !~ "frontend=") {
+        if (req.esi_level == 0 &&
+                req.http.X-Varnish-Cookie !~ "frontend=" &&
+                req.http.X-Forwarded-For !~ "\b{{crawler_ips}}\b") {
             set beresp.http.X-Varnish-Use-Set-Cookie = "1";
         }
         if (beresp.http.X-Turpentine-Esi ~ "1") {
             set beresp.do_esi = true;
         }
         set beresp.do_gzip = true;
-        if (beresp.http.X-Turpentine-Cache ~ "1") {
+        if (beresp.http.X-Turpentine-Cache ~ "0") {
             set beresp.ttl = {{grace_period}}s;
             return (hit_for_pass);
         } else {
@@ -188,10 +199,6 @@ sub vcl_fetch {
 sub vcl_deliver {
     if (resp.http.X-Varnish-Use-Set-Cookie) {
         set resp.http.Set-Cookie = resp.http.X-Varnish-Set-Cookie;
-        unset resp.http.X-Varnish-Set-Cookie;
-        unset resp.http.X-Varnish-Use-Set-Cookie;
-    } else {
-        unset resp.http.X-Varnish-Set-Cookie;
     }
     #GCC should optimize this entire branch away if debug headers are disabled
     if ({{debug_headers}}) {
@@ -206,5 +213,7 @@ sub vcl_deliver {
         unset resp.http.X-Turpentine-Cache;
         unset resp.http.X-Turpentine-Esi;
         unset resp.http.X-Varnish-Session;
+        unset resp.http.X-Varnish-Set-Cookie;
+        unset resp.http.X-Varnish-Use-Set-Cookie;
     }
 }

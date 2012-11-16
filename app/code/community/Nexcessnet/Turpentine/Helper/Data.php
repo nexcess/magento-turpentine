@@ -20,4 +20,16 @@
  */
 
 class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
+    /**
+     * Like built-in explode() but applies trim to each exploded element and
+     * filters out empty elements from result
+     *
+     * @param  string $token [description]
+     * @param  string $data  [description]
+     * @return array
+     */
+    public function cleanExplode( $token, $data ) {
+        return array_filter( array_map( 'trim',
+            explode( $token, trim( $data ) ) ) );
+    }
 }

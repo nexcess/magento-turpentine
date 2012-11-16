@@ -22,23 +22,53 @@
 class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     const ESI_DATA_ID_PARAM         = 'esiId';
 
+    /**
+     * Get whether ESI includes are enabled or not
+     *
+     * @return bool
+     */
     public function getEsiEnabled() {
         return Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() &&
             Mage::getStoreConfig( 'turpentine_varnish/general/enable_esi' );
     }
 
+    /**
+     * Check if ESI includes are enabled and throw an exception if not
+     *
+     * @return null
+     */
     public function ensureEsiEnabled() {
         if( !$this->getEsiEnabled() ) {
             Mage::throwException( 'ESI includes are not enabled' );
         }
     }
 
+    /**
+     * Get the name of the URL param that holds the ESI block hash
+     *
+     * @return string
+     */
     public function getEsiDataIdParam() {
         return self::ESI_DATA_ID_PARAM;
     }
 
+    /**
+     * Get whether ESI debugging is enabled or not
+     *
+     * @return bool
+     */
     public function getEsiDebugEnabled() {
         return (bool)Mage::getStoreConfig(
             'turpentine_varnish/general/esi_debug' );
+    }
+
+    /**
+     * Get whether block name logging is enabled or not
+     *
+     * @return bool
+     */
+    public function getEsiBlockLogEnabled() {
+        return (bool)Mage::getStoreConfig(
+            'turpentine_varnish/general/block_debug' );
     }
 }

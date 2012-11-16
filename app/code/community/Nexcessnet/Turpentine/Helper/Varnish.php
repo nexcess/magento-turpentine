@@ -21,16 +21,35 @@
 
 class Nexcessnet_Turpentine_Helper_Varnish extends Mage_Core_Helper_Abstract {
 
+    /**
+     * Get whether Varnish caching is enabled or not
+     *
+     * @return bool
+     */
     public function getVarnishEnabled() {
         return (bool)Mage::getStoreConfig(
             'turpentine_varnish/general/enable_varnish' );
     }
 
+    /**
+     * Get whether Varnish debugging is enabled or not
+     *
+     * @return bool
+     */
     public function getVarnishDebugEnabled() {
         return (bool)Mage::getStoreConfig(
             'turpentine_varnish/general/varnish_debug' );
     }
 
+    /**
+     * Get a Varnish management socket
+     *
+     * @param  string $host           [description]
+     * @param  string|int $port           [description]
+     * @param  string $secretKey=null [description]
+     * @param  string $version=null   [description]
+     * @return Nexcessnet_Turpentine_Model_Varnish_Admin_Socket
+     */
     public function getSocket( $host, $port, $secretKey=null, $version=null ) {
         $socket = Mage::getModel( 'turpentine/varnish_admin_socket',
             array( 'host' => $host, 'port' => $port ) );
@@ -43,11 +62,16 @@ class Nexcessnet_Turpentine_Helper_Varnish extends Mage_Core_Helper_Abstract {
         return $socket;
     }
 
+    /**
+     * Get management sockets for all the configured Varnish servers
+     *
+     * @return array
+     */
     public function getSockets() {
         $sockets = array();
-        $servers = array_filter( array_map( 'trim', explode( PHP_EOL,
-            Mage::getStoreConfig( 'turpentine_varnish/servers/server_list' ) ) ) );
-        $key = str_replace( '\n', "\n",
+        $servers = Mage::helper( 'turpentine/data' )->cleanExplode( PHP_EOL,
+            Mage::getStoreConfig( 'turpentine_varnish/servers/server_list' ) );
+        $key = str_replace( '\n', PHP_EOL,
             Mage::getStoreConfig( 'turpentine_varnish/servers/auth_key' ) );
         $version = Mage::getStoreConfig( 'turpentine_varnish/servers/version' );
         if( $version == 'auto' ) {

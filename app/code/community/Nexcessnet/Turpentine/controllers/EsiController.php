@@ -35,7 +35,9 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             Mage::helper( 'turpentine/esi' )->getEsiDataIdParam() );
         $cache = Mage::app()->getCache();
         if( $esiData = @unserialize( $cache->load( $esiDataId ) ) ) {
-            Mage::log( 'Loading ESI block: ' . $esiDataId );
+            if( Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled() ) {
+                Mage::log( 'Loading ESI block: ' . $esiDataId );
+            }
             if( $registry = $esiData->getRegistry() ) {
                 //restore the cached registry
                 foreach( $registry as $key => $value ) {
@@ -44,11 +46,9 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             }
         } else {
             //block data not in the cache
-            //TODO: figure out how to regenerate and cache it or do something
-            //besides just throwing an exception
-            Mage::throwException( sprintf(
-                'Block data missing from cache for ID: %s',
-                $esiDataId ) );
+            //TODO: figure out how to regenerate and cache it
+            Mage::log( 'Block data missing from cache for ID: ' . $esiDataId,
+                Zend_Log::WARN );
         }
         //this may all need to be moved up into the if block above, depending
         //on whether it ends up being possible to regenerate block data

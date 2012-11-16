@@ -63,7 +63,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             }
         }
         if( strlen( $generatedConfig ) !==
-                file_put_contents($filename, $generatedConfig ) ) {
+                file_put_contents( $filename, $generatedConfig ) ) {
             $err = error_get_last();
             return array( false, $err );
         }
@@ -176,9 +176,9 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getUrlExcludes() {
+        $urls = Mage::getStoreConfig( 'turpentine_vcl/urls/url_blacklist' );
         return implode( '|', array_merge( array( $this->_getAdminFrontname(), 'api' ),
-            array_map( 'trim', explode( PHP_EOL,
-                Mage::getStoreConfig( 'turpentine_vcl/urls/url_blacklist' ) ) ) ) );
+            Mage::helper( 'turpentine/data' )->cleanExplode( PHP_EOL, $urls ) ) );
     }
 
     /**
@@ -247,8 +247,8 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getGetParamExcludes() {
-        return implode( '|', array_map( 'trim', explode( ',',
-            Mage::getStoreConfig( 'turpentine_vcl/params/get_params' ) ) ) );
+        return implode( '|', Mage::helper( 'turpentine/data' )->cleanExplode( ',',
+            Mage::getStoreConfig( 'turpentine_vcl/params/get_params' ) ) );
     }
 
     /**
@@ -267,9 +267,8 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getStaticExtensions() {
-        $exts = implode( '|', array_filter( array_map( 'trim', explode( ',',
-            Mage::getStoreConfig( 'turpentine_vcl/static/exts' ) ) ) ) );
-        return $exts;
+        return implode( '|', Mage::helper( 'turpentine/data' )->cleanExplode( ',',
+            Mage::getStoreConfig( 'turpentine_vcl/static/exts' ) ) );
     }
 
     /**
@@ -288,8 +287,8 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      */
     protected function _getUrlTtls() {
         $str = array();
-        $configTtls = array_filter( array_map( 'trim', explode( PHP_EOL, trim(
-            Mage::getStoreConfig( 'turpentine_vcl/ttls/url_ttls' ) ) ) ) );
+        $configTtls = Mage::helper( 'turpentine/data' )->cleanExplode( PHP_EOL,
+            Mage::getStoreConfig( 'turpentine_vcl/ttls/url_ttls' ) );
         $ttls = array();
         foreach( $configTtls as $line ) {
             $ttls[] = explode( ',', trim( $line ) );
@@ -324,13 +323,13 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getCrawlerIps() {
-        return implode( '|',
-            array_filter( array_map( 'preg_quote', array_map( 'trim',
-                explode( ',', trim(
-                    Mage::getStoreConfig( 'turpentine_vcl/backend/crawlers' )
-                ) )
-            ) ) )
-        ); //this probably makes lisp programmers really uncomfortable
+        $ips = Mage::helper( 'turpentine/data' )->cleanExplode( ',',
+            Mage::getStoreConfig( 'turpentine_vcl/backend/crawlers' ) );
+        if( !$ips ) {
+            //the regex breaks if this is empty currently
+            $ips[] = preg_quote( '255.255.255.255' );
+        }
+        return implode( '|', $ips );
     }
 
     /**

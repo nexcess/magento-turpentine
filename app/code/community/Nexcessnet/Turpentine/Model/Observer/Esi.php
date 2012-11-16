@@ -32,9 +32,12 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $response = $eventObject->getResponse();
         $sentinel = Mage::getSingleton( 'turpentine/sentinel' );
         if( Mage::helper( 'turpentine/esi' )->getEsiEnabled() ) {
-            Mage::log( 'Setting ESI flag to: ' . $sentinel->getEsiFlag() );
             $response->setHeader( 'X-Turpentine-Esi',
                 $sentinel->getEsiFlag() ? '1' : '0' );
+            if( Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled() ) {
+                Mage::log( 'Set ESI flag header to: ' .
+                    ( $sentinel->getEsiFlag() ? '1' : '0' ) );
+            }
         }
     }
 
@@ -52,13 +55,11 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      */
     public function checkCacheFlag( $eventObject ) {
         if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
-            Mage::log( 'Checking Varnish cache flag' );
             $layoutXml = $eventObject->getLayout()->getUpdate()->asSimplexml();
             foreach( $layoutXml->xpath( '//turpentine_cache_flag' ) as $node ) {
                 foreach( $node->attributes() as $attr => $value ) {
                     if( $attr == 'value' ) {
                         if( !(string)$value ) {
-                            Mage::log( 'Disabling Varnish cache for request' );
                             Mage::getSingleton( 'turpentine/sentinel' )
                                 ->setCacheFlag( false );
                             return; //only need to set the flag once
@@ -81,6 +82,9 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $getBlockUrlPattern = sprintf( '~%s~',
             preg_quote( Mage::getUrl( 'turpentine/esi/getBlock' ), '~' ) );
         if( preg_match( $getBlockUrlPattern, $url ) ) {
+            if( Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled() ) {
+                Mage::log( 'Caught redirect to ESI getBlock URL, intercepting' );
+            }
             $eventObject->getTransport()->setUrl(
                 Mage::getBaseUrl() );
         }
@@ -144,8 +148,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             $esiData->setDebugId( $this->_getEsiDebugId( $esiDataHash ) );
             //save the requested registry keys
             if( isset( $esiOptions['registry_keys'] ) ) {
-                $keys = array_map( 'trim',
-                    explode( ',', $esiOptions['registry_keys'] ) );
+                $keys = Mage::helper( 'turpentine/data' )
+                    ->cleanExplode( ',', $esiOptions['registry_keys'] );
                 $registry = array_combine(
                     $keys,
                     array_map( array( 'Mage', 'registry' ), $keys ) );
