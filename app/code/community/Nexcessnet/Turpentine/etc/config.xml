@@ -231,6 +231,14 @@
                     </turpentine_varnish_catalog_product_save_commit_after>
                 </observers>
             </catalog_product_save_commit_after>
+            <cataloginventory_stock_item_save_after>
+                <observers>
+                    <turpentine_varnish_cataloginventory_stock_item_save_after>
+                        <class>turpentine/observer_ban</class>
+                        <method>banProductPageCacheCheckStock</method>
+                    </turpentine_varnish_cataloginventory_stock_item_save_after>
+                </observers>
+             </cataloginventory_stock_item_save_after>
             <catalog_category_save_commit_after>
                 <observers>
                     <turpentine_varnish_catalog_category_save_commit_after>
@@ -271,6 +279,7 @@
                     </turpentine_varnish_adminhtml_cache_flush_all>
                 </observers>
             </adminhtml_cache_flush_all>
+            <!--
             <adminhtml_cache_refresh_type>
                 <observers>
                     <turpentine_varnish_adminhtml_cache_refresh_type>
@@ -279,14 +288,7 @@
                     </turpentine_varnish_adminhtml_cache_refresh_type>
                 </observers>
             </adminhtml_cache_refresh_type>
-            <cataloginventory_stock_item_save_after>
-                <observers>
-                    <turpentine_varnish_cataloginventory_stock_item_save_after>
-                        <class>turpentine/observer_ban</class>
-                        <method>banProductPageCacheCheckStock</method>
-                    </turpentine_varnish_cataloginventory_stock_item_save_after>
-                </observers>
-             </cataloginventory_stock_item_save_after>
+            -->
         </events>
     </global>
     <frontend>

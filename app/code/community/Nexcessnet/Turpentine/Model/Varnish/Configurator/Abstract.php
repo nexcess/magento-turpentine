@@ -20,8 +20,22 @@
  */
 
 abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
+    /**
+     * Get the correct version of a configurator from a socket
+     *
+     * @param  Nexcessnet_Turpentine_Model_Varnish_Admin_Socket $socket
+     * @return Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract
+     */
     static public function getFromSocket( $socket ) {
-        switch( $socket->getVersion() ) {
+        try {
+            $version = $socket->getVersion();
+        } catch( Mage_Core_Exception $e ) {
+            Mage::getSingleton( 'core/session' )
+                ->addError( 'Error determining Varnish version: ' .
+                    $e->getMessage() );
+            return null;
+        }
+        switch( $version ) {
             case '3.0':
                 return Mage::getModel(
                     'turpentine/varnish_configurator_version3',
@@ -35,7 +49,17 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
         }
     }
 
+    /**
+     * The socket this configurator is based on
+     *
+     * @var Nexcessnet_Turpentine_Model_Varnish_Admin_Socket
+     */
     protected $_socket = null;
+    /**
+     * options array
+     *
+     * @var array
+     */
     protected $_options = array(
         'vcl_template'  => null,
     );
@@ -207,6 +231,11 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             $default_options );
     }
 
+    /**
+     * Get the admin backend configuration string
+     *
+     * @return string
+     */
     protected function _getAdminBackend() {
         $timeout = Mage::getStoreConfig( 'turpentine_vcl/backend/admin_timeout' );
         $admin_options = array(

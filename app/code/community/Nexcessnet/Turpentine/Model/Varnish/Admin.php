@@ -97,21 +97,30 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
         foreach( Mage::helper( 'turpentine/varnish' )->getSockets() as $socket ) {
             $cfgr = Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract::getFromSocket( $socket );
             $socketName = $socket->getConnectionString();
-            $vcl = $cfgr->generate();
-            $vclName = hash( 'sha256', microtime() );
-            try {
-                $socket->vcl_inline( $vclName, $vcl );
-                sleep( 1 ); //this is probably not really needed
-                $socket->vcl_use( $vclName );
-            } catch( Mage_Core_Exception $e ) {
-                $result[$socketName] = $e->getMessage();
-                continue;
+            if( is_null( $cfgr ) ) {
+                $result[$socketName] = 'Failed to load configurator';
+            } else {
+                $vcl = $cfgr->generate();
+                $vclName = hash( 'sha256', microtime() );
+                try {
+                    $socket->vcl_inline( $vclName, $vcl );
+                    sleep( 1 ); //this is probably not really needed
+                    $socket->vcl_use( $vclName );
+                } catch( Mage_Core_Exception $e ) {
+                    $result[$socketName] = $e->getMessage();
+                    continue;
+                }
+                $result[$socketName] = true;
             }
-            $result[$socketName] = true;
         }
         return $result;
     }
 
+    /**
+     * Get a configurator based on the first socket in the server list
+     *
+     * @return Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract
+     */
     public function getConfigurator() {
         $sockets = Mage::helper( 'turpentine/varnish' )->getSockets();
         $cfgr = Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract::getFromSocket( $sockets[0] );
