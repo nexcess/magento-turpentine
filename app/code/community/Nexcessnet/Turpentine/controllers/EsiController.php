@@ -61,11 +61,14 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             $design->getPackageName(),
             $design->getTheme( 'layout' ),
             $esiData->getStoreId() );
-
-        $handleNames = $layoutXml->xpath( sprintf(
+        $handles = $layoutXml->xpath( sprintf(
             '//block[@name=\'%s\']/ancestor::node()[last()-2]',
             $esiData->getNameInLayout() ) );
-        foreach( $handleNames as $handle ) {
+        //create any dummy blocks needed
+        foreach( $esiData->getDummyBlocks() as $blockName ) {
+            $layout->createBlock( 'Mage_Core_Block_Template', $blockName );
+        }
+        foreach( $handles as $handle ) {
             $handleName = $handle->getName();
             $layout->getUpdate()->addHandle( $handleName );
             $layout->getUpdate()->load();

@@ -33,7 +33,7 @@ to how it works).
 
  - Magento Community Edition 1.6+ (earlier versions may work but have not been
  tested) or Magento Enterprise Edition 1.11+
- - Varnish 2.1.4+ (including 3.x versions)
+ - Varnish 2.1+ (including 3.x versions)
 
 ## Installation
 

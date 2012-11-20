@@ -85,8 +85,8 @@ sub vcl_recv {
                 set req.http.Cookie = "frontend=no-session";
                 set req.http.X-Varnish-Cookie = req.http.Cookie;
             } else {
-                # this option is only supported on v2.1.4+
-                set req.hash_always_miss = true;
+                #pass so we can get a unique session
+                return (pass);
             }
         }
         if (req.http.X-Opt-Force-Static-Caching ~ "true" &&

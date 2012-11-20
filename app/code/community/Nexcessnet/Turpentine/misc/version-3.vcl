@@ -82,7 +82,8 @@ sub vcl_recv {
                 set req.http.Cookie = "frontend=no-session";
                 set req.http.X-Varnish-Cookie = req.http.Cookie;
             } else {
-                set req.hash_always_miss = true;
+                #pass so we can get a unique session
+                return (pass);
             }
         }
         if ({{force_cache_static}} &&

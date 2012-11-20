@@ -56,10 +56,10 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
                 !$this->_esiClearFlag ) {
             $sessionId = Mage::app()->getRequest()->getCookie( 'frontend' );
             if( $sessionId ) {
-                $result = $this->_getVarnishAdmin()->flushExpression(
-                    'obj.http.X-Varnish-Session', '~', $sessionId );
                 Mage::app()->cleanCache(
                     array( 'TURPENTINE_ESI_CLIENTID_' . $sessionId ) );
+                $result = $this->_getVarnishAdmin()->flushExpression(
+                    'obj.http.X-Varnish-Session', '~', $sessionId );
                 Mage::dispatchEvent( 'turpentine_ban_client_esi_cache', $result );
                 if( $this->_checkResult( $result ) &&
                         Mage::helper( 'turpentine/esi' )

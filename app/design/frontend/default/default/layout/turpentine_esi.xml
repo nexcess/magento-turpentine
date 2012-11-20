@@ -139,6 +139,11 @@
     <!-- Customer Account -->
 
     <customer_account>
+        <!--
+        Disabling caching here disables it for all the customer account sub-
+        pages, and it doesn't seem to be overridable. We'll do this for now
+        and add the sub-pages at some later release.
+        -->
         <turpentine_cache_flag value="0"/>
     </customer_account>
 
@@ -166,95 +171,49 @@
         <turpentine_cache_flag value="0"/>
     </customer_account_confirmation>
 
+<!--
     <customer_account_edit>
-        <action method="setEsi">
-            <params>
-                <cache_type>per-client</cache_type>
-            </params>
-        </action>
+        <turpentine_cache_flag value="0"/>
     </customer_account_edit>
 
     <customer_account_index>
-        <!--
-        Due to "stupid line 43" in Mage_Customer_Block_Form_Register we can't
-        do a setEsi on the entire customer_account_dashboard so we do it for
-        every single sub-blocks.
-        If you want, you can override Mage_Customer_Block_Form_Register and
-        comment line 43. Then you'll be able to uncomment the 7 lines below.
-        -->
-        <!--
+        <turpentine_cache_flag value="1"/>
         <reference name="customer_account_dashboard">
             <action method="setEsi">
                 <params>
                     <cache_type>per-client</cache_type>
-                </params>
-            </action>
-        </reference>
-        -->
-        <reference type="customer_account_dashboard_hello">
-            <action method="setEsi">
-                <params>
-                    <cache_type>per-client</cache_type>
-                </params>
-            </action>
-        </reference>
-        <reference name="customer_account_dashboard_newsletter">
-            <action method="setEsi">
-                <params>
-                    <cache_type>per-client</cache_type>
-                </params>
-            </action>
-        </reference>
-        <reference name="customer_account_dashboard_address" >
-            <action method="setEsi">
-                <params>
-                    <cache_type>per-client</cache_type>
-                </params>
-            </action>
-        </reference>
-        <reference name="customer_account_dashboard_info1">
-            <action method="setEsi">
-                <params>
-                    <cache_type>per-client</cache_type>
-                </params>
-            </action>
-        </reference>
-        <reference name="customer_account_dashboard_info2" >
-            <action method="setEsi">
-                <params>
-                    <cache_type>per-client</cache_type>
+                    <dummy_blocks>head</dummy_blocks>
                 </params>
             </action>
         </reference>
     </customer_account_index>
-
     <customer_address_index>
         <turpentine_cache_flag value="0"/>
     </customer_address_index>
 
-    <customer_address_form>
-        <reference name="customer_address_edit">
-            <action method="setEsi">
-                <params>
-                    <cache_type>per-client</cache_type>
-                </params>
-            </action>
-        </reference>
-    </customer_address_form>
+    <customer_address_view>
+        <turpentine_cache_flag value="0"/>
+    </customer_address_view>
 
+    <customer_address_form>
+        <turpentine_cache_flag value="0"/>
+    </customer_address_form>
+-->
     <!-- End Customer Account -->
 
     <!-- Sales -->
-
+<!--
     <sales_order_history>
+        <turpentine_cache_flag value="1"/>
         <reference name="sales.order.history">
             <action method="setEsi">
                 <params>
                     <cache_type>per-client</cache_type>
+                    <dummy_blocks>root</dummy_blocks>
                 </params>
             </action>
         </reference>
     </sales_order_history>
-
+-->
     <!-- End Sales -->
 </layout>

@@ -193,6 +193,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $esiOptions = array_merge(
             array(
                 'cache_type'    => 'per-client',
+                'dummy_blocks'  => '',
             ),
             $esiOptions );
 
@@ -203,6 +204,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $esiData->setDesignTheme( Mage::getDesign()->getTheme( 'layout' ) );
         $esiData->setNameInLayout( $blockObject->getNameInLayout() );
         $esiData->setCacheType( $esiOptions['cache_type'] );
+        $esiData->setDummyBlocks( Mage::helper( 'turpentine/data' )
+            ->cleanExplode( ',', $esiOptions['dummy_blocks'] ) );
         if( isset( $esiOptions['ttl'] ) ) {
             $esiData->setTtl( $esiOptions['ttl'] );
         } else {
