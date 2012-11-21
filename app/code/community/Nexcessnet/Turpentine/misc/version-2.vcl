@@ -204,9 +204,8 @@ sub vcl_fetch {
                     /** Inspired by
                      * @link http://grosser.it/2009/12/05/setting-dynamic-ttl-from-varnish-headers-in-vcl/
                      */
-                    char* ttl;
-                    ttl = VRT_GetHdr(sp, HDR_REQ, "\13X-Varnish-Ttl:");
-                    VRT_l_beresp_ttl(sp, atoi(ttl));
+                    VRT_l_beresp_ttl(sp,
+                        atoi(VRT_regsub(sp, 0, VRT_r_req_url(sp), VGC_re_31, "\\1"));
                 }C
                 set beresp.http.X-Varnish-Ttl = beresp.ttl;
             } else {
