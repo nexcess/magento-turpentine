@@ -10,10 +10,6 @@
 
 {{crawler_acl}}
 
-acl local_ip {
-    "127.0.0.1";
-}
-
 ## Custom Subroutines
 sub remove_cache_headers {
     remove beresp.http.Set-Cookie;
@@ -93,11 +89,7 @@ sub vcl_recv {
     call set_fake_esi_level;
 
     if (req.http.X-Varnish-Esi-Level) {
-        if (client.ip ~ local_ip) {
-            remove req.http.Accept-Encoding;
-        } else {
-            error 403 "External ESI requests are not allowed";
-        }
+        remove req.http.Accept-Encoding;
     }
     if (req.url ~ "{{url_base_regex}}") {
         if (req.http.Cookie ~ "frontend=") {
