@@ -85,7 +85,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 Zend_Log::WARN );
             $resp = $this->getResponse();
             $resp->setHttpResponseCode( 404 );
-            $this->setBody( 'ESI data not available' );
+            $resp->setBody( 'ESI data not available' );
             Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
         }
     }
