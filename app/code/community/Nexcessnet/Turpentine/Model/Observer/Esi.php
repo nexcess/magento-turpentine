@@ -257,14 +257,16 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
     /**
      * Get the Magento cache TTL to use for a given ESI data
      *
-     * Calculated as <block's specific TTL> + <varnish grace period>
+     * Calculated as (<block's specific TTL> + <varnish grace period>) with a
+     * minimum of 30 seconds
      *
      * @param  Varien_Object $esiData
      * @return int
      */
     protected function _getEsiDataCacheTtl( $esiData ) {
-        return intval( $esiData->getTtl() ) +
-            intval( Mage::getStoreConfig( 'turpentine_vcl/ttls/grace_period' ) );
+        return max( 30, intval( $esiData->getTtl() ) +
+            intval( Mage::getStoreConfig(
+                'turpentine_vcl/ttls/grace_period' ) ) );
     }
 
     /**
