@@ -1,9 +1,5 @@
 ## Nexcessnet_Turpentine Varnish v2 VCL Template
 
-## Imports
-
-import std;
-
 ## Backends
 
 {{default_backend}}
@@ -13,6 +9,10 @@ import std;
 ## ACLs
 
 {{crawler_acl}}
+
+acl local_ip {
+    "127.0.0.1";
+}
 
 ## Custom Subroutines
 sub remove_cache_headers {
@@ -26,6 +26,22 @@ sub remove_cache_headers {
 
 sub remove_double_slashes {
     set req.url = regsub(req.url, "(.*)//+(.*)", "\1/\2");
+}
+
+sub set_fake_esi_level {
+    if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") {
+        set req.http.X-Varnish-Esi-Level = "1";
+    } else {
+        remove req.http.X-Varnish-Esi-Level;
+    }
+}
+
+sub handle_req_cookie {
+    if (!req.http.X-Varnish-Esi-Level && req.http.X-Varnish-Cookie) {
+        remove req.http.Cookie;
+    } else if (req.http.X-Varnish-Esi-Level && req.http.X-Varnish-Cookie) {
+        set req.http.Cookie = req.http.X-Varnish-Cookie;
+    }
 }
 
 ## Varnish Subroutines
@@ -73,8 +89,10 @@ sub vcl_recv {
         set req.backend = admin;
         return (pipe);
     }
-    if (req.url ~ "{{url_base_regex}}turpetine/esi/getBlock" &&
-            req.esi_level == 0) {
+
+    call set_fake_esi_level;
+
+    if (req.http.X-Varnish-Esi-Level && client.ip ~ local_ip) {
         error 403 "External ESI requests are not allowed";
     }
     if (req.url ~ "{{url_base_regex}}") {
@@ -113,11 +131,7 @@ sub vcl_pipe {
 }
 
 sub vcl_pass {
-    if (req.esi_level == 0 && req.http.X-Varnish-Cookie) {
-        remove req.http.Cookie;
-    } else if (req.esi_level > 0 && req.http.X-Varnish-Cookie) {
-        set req.http.Cookie = req.http.X-Varnish-Cookie;
-    }
+    call handle_req_cookie;
     return (pass);
 }
 
@@ -134,7 +148,7 @@ sub vcl_hash {
     if (req.http.Accept-Encoding) {
         set req.hash += req.http.Accept-Encoding;
     }
-    if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/.*") {
+    if (req.http.X-Varnish-Esi-Level) {
         if (req.url ~ "/cacheType/per-client/" && req.http.Cookie ~ "frontend=") {
             set req.hash += regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1");
         }
@@ -147,11 +161,7 @@ sub vcl_hash {
 # }
 
 sub vcl_miss {
-    if (req.esi_level == 0 && req.http.X-Varnish-Cookie) {
-        unset req.http.Cookie;
-    } else if (req.esi_level > 0 && req.http.X-Varnish-Cookie) {
-        set req.http.Cookie = req.http.X-Varnish-Cookie;
-    }
+    call handle_req_cookie;
     return (fetch);
 }
 
@@ -166,15 +176,14 @@ sub vcl_fetch {
             set beresp.http.X-Varnish-Set-Cookie = beresp.http.Set-Cookie;
             remove beresp.http.Set-Cookie;
         }
-        if (req.esi_level == 0 &&
+        if (!req.http.X-Varnish-Esi-Level &&
                 req.http.X-Varnish-Cookie !~ "frontend=" &&
                 client.ip !~ crawler_acl) {
             set beresp.http.X-Varnish-Use-Set-Cookie = "1";
         }
         if (beresp.http.X-Turpentine-Esi ~ "1") {
-            set beresp.do_esi = true;
+            esi;
         }
-        set beresp.do_gzip = true;
         if (beresp.http.X-Turpentine-Cache ~ "0") {
             set beresp.cacheable = false;
             set beresp.ttl = {{grace_period}}s;
@@ -187,15 +196,14 @@ sub vcl_fetch {
                     bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
                 call remove_cache_headers;
                 set beresp.ttl = {{static_ttl}}s;
-            } else if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/.*") {
+            } else if (req.http.X-Varnish-Esi-Level) {
                 call remove_cache_headers;
                 if (req.url ~ "/cacheType/per-client/" &&
                         req.http.Cookie ~ "frontend=") {
                     set beresp.http.X-Varnish-Session = regsub(req.http.Cookie,
                         "^.*?frontend=([^;]*);*.*$", "\1");
                 }
-                set beresp.ttl = std.duration(regsub(req.url,
-                    ".*/ttl/([0-9]+)/.*","\1s"), 300s);
+                set beresp.ttl = regsub(req.url, ".*/ttl/([0-9]+)/.*","\1s");
             } else {
                 call remove_cache_headers;
                 {{url_ttls}}
