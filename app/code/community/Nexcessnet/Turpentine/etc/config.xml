@@ -67,7 +67,7 @@
             </params>
             <static>
                 <force_static>1</force_static>
-                <exts>css,js,jpe?g,png,gif</exts>
+                <exts>css,js,jpe?g,png,gif,ico,swf</exts>
             </static>
         </turpentine_vcl>
     </default>
