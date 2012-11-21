@@ -142,25 +142,54 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 $esiOptions = $blockObject->getEsi() ) {
             if( Mage::app()->getStore()->getCode() == 'admin' ) {
                 //admin blocks are not allowed to be cached for now
-                Mage::log( 'Erroneous attempt to ESI inject adminhtml block: ' .
+                Mage::log( 'Ignoring attempt to ESI inject adminhtml block: ' .
                     $blockObject->getNameInLayout(), Zend_Log::WARN );
                 return;
             }
             $esiOptions = array_merge( $this->_defaultEsiOptions, $esiOptions );
             //change the block's template to the stripped down ESI template
             $blockObject->setTemplate( 'turpentine/esi.phtml' );
-            $esiData = $this->_getEsiData( $blockObject, $esiOptions );
+            $esiData = $this->_getEsiData( $blockObject );
             //get this now so we don't include stuff added later
             $esiDataHash = $this->_getEsiDataHash( $esiData );
-            $esiData->setDebugId( $this->_getEsiDebugId( $esiDataHash ) );
 
+            //load the full esi data from the cache if possible, instead of
+            //re-calculating and saving it again. this assumes that checking the
+            //cache and unserializing is less expensive than re-calculating
+            //the remaining esi data and saving it every time
             if( $cachedEsiData = @unserialize(
                     Mage::app()->getCache()->load( $esiDataHash ) ) ) {
                 $esiData = $cachedEsiData;
-                Mage::log( sprintf(
-                    'Skipped ESI block save with cached block: %s -> %s',
-                    $esiData->getNameInLayout(), $esiDataHash ) );
+                if( Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled() ) {
+                    Mage::log( sprintf(
+                        'Skipped ESI block save with cached block: %s -> %s',
+                        $esiData->getNameInLayout(), $esiDataHash ) );
+                }
             } else {
+                $esiData->setDebugId( $this->_getEsiDebugId( $esiDataHash ) );
+                if( isset( $esiOptions['ttl'] ) ) {
+                    $esiData->setTtl( $esiOptions['ttl'] );
+                } else {
+                    switch( $esiOptions['cache_type'] ) {
+                        case 'global':
+                            $ttlKey = 'turpentine_vcl/ttls/esi_global';
+                            break;
+                        case 'per-page':
+                            $ttlKey = 'turpentine_vcl/ttls/esi_per_page';
+                            $esiData->setParentUrl( Mage::app()->getRequest()
+                                ->getRequestString() );
+                            break;
+                        case 'per-client':
+                            $ttlKey = 'turpentine_vcl/ttls/esi_per_client';
+                            //TODO: may need to set session id like parent url
+                            break;
+                        default:
+                            Mage::throwException( 'Invalid block cache_type: ' .
+                                $esiOptions['cache_type'] );
+                    }
+                    $esiData->setTtl( Mage::getStoreConfig( $ttlKey ) );
+                }
+                $esiData->setCacheType( $esiOptions['cache_type'] );
                 $esiData->setDummyBlocks( Mage::helper( 'turpentine/data' )
                     ->cleanExplode( ',', $esiOptions['dummy_blocks'] ) );
                 //save the requested registry keys
@@ -188,8 +217,10 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                         array( 'name' => 'frontend' ) )
                         ->getSessionId(),
                 );
-                Mage::log( sprintf( 'Saving ESI block: %s -> %s',
-                    $esiData->getNameInLayout(), $esiDataHash ) );
+                if( Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled() ) {
+                    Mage::log( sprintf( 'Saving ESI block: %s -> %s',
+                        $esiData->getNameInLayout(), $esiDataHash ) );
+                }
                 Mage::app()->getCache()->save( serialize( $esiData ),
                     $esiDataHash, $tags, $this->_getEsiDataCacheTtl( $esiData ) );
             }
@@ -207,36 +238,12 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      * @param  array $esiOptions
      * @return Varien_Object
      */
-    protected function _getEsiData( $blockObject, $esiOptions ) {
+    protected function _getEsiData( $blockObject ) {
         $esiData = new Varien_Object();
-        //store stuff used in the hash
         $esiData->setStoreId( Mage::app()->getStore()->getId() );
         $esiData->setDesignPackage( Mage::getDesign()->getPackageName() );
         $esiData->setDesignTheme( Mage::getDesign()->getTheme( 'layout' ) );
         $esiData->setNameInLayout( $blockObject->getNameInLayout() );
-        $esiData->setCacheType( $esiOptions['cache_type'] );
-        if( isset( $esiOptions['ttl'] ) ) {
-            $esiData->setTtl( $esiOptions['ttl'] );
-        } else {
-            switch( $esiOptions['cache_type'] ) {
-                case 'global':
-                    $ttlKey = 'turpentine_vcl/ttls/esi_global';
-                    break;
-                case 'per-page':
-                    $ttlKey = 'turpentine_vcl/ttls/esi_per_page';
-                    $esiData->setParentUrl( Mage::app()->getRequest()
-                        ->getRequestString() );
-                    break;
-                case 'per-client':
-                    $ttlKey = 'turpentine_vcl/ttls/esi_per_client';
-                    //TODO: may need to set session id like parent url
-                    break;
-                default:
-                    Mage::throwException( 'Invalid block cache_type: ' .
-                        $esiOptions['cache_type'] );
-            }
-            $esiData->setTtl( Mage::getStoreConfig( $ttlKey ) );
-        }
         $esiData->setBlockType( get_class( $blockObject ) );
         return $esiData;
     }
