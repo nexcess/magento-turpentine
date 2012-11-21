@@ -178,7 +178,7 @@ sub vcl_fetch {
         }
         if (!req.http.X-Varnish-Esi-Level &&
                 req.http.X-Varnish-Cookie !~ "frontend=" &&
-                client.ip !~ crawler_acl) {
+                !(client.ip ~ crawler_acl)) {
             set beresp.http.X-Varnish-Use-Set-Cookie = "1";
         }
         if (beresp.http.X-Turpentine-Esi ~ "1") {
