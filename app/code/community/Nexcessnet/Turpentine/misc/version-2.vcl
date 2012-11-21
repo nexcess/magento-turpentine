@@ -92,8 +92,12 @@ sub vcl_recv {
 
     call set_fake_esi_level;
 
-    if (req.http.X-Varnish-Esi-Level && client.ip ~ local_ip) {
-        error 403 "External ESI requests are not allowed";
+    if (req.http.X-Varnish-Esi-Level) {
+        if (client.ip ~ local_ip) {
+            remove req.http.Accept-Encoding;
+        } else {
+            error 403 "External ESI requests are not allowed";
+        }
     }
     if (req.url ~ "{{url_base_regex}}") {
         if (req.http.Cookie ~ "frontend=") {
@@ -205,6 +209,9 @@ sub vcl_fetch {
                 }
                 set req.http.X-Varnish-Ttl = regsub(req.url, ".*/ttl/([0-9]+)/.*","\1");
                 C{
+                    /** Inspired by
+                     * @link http://grosser.it/2009/12/05/setting-dynamic-ttl-from-varnish-headers-in-vcl/
+                     */
                     char* ttl;
                     ttl = VRT_GetHdr(sp, HDR_REQ, "\13X-Varnish-Ttl:");
                     VRT_l_beresp_ttl(sp, atoi(ttl));
