@@ -174,7 +174,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             Mage::log( sprintf( 'Saving ESI block: %s -> %s',
                 $esiData->getNameInLayout(), $esiDataHash ) );
             Mage::app()->getCache()->save( serialize( $esiData ),
-                $esiDataHash, $tags, null );
+                $esiDataHash, $tags, $this->_getEsiDataCacheTtl( $esiData ) );
             $blockObject->setEsiData( $esiData );
 
             //flag request for ESI processing
@@ -252,6 +252,19 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $hashData = $esiData->toArray();
         ksort( $hashData );
         return sha1( $this->_getHashSalt() . serialize( $hashData ) );
+    }
+
+    /**
+     * Get the Magento cache TTL to use for a given ESI data
+     *
+     * Calculated as <block's specific TTL> + <varnish grace period>
+     *
+     * @param  Varien_Object $esiData
+     * @return int
+     */
+    protected function _getEsiDataCacheTtl( $esiData ) {
+        return intval( $esiData->getTtl() ) +
+            intval( Mage::getStoreConfig( 'turpentine_vcl/ttls/grace_period' ) );
     }
 
     /**
