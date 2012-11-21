@@ -203,7 +203,13 @@ sub vcl_fetch {
                     set beresp.http.X-Varnish-Session = regsub(req.http.Cookie,
                         "^.*?frontend=([^;]*);*.*$", "\1");
                 }
-                set beresp.ttl = regsub(req.url, ".*/ttl/([0-9]+)/.*","\1s");
+                set req.http.X-Varnish-Ttl = regsub(req.url, ".*/ttl/([0-9]+)/.*","\1");
+                C{
+                    char* ttl;
+                    ttl = VRT_GetHdr(sp, HDR_REQ, "\13X-Varnish-Ttl:");
+                    VRT_l_beresp_ttl(sp, atoi(ttl));
+                }C
+                set beresp.http.X-Varnish-Ttl = beresp.ttl;
             } else {
                 call remove_cache_headers;
                 {{url_ttls}}
