@@ -174,7 +174,9 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 $cacheTypeParam => $esiOptions[$cacheTypeParam],
                 $ttlParam       => $esiOptions[$ttlParam],
                 //we probably don't really need to encrypt this but it doesn't hurt
-                $dataParam      => base64_encode( Mage::helper( 'core' )
+                //use core/encryption instead of Mage::encrypt/decrypt because
+                //EE uses a different method by default
+                $dataParam      => Mage::getModel( 'core/encryption' )
                                     ->encrypt( serialize( $esiData ) ) ),
             ) );
             $blockObject->setEsiUrl( $esiUrl );

@@ -35,8 +35,8 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         $esiDataParamValue = $req->getParam(
             Mage::helper( 'turpentine/esi' )->getEsiDataParam() );
         $esiDataArray = unserialize(
-            Mage::helper( 'core' )->decrypt(
-                base64_decode( $esiDataParamValue ) ) );
+            Mage::getModel( 'core/encryption' )->decrypt(
+                $esiDataParamValue ) );
         if( !$esiDataArray ) {
             Mage::log( 'Invalid ESI data in URL: ' . $esiDataParamValue, Zend_Log::WARN );
             $resp = $this->getResponse();
