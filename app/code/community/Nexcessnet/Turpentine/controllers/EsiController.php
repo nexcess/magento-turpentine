@@ -21,25 +21,82 @@
 
 class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Action {
     public function indexAction() {
-        return $this->getBlockAction();
+        $this->getResponse()->setRedirect( Mage::getBaseUrl() );
     }
 
     /**
-     * Spit out the rendered block from the cached data
+     * Spit out the rendered block from the URL-encoded data
      *
      * @return [type]
      */
     public function getBlockAction() {
         Mage::helper( 'turpentine/esi' )->ensureEsiEnabled();
         $req = $this->getRequest();
-        $esiData = new Varien_Object( unserialize(
+        $esiDataParamValue = $req->getParam(
+            Mage::helper( 'turpentine/esi' )->getEsiDataParam() );
+        $esiDataArray = unserialize(
             Mage::helper( 'core' )->decrypt(
-                base64_decode( $req->getParam(
-                    Mage::helper( 'turpentine/esi' )->getEsiDataIdParam() ) ) ) ) );
-        $esiOptions = array(
-            'cache_type'    => $req->getParam( 'cacheType' ),
-            'ttl'           => $req->getParam( 'ttl' ),
-        );
+                base64_decode( $esiDataParamValue ) ) );
+        if( !$esiDataArray ) {
+            Mage::log( 'Invalid ESI data in URL: ' . $esiDataParamValue, Zend_Log::WARN );
+            $resp = $this->getResponse();
+            $resp->setHttpResponseCode( 500 );
+            $resp->setBody( 'Invalid ESI data in URL' );
+            //this wouldn't be cached anyway but we'll set this just in case
+            Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
+        } else {
+            $esiData = new Varien_Object( $esiDataArray );
+            $handles = $this->_doEsiLayoutSetup( $esiData );
+            if( !$this->_generateEsiBlock( $handles, $esiData->getNameInLayout() ) ) {
+                //404 and log error
+                $resp = $this->getResponse();
+                $resp->setHttpResponseCode( 404 );
+                $resp->setBody( 'ESI block not found in layout' );
+                Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
+            }
+        }
+    }
+
+    /**
+     * Generate the ESI block output
+     *
+     * @param  array $handles
+     * @param  string $blockNameInLayout name of the block to generate
+     * @return bool
+     */
+    protected function _generateEsiBlock( $handles, $blockNameInLayout ) {
+        $layout = Mage::getSingleton( 'core/layout' );
+        foreach( $handles as $handle ) {
+            $handleName = $handle->getName();
+            $layout->getUpdate()->addHandle( $handleName );
+            $layout->getUpdate()->load();
+            $layout->generateXml();
+            $layout->generateBlocks();
+
+            if( $block = $layout->getBlock( $blockNameInLayout ) ) {
+                //disable ESI flag on the block to avoid infinite loop
+                $block->setEsiOptions( false );
+                $this->getResponse()->setBody( $block->toHtml() );
+                //break early since we got our block
+                return true;
+            } else {
+                //reset for next loop
+                Mage::app()->removeCache( $layout->getUpdate()->getCacheId() );
+                $layout->getUpdate()->removeHandle( $handleName );
+                $layout->getUpdate()->resetUpdates();
+            }
+        }
+        //never found the block, indicate as such
+        return false;
+    }
+
+    /**
+     * Setup the layout for ESI block generation
+     *
+     * @param  Varien_Object $esiData
+     * @return array
+     */
+    protected function _doEsiLayoutSetup( $esiData ) {
         //restore the cached registry
         foreach( $esiData->getRegistry() as $key => $value ) {
             Mage::register( $key, $value, true );
@@ -53,30 +110,13 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             $design->getPackageName(),
             $design->getTheme( 'layout' ),
             $esiData->getStoreId() );
-        $handles = $layoutXml->xpath( sprintf(
-            '//block[@name=\'%s\']/ancestor::node()[last()-2]',
-            $esiData->getNameInLayout() ) );
         //create any dummy blocks needed
         foreach( $esiData->getDummyBlocks() as $blockName ) {
             $layout->createBlock( 'Mage_Core_Block_Template', $blockName );
         }
-        foreach( $handles as $handle ) {
-            $handleName = $handle->getName();
-            $layout->getUpdate()->addHandle( $handleName );
-            $layout->getUpdate()->load();
-            $layout->generateXml();
-            $layout->generateBlocks();
-
-            if( $block = $layout->getBlock( $esiData->getNameInLayout() ) ) {
-                //disable ESI flag on the block to avoid infinite loop
-                $block->setEsi( false );
-                $this->getResponse()->setBody( $block->toHtml() );
-                return;
-            }
-            //reset for next loop
-            Mage::app()->removeCache( $layout->getUpdate()->getCacheId() );
-            $layout->getUpdate()->removeHandle( $handleName );
-            $layout->getUpdate()->resetUpdates();
-        }
+        $handles = $layoutXml->xpath( sprintf(
+            '//block[@name=\'%s\']/ancestor::node()[last()-2]',
+            $esiData->getNameInLayout() ) );
+        return $handles;
     }
 }

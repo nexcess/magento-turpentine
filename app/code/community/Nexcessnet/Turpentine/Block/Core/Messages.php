@@ -22,7 +22,7 @@
 class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages {
     protected function _toHtml() {
         if( Mage::helper( 'turpentine/esi' )->getEsiEnabled() &&
-                $this->getEsi() ) {
+                $this->getEsiOptions() ) {
             return $this->renderView();
         } else {
             return parent::_toHtml();

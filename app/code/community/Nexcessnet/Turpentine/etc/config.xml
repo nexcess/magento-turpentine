@@ -99,9 +99,13 @@
         </models>
         <cache>
             <types>
+                <!--
+                This isn't used to actually store anything in Magento's cache,
+                we just use it to signal Varnish to purge it's ESI block cache.
+                -->
                 <turpentine_esi_blocks>
-                    <label>Varnish ESI</label>
-                    <description>Varnish ESI blocks</description>
+                    <label>Varnish ESI blocks</label>
+                    <description>ESI blocks cached in Varnish</description>
                     <tags>TURPENTINE_ESI_BLOCK</tags>
                 </turpentine_esi_blocks>
             </types>

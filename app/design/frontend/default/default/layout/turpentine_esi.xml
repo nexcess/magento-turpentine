@@ -36,53 +36,53 @@
         cached per-client.
         -->
         <reference name="header">
-            <action method="setEsi">
+            <action method="setEsiOptions">
                 <params>
-                    <cache_type>per-client</cache_type>
+                    <cacheType>per-client</cacheType>
                 </params>
             </action>
         </reference>
         <reference name="cart_sidebar">
-            <action method="setEsi">
+            <action method="setEsiOptions">
                 <params>
-                    <cache_type>per-client</cache_type>
+                    <cacheType>per-client</cacheType>
                 </params>
             </action>
         </reference>
         <reference name="catalog.compare.sidebar">
-            <action method="setEsi">
+            <action method="setEsiOptions">
                 <params>
-                    <cache_type>per-client</cache_type>
+                    <cacheType>per-client</cacheType>
                 </params>
             </action>
         </reference>
         <reference name="right.reports.product.viewed">
-            <action method="setEsi">
+            <action method="setEsiOptions">
                 <params>
-                    <cache_type>per-client</cache_type>
+                    <cacheType>per-client</cacheType>
                 </params>
             </action>
         </reference>
         <reference name="right.reports.product.compared">
-            <action method="setEsi">
+            <action method="setEsiOptions">
                 <params>
-                    <cache_type>per-client</cache_type>
+                    <cacheType>per-client</cacheType>
                 </params>
             </action>
         </reference>
 
         <!-- Messages are cached on a per-client basis -->
         <reference name="global_messages">
-            <action method="setEsi">
+            <action method="setEsiOptions">
                 <params>
-                    <cache_type>per-client</cache_type>
+                    <cacheType>per-client</cacheType>
                 </params>
             </action>
         </reference>
         <reference name="messages">
-            <action method="setEsi">
+            <action method="setEsiOptions">
                 <params>
-                    <cache_type>per-client</cache_type>
+                    <cacheType>per-client</cacheType>
                 </params>
             </action>
         </reference>
@@ -93,9 +93,9 @@
     <!-- We cache the checkout cart page on a per-client basis -->
     <checkout_cart_index>
         <reference name="checkout.cart">
-            <action method="setEsi">
+            <action method="setEsiOptions">
                 <params>
-                    <cache_type>per-client</cache_type>
+                    <cacheType>per-client</cacheType>
                 </params>
             </action>
         </reference>
@@ -179,9 +179,9 @@
     <customer_account_index>
         <turpentine_cache_flag value="1"/>
         <reference name="customer_account_dashboard">
-            <action method="setEsi">
+            <action method="setEsiOptions">
                 <params>
-                    <cache_type>per-client</cache_type>
+                    <cacheType>per-client</cacheType>
                     <dummy_blocks>head</dummy_blocks>
                 </params>
             </action>
@@ -206,9 +206,9 @@
     <sales_order_history>
         <turpentine_cache_flag value="1"/>
         <reference name="sales.order.history">
-            <action method="setEsi">
+            <action method="setEsiOptions">
                 <params>
-                    <cache_type>per-client</cache_type>
+                    <cacheType>per-client</cacheType>
                     <dummy_blocks>root</dummy_blocks>
                 </params>
             </action>

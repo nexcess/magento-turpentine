@@ -20,7 +20,9 @@
  */
 
 class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
-    const ESI_DATA_ID_PARAM         = 'esiId';
+    const ESI_DATA_PARAM            = 'esiData';
+    const ESI_TTL_PARAM             = 'ttl';
+    const ESI_CACHE_TYPE_PARAM      = 'cacheType';
 
     /**
      * Get whether ESI includes are enabled or not
@@ -48,8 +50,26 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      *
      * @return string
      */
-    public function getEsiDataIdParam() {
-        return self::ESI_DATA_ID_PARAM;
+    public function getEsiDataParam() {
+        return self::ESI_DATA_PARAM;
+    }
+
+    /**
+     * Get the URL param name for the ESI block cache type
+     *
+     * @return string
+     */
+    public function getEsiCacheTypeParam() {
+        return self::ESI_CACHE_TYPE_PARAM;
+    }
+
+    /**
+     * Get the URL param name for the ESI block TTL
+     *
+     * @return string
+     */
+    public function getEsiTtlParam() {
+        return self::ESI_TTL_PARAM;
     }
 
     /**
