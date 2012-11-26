@@ -167,14 +167,15 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             //change the block's template to the stripped down ESI template
             $blockObject->setTemplate( 'turpentine/esi.phtml' );
             //esi data is the data needed to regenerate the ESI'd block
-            $esiData = $this->_getEsiData( $blockObject, $esiOptions );
+            $esiData = $this->_getEsiData( $blockObject, $esiOptions )->toArray();
+            ksort( $esiData );
 
             $esiUrl = Mage::getUrl( 'turpentine/esi/getBlock', array(
                 $cacheTypeParam => $esiOptions[$cacheTypeParam],
                 $ttlParam       => $esiOptions[$ttlParam],
                 //we probably don't really need to encrypt this but it doesn't hurt
                 $dataParam      => base64_encode( Mage::helper( 'core' )
-                                    ->encrypt( serialize( $esiData->toArray() ) ) ),
+                                    ->encrypt( serialize( $esiData ) ) ),
             ) );
             $blockObject->setEsiUrl( $esiUrl );
             if( strlen( $esiUrl ) > 2047 ) {
