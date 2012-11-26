@@ -32,11 +32,11 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
     public function getBlockAction() {
         Mage::helper( 'turpentine/esi' )->ensureEsiEnabled();
         $req = $this->getRequest();
+        $decrypter = Mage::getModel( 'core/encryption' );
+        $decrypter->setHelper( Mage::helper( 'core' ) );
         $esiDataParamValue = $req->getParam(
             Mage::helper( 'turpentine/esi' )->getEsiDataParam() );
-        $esiDataArray = unserialize(
-            Mage::getModel( 'core/encryption' )->decrypt(
-                $esiDataParamValue ) );
+        $esiDataArray = unserialize( $decrypter->decrypt( $esiDataParamValue ) );
         if( !$esiDataArray ) {
             Mage::log( 'Invalid ESI data in URL: ' . $esiDataParamValue, Zend_Log::WARN );
             $resp = $this->getResponse();
@@ -48,7 +48,6 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             $esiData = new Varien_Object( $esiDataArray );
             $handles = $this->_doEsiLayoutSetup( $esiData );
             if( !$this->_generateEsiBlock( $handles, $esiData->getNameInLayout() ) ) {
-                //404 and log error
                 $resp = $this->getResponse();
                 $resp->setHttpResponseCode( 404 );
                 $resp->setBody( 'ESI block not found in layout' );
