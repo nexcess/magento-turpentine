@@ -1,27 +1,25 @@
 <?php
 
-/** 
+/**
  * Nexcess.net Turpentine Extension for Magento
  * Copyright (C) 2012  Nexcess.net L.L.C.
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */ 
+ */
 
 class Nexcessnet_Turpentine_Model_Varnish_Admin {
-
-    protected $_configurator = null;
 
     /**
      * Flush all Magento URLs in Varnish cache
@@ -41,13 +39,33 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
      * @return bool
      */
     public function flushUrl( $subPattern ) {
-        $cfgr = $this->getConfigurator();
-        $pattern = $cfgr->getBaseUrlPathRegex() . $subPattern;
         $result = array();
-        foreach( $cfgr->getSockets() as $socket ) {
-            $socketName = sprintf( '%s:%d', $socket->getHost(), $socket->getPort() );
+        foreach( Mage::helper( 'turpentine/varnish' )->getSockets() as $socket ) {
+            $socketName = $socket->getConnectionString();
             try {
-                $socket->ban_url( $pattern );
+                $socket->ban_url( $subPattern );
+            } catch( Mage_Core_Exception $e ) {
+                $result[$socketName] = $e->getMessage();
+                continue;
+            }
+            $result[$socketName] = true;
+        }
+        return $result;
+    }
+
+    /**
+     * Flush according to Varnish expression
+     *
+     * @param  mixed ...
+     * @return array
+     */
+    public function flushExpression() {
+        $args = func_get_args();
+        $result = array();
+        foreach( Mage::helper( 'turpentine/varnish' )->getSockets() as $socket ) {
+            $socketName = $socket->getConnectionString();
+            try {
+                call_user_func_array( array( $socket, 'ban' ), $args );
             } catch( Mage_Core_Exception $e ) {
                 $result[$socketName] = $e->getMessage();
                 continue;
@@ -64,18 +82,8 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
      * @return array
      */
     public function flushContentType( $contentType ) {
-        $result = array();
-        foreach( $this->getConfigurator()->getSockets() as $socket ) {
-            $socketName = sprintf( '%s:%d', $socket->getHost(), $socket->getPort() );
-            try {
-                $socket->ban( 'obj.http.Content-type', '~', $contentType );
-            } catch( Mage_Core_Exception $e ) {
-                $result[$socketName] = $e->getMessage();
-                continue;
-            }
-            $result[$socketName] = true;
-        }
-        return $result;
+        return $this->flushExpression(
+            'obj.http.Content-Type', '~', $contentType );
     }
 
     /**
@@ -86,58 +94,36 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
      */
     public function applyConfig() {
         $result = array();
-        $cfgr = $this->getConfigurator();
-        $vcl = $cfgr->generate();
-        $vclname = hash( 'sha256', microtime() );
-        foreach( $cfgr->getSockets() as $socket ) {
-            $socketName = sprintf( '%s:%d', $socket->getHost(), $socket->getPort() );
-            try {
-                $socket->vcl_inline( $vclname, $vcl );
-                sleep(1);
-                $socket->vcl_use( $vclname );
-            } catch( Mage_Core_Exception $e ) {
-                $result[$socketName] = $e->getMessage();
-                continue;
+        foreach( Mage::helper( 'turpentine/varnish' )->getSockets() as $socket ) {
+            $cfgr = Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract::getFromSocket( $socket );
+            $socketName = $socket->getConnectionString();
+            if( is_null( $cfgr ) ) {
+                $result[$socketName] = 'Failed to load configurator';
+            } else {
+                $vcl = $cfgr->generate();
+                $vclName = hash( 'sha256', microtime() );
+                try {
+                    $socket->vcl_inline( $vclName, $vcl );
+                    sleep( 1 ); //this is probably not really needed
+                    $socket->vcl_use( $vclName );
+                } catch( Mage_Core_Exception $e ) {
+                    $result[$socketName] = $e->getMessage();
+                    continue;
+                }
+                $result[$socketName] = true;
             }
-            $result[$socketName] = true;
         }
         return $result;
     }
 
     /**
-     * Get the appropriate configurator based on the specified Varnish version
-     * in the Magento config
+     * Get a configurator based on the first socket in the server list
      *
-     * @param  string $version=null provide version string instead of pulling
-     *                              from config
      * @return Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract
      */
-    public function getConfigurator( $version=null ) {
-        if( is_null( $this->_configurator ) ) {
-            if( is_null( $version ) ) {
-                $version = Mage::getStoreConfig(
-                    'turpentine_servers/servers/version' );
-            }
-            switch( $version ) {
-                case '2.1':
-                    $this->_configurator = Mage::getModel(
-                        'turpentine/varnish_configurator_version2' );
-                    break;
-                case '3.0':
-                    $this->_configurator = Mage::getModel(
-                        'turpentine/varnish_configurator_version3' );
-                    break;
-                case 'auto':
-                default:
-                    $sockets = Mage::getModel(
-                        'turpentine/varnish_configurator_version3' )->getSockets();
-                    foreach( $sockets as $socket ) {
-                        return $this->getConfigurator( $socket->getVersion() );
-                    }
-                    break;
-            }
-
-        }
-        return $this->_configurator;
+    public function getConfigurator() {
+        $sockets = Mage::helper( 'turpentine/varnish' )->getSockets();
+        $cfgr = Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract::getFromSocket( $sockets[0] );
+        return $cfgr;
     }
 }

@@ -19,17 +19,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
-    /**
-     * Like built-in explode() but applies trim to each exploded element and
-     * filters out empty elements from result
-     *
-     * @param  string $token [description]
-     * @param  string $data  [description]
-     * @return array
-     */
-    public function cleanExplode( $token, $data ) {
-        return array_filter( array_map( 'trim',
-            explode( $token, trim( $data ) ) ) );
-    }
+$esiDebugEnabled = (bool)Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled();
+
+if( $esiDebugEnabled ) {
+    echo sprintf( '<!-- ESI START [%s] -->', $this->getNameInLayout() ) . PHP_EOL;
+}
+echo sprintf( '<esi:remove>ESI processing not enabled</esi:remove>
+<!--esi <esi:include src="%s" /> -->',
+    $this->getEsiUrl() ) . PHP_EOL;
+if( $esiDebugEnabled ) {
+    echo sprintf( '<!-- ESI END [%s] -->', $this->getNameInLayout() ) . PHP_EOL;
 }

@@ -1,0 +1,221 @@
+<?xml version="1.0"?>
+<!--
+    Nexcess.net Turpentine Extension for Magento
+    Copyright (C) 2012  Nexcess.net L.L.C.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+-->
+<layout version="0.1.0">
+    <!--
+    Editing XML files sucks, I want to move this to the configuration
+    interface once I think of a good way to without losing functionality
+    and ease-of-use.
+
+    Maybe something like:
+        in turpentine_varnish/esi/blocks:
+            $BLOCK_NAME[,$CACHE_TYPE[,$TTL[,$REGISTRY_KEYS]]]
+        with $REGISTRY_KEYS being separated by | (pipe)
+        ex: header,per-client,300,key1|key2|key3
+    -->
+    <default>
+        <!--
+        A default Magento site includes a logged in user's name in the welcome
+        message and the number of items in the shopping cart so it must be
+        cached per-client.
+        -->
+        <reference name="header">
+            <action method="setEsiOptions">
+                <params>
+                    <cacheType>per-client</cacheType>
+                </params>
+            </action>
+        </reference>
+        <!-- This block is inside of the header block on mage EE, so it could
+        be commented out for EE stores for a small performance increase -->
+        <reference name="cart_sidebar">
+            <action method="setEsiOptions">
+                <params>
+                    <cacheType>per-client</cacheType>
+                </params>
+            </action>
+        </reference>
+        <reference name="catalog.compare.sidebar">
+            <action method="setEsiOptions">
+                <params>
+                    <cacheType>per-client</cacheType>
+                </params>
+            </action>
+        </reference>
+        <reference name="right.reports.product.viewed">
+            <action method="setEsiOptions">
+                <params>
+                    <cacheType>per-client</cacheType>
+                </params>
+            </action>
+        </reference>
+        <reference name="right.reports.product.compared">
+            <action method="setEsiOptions">
+                <params>
+                    <cacheType>per-client</cacheType>
+                </params>
+            </action>
+        </reference>
+
+        <!-- Messages are cached on a per-client basis -->
+        <reference name="global_messages">
+            <action method="setEsiOptions">
+                <params>
+                    <cacheType>per-client</cacheType>
+                </params>
+            </action>
+        </reference>
+        <reference name="messages">
+            <action method="setEsiOptions">
+                <params>
+                    <cacheType>per-client</cacheType>
+                </params>
+            </action>
+        </reference>
+    </default>
+
+    <!-- Checkout -->
+
+    <!-- We cache the checkout cart page on a per-client basis -->
+    <checkout_cart_index>
+        <reference name="checkout.cart">
+            <action method="setEsiOptions">
+                <params>
+                    <cacheType>per-client</cacheType>
+                </params>
+            </action>
+        </reference>
+    </checkout_cart_index>
+
+    <!-- We never cache anything in the checkout funnel -->
+    <checkout_onepage_index>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_index>
+
+    <checkout_onepage_progress>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_progress>
+
+    <checkout_onepage_paymentmethod>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_paymentmethod>
+
+    <checkout_onepage_shippingmethod>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_shippingmethod>
+
+    <checkout_onepage_additional>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_additional>
+
+    <checkout_onepage_review>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_review>
+
+    <checkout_onepage_success>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_success>
+
+    <checkout_onepage_failure>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_failure>
+
+    <!-- End Checkout -->
+
+    <!-- Customer Account -->
+
+    <customer_account>
+        <!--
+        Disabling caching here disables it for all the customer account sub-
+        pages, and it doesn't seem to be overridable. We'll do this for now
+        and add the sub-pages at some later release.
+        -->
+        <turpentine_cache_flag value="0"/>
+    </customer_account>
+
+    <customer_account_login>
+        <turpentine_cache_flag value="0"/>
+    </customer_account_login>
+
+    <customer_account_logoutsuccess>
+        <turpentine_cache_flag value="0"/>
+    </customer_account_logoutsuccess>
+
+    <customer_account_create>
+        <turpentine_cache_flag value="0"/>
+    </customer_account_create>
+
+    <customer_account_forgotpassword>
+        <turpentine_cache_flag value="0"/>
+    </customer_account_forgotpassword>
+
+    <customer_account_resetpassword>
+        <turpentine_cache_flag value="0"/>
+    </customer_account_resetpassword>
+
+    <customer_account_confirmation>
+        <turpentine_cache_flag value="0"/>
+    </customer_account_confirmation>
+
+<!--
+    <customer_account_edit>
+        <turpentine_cache_flag value="0"/>
+    </customer_account_edit>
+
+    <customer_account_index>
+        <turpentine_cache_flag value="1"/>
+        <reference name="customer_account_dashboard">
+            <action method="setEsiOptions">
+                <params>
+                    <cacheType>per-client</cacheType>
+                    <dummy_blocks>head</dummy_blocks>
+                </params>
+            </action>
+        </reference>
+    </customer_account_index>
+    <customer_address_index>
+        <turpentine_cache_flag value="0"/>
+    </customer_address_index>
+
+    <customer_address_view>
+        <turpentine_cache_flag value="0"/>
+    </customer_address_view>
+
+    <customer_address_form>
+        <turpentine_cache_flag value="0"/>
+    </customer_address_form>
+-->
+    <!-- End Customer Account -->
+
+    <!-- Sales -->
+<!--
+    <sales_order_history>
+        <turpentine_cache_flag value="1"/>
+        <reference name="sales.order.history">
+            <action method="setEsiOptions">
+                <params>
+                    <cacheType>per-client</cacheType>
+                    <dummy_blocks>root</dummy_blocks>
+                </params>
+            </action>
+        </reference>
+    </sales_order_history>
+-->
+    <!-- End Sales -->
+</layout>

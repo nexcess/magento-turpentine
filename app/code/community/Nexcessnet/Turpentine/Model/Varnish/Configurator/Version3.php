@@ -52,7 +52,6 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
             'get_param_excludes'    => $this->_getGetParamExcludes(),
             'default_ttl'   => $this->_getDefaultTtl(),
             'enable_get_excludes'   => ($this->_getGetParamExcludes() ? 'true' : 'false'),
-            'cookie_excludes'  => $this->_getCookieExcludes(),
             'debug_headers' => $this->_getEnableDebugHeaders(),
             'grace_period'  => $this->_getGracePeriod(),
             'force_cache_static'    => $this->_getForceCacheStatic(),
@@ -60,15 +59,19 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
             'static_ttl'    => $this->_getStaticTtl(),
             'url_ttls'      => $this->_getUrlTtls(),
             'enable_caching'    => $this->_getEnableCaching(),
-            'set_initial_cookie'    => $this->_getSetInitialCookie(),
+            'crawler_acl'   => $this->_vcl_acl( 'crawler_acl',
+                $this->_getCrawlerIps() ),
+            'esi_cache_type_param'  =>
+                Mage::helper( 'turpentine/esi' )->getEsiCacheTypeParam(),
+            'esi_ttl_param' => Mage::helper( 'turpentine/esi' )->getEsiTtlParam(),
         );
-        if( Mage::getStoreConfig( 'turpentine_control/normalization/encoding' ) ) {
+        if( Mage::getStoreConfig( 'turpentine_vcl/normalization/encoding' ) ) {
             $vars['normalize_encoding'] = $this->_vcl_sub_normalize_encoding();
         }
-        if( Mage::getStoreConfig( 'turpentine_control/normalization/user_agent' ) ) {
+        if( Mage::getStoreConfig( 'turpentine_vcl/normalization/user_agent' ) ) {
             $vars['normalize_user_agent'] = $this->_vcl_sub_normalize_user_agent();
         }
-        if( Mage::getStoreConfig( 'turpentine_control/normalization/host' ) ) {
+        if( Mage::getStoreConfig( 'turpentine_vcl/normalization/host' ) ) {
             $vars['normalize_host'] = $this->_vcl_sub_normalize_host();
         }
         return $vars;

@@ -132,6 +132,15 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
     }
 
     /**
+     * Get the connection string for this socket (<host>:<port>)
+     *
+     * @return string
+     */
+    public function getConnectionString() {
+        return sprintf( '%s:%d', $this->getHost(), $this->getPort() );
+    }
+
+    /**
      * Get the set host for this instance
      *
      * @return string
@@ -402,8 +411,8 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         $response = $this->_write( $data )->_read();
         if( $response['code'] !== $okCode && !is_null( $okCode ) ) {
             Mage::throwException( sprintf(
-                "Got unexpected response code from Varnish: %d\n%s",
-                $response['code'], $response['text'] ) );
+                "Sent command: %s\nGot unexpected response code from Varnish: %d\n%s",
+                $data, $response['code'], $response['text'] ) );
         } else {
             return $response;
         }

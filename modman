@@ -4,3 +4,5 @@ app/etc/modules/Nexcessnet_Turpentine.xml       app/etc/modules/Nexcessnet_Turpe
 app/code/community/Nexcessnet/Turpentine/       app/code/community/Nexcessnet/Turpentine/
 app/design/adminhtml/default/default/layout/turpentine.xml  app/design/adminhtml/default/default/layout/turpentine.xml
 app/design/adminhtml/default/default/template/turpentine/  app/design/adminhtml/default/default/template/turpentine/
+app/design/frontend/default/default/layout/turpentine_esi.xml   app/design/frontend/default/default/layout/turpentine_esi.xml
+app/design/frontend/default/default/template/turpentine/esi.phtml   app/design/frontend/default/default/template/turpentine/esi.phtml

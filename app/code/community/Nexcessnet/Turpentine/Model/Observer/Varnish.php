@@ -19,17 +19,25 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
+class Nexcessnet_Turpentine_Model_Observer_Varnish extends Varien_Event_Observer {
     /**
-     * Like built-in explode() but applies trim to each exploded element and
-     * filters out empty elements from result
+     * Check sentinel flags and set headers/cookies as needed
      *
-     * @param  string $token [description]
-     * @param  string $data  [description]
-     * @return array
+     * Events: http_response_send_before
+     *
+     * @param  mixed $eventObject
+     * @return null
      */
-    public function cleanExplode( $token, $data ) {
-        return array_filter( array_map( 'trim',
-            explode( $token, trim( $data ) ) ) );
+    public function setCacheFlagHeader( $eventObject ) {
+        $response = $eventObject->getResponse();
+        $sentinel = Mage::getSingleton( 'turpentine/sentinel' );
+        if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
+            $response->setHeader( 'X-Turpentine-Cache',
+                $sentinel->getCacheFlag() ? '1' : '0' );
+            if( Mage::helper( 'turpentine/varnish' )->getVarnishDebugEnabled() ) {
+                Mage::log( 'Set Varnish cache flag header to: ' .
+                    ( $sentinel->getCacheFlag() ? '1' : '0' ) );
+            }
+        }
     }
 }

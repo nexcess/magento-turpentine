@@ -6,6 +6,10 @@
 
 {{admin_backend}}
 
+## ACLs
+
+{{crawler_acl}}
+
 ## Custom Subroutines
 sub remove_cache_headers {
     remove beresp.http.Set-Cookie;
@@ -14,6 +18,26 @@ sub remove_cache_headers {
     remove beresp.http.Pragma;
     remove beresp.http.Cache;
     remove beresp.http.Age;
+}
+
+sub remove_double_slashes {
+    set req.url = regsub(req.url, "(.*)//+(.*)", "\1/\2");
+}
+
+sub set_fake_esi_level {
+    if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") {
+        set req.http.X-Varnish-Esi-Level = "1";
+    } else {
+        remove req.http.X-Varnish-Esi-Level;
+    }
+}
+
+sub handle_req_cookie {
+    if (!req.http.X-Varnish-Esi-Level && req.http.X-Varnish-Cookie) {
+        remove req.http.Cookie;
+    } else if (req.http.X-Varnish-Esi-Level && req.http.X-Varnish-Cookie) {
+        set req.http.Cookie = req.http.X-Varnish-Cookie;
+    }
 }
 
 ## Varnish Subroutines
@@ -44,6 +68,8 @@ sub vcl_recv {
         return (pass);
     }
 
+    call remove_double_slashes;
+
     {{normalize_encoding}}
     {{normalize_user_agent}}
     {{normalize_host}}
@@ -51,16 +77,32 @@ sub vcl_recv {
     set req.http.X-Opt-Enable-Caching = "{{enable_caching}}";
     set req.http.X-Opt-Force-Static-Caching = "{{force_cache_static}}";
     set req.http.X-Opt-Enable-Get-Excludes = "{{enable_get_excludes}}";
-    set req.http.X-Opt-Set-Initial-Cookie = "{{set_initial_cookie}}";
 
     if (req.http.X-Opt-Enable-Caching !~ "true") {
-        return (pass);
+        return (pipe);
     }
     if (req.url ~ "{{url_base_regex}}{{admin_frontname}}") {
         set req.backend = admin;
-        return (pass);
+        return (pipe);
+    }
+
+    call set_fake_esi_level;
+
+    if (req.http.X-Varnish-Esi-Level) {
+        remove req.http.Accept-Encoding;
     }
     if (req.url ~ "{{url_base_regex}}") {
+        if (req.http.Cookie ~ "frontend=") {
+            set req.http.X-Varnish-Cookie = req.http.Cookie;
+        } else {
+            if (client.ip ~ crawler_acl) {
+                set req.http.Cookie = "frontend=no-session";
+                set req.http.X-Varnish-Cookie = req.http.Cookie;
+            } else {
+                #pass so we can get a unique session
+                return (pass);
+            }
+        }
         if (req.http.X-Opt-Force-Static-Caching ~ "true" &&
                 req.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
             remove req.http.Cookie;
@@ -69,25 +111,11 @@ sub vcl_recv {
         if (req.url ~ "{{url_base_regex}}(?:{{url_excludes}})") {
             return (pass);
         }
-        if (req.http.Cookie ~ "{{cookie_excludes}}") {
-            return (pass);
-        }
         if (req.http.X-Opt-Enable-Get-Excludes ~ "true" &&
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
             return (pass);
         }
-        if (req.http.X-Opt-Set-Initial-Cookie ~ "true") {
-            if (req.http.Cookie && req.http.Cookie ~ "frontend=") {
-                set req.http.X-Varnish-Cookie = req.http.Cookie;
-                remove req.http.Cookie;
-                return (lookup);
-            } else {
-                return (pass);
-            }
-        } else {
-            remove req.http.Cookie;
-            return (lookup);
-        }
+        return (lookup);
     }
     # else it's not part of magento so do default handling (doesn't help
     # things underneath magento but we can't detect that)
@@ -98,9 +126,10 @@ sub vcl_pipe {
     return (pipe);
 }
 
-# sub vcl_pass {
-#     return (pass);
-# }
+sub vcl_pass {
+    call handle_req_cookie;
+    return (pass);
+}
 
 sub vcl_hash {
     set req.hash += req.url;
@@ -115,71 +144,88 @@ sub vcl_hash {
     if (req.http.Accept-Encoding) {
         set req.hash += req.http.Accept-Encoding;
     }
+    if (req.http.X-Varnish-Esi-Level) {
+        if (req.url ~ "/cacheType/per-client/" && req.http.Cookie ~ "frontend=") {
+            set req.hash += regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1");
+        }
+    }
     return (hash);
 }
 
 # sub vcl_hit {
 #     return (deliver);
 # }
-#
-# sub vcl_miss {
-#     return (fetch);
-# }
-#
+
+sub vcl_miss {
+    call handle_req_cookie;
+    return (fetch);
+}
 
 sub vcl_fetch {
     set req.grace = {{grace_period}}s;
     remove beresp.http.Vary;
 
-    if (req.http.X-Opt-Force-Static-Caching ~ "true" &&
-            bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
-        call remove_cache_headers;
-        set beresp.cacheable = true;
-        set beresp.ttl = {{static_ttl}}s;
-    } else if (req.http.Cookie ~ "{{cookie_excludes}}" ||
-        beresp.http.Set-Cookie ~ "{{cookie_excludes}}") {
-        return (deliver);
-    } else if (beresp.http.X-Varnish-Bypass) {
+    if (beresp.status != 200 && beresp.status != 404) {
         set beresp.ttl = {{grace_period}}s;
         return (pass);
     } else {
-        if (req.http.X-Opt-Set-Initial-Cookie ~ "true") {
-            if (req.http.X-Varnish-Cookie) {
+        if (beresp.http.Set-Cookie) {
+            set beresp.http.X-Varnish-Set-Cookie = beresp.http.Set-Cookie;
+            remove beresp.http.Set-Cookie;
+        }
+        if (!req.http.X-Varnish-Esi-Level &&
+                req.http.X-Varnish-Cookie !~ "frontend=" &&
+                !(client.ip ~ crawler_acl)) {
+            set beresp.http.X-Varnish-Use-Set-Cookie = "1";
+        }
+        if (beresp.http.X-Turpentine-Esi ~ "1") {
+            esi;
+        }
+        if (beresp.http.X-Turpentine-Cache ~ "0") {
+            set beresp.cacheable = false;
+            set beresp.ttl = {{grace_period}}s;
+            return (pass);
+        } else {
+            set beresp.cacheable = true;
+            #TODO: only remove the User-Agent field from this if it exists
+            remove beresp.http.Vary;
+            if (req.http.X-Opt-Force-Static-Caching ~ "true" &&
+                    bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
                 call remove_cache_headers;
-                set beresp.cacheable = true;
+                set beresp.ttl = {{static_ttl}}s;
+            } else if (req.http.X-Varnish-Esi-Level) {
+                call remove_cache_headers;
+                if (req.url ~ "/cacheType/per-client/" &&
+                        req.http.Cookie ~ "frontend=") {
+                    set beresp.http.X-Varnish-Session = regsub(req.http.Cookie,
+                        "^.*?frontend=([^;]*);*.*$", "\1");
+                }
+                set req.http.X-Varnish-Ttl = regsub(req.url, ".*/ttl/([0-9]+)/.*","\1");
+                C{
+                    /** Inspired by
+                     * @link http://grosser.it/2009/12/05/setting-dynamic-ttl-from-varnish-headers-in-vcl/
+                     */
+                    VRT_l_beresp_ttl(sp,
+                        atoi(VRT_regsub(sp, 0, VRT_r_req_url(sp), VGC_re_31, "\\1")));
+                }C
+                set beresp.http.X-Varnish-Ttl = beresp.ttl;
+            } else {
+                call remove_cache_headers;
                 {{url_ttls}}
             }
-        } else {
-            call remove_cache_headers;
-            set beresp.cacheable = true;
-            {{url_ttls}}
         }
     }
     return (deliver);
 }
 
-# sub vcl_fetch {
-#     if (beresp.ttl <= 0s ||
-#         beresp.http.Set-Cookie ||
-#         beresp.http.Vary == "*") {
-# 		/*
-# 		 * Mark as "Hit-For-Pass" for the next 2 minutes
-# 		 */
-# 		set beresp.ttl = 120 s;
-# 		return (hit_for_pass);
-#     }
-#     return (deliver);
-# }
-
 #https://www.varnish-cache.org/trac/wiki/VCLExampleHitMissHeader
 sub vcl_deliver {
+    if (resp.http.X-Varnish-Use-Set-Cookie) {
+        set resp.http.Set-Cookie = resp.http.X-Varnish-Set-Cookie;
+    }
     set resp.http.X-Opt-Debug-Headers = "{{debug_headers}}";
     if (resp.http.X-Opt-Debug-Headers ~ "true") {
-        if (obj.hits > 0) {
-            set resp.http.X-Varnish-Hits = "HIT: " obj.hits;
-        } else {
-            set resp.http.X-Varnish-Hits = "MISS";
-        }
+        set resp.http.X-Varnish-Hits = obj.hits;
     } else {
         #remove Varnish fingerprints
         remove resp.http.X-Varnish;
@@ -187,42 +233,11 @@ sub vcl_deliver {
         remove resp.http.X-Powered-By;
         remove resp.http.Server;
         remove resp.http.Age;
+        remove resp.http.X-Turpentine-Cache;
+        remove resp.http.X-Turpentine-Esi;
+        remove resp.http.X-Varnish-Session;
+        remove resp.http.X-Varnish-Set-Cookie;
+        remove resp.http.X-Varnish-Use-Set-Cookie;
     }
     remove resp.http.X-Opt-Debug-Headers;
 }
-
-sub vcl_error {
-    remove obj.http.Server;
-}
-
-# sub vcl_error {
-#     set obj.http.Content-Type = "text/html; charset=utf-8";
-#     set obj.http.Retry-After = "5";
-#     synthetic {"
-# <?xml version="1.0" encoding="utf-8"?>
-# <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-#  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-# <html>
-#   <head>
-#     <title>"} + obj.status + " " + obj.response + {"</title>
-#   </head>
-#   <body>
-#     <h1>Error "} + obj.status + " " + obj.response + {"</h1>
-#     <p>"} + obj.response + {"</p>
-#     <h3>Guru Meditation:</h3>
-#     <p>XID: "} + req.xid + {"</p>
-#     <hr>
-#     <p>Varnish cache server</p>
-#   </body>
-# </html>
-# "};
-#     return (deliver);
-# }
-#
-# sub vcl_init {
-# 	return (ok);
-# }
-#
-# sub vcl_fini {
-# 	return (ok);
-# }

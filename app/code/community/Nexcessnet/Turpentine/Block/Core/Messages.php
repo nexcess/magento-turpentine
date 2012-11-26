@@ -19,17 +19,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
-    /**
-     * Like built-in explode() but applies trim to each exploded element and
-     * filters out empty elements from result
-     *
-     * @param  string $token [description]
-     * @param  string $data  [description]
-     * @return array
-     */
-    public function cleanExplode( $token, $data ) {
-        return array_filter( array_map( 'trim',
-            explode( $token, trim( $data ) ) ) );
+class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages {
+    protected function _toHtml() {
+        if( Mage::helper( 'turpentine/esi' )->getEsiEnabled() &&
+                $this->getEsiOptions() ) {
+            return $this->renderView();
+        } else {
+            return parent::_toHtml();
+        }
     }
 }
