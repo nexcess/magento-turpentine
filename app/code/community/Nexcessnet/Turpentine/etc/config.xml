@@ -271,6 +271,14 @@
                     </turpentine_varnish_cms_page_save_commit_after>
                 </observers>
             </cms_page_save_commit_after>
+            <adminhtml_cache_flush_system>
+                <observers>
+                    <turpentine_varnish_adminhtml_cache_flush_system>
+                        <class>turpentine/observer_ban</class>
+                        <method>banAllCache</method>
+                    </turpentine_varnish_adminhtml_cache_flush_system>
+                </observers>
+            </adminhtml_cache_flush_system>
             <adminhtml_cache_flush_all>
                 <observers>
                     <turpentine_varnish_adminhtml_cache_flush_all>
@@ -279,16 +287,14 @@
                     </turpentine_varnish_adminhtml_cache_flush_all>
                 </observers>
             </adminhtml_cache_flush_all>
-            <!--
             <adminhtml_cache_refresh_type>
                 <observers>
                     <turpentine_varnish_adminhtml_cache_refresh_type>
                         <class>turpentine/observer_ban</class>
-                        <method>banAllCache</method>
+                        <method>banCacheType</method>
                     </turpentine_varnish_adminhtml_cache_refresh_type>
                 </observers>
             </adminhtml_cache_refresh_type>
-            -->
         </events>
     </global>
     <frontend>

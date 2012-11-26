@@ -202,10 +202,11 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
     }
 
     /**
-     * Do a full cache flush, corresponds to "Flush Magento Cache" button in
-     * admin > cache management
+     * Do a full cache flush, corresponds to "Flush Magento Cache" and
+     * "Flush Cache Storage" buttons in admin > cache management
      *
      * Events:
+     *     adminhtml_cache_flush_system
      *     adminhtml_cache_flush_all
      *
      * @param  [type] $eventObject [description]
@@ -216,6 +217,30 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
             $result = $this->_getVarnishAdmin()->flushAll();
             Mage::dispatchEvent( 'turpentine_ban_all_cache', $result );
             $this->_checkResult( $result );
+        }
+    }
+
+    /**
+     * Do a flush on the ESI blocks
+     *
+     * Events:
+     *     adminhtml_cache_refresh_type
+     *
+     * @param  [type] $eventObject [description]
+     * @return [type]
+     */
+    public function banCacheType( $eventObject ) {
+        switch( $eventObject->getType() ) {
+            //note this is the name of the container xml tag in config.xml,
+            // **NOT** the cache tag name
+            case 'turpentine_esi_blocks':
+                if( Mage::helper( 'turpentine/esi' )->getEsiEnabled() ) {
+                    $result = $this->_getVarnishAdmin()->flushUrl(
+                        '/turpentine/esi/getBlock/' );
+                    Mage::dispatchEvent( 'turpentine_ban_esi_cache', $result );
+                    $this->_checkResult( $result );
+                }
+                break;
         }
     }
 

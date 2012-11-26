@@ -150,81 +150,53 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             //change the block's template to the stripped down ESI template
             $blockObject->setTemplate( 'turpentine/esi.phtml' );
             $esiData = $this->_getEsiData( $blockObject );
-            //get this now so we don't include stuff added later
-            $esiDataHash = $this->_getEsiDataHash( $esiData );
 
-            //load the full esi data from the cache if possible, instead of
-            //re-calculating and saving it again. this assumes that checking the
-            //cache and unserializing is less expensive than re-calculating
-            //the remaining esi data and saving it every time
-            if( $cachedEsiData = @unserialize(
-                    Mage::app()->getCache()->load( $esiDataHash ) ) ) {
-                $esiData = $cachedEsiData;
-                if( Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled() ) {
-                    Mage::log( sprintf(
-                        'Skipped ESI block save with cached block: %s -> %s',
-                        $esiData->getNameInLayout(), $esiDataHash ) );
+            if( !isset( $esiOptions['ttl'] ) ) {
+                //set default esi ttl by cache type
+                switch( $esiOptions['cache_type'] ) {
+                    case 'global':
+                        $ttlKey = 'turpentine_vcl/ttls/esi_global';
+                        break;
+                    case 'per-page':
+                        $ttlKey = 'turpentine_vcl/ttls/esi_per_page';
+                        $esiData->setParentUrl( Mage::app()->getRequest()
+                            ->getRequestString() );
+                        break;
+                    case 'per-client':
+                        $ttlKey = 'turpentine_vcl/ttls/esi_per_client';
+                        //TODO: may need to set session id like parent url
+                        break;
+                    default:
+                        Mage::throwException( 'Invalid block cache_type: ' .
+                            $esiOptions['cache_type'] );
                 }
-            } else {
-                $esiData->setDebugId( $this->_getEsiDebugId( $esiDataHash ) );
-                if( isset( $esiOptions['ttl'] ) ) {
-                    $esiData->setTtl( $esiOptions['ttl'] );
-                } else {
-                    switch( $esiOptions['cache_type'] ) {
-                        case 'global':
-                            $ttlKey = 'turpentine_vcl/ttls/esi_global';
-                            break;
-                        case 'per-page':
-                            $ttlKey = 'turpentine_vcl/ttls/esi_per_page';
-                            $esiData->setParentUrl( Mage::app()->getRequest()
-                                ->getRequestString() );
-                            break;
-                        case 'per-client':
-                            $ttlKey = 'turpentine_vcl/ttls/esi_per_client';
-                            //TODO: may need to set session id like parent url
-                            break;
-                        default:
-                            Mage::throwException( 'Invalid block cache_type: ' .
-                                $esiOptions['cache_type'] );
-                    }
-                    $esiData->setTtl( Mage::getStoreConfig( $ttlKey ) );
-                }
-                $esiData->setCacheType( $esiOptions['cache_type'] );
-                $esiData->setDummyBlocks( Mage::helper( 'turpentine/data' )
-                    ->cleanExplode( ',', $esiOptions['dummy_blocks'] ) );
-                //save the requested registry keys
-                if( $esiOptions['registry_keys'] ) {
-                    $keys = Mage::helper( 'turpentine/data' )
-                        ->cleanExplode( ',', $esiOptions['registry_keys'] );
-                    $registry = array_combine(
-                        $keys,
-                        array_map( array( 'Mage', 'registry' ), $keys ) );
-                    $esiData->setRegistry( $registry );
-                }
-                $esiData->setUrl( Mage::getUrl( 'turpentine/esi/getBlock', array(
-                    'cacheType'     => $esiData->getCacheType(),
-                    'ttl'           => $esiData->getTtl(),
-                    Mage::helper( 'turpentine/esi' )->getEsiDataIdParam()
-                                    => $esiDataHash,
-                ) ) );
-
-                $tags = array(
-                    'TURPENTINE_ESI_BLOCK',
-                    'TURPENTINE_ESI_CACHETYPE_' . $esiData->getCacheType(),
-                    'TURPENTINE_ESI_BLOCKTYPE_' . $esiData->getBlockType(),
-                    'TURPENTINE_ESI_BLOCKNAME_' . $esiData->getNameInLayout(),
-                    'TURPENTINE_ESI_CLIENTID_' . Mage::getSingleton( 'core/session',
-                        array( 'name' => 'frontend' ) )
-                        ->getSessionId(),
-                );
-                if( Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled() ) {
-                    Mage::log( sprintf( 'Saving ESI block: %s -> %s',
-                        $esiData->getNameInLayout(), $esiDataHash ) );
-                }
-                Mage::app()->getCache()->save( serialize( $esiData ),
-                    $esiDataHash, $tags, $this->_getEsiDataCacheTtl( $esiData ) );
+                $esiOptions['ttl'] = Mage::getStoreConfig( $ttlKey );
             }
+            $esiData->setDummyBlocks( Mage::helper( 'turpentine/data' )
+                ->cleanExplode( ',', $esiOptions['dummy_blocks'] ) );
+            //save the requested registry keys
+            $keys = Mage::helper( 'turpentine/data' )
+                ->cleanExplode( ',', @$esiOptions['registry_keys'] );
+            $registry = array_combine(
+                $keys,
+                array_map( array( 'Mage', 'registry' ), $keys ) );
+            $esiData->setRegistry( $registry );
+
+            $esiOptions['url'] = Mage::getUrl( 'turpentine/esi/getBlock', array(
+                'cacheType'     => $esiOptions['cache_type'],
+                'ttl'           => $esiOptions['ttl'],
+                Mage::helper( 'turpentine/esi' )->getEsiDataIdParam()
+                                => base64_encode( Mage::helper( 'core' )
+                                    ->encrypt( serialize( $esiData->toArray() ) ) ),
+            ) );
+
+            if( strlen( $esiOptions['url'] ) > 2047 ) {
+                Mage::log( 'ESI url is probably to long (> 2047 characters): ' .
+                    $esiOptions['url'], Zend_Log::WARN );
+            }
+
             $blockObject->setEsiData( $esiData );
+            $blockObject->setEsiOptions( $esiOptions );
 
             //flag request for ESI processing
             Mage::getSingleton( 'turpentine/sentinel' )->setEsiFlag( true );
@@ -246,43 +218,6 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $esiData->setNameInLayout( $blockObject->getNameInLayout() );
         $esiData->setBlockType( get_class( $blockObject ) );
         return $esiData;
-    }
-
-    /**
-     * Generate the block debug ID to identify ESI blocks in output
-     *
-     * @param  string $esiDataHash ESI block hash
-     * @return string
-     */
-    protected function _getEsiDebugId( $esiDataHash ) {
-        return sha1( $this->_getHashSalt() . $esiDataHash . microtime() );
-    }
-
-    /**
-     * Generate the block hash for cache ID
-     *
-     * @param  Varien_Object $esiData
-     * @return string
-     */
-    protected function _getEsiDataHash( $esiData ) {
-        $hashData = $esiData->toArray();
-        ksort( $hashData );
-        return sha1( $this->_getHashSalt() . serialize( $hashData ) );
-    }
-
-    /**
-     * Get the Magento cache TTL to use for a given ESI data
-     *
-     * Calculated as (<block's specific TTL> + <varnish grace period>) with a
-     * minimum of 30 seconds
-     *
-     * @param  Varien_Object $esiData
-     * @return int
-     */
-    protected function _getEsiDataCacheTtl( $esiData ) {
-        return max( 30, intval( $esiData->getTtl() ) +
-            intval( Mage::getStoreConfig(
-                'turpentine_vcl/ttls/grace_period' ) ) );
     }
 
     /**

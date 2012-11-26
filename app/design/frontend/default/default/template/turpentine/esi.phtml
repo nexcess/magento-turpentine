@@ -19,20 +19,16 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-$esiData = array(
-    'link'      => sprintf( '<esi:remove>ESI processing not enabled</esi:remove>
-            <!--esi <esi:include src="%s" /> -->',
-        $this->getEsiData()->getUrl() ),
-    'debugId'   => $this->getEsiData()->getDebugId(),
-    'debugEnabled'  => Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled(),
-);
+$esiDebugEnabled = (bool)Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled();
+$esiData = $this->getEsiData();
+$esiOptions = $this->getEsiOptions();
 
-if( $esiData['debugEnabled'] ) {
-    echo sprintf( '<!-- ESI START [%s:%s] -->', $this->getNameInLayout(),
-        $esiData['debugId'] ) . PHP_EOL;
+if( $esiDebugEnabled ) {
+    echo sprintf( '<!-- ESI START [%s] -->', $this->getNameInLayout() ) . PHP_EOL;
 }
-echo $esiData['link'] . PHP_EOL;
-if( $esiData['debugEnabled'] ) {
-    echo sprintf( '<!-- ESI END [%s:%s] -->', $this->getNameInLayout(),
-        $esiData['debugId'] ) . PHP_EOL;
+echo sprintf( '<esi:remove>ESI processing not enabled</esi:remove>
+<!--esi <esi:include src="%s" /> -->',
+    $esiOptions['url'] ) . PHP_EOL;
+if( $esiDebugEnabled ) {
+    echo sprintf( '<!-- ESI END [%s] -->', $this->getNameInLayout() ) . PHP_EOL;
 }
