@@ -177,7 +177,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 //we probably don't really need to encrypt this but it doesn't hurt
                 //use core/encryption instead of Mage::encrypt/decrypt because
                 //EE uses a different method by default
-                $dataParam      => $encrypter->encrypt( serialize( $esiData ) ),
+                $dataParam      => base64_encode(
+                    $encrypter->encrypt( serialize( $esiData ) ) ),
             ) );
             $blockObject->setEsiUrl( $esiUrl );
             if( strlen( $esiUrl ) > 2047 ) {
