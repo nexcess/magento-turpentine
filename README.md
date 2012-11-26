@@ -7,7 +7,7 @@ default, Varnish doesn't cache requests with cookies and Magento sends the
 Turpentine provides Varnish configuration files (VCLs) to work with Magento and
 modifies Magento's behaviour to significantly improve the cache hit rate.
 
-Note that this extension is still in *beta* so use on a production site should
+Note that this extension is still in **beta** so use on a production site should
 be considered carefully. There are already some sites using it in production,
 but it is certainly not *stable* yet (ESI support brought significant changes
 to how it works).
@@ -34,9 +34,10 @@ to how it works).
  tested) or Magento Enterprise Edition 1.11+
  - Varnish 3.0+
 
-## Installation
+## Installation & Usage
 
-See the [Installation](/nexcess/magento-turpentine/wiki/Installation) page.
+See the [Installation](/nexcess/magento-turpentine/wiki/Installation) and
+[Usage](/nexcess/magento-turpentine/wiki/Usage) pages.
 
 ## Support
 
@@ -99,5 +100,5 @@ the page and may differ between different visitors/clients.
 ## License
 
 The code is licensed under GPLv2+, much of the ESI-specific code is taken from
-Hughes Alary's (Magento-Varnish)[https://github.com/huguesalary/Magento-Varnish]
+Hughes Alary's [Magento-Varnish](https://github.com/huguesalary/Magento-Varnish)
 extension, which is licensed as GPLv3.
