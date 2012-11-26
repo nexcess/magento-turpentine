@@ -182,7 +182,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             $blockObject->setEsiUrl( $esiUrl );
             if( strlen( $esiUrl ) > 2047 ) {
                 Mage::log( 'ESI url is probably to long (> 2047 characters): ' .
-                    $esiOptions['url'], Zend_Log::WARN );
+                    $esiUrl, Zend_Log::WARN );
             }
 
             //flag request for ESI processing
