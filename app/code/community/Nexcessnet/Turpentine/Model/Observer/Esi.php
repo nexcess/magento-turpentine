@@ -208,12 +208,16 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         }
         $esiData->setDummyBlocks( Mage::helper( 'turpentine/data' )
             ->cleanExplode( ',', $esiOptions['dummy_blocks'] ) );
+        if( $esiOptions['registry_keys'] ) {
+            $keys = Mage::helper( 'turpentine/data' )
+                ->cleanExplode( ',', $esiOptions['registry_keys'] );
+            $registry = array_combine(
+                $keys,
+                array_map( array( 'Mage', 'registry' ), $keys ) );
+        } else {
+            $registry = array();
+        }
         //save the requested registry keys
-        $keys = Mage::helper( 'turpentine/data' )
-            ->cleanExplode( ',', $esiOptions['registry_keys'] );
-        $registry = array_combine(
-            $keys,
-            array_map( array( 'Mage', 'registry' ), $keys ) );
         $esiData->setRegistry( $registry );
         return $esiData;
     }
