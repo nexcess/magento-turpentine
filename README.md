@@ -15,12 +15,11 @@ to how it works).
 ## Features
 
  - Full Magento Page Caching
- - Compatible with Varnish versions 2.1.4+ (including 3.x)
  - Requires very little configuration for impressive results
- - Able to apply new Varnish VCL (configurations) on the fly, without
- restarting/changing Varnish's config files
+ - Able to apply new Varnish VCLs (configurations) on the fly, without
+ restarting/changing Varnish's config files or flushing the cache
  - Cache purging by URL and content type
- - Exclude URL paths, request parameters (__SID, __store, etc)
+ - Exclude URL paths, request parameters (__SID, __store, etc) from caching
  - Configure cache TTL by URL and individual block's TTL
  - Ability to force static asset (css, js, etc) caching
  - Supports multiple Varnish instances for clustered usage
@@ -33,11 +32,18 @@ to how it works).
 
  - Magento Community Edition 1.6+ (earlier versions may work but have not been
  tested) or Magento Enterprise Edition 1.11+
- - Varnish 2.1+ (including 3.x versions)
+ - Varnish 3.0+
 
 ## Installation
 
 See the [Installation](/nexcess/magento-turpentine/wiki/Installation) page.
+
+## Support
+
+If you have an issue, please read the [FAQ](/nexcess/magento-turpentine/wiki/FAQ)
+then if you still need help, open a bug report in GitHub's
+[issue tracker](/nexcess/magento-turpentine/issues).
+I get too much email and have too poor a memory to try and do support through it.
 
 ## How it works
 
@@ -49,16 +55,26 @@ If they didn't, then they are served a served a new page from the backend (Magen
 regardless of whether that page is already cached. This is so they get a new
 session from Magento. If they already already have a ``frontend`` cookie, then
 they get a (non-session-specific) page from the backend, with any session-specific
-blocks (defined by the ESI policies) filled in via ESI.
+blocks (defined by the ESI policies) filled in via ESI. Note that this is bypassed
+for client IPs in the ``Crawler IPs`` setting.
 
 For blocks, the extension listens for the ``core_block_abstract_to_html_before``
 event in Magento. When this event is triggered, the extension looks at the block
-attached to it and if an ESI policy has been defined for the block then the
+attached to it and if an [ESI policy](/nexcess/magento-turpentine/wiki/ESI_Cache_Policy)
+has been defined for the block then the
 block's template is replaced with a simple ESI template that tells Varnish to
-pull the block content from a separate URL. The original block content is stored
-in Magento's cache so that it can be returned when Varnish comes back to ask for
-it.
+pull the block content from a separate URL. Varnish then does another request to
+that URL to get the content for that block, which can be cached separately from
+the page and may differ between different visitors/clients.
 
+## Notes
+
+ - This extension is currently in **beta**. There are some sites using it in
+ production but you should carefully test it on your own dev site before pushing
+ to production.
+ - Turpentine will **not** help with the speed of "actions" like adding things
+ to the cart or checking out. It only caches, so it can only speed up page load
+ speed for site browsing.
 
 ## Future Plans
 
@@ -67,17 +83,18 @@ it.
  - Use standard cache-control headers to tell Varnish about the block and page
  TTLs
  - Add support for caching in the admin section
+ - Re-add Varnish 2.1.x support
+ - More tightly integrate with the Magento admin interface, in theory the Varnish
+ Management page can go away entirely
 
 ## Known Issues
 
  - Logging and statistics will show all requests as coming from the same IP address
  (usually localhost/127.0.0.1). It should be possible to work around this using
  Apache's [mod_remoteip](http://httpd.apache.org/docs/trunk/mod/mod_remoteip.html)
- - Using memcached (or any other backend that doesn't support tags) is not likely
- to work well, the ESI blocks are stored and cleared by tags so cache tag support
- is needed.
  - The admin panel will not be cached at all. Attempts to inject ESI in the admin
  panel will cause a warning to be logged and then ignored.
+ - Flash messages usually do not display, or display sporadically
 
 ## License
 

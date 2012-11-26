@@ -42,6 +42,8 @@
                 </params>
             </action>
         </reference>
+        <!-- This block is inside of the header block on mage EE, so it could
+        be commented out for EE stores for a small performance increase -->
         <reference name="cart_sidebar">
             <action method="setEsiOptions">
                 <params>
