@@ -285,4 +285,7 @@ if __name__ == '__main__':
     parser.add_option('-T', '--skip-tarball', action='store_true', default=False)
     opts, args = parser.parse_args()
     base_path = os.path.dirname(os.path.dirname(os.path.abspath(sys.argv[0])))
-    main(base_path, args[0], **vars(opts))
+    if len(args):
+        main(base_path, args[0], **vars(opts))
+    else:
+        print 'Missing package definition file argument (mage-package.xml)!'
