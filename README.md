@@ -87,6 +87,7 @@ the page and may differ between different visitors/clients.
  - Re-add Varnish 2.1.x support
  - More tightly integrate with the Magento admin interface, in theory the Varnish
  Management page can go away entirely
+ - SSL support through [Pound](http://www.apsis.ch/pound)
 
 ## Known Issues
 
