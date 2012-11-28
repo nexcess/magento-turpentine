@@ -92,31 +92,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
     /**
      * Cache block content then replace with ESI template
      *
-     * TODO: this could possible be sped up by checking if the block is already
-     * in the cache
-     *
-     * ESI blocks can be designated by adding to:
-     *     app/design/frontend/default/default/layout/turpentine_esi_custom.xml
-     *
-     *     <layout version="0.1.0">
-     *         <$CONTROLLER_NAME>
-     *             <reference name="$BLOCK_NAME">
-     *                 <action method="setEsiOptions">
-     *                     <params>
-     *                         <cacheType>per-client</cacheType>
-     *                         <ttl>120</ttl>
-     *                         <registry_keys>$KEY1,$KEY2</registry_keys>
-     *                     </params>
-     *                 </action>
-     *             </reference>
-     *         </$CONTROLLER_NAME>
-     *     </layout>
-     *
-     * The params are optional. Valid cache_types are:
-     *     global, per-page, and per-client
-     * TTLs are in seconds, registry_keys should be a comma-separated list of
-     * keys to preserve in the cache, that will be needed to do the actual
-     * rendering of the block.
+     * @link https://github.com/nexcess/magento-turpentine/wiki/ESI_Cache_Policy
      *
      * Events: core_block_abstract_to_html_before
      *
