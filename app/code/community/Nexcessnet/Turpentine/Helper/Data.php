@@ -20,6 +20,14 @@
  */
 
 class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
+
+    /**
+     * encryption singleton thing
+     *
+     * @var Mage_Core_Model_Encryption
+     */
+    protected $_crypt   = null;
+
     /**
      * Like built-in explode() but applies trim to each exploded element and
      * filters out empty elements from result
@@ -31,5 +39,38 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
     public function cleanExplode( $token, $data ) {
         return array_filter( array_map( 'trim',
             explode( $token, trim( $data ) ) ) );
+    }
+
+    /**
+     * Encrypt using Magento CE standard encryption (even on Magento EE)
+     *
+     * @param  string $data
+     * @return string
+     */
+    public function encrypt( $data ) {
+        return base64_encode( $this->_getCrypt()->encrypt( $data ) );
+    }
+
+    /**
+     * Decrypt using Mage CE standard encryption (even on Magento EE)
+     *
+     * @param  string $data
+     * @return string
+     */
+    public function decrypt( $data ) {
+        return $this->_getCrypt()->decrypt( base64_decode( $data ) );
+    }
+
+    /**
+     * Get encryption singleton thing
+     *
+     * @return Mage_Core_Model_Encryption
+     */
+    protected function _getCrypt() {
+        if( is_null( $this->_crypt ) ) {
+            $this->_crypt = Mage::getModel( 'core/encryption' );
+            $this->_crypt->setHelper( Mage::helper( 'core' ) );
+        }
+        return $this->_crypt;
     }
 }

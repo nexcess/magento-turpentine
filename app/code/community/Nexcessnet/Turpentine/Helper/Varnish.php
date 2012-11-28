@@ -28,7 +28,8 @@ class Nexcessnet_Turpentine_Helper_Varnish extends Mage_Core_Helper_Abstract {
      */
     public function getVarnishEnabled() {
         return (bool)Mage::getStoreConfig(
-            'turpentine_varnish/general/enable_varnish' );
+                'turpentine_varnish/general/enable_varnish' ) &&
+            $this->isRequestFromVarnish();
     }
 
     /**
@@ -39,6 +40,39 @@ class Nexcessnet_Turpentine_Helper_Varnish extends Mage_Core_Helper_Abstract {
     public function getVarnishDebugEnabled() {
         return (bool)Mage::getStoreConfig(
             'turpentine_varnish/general/varnish_debug' );
+    }
+
+    /**
+     * Check if the request passed through Varnish (has the correct secret
+     * handshake header)
+     *
+     * @return boolean
+     */
+    public function isRequestFromVarnish() {
+        return $this->getSecretHandshake() ==
+            Mage::app()->getRequest()->getHeader( 'X-Turpentine-Secret-Handshake' );
+    }
+
+    /**
+     * Get the secret handshake value
+     *
+     * @return string
+     */
+    public function getSecretHandshake() {
+        return '1';
+        /**
+         * If we use the below code for the secret handshake, it will make the
+         * secret handshake not-forgable but will break multistore setups that
+         * don't share the same encryption key, which it turns out is a common
+         * use case, even though it is kind of a hack and really shouldn't be
+         * done. Fortunately forging the secret handshake shouldn't really be
+         * a security vulnerability since it won't show any information that
+         * wouldn't be available anyways (like debug headers), it would just
+         * cause ESI injection despite the request not passing through Varnish
+         * for ESI parsing/handling.
+         */
+        // return sha1( Mage::helper( 'turpentine/data' )->encrypt(
+        //     Mage::getStoreConfig( 'turpentine_varnish/servers/auth_key' ) ) );
     }
 
     /**

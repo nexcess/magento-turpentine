@@ -40,6 +40,8 @@ sub vcl_recv {
         }
     }
 
+    set req.http.X-Turpentine-Secret-Handshake = "{{secret_handshake}}";
+
     if (req.request != "GET" &&
             req.request != "HEAD" &&
             req.request != "PUT" &&

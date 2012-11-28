@@ -20,6 +20,12 @@
  */
 
 class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Action {
+    /**
+     * It seems this has to exist so we just make it redirect to the base URL
+     * for lack of anything better to do.
+     *
+     * @return null
+     */
     public function indexAction() {
         $this->getResponse()->setRedirect( Mage::getBaseUrl() );
     }
@@ -27,17 +33,15 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
     /**
      * Spit out the rendered block from the URL-encoded data
      *
-     * @return [type]
+     * @return null
      */
     public function getBlockAction() {
         Mage::helper( 'turpentine/esi' )->ensureEsiEnabled();
         $req = $this->getRequest();
-        $decrypter = Mage::getModel( 'core/encryption' );
-        $decrypter->setHelper( Mage::helper( 'core' ) );
         $esiDataParamValue = $req->getParam(
             Mage::helper( 'turpentine/esi' )->getEsiDataParam() );
-        $esiDataArray = unserialize( $decrypter->decrypt(
-            base64_decode( $esiDataParamValue ) ) );
+        $esiDataArray = unserialize( Mage::helper( 'turpentine/data' )
+            ->decrypt( $esiDataParamValue ) );
         if( !$esiDataArray ) {
             Mage::log( 'Invalid ESI data in URL: ' . $esiDataParamValue, Zend_Log::WARN );
             $resp = $this->getResponse();
