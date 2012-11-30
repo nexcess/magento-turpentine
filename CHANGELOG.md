@@ -32,3 +32,8 @@
 
   * Disable ESI injection if request does not come through Varnish to prevent
   broken output for SSL-enabled sites
+
+### RELEASE-0.1.3
+
+  * Fix ESI block rendering to be more accurate. This fixes the issue where some
+  blocks didn't render exactly right (missing links in the header block)
