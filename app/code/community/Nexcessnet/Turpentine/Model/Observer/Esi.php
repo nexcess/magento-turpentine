@@ -183,6 +183,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $esiData->setDesignTheme( Mage::getDesign()->getTheme( 'layout' ) );
         $esiData->setNameInLayout( $blockObject->getNameInLayout() );
         $esiData->setBlockType( get_class( $blockObject ) );
+        $esiData->setLayoutHandles( $this->_getBlockLayoutHandles( $blockObject ) );
         if( $esiOptions[$cacheTypeParam] == 'per-page' ) {
             $esiData->setParentUrl( Mage::app()->getRequest()->getRequestString() );
         }
@@ -204,6 +205,31 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         //save the requested registry keys
         $esiData->setRegistry( $registry );
         return $esiData;
+    }
+
+    protected function _getBlockLayoutHandles( $block ) {
+        $layout = $block->getLayout();
+        $design = Mage::getDesign();
+        $layoutXml = $layout->getUpdate()->getFileLayoutUpdatesXml(
+            $design->getArea(),
+            $design->getPackageName(),
+            $design->getTheme( 'layout' ),
+            Mage::app()->getStore()->getId() );
+        $activeHandles = array();
+        $blockNode = current( $layout->getNode()->xpath( sprintf(
+            '//block[@name=\'%s\']',
+            $block->getNameInLayout() ) ) );
+        $childBlocks = Mage::helper( 'turpentine/data' )
+            ->getChildBlockNames( $blockNode );
+        foreach( $childBlocks as $blockName ) {
+            foreach( $layout->getUpdate()->getHandles() as $handle ) {
+                if( $layoutXml->xpath( sprintf(
+                    '//%s//*[@name=\'%s\']', $handle, $blockName ) ) ) {
+                    $activeHandles[] = $handle;
+                }
+            }
+        }
+        return array_unique( $activeHandles );
     }
 
     /**

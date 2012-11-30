@@ -42,23 +42,74 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             Mage::helper( 'turpentine/esi' )->getEsiDataParam() );
         $esiDataArray = unserialize( Mage::helper( 'turpentine/data' )
             ->decrypt( $esiDataParamValue ) );
+        $resp = $this->getResponse();
         if( !$esiDataArray ) {
             Mage::log( 'Invalid ESI data in URL: ' . $esiDataParamValue, Zend_Log::WARN );
-            $resp = $this->getResponse();
             $resp->setHttpResponseCode( 500 );
             $resp->setBody( 'Invalid ESI data in URL' );
             //this wouldn't be cached anyway but we'll set this just in case
             Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
         } else {
             $esiData = new Varien_Object( $esiDataArray );
-            $handles = $this->_doEsiLayoutSetup( $esiData );
-            if( !$this->_generateEsiBlock( $handles, $esiData->getNameInLayout() ) ) {
-                $resp = $this->getResponse();
+            $block = $this->_getEsiBlock( $esiData );
+            if( $block ) {
+                $block->setEsiOptions( false );
+                $resp->setBody( $block->toHtml() );
+            } else {
                 $resp->setHttpResponseCode( 404 );
-                $resp->setBody( 'ESI block not found in layout' );
+                $resp->setBody( 'ESI block not found' );
                 Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
             }
         }
+    }
+
+    protected function _getEsiBlock( $esiData ) {
+        return $this->_testEsiGeneration( $esiData );
+        return $this->_generateEsiBlock( $this->_doEsiLayoutSetup( $esiData ),
+            $esiData->getNameInLayout() );
+    }
+
+    protected function _testEsiGeneration( $esiData ) {
+        foreach( $esiData->getRegistry() as $key => $value ) {
+            Mage::register( $key, $value, true );
+        }
+        $layout = Mage::getSingleton( 'core/layout' );
+        $design = Mage::getSingleton( 'core/design_package' )
+            ->setPackageName( $esiData->getDesignPackage() )
+            ->setTheme( $esiData->getDesignTheme() );
+        $layoutUpdate = $layout->getUpdate();
+        $layoutUpdate->load( $esiData->getLayoutHandles() );
+        $layoutXml = $layoutUpdate->getFileLayoutUpdatesXml(
+            $design->getArea(),
+            $design->getPackageName(),
+            $design->getTheme( 'layout' ),
+            $esiData->getStoreId() );
+        foreach( $esiData->getDummyBlocks() as $blockName ) {
+            $layout->createBlock( 'Mage_Core_Block_Template', $blockName );
+        }
+        $layout->generateXml();
+        $layoutShim = Mage::getModel( 'turpentine/mage_shim_layout' );
+        $blockNode = current( $layout->getNode()->xpath( sprintf(
+            '//block[@name=\'%s\']',
+            $esiData->getNameInLayout() ) ) );
+        $nodesToGenerate = array_unique( $this->_getChildBlocks( $blockNode ) );
+        $layoutShim::generateFullBlock( $blockNode );
+        foreach( $nodesToGenerate as $nodeName ) {
+            foreach( $layout->getNode()->xpath( sprintf(
+                    '//reference[@name=\'%s\']', $nodeName ) ) as $node ) {
+                $layout->generateBlocks( $node );
+            }
+        }
+        return $layout->getBlock( $esiData->getNameInLayout() );
+    }
+
+    protected function _getChildBlocks( $node ) {
+        $blocks = array( (string)$node['name'] );
+        $childNodes = $node->xpath( './block | ./reference' );
+        foreach( $childNodes as $childNode ) {
+            $blocks = array_merge( $blocks, $this->_getChildBlocks( $childNode ) );
+        }
+        return $blocks;
     }
 
     /**
@@ -78,11 +129,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             $layout->generateBlocks();
 
             if( $block = $layout->getBlock( $blockNameInLayout ) ) {
-                //disable ESI flag on the block to avoid infinite loop
-                $block->setEsiOptions( false );
-                $this->getResponse()->setBody( $block->toHtml() );
-                //break early since we got our block
-                return true;
+                return $block;
             } else {
                 //reset for next loop
                 Mage::app()->removeCache( $layout->getUpdate()->getCacheId() );
@@ -91,7 +138,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             }
         }
         //never found the block, indicate as such
-        return false;
+        return null;
     }
 
     /**
@@ -109,7 +156,8 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         $design = Mage::getSingleton( 'core/design_package' )
             ->setPackageName( $esiData->getDesignPackage() )
             ->setTheme( $esiData->getDesignTheme() );
-        $layoutXml = $layout->getUpdate()->getFileLayoutUpdatesXml(
+        $layoutUpdate = $layout->getUpdate();
+        $layoutXml = $layoutUpdate->getFileLayoutUpdatesXml(
             $design->getArea(),
             $design->getPackageName(),
             $design->getTheme( 'layout' ),

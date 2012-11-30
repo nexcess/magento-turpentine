@@ -62,6 +62,31 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
     }
 
     /**
+     * Get a list of child blocks inside the given block
+     *
+     * @param  Mage_Core_Model_Layout_Element $blockNode
+     * @return array
+     */
+    public function getChildBlockNames( $blockNode ) {
+        return array_unique( $this->_getChildBlockNames( $blockNode ) );
+    }
+
+    /**
+     * The actual recursive implementation of getChildBlockNames
+     *
+     * @param  Mage_Core_Model_Layout_Element $blockNode
+     * @return array
+     */
+    protected function _getChildBlockNames( $blockNode ) {
+        $blockNames = array( (string)$blockNode['name'] );
+        foreach( $blockNode->xpath( './block | ./reference' ) as $childBlockNode ) {
+            $blockNames = array_merge( $blockNames,
+                $this->_getChildBlockNames( $childBlockNode ) );
+        }
+        return $blockNames;
+    }
+
+    /**
      * Get encryption singleton thing
      *
      * @return Mage_Core_Model_Encryption
