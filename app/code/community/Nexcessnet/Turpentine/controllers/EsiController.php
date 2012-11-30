@@ -88,7 +88,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             '//block[@name=\'%s\']',
             $esiData->getNameInLayout() ) ) );
         $nodesToGenerate = Mage::helper( 'turpentine/data' )
-            ->getChildBlocks( $blockNode );
+            ->getChildBlockNames( $blockNode );
         $layoutShim::generateFullBlock( $blockNode );
         foreach( $nodesToGenerate as $nodeName ) {
             foreach( $layout->getNode()->xpath( sprintf(
