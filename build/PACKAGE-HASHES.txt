@@ -10,3 +10,5 @@ dd2937a4832a3f178a97beed7341293e  Nexcessnet_Turpentine-0.1.1.tgz
 63f8a452b33353f7003793ad2b63b272e84944fa  Nexcessnet_Turpentine-0.1.1.tgz
 06c1182f6ea817c8ec7406c00d4f5451  Nexcessnet_Turpentine-0.1.2.tgz
 c5fc5ee8d8e8ca982cbd6314b7dc2e98c9ff00ba  Nexcessnet_Turpentine-0.1.2.tgz
+54ae1478abea9aaa333fa8a463a014a4  Nexcessnet_Turpentine-0.1.3.tgz
+03b3f964dfd227702e3e2ed972d7c30adaaff556  Nexcessnet_Turpentine-0.1.3.tgz
