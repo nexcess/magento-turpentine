@@ -207,6 +207,16 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         return $esiData;
     }
 
+    /**
+     * Get the active layout handles for this block and any child blocks
+     *
+     * This is probably kind of slow since it uses a bunch of xpath searches
+     * but this was the easiest way to get the info needed. Should be a target
+     * for future optimization
+     *
+     * @param  Mage_Core_Block_Template $block
+     * @return array
+     */
     protected function _getBlockLayoutHandles( $block ) {
         $layout = $block->getLayout();
         $design = Mage::getDesign();
@@ -216,6 +226,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             $design->getTheme( 'layout' ),
             Mage::app()->getStore()->getId() );
         $activeHandles = array();
+        // get the xml node representing the block we're working on (from the
+        // default handle probably)
         $blockNode = current( $layout->getNode()->xpath( sprintf(
             '//block[@name=\'%s\']',
             $block->getNameInLayout() ) ) );
@@ -223,6 +235,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             ->getChildBlockNames( $blockNode );
         foreach( $childBlocks as $blockName ) {
             foreach( $layout->getUpdate()->getHandles() as $handle ) {
+                // check if this handle has any block or reference tags that
+                // refer to this block or a child block
                 if( $layoutXml->xpath( sprintf(
                     '//%s//*[@name=\'%s\']', $handle, $blockName ) ) ) {
                     $activeHandles[] = $handle;

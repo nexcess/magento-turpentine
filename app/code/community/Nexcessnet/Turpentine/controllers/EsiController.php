@@ -63,13 +63,13 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         }
     }
 
+    /**
+     * Generate the ESI block
+     *
+     * @param  Varien_Object $esiData
+     * @return Mage_Core_Block_Template
+     */
     protected function _getEsiBlock( $esiData ) {
-        return $this->_testEsiGeneration( $esiData );
-        return $this->_generateEsiBlock( $this->_doEsiLayoutSetup( $esiData ),
-            $esiData->getNameInLayout() );
-    }
-
-    protected function _testEsiGeneration( $esiData ) {
         foreach( $esiData->getRegistry() as $key => $value ) {
             Mage::register( $key, $value, true );
         }
@@ -79,11 +79,6 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             ->setTheme( $esiData->getDesignTheme() );
         $layoutUpdate = $layout->getUpdate();
         $layoutUpdate->load( $esiData->getLayoutHandles() );
-        $layoutXml = $layoutUpdate->getFileLayoutUpdatesXml(
-            $design->getArea(),
-            $design->getPackageName(),
-            $design->getTheme( 'layout' ),
-            $esiData->getStoreId() );
         foreach( $esiData->getDummyBlocks() as $blockName ) {
             $layout->createBlock( 'Mage_Core_Block_Template', $blockName );
         }
@@ -92,7 +87,8 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         $blockNode = current( $layout->getNode()->xpath( sprintf(
             '//block[@name=\'%s\']',
             $esiData->getNameInLayout() ) ) );
-        $nodesToGenerate = array_unique( $this->_getChildBlocks( $blockNode ) );
+        $nodesToGenerate = Mage::helper( 'turpentine/data' )
+            ->getChildBlocks( $blockNode );
         $layoutShim::generateFullBlock( $blockNode );
         foreach( $nodesToGenerate as $nodeName ) {
             foreach( $layout->getNode()->xpath( sprintf(
@@ -101,74 +97,5 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             }
         }
         return $layout->getBlock( $esiData->getNameInLayout() );
-    }
-
-    protected function _getChildBlocks( $node ) {
-        $blocks = array( (string)$node['name'] );
-        $childNodes = $node->xpath( './block | ./reference' );
-        foreach( $childNodes as $childNode ) {
-            $blocks = array_merge( $blocks, $this->_getChildBlocks( $childNode ) );
-        }
-        return $blocks;
-    }
-
-    /**
-     * Generate the ESI block output
-     *
-     * @param  array $handles
-     * @param  string $blockNameInLayout name of the block to generate
-     * @return bool
-     */
-    protected function _generateEsiBlock( $handles, $blockNameInLayout ) {
-        $layout = Mage::getSingleton( 'core/layout' );
-        foreach( $handles as $handle ) {
-            $handleName = $handle->getName();
-            $layout->getUpdate()->addHandle( $handleName );
-            $layout->getUpdate()->load();
-            $layout->generateXml();
-            $layout->generateBlocks();
-
-            if( $block = $layout->getBlock( $blockNameInLayout ) ) {
-                return $block;
-            } else {
-                //reset for next loop
-                Mage::app()->removeCache( $layout->getUpdate()->getCacheId() );
-                $layout->getUpdate()->removeHandle( $handleName );
-                $layout->getUpdate()->resetUpdates();
-            }
-        }
-        //never found the block, indicate as such
-        return null;
-    }
-
-    /**
-     * Setup the layout for ESI block generation
-     *
-     * @param  Varien_Object $esiData
-     * @return array
-     */
-    protected function _doEsiLayoutSetup( $esiData ) {
-        //restore the cached registry
-        foreach( $esiData->getRegistry() as $key => $value ) {
-            Mage::register( $key, $value, true );
-        }
-        $layout = Mage::getSingleton( 'core/layout' );
-        $design = Mage::getSingleton( 'core/design_package' )
-            ->setPackageName( $esiData->getDesignPackage() )
-            ->setTheme( $esiData->getDesignTheme() );
-        $layoutUpdate = $layout->getUpdate();
-        $layoutXml = $layoutUpdate->getFileLayoutUpdatesXml(
-            $design->getArea(),
-            $design->getPackageName(),
-            $design->getTheme( 'layout' ),
-            $esiData->getStoreId() );
-        //create any dummy blocks needed
-        foreach( $esiData->getDummyBlocks() as $blockName ) {
-            $layout->createBlock( 'Mage_Core_Block_Template', $blockName );
-        }
-        $handles = $layoutXml->xpath( sprintf(
-            '//block[@name=\'%s\']/ancestor::node()[last()-2]',
-            $esiData->getNameInLayout() ) );
-        return $handles;
     }
 }
