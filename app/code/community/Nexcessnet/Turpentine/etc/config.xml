@@ -225,6 +225,24 @@
                     </turpentine_esi_sales_quote_save_after>
                 </observers>
             </sales_quote_save_after>
+            <customer_login>
+                <observers>
+                    <turpentine_esi_customer_login>
+                        <type>singleton</type>
+                        <class>turpentine/observer_ban</class>
+                        <method>banClientEsiCache</method>
+                    </turpentine_esi_customer_login>
+                </observers>
+            </customer_login>
+            <customer_logout>
+                <observers>
+                    <turpentine_esi_customer_logout>
+                        <type>singleton</type>
+                        <class>turpentine/observer_ban</class>
+                        <method>banClientEsiCache</method>
+                    </turpentine_esi_customer_logout>
+                </observers>
+            </customer_logout>
 
             <!-- Varnish cache clear events -->
             <catalog_product_save_commit_after>
