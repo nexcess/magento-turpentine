@@ -36,8 +36,12 @@ import datetime
 import hashlib
 import re
 import tarfile
+import subprocess
 
 class Magento_Packager(object):
+    BIN_PHP = 'php'
+    BIN_XMLLINT = 'xmllint'
+
     TARGET_DIRS = {
         'magelocal':        'app/code/local',
         'magecommunity':    'app/code/community',
@@ -53,7 +57,27 @@ class Magento_Packager(object):
             self._logger.setLevel(logging.DEBUG)
         else:
             self._logger.setLevel(logging.INFO)
+        self._file_list = []
         self._logger.debug('Packager init with base dir: %s', self._base_dir)
+
+    def do_syntax_check(self):
+        self._logger.info('Running syntax check on %d files', len(self._file_list))
+        result = True
+        for filename in self._file_list:
+            if filename.endswith('.php'):
+                self._logger.debug('Checking PHP syntax for file: %s', filename)
+                if not self._php_syntax_check(filename):
+                    self._logger.warning('Syntax check failed for file: %s', filename)
+                    result = False
+            elif filename.endswith('.xml'):
+                self._logger.debug('Checking XML syntax for file: %s', filename)
+                if not self._xml_syntax_check(filename):
+                    self._logger.warning('Syntax check failed for file: %s', filename)
+                    result = False
+            else:
+                self._logger.debug('Skipping syntax check for unsupported file: %s',
+                    filename)
+        return result
 
     def build_package_xml(self, connect_file):
         self._logger.info('Building package from connect file: %s', connect_file)
@@ -171,6 +195,7 @@ class Magento_Packager(object):
                             obj_tag = ElementTree.SubElement(parent_tag, 'file')
                             obj_tag.set('name', obj_name)
                             obj_tag.set('hash', obj_hash)
+                            self._file_list.append(os.path.join(obj_path, obj_name))
                             self._logger.debug('Added file: %s (%s)', obj_name, obj_hash)
                 else:
                     parent_tag = self._make_parent_tags(target_tag, os.path.dirname(target['path']))
@@ -181,6 +206,8 @@ class Magento_Packager(object):
                     obj_tag = ElementTree.SubElement(parent_tag, 'file')
                     obj_tag.set('name', obj_name)
                     obj_tag.set('hash', obj_hash)
+                    self._file_list.append(os.path.join(self._base_dir,
+                        self.TARGET_DIRS[target['target']], target['path']))
                     self._logger.info('Added single file: %s::%s (%s)',
                         target['target'], target['path'], obj_hash)
         self._logger.debug('Finished adding targets')
@@ -265,10 +292,24 @@ class Magento_Packager(object):
                 err.__class__.__name__, err)
             return 'UNKNOWN'
 
+    def _php_syntax_check(self, filename):
+        return self._run_quiet(self.BIN_PHP, '-l', filename)
+
+    def _xml_syntax_check(self, filename):
+        return self._run_quiet(self.BIN_XMLLINT, '--format', filename)
+
+    def _run_quiet(self, *pargs):
+        with open('/dev/null', 'w') as dev_null:
+            return not bool(subprocess.call(pargs, stdin=None, stdout=dev_null,
+                stderr=dev_null))
+
 def main(base_path, pkg_desc_file, skip_tarball=False, tarball=None, keep_package_xml=False,
-        debug=False, **kwargs):
+        debug=False, skip_syntax_check=False, **kwargs):
     pkgr = Magento_Packager(base_path, debug=debug)
     pkg_xml = pkgr.build_package_xml(pkg_desc_file)
+    if not skip_syntax_check:
+        if not pkgr.do_syntax_check():
+            raise SystemExit('Syntax check failed!')
     if not skip_tarball:
         pkgr.build_tarball(pkg_xml, tarball_name=tarball,
             keep_pkg_xml=keep_package_xml)
@@ -283,6 +324,7 @@ if __name__ == '__main__':
     parser.add_option('-p', '--keep-package-xml', action='store_true', default=False)
     parser.add_option('-t', '--tarball', action='store', default=None)
     parser.add_option('-T', '--skip-tarball', action='store_true', default=False)
+    parser.add_option('-S', '--skip-syntax-check', action='store_true', default=False)
     opts, args = parser.parse_args()
     base_path = os.path.dirname(os.path.dirname(os.path.abspath(sys.argv[0])))
     if len(args):
