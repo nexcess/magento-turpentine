@@ -233,13 +233,16 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
         switch( $eventObject->getType() ) {
             //note this is the name of the container xml tag in config.xml,
             // **NOT** the cache tag name
-            case 'turpentine_esi_blocks':
+            case Mage::helper( 'turpentine/esi' )->getMageCacheName():
                 if( Mage::helper( 'turpentine/esi' )->getEsiEnabled() ) {
                     $result = $this->_getVarnishAdmin()->flushUrl(
                         '/turpentine/esi/getBlock/' );
                     Mage::dispatchEvent( 'turpentine_ban_esi_cache', $result );
                     $this->_checkResult( $result );
                 }
+                break;
+            case Mage::helper( 'turpentine/varnish' )->getMageCacheName():
+                $this->banAllCache( $eventObject );
                 break;
         }
     }

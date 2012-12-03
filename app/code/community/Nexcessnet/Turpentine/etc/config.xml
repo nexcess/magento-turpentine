@@ -26,8 +26,6 @@
     <default>
         <turpentine_varnish>
             <general>
-                <enable_varnish>1</enable_varnish>
-                <enable_esi>1</enable_esi>
                 <varnish_debug>0</varnish_debug>
                 <esi_debug>0</esi_debug>
                 <block_debug>0</block_debug>
@@ -100,13 +98,20 @@
         <cache>
             <types>
                 <!--
-                This isn't used to actually store anything in Magento's cache,
-                we just use it to signal Varnish to purge it's ESI block cache.
+                These aren't used to actually store anything in Magento's cache,
+                we just use them to signal Varnish to purge it's cache. Note
+                that the type names must match the MAGE_CACHE_NAME constant in
+                the Varnish and ESI helpers.
                 -->
+                <turpentine_pages>
+                    <label>Varnish Pages</label>
+                    <description>Full pages cached in Varnish (includes ESI blocks)</description>
+                    <tags></tags>
+                </turpentine_pages>
                 <turpentine_esi_blocks>
-                    <label>Varnish ESI blocks</label>
-                    <description>ESI blocks cached in Varnish</description>
-                    <tags>TURPENTINE_ESI_BLOCK</tags>
+                    <label>Varnish ESI Blocks</label>
+                    <description>ESI blocks cached in Varnish (this should not be disabled except for debugging)</description>
+                    <tags></tags>
                 </turpentine_esi_blocks>
             </types>
         </cache>
@@ -376,17 +381,6 @@
         </routers>
     </admin>
     <adminhtml>
-        <menu>
-            <system>
-                <children>
-                    <turpentine translate="title" module="turpentine">
-                        <title>Varnish Management</title>
-                        <action>adminhtml/varnish_management</action>
-                        <sort_order>91</sort_order>
-                    </turpentine>
-                </children>
-            </system>
-        </menu>
         <layout>
             <updates>
                 <turpentine module="turpentine">

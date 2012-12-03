@@ -23,6 +23,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     const ESI_DATA_PARAM            = 'esiData';
     const ESI_TTL_PARAM             = 'ttl';
     const ESI_CACHE_TYPE_PARAM      = 'cacheType';
+    const MAGE_CACHE_NAME           = 'turpentine_esi_blocks';
 
     /**
      * Get whether ESI includes are enabled or not
@@ -31,7 +32,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      */
     public function getEsiEnabled() {
         return Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() &&
-            Mage::getStoreConfig( 'turpentine_varnish/general/enable_esi' );
+            Mage::app()->useCache( self::MAGE_CACHE_NAME );
     }
 
     /**
@@ -90,5 +91,14 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     public function getEsiBlockLogEnabled() {
         return (bool)Mage::getStoreConfig(
             'turpentine_varnish/general/block_debug' );
+    }
+
+    /**
+     * Get the cache type Magento uses
+     *
+     * @return string
+     */
+    public function getMageCacheName() {
+        return self::MAGE_CACHE_NAME;
     }
 }

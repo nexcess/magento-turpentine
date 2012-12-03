@@ -21,14 +21,15 @@
 
 class Nexcessnet_Turpentine_Helper_Varnish extends Mage_Core_Helper_Abstract {
 
+    const MAGE_CACHE_NAME           = 'turpentine_pages';
+
     /**
      * Get whether Varnish caching is enabled or not
      *
      * @return bool
      */
     public function getVarnishEnabled() {
-        return (bool)Mage::getStoreConfig(
-                'turpentine_varnish/general/enable_varnish' ) &&
+        return Mage::app()->useCache( self::MAGE_CACHE_NAME ) &&
             $this->isRequestFromVarnish();
     }
 
@@ -116,5 +117,14 @@ class Nexcessnet_Turpentine_Helper_Varnish extends Mage_Core_Helper_Abstract {
             $sockets[] = $this->getSocket( $parts[0], $parts[1], $key, $version );
         }
         return $sockets;
+    }
+
+    /**
+     * Get the cache type Magento uses
+     *
+     * @return string
+     */
+    public function getMageCacheName() {
+        return self::MAGE_CACHE_NAME;
     }
 }
