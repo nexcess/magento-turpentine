@@ -44,7 +44,6 @@ See the [Installation](/nexcess/magento-turpentine/wiki/Installation) and
 If you have an issue, please read the [FAQ](/nexcess/magento-turpentine/wiki/FAQ)
 then if you still need help, open a bug report in GitHub's
 [issue tracker](/nexcess/magento-turpentine/issues).
-I get too much email and have too poor a memory to try and do support through it.
 
 ## How it works
 
@@ -85,8 +84,6 @@ the page and may differ between different visitors/clients.
  TTLs
  - Add support for caching in the admin section
  - Re-add Varnish 2.1.x support
- - More tightly integrate with the Magento admin interface, in theory the Varnish
- Management page can go away entirely
  - SSL support through [Pound](http://www.apsis.ch/pound)
 
 ## Known Issues
