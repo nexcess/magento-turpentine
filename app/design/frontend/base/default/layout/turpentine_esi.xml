@@ -88,6 +88,14 @@
                 </params>
             </action>
         </reference>
+
+        <reference name="footer">
+            <action method="setEsiOptions">
+                <params>
+                    <cacheType>global</cacheType>
+                </params>
+            </action>
+        </reference>
     </default>
 
     <!-- Checkout -->
