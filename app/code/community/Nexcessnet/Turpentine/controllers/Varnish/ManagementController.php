@@ -57,7 +57,7 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
                         ->__( 'Error flushing Varnish cache on: ' ) . $name );
             }
         }
-        $this->_redirect( '*/*' );
+        $this->_redirect( '*/cache' );
     }
 
     /**
@@ -88,7 +88,7 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
                 }
             }
         }
-        $this->_redirect( '*/*' );
+        $this->_redirect( '*/cache' );
     }
 
     /**
@@ -118,7 +118,7 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
                 }
             }
         }
-        $this->_redirect('*/*');
+        $this->_redirect('*/cache');
     }
 
     /**
@@ -141,7 +141,7 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
                             $name, $value ) ) );
             }
         }
-        $this->_redirect('*/*');
+        $this->_redirect('*/cache');
     }
 
     /**
@@ -168,7 +168,7 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
                         ->__('Failed to save the VCL file: ' . $result[1]['message'] ) );
             }
         }
-        $this->_redirect('*/*');
+        $this->_redirect('*/cache');
     }
 
     /**
@@ -181,7 +181,7 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
             ->getConfigurator();
         if( is_null( $cfgr ) ) {
             $this->_getSession()->addError( $this->__( 'Failed to load configurator' ) );
-            $this->_redirect( '*/*' );
+            $this->_redirect( '*/cache' );
         } else {
             $vcl = $cfgr->generate();
             $this->getResponse()

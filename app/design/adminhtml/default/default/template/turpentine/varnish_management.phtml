@@ -24,94 +24,13 @@
  * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 ?>
+<br />
 <div class="content-header">
     <table cellspacing="0">
         <tr>
             <td>
-                <h3><?php echo Mage::helper('turpentine')
-                        ->__('Cache Management') ?></h3>
-            </td>
-            <td class="form-buttons"></td>
-         </tr>
-    </table>
-</div>
-<table class="form-list">
-    <tr>
-        <td class="scope-label">
-            <button
-                onclick="setLocation('<?php echo $this->getFlushAllUrl()?>')"
-                type="button"
-                class="scalable delete">
-                <span><?php echo Mage::helper('turpentine')
-                        ->__('Flush Varnish Cache') ?></span>
-            </button>
-        </td>
-        <td class="scope-label">
-            <?php echo Mage::helper('turpentine')
-                ->__('Full Varnish cache flush.')?>
-        </td>
-    </tr>
-    <tr>
-        <form method="post" action="<?php echo $this->getFlushPartialUrl() ?>">
-        <td class="scope-label">
-            <button
-                type="submit"
-                class="scalable delete">
-                <span><?php echo Mage::helper('turpentine')
-                        ->__('Flush URL Pattern') ?></span>
-            </button>
-        </td>
-        <td class="scope-label">
-            <input
-                type="text"
-                name="pattern"
-                value=".*"
-                class="input-text"
-            </input>
-            <br/>
-            <?php echo Mage::helper('turpentine')
-                ->__('Flush URLs that match a regular expression (relative to Magento base URL)') ?>
-        </td>
-         <input
-            name="form_key"
-            type="hidden"
-            value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
-        </form>
-    </tr>
-    <tr>
-        <form method="post" action="<?php echo $this->getFlushContentTypeUrl() ?>">
-        <td class="scope-label">
-            <button
-                type="submit"
-                class="scalable delete">
-                <span><?php echo Mage::helper('turpentine')
-                        ->__('Flush Content Type') ?></span>
-            </button>
-        </td>
-        <td class="scope-label">
-            <input
-                type="text"
-                name="ctype"
-                value="text/html"
-                class="input-text"
-            </input>
-            <br/>
-            <?php echo Mage::helper('turpentine')
-                ->__('Flush cached objects with the given content (mime) type') ?>
-        </td>
-         <input
-            name="form_key"
-            type="hidden"
-            value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
-        </form>
-    </tr>
-</table>
-<div class="content-header">
-    <table cellspacing="0">
-        <tr>
-            <td>
-                <h3><?php echo Mage::helper('turpentine')
-                        ->__('Config Management') ?></h3>
+                <h3><?php echo Mage::helper( 'turpentine/data' )
+                        ->__('Varnish Management') ?></h3>
             </td>
             <td class="form-buttons"></td>
          </tr>
@@ -124,12 +43,12 @@
                 onclick="setLocation('<?php echo $this->getApplyConfigUrl()?>')"
                 type="button"
                 class="scalable save">
-                <span><?php echo Mage::helper('turpentine')
+                <span><?php echo Mage::helper( 'turpentine/data' )
                         ->__('Apply Varnish Config') ?></span>
             </button>
         </td>
         <td class="scope-label">
-            <?php echo Mage::helper('turpentine')
+            <?php echo Mage::helper( 'turpentine/data' )
                 ->__('Update the VCL configuration on the running Varnish instances')?>
         </td>
     </tr>
@@ -139,12 +58,12 @@
                 onclick="setLocation('<?php echo $this->getSaveConfigUrl()?>')"
                 type="button"
                 class="scalable save">
-                <span><?php echo Mage::helper('turpentine')
+                <span><?php echo Mage::helper( 'turpentine/data' )
                         ->__('Save Varnish Config') ?></span>
             </button>
         </td>
         <td class="scope-label">
-            <?php echo Mage::helper('turpentine')
+            <?php echo Mage::helper( 'turpentine/data' )
                 ->__('Save the configuration to a VCL file.')?>
         </td>
     </tr>
@@ -154,12 +73,12 @@
                 onclick="setLocation('<?php echo $this->getGetConfigUrl()?>')"
                 type="button"
                 class="scalable">
-                <span><?php echo Mage::helper('turpentine')
+                <span><?php echo Mage::helper( 'turpentine/data' )
                         ->__('Download Varnish Config') ?></span>
             </button>
         </td>
         <td class="scope-label">
-            <?php echo Mage::helper('turpentine')
+            <?php echo Mage::helper( 'turpentine/data' )
                 ->__('Download the generated VCL file.')?>
         </td>
     </tr>

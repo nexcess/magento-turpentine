@@ -42,29 +42,6 @@
                     <show_in_website>0</show_in_website>
                     <show_in_store>0</show_in_store>
                     <fields>
-                        <enable_varnish translate="label" module="turpentine">
-                            <label>Enable Varnish Caching</label>
-                            <comment>Disabling this will make Varnish pass through all requests to the backend</comment>
-                            <frontend_type>select</frontend_type>
-                            <source_model>turpentine/config_select_toggle</source_model>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </enable_varnish>
-                        <enable_esi translate="label" module="turpentine">
-                            <label>Enable Varnish ESI</label>
-                            <comment>Disabling this will remove the hole-punch functionality, do not do this except for debugging</comment>
-                            <frontend_type>select</frontend_type>
-                            <source_model>turpentine/config_select_toggle</source_model>
-                            <sort_order>20</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
-                            <depends>
-                                <enable_varnish>1</enable_varnish>
-                            </depends>
-                        </enable_esi>
                         <varnish_debug translate="label" module="turpentine">
                             <label>Enable Varnish Debug Info</label>
                             <comment>This should be disabled on production sites to prevent information leakage</comment>
