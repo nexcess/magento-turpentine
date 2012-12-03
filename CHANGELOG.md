@@ -37,3 +37,17 @@
 
   * Fix ESI block rendering to be more accurate. This fixes the issue where some
   blocks didn't render exactly right (missing links in the header block)
+
+### RELEASE-0.1.4
+
+  * Added ESI block flushing on customer login/logout
+  * Fixed syntax error under PHP 5.2
+  * Added syntax check to build script
+  * Made *footer* block global ESI cached by default
+  * Removed *Varnish Management* admin page
+    * VCL is now saved and applied on Varnish Options and Caching Options config
+    saving
+    * Cache clearing is now integrated into Cache Management page like other Magento
+    cache types
+    * Cache clearing by URL and content-type have been removed since they were
+    not very useful in light of automatic cache clearing
