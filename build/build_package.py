@@ -21,6 +21,10 @@
 """Script to generate Magento Extension package files
 
 Run as: build_package.py <package_description.xml>
+
+You can override the xmllint and PHP binaries used for syntax checks with the
+TURPENTINE_BIN_PHP and TURPENTINE_BIN_XMLLINT environment variables. Useful for
+checking with a non-default version of PHP.
 """
 
 __title__       = 'build_package.py'
@@ -39,8 +43,8 @@ import tarfile
 import subprocess
 
 class Magento_Packager(object):
-    BIN_PHP = 'php'
-    BIN_XMLLINT = 'xmllint'
+    BIN_PHP = os.environ.get('TURPENTINE_BIN_PHP', 'php')
+    BIN_XMLLINT = os.environ.get('TURPENTINE_BIN_XMLLINT', 'xmllint')
 
     TARGET_DIRS = {
         'magelocal':        'app/code/local',
@@ -59,6 +63,8 @@ class Magento_Packager(object):
             self._logger.setLevel(logging.INFO)
         self._file_list = []
         self._logger.debug('Packager init with base dir: %s', self._base_dir)
+        self._logger.debug('Using PHP binary: %s', self.BIN_PHP)
+        self._logger.debug('Using xmllint binary: %s', self.BIN_XMLLINT)
 
     def do_syntax_check(self):
         self._logger.info('Running syntax check on %d files', len(self._file_list))
