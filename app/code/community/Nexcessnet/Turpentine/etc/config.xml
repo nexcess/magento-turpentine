@@ -121,6 +121,23 @@
                 </observers>
             </http_response_send_before>
 
+            <admin_system_config_changed_section_turpentine_varnish>
+                <observers>
+                    <turpentine_varnish_admin_system_config_changed_section_turpentine_varnish>
+                        <class>turpentine/observer_varnish</class>
+                        <method>adminSystemConfigChangedSection</method>
+                    </turpentine_varnish_admin_system_config_changed_section_turpentine_varnish>
+                </observers>
+            </admin_system_config_changed_section_turpentine_varnish>
+            <admin_system_config_changed_section_turpentine_vcl>
+                <observers>
+                    <turpentine_varnish_admin_system_config_changed_section_turpentine_vcl>
+                        <class>turpentine/observer_varnish</class>
+                        <method>adminSystemConfigChangedSection</method>
+                    </turpentine_varnish_admin_system_config_changed_section_turpentine_vcl>
+                </observers>
+            </admin_system_config_changed_section_turpentine_vcl>
+
             <!-- ESI Events -->
             <core_block_abstract_to_html_before>
                 <observers>
