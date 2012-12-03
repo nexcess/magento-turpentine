@@ -101,5 +101,5 @@ the page and may differ between different visitors/clients.
 ## License
 
 The code is licensed under GPLv2+, much of the ESI-specific code is taken from
-Hughes Alary's [Magento-Varnish](https://github.com/huguesalary/Magento-Varnish)
+Hugues Alary's [Magento-Varnish](https://github.com/huguesalary/Magento-Varnish)
 extension, which is licensed as GPLv3.
