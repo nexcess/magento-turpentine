@@ -211,6 +211,13 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      * but this was the easiest way to get the info needed. Should be a target
      * for future optimization
      *
+     * There is an issue with encoding the used handles in the URL, if the used
+     * handles change (ex customer logs in), the cached version of the page will
+     * still have the old handles encoded in it's ESI url. This can lead to
+     * weirdness like the "Log in" link displaying for already logged in
+     * visitors on pages that were initially visited by not-logged-in visitors.
+     * Not sure of a solution for this yet.
+     *
      * @param  Mage_Core_Block_Template $block
      * @return array
      */
