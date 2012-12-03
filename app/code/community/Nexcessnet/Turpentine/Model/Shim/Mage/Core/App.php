@@ -23,7 +23,7 @@
  * Slightly modified from:
  * @link http://magedev.com/2010/10/15/adding-event-observer-on-the-fly/
  */
-class Nexcessnet_Turpentine_Model_Mage_Shim extends Mage_Core_Model_App {
+class Nexcessnet_Turpentine_Model_Shim_Mage_Core_App extends Mage_Core_Model_App {
     /**
      * Adds new observer for specified event
      *

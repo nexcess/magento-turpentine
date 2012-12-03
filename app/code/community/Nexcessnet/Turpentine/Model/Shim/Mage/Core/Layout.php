@@ -19,7 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-class Nexcessnet_Turpentine_Model_Mage_Shim_Layout extends Mage_Core_Model_Layout {
+class Nexcessnet_Turpentine_Model_Shim_Mage_Core_Layout extends Mage_Core_Model_Layout {
     /**
      * Generate a full block instead of just it's decendents
      *
