@@ -27,7 +27,7 @@ class Nexcessnet_Turpentine_Model_Mage_Shim_Layout extends Mage_Core_Model_Layou
      * @param  Mage_Core_Model_Layout_Element $blockNode
      * @return null
      */
-    static public function generateFullBlock( $blockNode ) {
+    public function generateFullBlock( $blockNode ) {
         $layout = Mage::getSingleton( 'core/layout' );
         if( !( $parent = $blockNode->getParent() ) ) {
             $parent = new Varien_Object();
