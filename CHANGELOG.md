@@ -51,3 +51,8 @@
     cache types
     * Cache clearing by URL and content-type have been removed since they were
     not very useful in light of automatic cache clearing
+
+### RELEASE-0.1.5
+
+  * Fix VCL application and saving when the Magento compiler is enabled
+  * Remove defunct debug option config dependancies
