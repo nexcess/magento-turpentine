@@ -51,9 +51,6 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <depends>
-                                <enable_varnish>1</enable_varnish>
-                            </depends>
                         </varnish_debug>
                         <esi_debug translate="label" module="turpentine">
                             <label>Enable ESI Debug Info</label>
@@ -64,9 +61,6 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <depends>
-                                <enable_esi>1</enable_esi>
-                            </depends>
                         </esi_debug>
                         <block_debug translate="label" module="turpentine">
                             <label>Enable Block Logging</label>
@@ -77,9 +71,6 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                            <depends>
-                                <enable_esi>1</enable_esi>
-                            </depends>
                         </block_debug>
                     </fields>
                 </general>
