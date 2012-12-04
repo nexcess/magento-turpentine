@@ -72,6 +72,13 @@
                 </params>
             </action>
         </reference>
+        <reference name="right.poll">
+            <action method="setEsiOptions">
+                <params>
+                    <cacheType>per-client</cacheType>
+                </params>
+            </action>
+        </reference>
 
         <!-- Messages are cached on a per-client basis -->
         <reference name="global_messages">

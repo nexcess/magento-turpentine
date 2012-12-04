@@ -184,6 +184,11 @@
             </controller_response_redirect>
 
             <!-- ESI cache clear events -->
+            <!--
+            Need to make these a config option, using the mage app shim. Is dumb
+            to have to edit xml just to add new events to trigger esi cache
+            clear
+            -->
             <checkout_cart_add_product_complete>
                 <observers>
                     <turpentine_esi_checkout_cart_add_product_complete>
@@ -265,6 +270,15 @@
                     </turpentine_esi_customer_logout>
                 </observers>
             </customer_logout>
+            <poll_vote_add>
+                <observers>
+                    <turpentine_esi_poll_vote_add>
+                        <type>singleton</type>
+                        <class>turpentine/observer_ban</class>
+                        <method>banClientEsiCache</method>
+                    </turpentine_esi_poll_vote_add>
+                </observers>
+            </poll_vote_add>
 
             <!-- Varnish cache clear events -->
             <catalog_product_save_commit_after>
