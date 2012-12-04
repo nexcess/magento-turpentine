@@ -31,7 +31,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
     public function setFlagHeaders( $eventObject ) {
         $response = $eventObject->getResponse();
         $sentinel = Mage::getSingleton( 'turpentine/sentinel' );
-        if( Mage::helper( 'turpentine/esi' )->getEsiEnabled() ) {
+        if( Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() ) {
             $response->setHeader( 'X-Turpentine-Esi',
                 $sentinel->getEsiFlag() ? '1' : '0' );
             if( Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled() ) {
@@ -54,7 +54,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      * @return null
      */
     public function checkCacheFlag( $eventObject ) {
-        if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
+        if( Mage::helper( 'turpentine/varnish' )->shouldResponseUseVarnish() ) {
             $layoutXml = $eventObject->getLayout()->getUpdate()->asSimplexml();
             foreach( $layoutXml->xpath( '//turpentine_cache_flag' ) as $node ) {
                 foreach( $node->attributes() as $attr => $value ) {
@@ -105,7 +105,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             Mage::log( 'Checking ESI block candidate: ' .
                 $blockObject->getNameInLayout() );
         }
-        if( Mage::helper( 'turpentine/esi' )->getEsiEnabled() &&
+        if( Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() &&
                 $blockObject instanceof Mage_Core_Block_Template &&
                 $esiOptions = $blockObject->getEsiOptions() ) {
             if( Mage::app()->getStore()->getCode() == 'admin' ) {

@@ -343,8 +343,8 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getEnableCaching() {
-        return Mage::getStoreConfig( 'turpentine_varnish/general/enable_varnish' )
-            ? 'true' : 'false';
+        return Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ?
+            'true' : 'false';
     }
 
     /**

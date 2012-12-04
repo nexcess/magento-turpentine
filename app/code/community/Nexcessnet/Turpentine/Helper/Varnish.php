@@ -29,8 +29,7 @@ class Nexcessnet_Turpentine_Helper_Varnish extends Mage_Core_Helper_Abstract {
      * @return bool
      */
     public function getVarnishEnabled() {
-        return Mage::app()->useCache( self::MAGE_CACHE_NAME ) &&
-            $this->isRequestFromVarnish();
+        return Mage::app()->useCache( $this->getMageCacheName() );
     }
 
     /**
@@ -52,6 +51,15 @@ class Nexcessnet_Turpentine_Helper_Varnish extends Mage_Core_Helper_Abstract {
     public function isRequestFromVarnish() {
         return $this->getSecretHandshake() ==
             Mage::app()->getRequest()->getHeader( 'X-Turpentine-Secret-Handshake' );
+    }
+
+    /**
+     * Check if Varnish should be used for this request
+     *
+     * @return bool
+     */
+    public function shouldResponseUseVarnish() {
+        return $this->getVarnishEnabled() && $this->isRequestFromVarnish();
     }
 
     /**

@@ -31,8 +31,17 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return bool
      */
     public function getEsiEnabled() {
-        return Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() &&
-            Mage::app()->useCache( self::MAGE_CACHE_NAME );
+        return Mage::app()->useCache( $this->getMageCacheName() );
+    }
+
+    /**
+     * Get if ESI should be used for this request
+     *
+     * @return bool
+     */
+    public function shouldResponseUseEsi() {
+        return Mage::helper( 'turpentine/varnish' )->shouldResponseUseVarnish() &&
+            $this->getEsiEnabled();
     }
 
     /**
@@ -41,7 +50,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return null
      */
     public function ensureEsiEnabled() {
-        if( !$this->getEsiEnabled() ) {
+        if( !$this->shouldResponseUseEsi() ) {
             Mage::throwException( 'ESI includes are not enabled' );
         }
     }
