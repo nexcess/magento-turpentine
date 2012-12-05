@@ -54,6 +54,9 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 $block = $this->_getEsiBlock( $esiData );
                 if( $block ) {
                     $block->setEsiOptions( false );
+                    // if we don't clear the cached output we end up getting
+                    // the ESI template output again, which results in it
+                    // looking like Varnish didn't do ESI processing
                     Mage::app()->removeCache( $block->getCacheKey() );
                     $resp->setBody( $block->toHtml() );
                 } else {

@@ -111,7 +111,12 @@
                 <turpentine_esi_blocks>
                     <label>Varnish ESI Blocks</label>
                     <description>ESI blocks cached in Varnish (this should not be disabled except for debugging)</description>
-                    <tags></tags>
+                    <!--
+                    This is helpful to prevent blocks from being double ESI-
+                    included, which ends up resulting in the "ESI processing
+                    not enabled" error
+                    -->
+                    <tags>BLOCK_HTML</tags>
                 </turpentine_esi_blocks>
             </types>
         </cache>
