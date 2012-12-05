@@ -106,7 +106,7 @@
                 <turpentine_pages>
                     <label>Varnish Pages</label>
                     <description>Full pages cached in Varnish (will also flush ESI blocks)</description>
-                    <tags></tags>
+                    <tags>TURPENTINE_FAKE_PAGE_TAG</tags>
                 </turpentine_pages>
                 <turpentine_esi_blocks>
                     <label>Varnish ESI Blocks</label>
