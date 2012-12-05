@@ -18,7 +18,6 @@ to how it works).
  - Requires very little configuration for impressive results
  - Able to apply new Varnish VCLs (configurations) on the fly, without
  restarting/changing Varnish's config files or flushing the cache
- - Cache purging by URL and content type
  - Exclude URL paths, request parameters (__SID, __store, etc) from caching
  - Configure cache TTL by URL and individual block's TTL
  - Ability to force static asset (css, js, etc) caching
@@ -27,6 +26,8 @@ to how it works).
  - Automatic cache clearing on actions (clearing product/catalog/cms page after saving)
  - Non-root Magento installs (i.e. putting Magento in /store/ instead of /)
  - Web crawler support for warming the cache
+ - [SSL support](/nexcess/magento-turpentine/wiki/SSL_Support) through
+ [Pound](http://www.apsis.ch/pound)
 
 ## Requirements
 
@@ -84,7 +85,6 @@ the page and may differ between different visitors/clients.
  TTLs
  - Add support for caching in the admin section
  - Re-add Varnish 2.1.x support
- - SSL support through [Pound](http://www.apsis.ch/pound)
 
 ## Known Issues
 
