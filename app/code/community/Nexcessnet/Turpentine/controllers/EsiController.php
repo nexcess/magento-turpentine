@@ -54,6 +54,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 $block = $this->_getEsiBlock( $esiData );
                 if( $block ) {
                     $block->setEsiOptions( false );
+                    Mage::app()->removeCache( $block->getCacheKey() );
                     $resp->setBody( $block->toHtml() );
                 } else {
                     $resp->setHttpResponseCode( 404 );
