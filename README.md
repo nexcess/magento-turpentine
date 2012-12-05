@@ -97,7 +97,7 @@ the page and may differ between different visitors/clients.
 
 ## Demo
 
-See the [Demo Sites](/nexcess/magento-turpentine/wiki/Demo_Sites) wiki page.
+See the [Demo Sites](/nexcess/magento-turpentine/wiki/Demo-Sites) wiki page.
 
 ## License
 
