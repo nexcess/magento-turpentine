@@ -95,6 +95,10 @@ the page and may differ between different visitors/clients.
  panel will cause a warning to be logged and then ignored.
  - Flash messages usually do not display, or display sporadically
 
+## Demo
+
+See the [Demo Sites](/nexcess/magento-turpentine/wiki/Demo_Sites) wiki page.
+
 ## License
 
 The code is licensed under GPLv2+, much of the ESI-specific code is taken from
