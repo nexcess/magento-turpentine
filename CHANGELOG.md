@@ -57,3 +57,4 @@
   * Fix VCL application and saving when the Magento compiler is enabled
   * Remove defunct debug option config dependancies
   * Added *right.poll* block to default ESI cache policy
+  * Fix occasional "ESI processing not enabled" message (double ESI-include)
