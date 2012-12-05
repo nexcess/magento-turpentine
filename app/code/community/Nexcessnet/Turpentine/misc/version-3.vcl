@@ -80,7 +80,7 @@ sub vcl_recv {
         if (req.http.Cookie ~ "frontend=") {
             set req.http.X-Varnish-Cookie = req.http.Cookie;
         } else {
-            if (client.ip ~ crawler_acl ) {
+            if (client.ip ~ crawler_acl || req.http.User-Agent ~ "^(?:{{crawler_user_agent_regex}})$") {
                 set req.http.Cookie = "frontend=no-session";
                 set req.http.X-Varnish-Cookie = req.http.Cookie;
             } else {

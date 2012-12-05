@@ -358,6 +358,18 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     }
 
     /**
+     * Get the regex formatted list of crawler user agents
+     *
+     * @return string
+     */
+    protected function _getCrawlerUserAgents() {
+        return implode( '|', Mage::helper( 'turpentine/data' )
+            ->cleanExplode( ',',
+                Mage::getStoreConfig(
+                    'turpentine_vcl/backend/crawler_user_agents' ) ) );
+    }
+
+    /**
      * Remove empty and commented out lines from the generated VCL
      *
      * @param  string $dirtyVcl generated vcl
