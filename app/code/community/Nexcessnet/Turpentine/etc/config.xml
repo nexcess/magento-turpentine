@@ -43,7 +43,7 @@
                 <frontend_timeout>300</frontend_timeout>
                 <admin_timeout>21600</admin_timeout>
                 <crawlers>127.0.0.1</crawlers>
-                <crawler_user_agents>curl/.*libcurl,GoogleBot,JoeDog/.*siege</crawler_user_agents>
+                <crawler_user_agents><![CDATA[curl/.*libcurl,GoogleBot,JoeDog/.*siege,magespeedtest\.com]]></crawler_user_agents>
             </backend>
             <normalization>
                 <encoding>1</encoding>
