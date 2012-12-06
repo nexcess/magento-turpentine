@@ -156,6 +156,7 @@ sub vcl_miss {
 
 sub vcl_fetch {
     set req.grace = {{grace_period}}s;
+    #TODO: only remove the User-Agent field from this if it exists
     unset beresp.http.Vary;
 
     if (beresp.status != 200 && beresp.status != 404) {
@@ -168,7 +169,8 @@ sub vcl_fetch {
         }
         if (req.esi_level == 0 &&
                 req.http.X-Varnish-Cookie !~ "frontend=" &&
-                client.ip !~ crawler_acl) {
+                client.ip !~ crawler_acl &&
+                req.http.User-Agent !~ "^(?:{{crawler_user_agent_regex}})$") {
             set beresp.http.X-Varnish-Use-Set-Cookie = "1";
         }
         if (beresp.http.X-Turpentine-Esi ~ "1") {
@@ -179,8 +181,6 @@ sub vcl_fetch {
             set beresp.ttl = {{grace_period}}s;
             return (hit_for_pass);
         } else {
-            #TODO: only remove the User-Agent field from this if it exists
-            unset beresp.http.Vary;
             if ({{force_cache_static}} &&
                     bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
                 call remove_cache_headers;
