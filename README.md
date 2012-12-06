@@ -26,7 +26,7 @@ to how it works).
  - Automatic cache clearing on actions (clearing product/catalog/cms page after saving)
  - Non-root Magento installs (i.e. putting Magento in /store/ instead of /)
  - Web crawler support for warming the cache
- - [SSL support](/nexcess/magento-turpentine/wiki/SSL_Support) through
+ - [SSL support](https://github.com/nexcess/magento-turpentine/wiki/SSL_Support) through
  [Pound](http://www.apsis.ch/pound)
 
 ## Requirements
@@ -37,14 +37,14 @@ to how it works).
 
 ## Installation & Usage
 
-See the [Installation](/nexcess/magento-turpentine/wiki/Installation) and
+See the [Installation](https://github.com/nexcess/magento-turpentine/wiki/Installation) and
 [Usage](/nexcess/magento-turpentine/wiki/Usage) pages.
 
 ## Support
 
 If you have an issue, please read the [FAQ](/nexcess/magento-turpentine/wiki/FAQ)
 then if you still need help, open a bug report in GitHub's
-[issue tracker](/nexcess/magento-turpentine/issues).
+[issue tracker](https://github.com/nexcess/magento-turpentine/issues).
 
 ## How it works
 
@@ -61,7 +61,7 @@ for client IPs in the ``Crawler IPs`` setting.
 
 For blocks, the extension listens for the ``core_block_abstract_to_html_before``
 event in Magento. When this event is triggered, the extension looks at the block
-attached to it and if an [ESI policy](/nexcess/magento-turpentine/wiki/ESI_Cache_Policy)
+attached to it and if an [ESI policy](https://github.com/nexcess/magento-turpentine/wiki/ESI_Cache_Policy)
 has been defined for the block then the
 block's template is replaced with a simple ESI template that tells Varnish to
 pull the block content from a separate URL. Varnish then does another request to
@@ -97,7 +97,7 @@ the page and may differ between different visitors/clients.
 
 ## Demo
 
-See the [Demo Sites](/nexcess/magento-turpentine/wiki/Demo-Sites) wiki page.
+See the [Demo Sites](https://github.com/nexcess/magento-turpentine/wiki/Demo-Sites) wiki page.
 
 ## License
 

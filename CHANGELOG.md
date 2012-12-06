@@ -63,6 +63,6 @@
 ### RELEASE-0.1.6
 
   * Add support for identifing crawlers by User-Agent in addition to IP address,
-  see the new *Crawler User Agents* setting (matches Googlebot, siege, curl, and
-  MageSpeedTest.com by default)
+  see the new *Crawler User Agents* setting (matches Googlebot, siege, ab, and
+  [MageSpeedTest.com](http://www.magespeedtest.com/) by default)
   * Fix stale Login/Logout links
