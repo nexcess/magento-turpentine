@@ -38,11 +38,11 @@ to how it works).
 ## Installation & Usage
 
 See the [Installation](https://github.com/nexcess/magento-turpentine/wiki/Installation)
-and [Usage](/nexcess/magento-turpentine/wiki/Usage) pages.
+and [Usage](https://github.com/nexcess/magento-turpentine/wiki/Usage) pages.
 
 ## Support
 
-If you have an issue, please read the [FAQ](/nexcess/magento-turpentine/wiki/FAQ)
+If you have an issue, please read the [FAQ](https://github.com/nexcess/magento-turpentine/wiki/FAQ)
 then if you still need help, open a bug report in GitHub's
 [issue tracker](https://github.com/nexcess/magento-turpentine/issues).
 
