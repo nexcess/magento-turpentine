@@ -37,8 +37,8 @@ to how it works).
 
 ## Installation & Usage
 
-See the [Installation](https://github.com/nexcess/magento-turpentine/wiki/Installation) and
-[Usage](/nexcess/magento-turpentine/wiki/Usage) pages.
+See the [Installation](https://github.com/nexcess/magento-turpentine/wiki/Installation)
+and [Usage](/nexcess/magento-turpentine/wiki/Usage) pages.
 
 ## Support
 
@@ -57,7 +57,8 @@ regardless of whether that page is already cached. This is so they get a new
 session from Magento. If they already already have a ``frontend`` cookie, then
 they get a (non-session-specific) page from the backend, with any session-specific
 blocks (defined by the ESI policies) filled in via ESI. Note that this is bypassed
-for client IPs in the ``Crawler IPs`` setting.
+for clients identified as crawlers (see the ``Crawler IP Addresses`` and
+``Crawler User Agents`` settings).
 
 For blocks, the extension listens for the ``core_block_abstract_to_html_before``
 event in Magento. When this event is triggered, the extension looks at the block
@@ -73,9 +74,19 @@ the page and may differ between different visitors/clients.
  - This extension is currently in **beta**. There are some sites using it in
  production but you should carefully test it on your own dev site before pushing
  to production.
- - Turpentine will **not** help with the speed of "actions" like adding things
+ - Turpentine will **not** help (directly) with the speed of "actions" like adding things
  to the cart or checking out. It only caches, so it can only speed up page load
- speed for site browsing.
+ speed for site browsing. It will remove a lot of load on the backend though so
+ for heavily loaded sites it can free up enough backend resources to have a
+ noticeable effect on "actions".
+ - By design, the first request from a new visitor will not serve them a cached
+ page (it will be passed through to the backend so they get a unique session),
+ so the page load speed will the same as normal (without Varnish/Turpentine).
+ The second request will also
+ be somewhat faster than normal, but not full cached-page speed as the ESI blocks
+ will need to be regenerated and cached for the visitor's new session. Any further
+ requests will be at full cached-page speed (assuming the pages are already in
+ the cache).
 
 ## Future Plans
 
@@ -83,7 +94,6 @@ the page and may differ between different visitors/clients.
  be configurable in the Magento system configuration
  - Use standard cache-control headers to tell Varnish about the block and page
  TTLs
- - Add support for caching in the admin section
  - Re-add Varnish 2.1.x support
 
 ## Known Issues
@@ -91,13 +101,16 @@ the page and may differ between different visitors/clients.
  - Logging and statistics will show all requests as coming from the same IP address
  (usually localhost/127.0.0.1). It should be possible to work around this using
  Apache's [mod_remoteip](http://httpd.apache.org/docs/trunk/mod/mod_remoteip.html)
- - The admin panel will not be cached at all. Attempts to inject ESI in the admin
- panel will cause a warning to be logged and then ignored.
+ or [mod_rpaf](http://www.stderr.net/apache/rpaf/).
  - Flash messages usually do not display, or display sporadically
 
 ## Demo
 
-See the [Demo Sites](https://github.com/nexcess/magento-turpentine/wiki/Demo-Sites) wiki page.
+See the [Demo Sites](https://github.com/nexcess/magento-turpentine/wiki/Demo-Sites)
+wiki page.
+
+If you use Turpentine (on a production site), feel free to add your site to the
+list!
 
 ## License
 
