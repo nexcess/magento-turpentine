@@ -1,10 +1,13 @@
 SHELL := /bin/bash
-.PHONY: connect-pkg all clean
+.PHONY: connect-desc connect-pkg all clean
+
+connect-desc:
+	markdown2 README.md > build/magento-connect-desc-$(shell ./util/get-version.sh).html
 
 connect-pkg:
-	./build/build_package.py build/mage-package.xml
+	./build/build_package.py -d build/mage-package.xml
 
-all: connect-pkg
+all: connect-desc connect-pkg
 
 clean:
-	rm -f ./build/*.tgz ./package.xml
+	rm -f ./build/*.tgz ./build/*.html ./package.xml
