@@ -61,6 +61,11 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version2
             'enable_caching'    => $this->_getEnableCaching(),
             'crawler_acl'   => $this->_vcl_acl( 'crawler_acl',
                 $this->_getCrawlerIps() ),
+            'esi_cache_type_param'  =>
+                Mage::helper( 'turpentine/esi' )->getEsiCacheTypeParam(),
+            'esi_ttl_param' => Mage::helper( 'turpentine/esi' )->getEsiTtlParam(),
+            'secret_handshake'  => Mage::helper( 'turpentine/varnish' )->getSecretHandshake(),
+            'crawler_user_agent_regex'  => $this->_getCrawlerUserAgents(),
         );
         if( Mage::getStoreConfig( 'turpentine_control/normalization/encoding' ) ) {
             $vars['normalize_encoding'] = $this->_vcl_sub_normalize_encoding();
