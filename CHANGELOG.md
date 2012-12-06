@@ -66,3 +66,4 @@
   see the new *Crawler User Agents* setting (matches Googlebot, siege, ab, and
   [MageSpeedTest.com](http://www.magespeedtest.com/) by default)
   * Fix stale Login/Logout links
+  * Add documentation for [SSL Support](https://github.com/nexcess/magento-turpentine/wiki/SSL_Support)
