@@ -370,6 +370,17 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     }
 
     /**
+     * Get the time to increase a cached objects TTL on cache hit (in seconds).
+     *
+     * This should be set very low since it gets added to every hit.
+     *
+     * @return string
+     */
+    protected function _getLruFactor() {
+        return Mage::getStoreConfig( 'turpentine_vcl/ttls/lru_factor' );
+    }
+
+    /**
      * Remove empty and commented out lines from the generated VCL
      *
      * @param  string $dirtyVcl generated vcl

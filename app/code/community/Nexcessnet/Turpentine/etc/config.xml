@@ -57,6 +57,7 @@
                 <esi_global>3600</esi_global>
                 <esi_per_page>3600</esi_per_page>
                 <esi_per_client>300</esi_per_client>
+                <lru_factor>15</lru_factor>
             </ttls>
             <urls>
                 <url_blacklist><![CDATA[cron\.php]]></url_blacklist>

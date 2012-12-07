@@ -321,6 +321,16 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </esi_per_client>
+                        <lru_factor translate="label" module="turpentine">
+                            <label>Cache Hit Extension Time</label>
+                            <comment>Time (in seconds) to add to cache object TTL on a cache hit (this should be set very low)</comment>
+                            <frontend_type>text</frontend_type>
+                            <validate>validate-greater-than-zero</validate>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </lru_factor>
                     </fields>
                 </ttls>
                 <urls translate="label" module="turpentine">

@@ -141,9 +141,11 @@ sub vcl_hash {
     return (hash);
 }
 
-# sub vcl_hit {
-#     return (deliver);
-# }
+sub vcl_hit {
+    if (obj.hits > 0) {
+        set obj.ttl = obj.ttl + {{lru_factor}}s;
+    }
+}
 
 sub vcl_miss {
     if (req.esi_level == 0 && req.http.X-Varnish-Cookie) {

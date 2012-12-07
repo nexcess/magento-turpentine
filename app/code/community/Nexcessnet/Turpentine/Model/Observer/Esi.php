@@ -154,6 +154,11 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                                     ->encrypt( serialize( $esiData ) ),
             ) );
             $blockObject->setEsiUrl( $esiUrl );
+            // avoid caching the ESI template output to prevent the double-esi-
+            // include/"ESI processing not enabled" bug
+            foreach( array( 'lifetime', 'tags', 'key' ) as $dataKey ) {
+                $blockObject->unsetData( 'cache_' . $dataKey );
+            }
             if( strlen( $esiUrl ) > 2047 ) {
                 Mage::log( 'ESI url is probably to long (> 2047 characters): ' .
                     $esiUrl, Zend_Log::WARN );
