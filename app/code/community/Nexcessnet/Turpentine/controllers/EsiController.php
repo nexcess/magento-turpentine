@@ -86,9 +86,10 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
      * @return null
      */
     public function postDispatch() {
+        $flag = $this->getFlag( 'getBlock', self::FLAG_NO_START_SESSION );
         $this->setFlag( 'getBlock', self::FLAG_NO_START_SESSION, true );
         parent::postDispatch();
-        $this->setFlag( 'getBlock', self::FLAG_NO_START_SESSION, false );
+        $this->setFlag( 'getBlock', self::FLAG_NO_START_SESSION, $flag );
     }
 
     /**
