@@ -9,8 +9,8 @@ if [ -z "$1" ]; then
 fi
 
 curl -ks "$SITEMAP_URL" | \
-	xpath /dev/stdin '/urlset/url/loc/text()' 2>/dev/null | \
-	sed -r 's~http(s)?:~\nhttp\1:~g' > "$TMP_URL_FILE"
+        xpath -e '/urlset/url/loc/text()' -q 2>/dev/null | \
+        sed -r 's~http(s)?:~\nhttp\1:~g' > "$TMP_URL_FILE"
 
 siege -b -v -c 1 -r once -f "$TMP_URL_FILE"
 
