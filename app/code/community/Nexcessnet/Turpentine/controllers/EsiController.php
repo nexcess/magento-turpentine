@@ -21,6 +21,16 @@
 
 class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Action {
     /**
+     * Set the action flags
+     *
+     * @return null
+     */
+    protected function _construct() {
+        parent::_construct();
+        $this->setFlag( 'getBlock', self::FLAG_NO_START_SESSION, true );
+    }
+
+    /**
      * It seems this has to exist so we just make it redirect to the base URL
      * for lack of anything better to do.
      *
@@ -51,6 +61,10 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
             } else {
                 $esiData = new Varien_Object( $esiDataArray );
+                $origRequest = Mage::app()->getRequest();
+                Mage::app()->setCurrentStore(
+                    Mage::app()->getStore( $esiData->getStoreId() ) );
+                Mage::app()->setRequest( $this->_getDummyRequest( $esiData ) );
                 $block = $this->_getEsiBlock( $esiData );
                 if( $block ) {
                     $block->setEsiOptions( false );
@@ -64,12 +78,28 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                     $resp->setBody( 'ESI block not found' );
                     Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
                 }
+                Mage::app()->setRequest( $origRequest );
             }
         } else {
             $resp->setHttpResponseCode( 403 );
             $resp->setBody( 'ESI includes are not enabled' );
             Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
         }
+    }
+
+    /**
+     * Get dummy request to base URL
+     *
+     * Used to pretend that the request was for the base URL instead of
+     * turpentine/esi/getBlock while rendering ESI blocks. Not perfect, but may
+     * be good enough
+     *
+     * @param  Varien_Object $esiData
+     * @return Mage_Core_Controller_Request_Http
+     */
+    protected function _getDummyRequest( $esiData ) {
+        $req = new Mage_Core_Controller_Request_Http( Mage::getBaseUrl() );
+        return $req;
     }
 
     /**
