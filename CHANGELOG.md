@@ -67,3 +67,17 @@
   [MageSpeedTest.com](http://www.magespeedtest.com/) by default)
   * Fix stale Login/Logout links
   * Add documentation for [SSL Support](https://github.com/nexcess/magento-turpentine/wiki/SSL_Support)
+
+### RELEASE-0.1.7
+
+  * Added TTL extension for cache hits. Cached object's TTL will be extended by a
+  small ammount on cache hits to keep frequently used cache objects from expiring
+  (unless the cache is flushed), allowing for lower TTL values to keep the cache
+  from filling.
+  * Prevented ESI injected blocks from being cached via Magento's block html
+  caching while still allowing full block output to be cached. This is an
+  improvement on the fix in RELEASE-0.1.5 for double ESI-includes
+  * Fixed Magento using the ESI getBlock URL as the previously visited URL for
+  visitor sessions
+  * Fixed ESI injected blocks using the ESI getBlock URL as the current URL
+  when rendering
