@@ -54,7 +54,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 $origRequest = Mage::app()->getRequest();
                 Mage::app()->setCurrentStore(
                     Mage::app()->getStore( $esiData->getStoreId() ) );
-                Mage::app()->setRequest( $this->_getDummyRequest( $esiData ) );
+                Mage::app()->setRequest( $this->_getDummyRequest() );
                 $block = $this->_getEsiBlock( $esiData );
                 if( $block ) {
                     $block->setEsiOptions( false );
@@ -81,6 +81,8 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
      * Need to disable this flag to prevent setting the last URL but we
      * don't want to completely break sessions.
      *
+     * see Mage_Core_Controller_Front_Action::postDispatch
+     *
      * @return null
      */
     public function postDispatch() {
@@ -96,12 +98,10 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
      * turpentine/esi/getBlock while rendering ESI blocks. Not perfect, but may
      * be good enough
      *
-     * @param  Varien_Object $esiData
      * @return Mage_Core_Controller_Request_Http
      */
-    protected function _getDummyRequest( $esiData ) {
-        $req = new Mage_Core_Controller_Request_Http( Mage::getBaseUrl() );
-        return $req;
+    protected function _getDummyRequest() {
+        return new Mage_Core_Controller_Request_Http( Mage::getBaseUrl() );
     }
 
     /**
