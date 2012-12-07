@@ -21,16 +21,6 @@
 
 class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Action {
     /**
-     * Set the action flags
-     *
-     * @return null
-     */
-    protected function _construct() {
-        parent::_construct();
-        $this->setFlag( 'getBlock', self::FLAG_NO_START_SESSION, true );
-    }
-
-    /**
      * It seems this has to exist so we just make it redirect to the base URL
      * for lack of anything better to do.
      *
@@ -85,6 +75,18 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             $resp->setBody( 'ESI includes are not enabled' );
             Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
         }
+    }
+
+    /**
+     * Need to disable this flag to prevent setting the last URL but we
+     * don't want to completely break sessions.
+     *
+     * @return null
+     */
+    public function postDispatch() {
+        $this->setFlag( 'getBlock', self::FLAG_NO_START_SESSION, true );
+        parent::postDispatch();
+        $this->setFlag( 'getBlock', self::FLAG_NO_START_SESSION, false );
     }
 
     /**
