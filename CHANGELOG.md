@@ -71,7 +71,7 @@
 ### RELEASE-0.1.7
 
   * Added TTL extension for cache hits. Cached object's TTL will be extended by a
-  small ammount on cache hits to keep frequently used cache objects from expiring
+  small amount on cache hits to keep frequently used cache objects from expiring
   (unless the cache is flushed), allowing for lower TTL values to keep the cache
   from filling.
   * Prevented ESI injected blocks from being cached via Magento's block html
