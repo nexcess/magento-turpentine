@@ -35,7 +35,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
      *
      * @return null
      */
-    public function getBlockAction() {
+    public function getEsiBlockAction() {
         $resp = $this->getResponse();
         if( Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() ) {
             $req = $this->getRequest();
@@ -59,6 +59,45 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 if( $block ) {
                     $block->setEsiOptions( false );
                     $resp->setBody( $block->toHtml() );
+                } else {
+                    $resp->setHttpResponseCode( 404 );
+                    $resp->setBody( 'ESI block not found' );
+                    Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
+                }
+                Mage::app()->setRequest( $origRequest );
+            }
+        } else {
+            $resp->setHttpResponseCode( 403 );
+            $resp->setBody( 'ESI includes are not enabled' );
+            Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
+        }
+    }
+
+    public function getAjaxBlockAction() {
+        $resp = $this->getResponse();
+        if( Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() ) {
+            $req = $this->getRequest();
+            $esiDataParamValue = $req->getParam(
+                Mage::helper( 'turpentine/esi' )->getEsiDataParam() );
+            $esiDataArray = unserialize( Mage::helper( 'turpentine/data' )
+                ->decrypt( $esiDataParamValue ) );
+            if( !$esiDataArray ) {
+                Mage::log( 'Invalid ESI data in URL: ' . $esiDataParamValue, Zend_Log::WARN );
+                $resp->setHttpResponseCode( 500 );
+                $resp->setBody( 'ESI data is not valid' );
+                //this wouldn't be cached anyway but we'll set this just in case
+                Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
+            } else {
+                $esiData = new Varien_Object( $esiDataArray );
+                $origRequest = Mage::app()->getRequest();
+                Mage::app()->setCurrentStore(
+                    Mage::app()->getStore( $esiData->getStoreId() ) );
+                Mage::app()->setRequest( $this->_getDummyRequest() );
+                $block = $this->_getEsiBlock( $esiData );
+                if( $block ) {
+                    $block->setAjaxOptions( false );
+                    $resp->setBody( $block->toHtml() );
+                    Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
                 } else {
                     $resp->setHttpResponseCode( 404 );
                     $resp->setBody( 'ESI block not found' );

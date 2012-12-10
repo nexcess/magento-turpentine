@@ -20,12 +20,88 @@
  */
 
 class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages {
+    /**
+     * Sentinel value to see if getHtml was passed a specific message type,
+     * can't use null because that is the default so no way to tell between
+     * the default and  not actually calling it
+     */
+    const NO_SINGLE_RENDER_TYPE     = -1;
+
+    /**
+     * Hold the message type to call getHtml with
+     * @var mixed
+     */
+    protected $_singleRenderType = self::NO_SINGLE_RENDER_TYPE;
+
+    /**
+     * Override this in case some dumb layout decides to use it instead of the
+     * standard toHtml stuff
+     *
+     * @param  mixed $type=self::NO_SINGLE_RENDER_TYPE
+     * @return string
+     */
+    public function getHtml( $type=self::NO_SINGLE_RENDER_TYPE ) {
+        if( $type !== self::NO_SINGLE_RENDER_TYPE ) {
+            $this->_singleRenderType = $type;
+        }
+        return $this->toHtml();
+    }
+
+    /**
+     * Override this in case some dumb layout decides to use it directly instead
+     * of the standard toHtml stuff (i.e. most of core magento)
+     *
+     * @return string
+     */
+    public function getGroupedHtml() {
+        return $this->toHtml();
+    }
+
+    /**
+     * Render the messages block
+     *
+     * @return string
+     */
     protected function _toHtml() {
         if( Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() &&
-                $this->getEsiOptions() ) {
+                $this->_hasTemplateSet() && $this->_hasInjectOptions() ) {
             return $this->renderView();
         } else {
-            return parent::_toHtml();
+            foreach( array( 'core', 'catalog', 'checkout', 'customer' ) as $storagePrefix ) {
+                $storageType = sprintf( '%s/session', $storagePrefix );
+                $storage = Mage::getSingleton( $storageType );
+                if( $storage ) {
+                    $this->addStorageType( $storageType );
+                    $this->addMessages( $storage->getMessages( true, true ) );
+                }
+            }
+            if( $this->_singleRenderType !== self::NO_SINGLE_RENDER_TYPE ) {
+                $html = parent::getHtml( $this->_singleRenderType );
+                $this->_singleRenderType = self::NO_SINGLE_RENDER_TYPE;
+            } else {
+                $html = parent::getGroupedHtml();
+            }
+            return $html;
         }
+    }
+
+    /**
+     * Check if this block has either the ajax or esi options set
+     *
+     * @return boolean
+     */
+    protected function _hasInjectOptions() {
+        return $this->getEsiOptions() || $this->getAjaxOptions();
+    }
+
+    /**
+     * Check if this block has a template set
+     *
+     * This should be false unless we're rendering with the ajax/esi option stuff
+     *
+     * @return boolean
+     */
+    protected function _hasTemplateSet() {
+        return (bool)$this->getTemplate();
     }
 }

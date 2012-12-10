@@ -82,14 +82,14 @@
 
         <!-- Messages are cached on a per-client basis -->
         <reference name="global_messages">
-            <action method="setEsiOptions">
+            <action method="setAjaxOptions">
                 <params>
                     <cacheType>per-client</cacheType>
                 </params>
             </action>
         </reference>
         <reference name="messages">
-            <action method="setEsiOptions">
+            <action method="setAjaxOptions">
                 <params>
                     <cacheType>per-client</cacheType>
                 </params>
@@ -104,6 +104,36 @@
             </action>
         </reference>
     </default>
+
+    <catalog_dummy_handle>
+        <reference name="messages">
+            <action method="setAjaxOptions">
+                <params>
+                    <cacheType>per-client</cacheType>
+                </params>
+            </action>
+        </reference>
+    </catalog_dummy_handle>
+
+    <checkout_dummy_handle>
+        <reference name="messages">
+            <action method="setAjaxOptions">
+                <params>
+                    <cacheType>per-client</cacheType>
+                </params>
+            </action>
+        </reference>
+    </checkout_dummy_handle>
+
+    <customer_dummy_handle>
+        <reference name="messages">
+            <action method="setAjaxOptions">
+                <params>
+                    <cacheType>per-client</cacheType>
+                </params>
+            </action>
+        </reference>
+    </customer_dummy_handle>
 
     <!-- Checkout -->
 

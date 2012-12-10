@@ -6,3 +6,4 @@ app/design/adminhtml/default/default/layout/turpentine.xml  app/design/adminhtml
 app/design/adminhtml/default/default/template/turpentine/  app/design/adminhtml/default/default/template/turpentine/
 app/design/frontend/base/default/layout/turpentine_esi.xml   app/design/frontend/base/default/layout/turpentine_esi.xml
 app/design/frontend/base/default/template/turpentine/esi.phtml   app/design/frontend/base/default/template/turpentine/esi.phtml
+app/design/frontend/base/default/template/turpentine/ajax.phtml   app/design/frontend/base/default/template/turpentine/ajax.phtml

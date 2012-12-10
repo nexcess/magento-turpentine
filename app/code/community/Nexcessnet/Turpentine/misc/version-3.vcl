@@ -72,9 +72,12 @@ sub vcl_recv {
         set req.backend = admin;
         return (pipe);
     }
-    if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock" &&
+    if (req.url ~ "{{url_base_regex}}turpentine/esi/getEsiBlock" &&
             req.esi_level == 0) {
         error 403 "External ESI requests are not allowed";
+    }
+    if (req.url ~ "{{url_base_regex}}turpentine/esi/getAjaxBlock") {
+        return (pass);
     }
     if (req.url ~ "{{url_base_regex}}") {
         if (req.http.Cookie ~ "frontend=") {
@@ -133,7 +136,7 @@ sub vcl_hash {
     if (req.http.Accept-Encoding) {
         hash_data(req.http.Accept-Encoding);
     }
-    if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/.*") {
+    if (req.url ~ "{{url_base_regex}}turpentine/esi/get(?:Esi|Ajax)Block/.*") {
         if (req.url ~ "/{{esi_cache_type_param}}/per-client/" && req.http.Cookie ~ "frontend=") {
             hash_data(regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1"));
         }
@@ -187,7 +190,7 @@ sub vcl_fetch {
                     bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
                 call remove_cache_headers;
                 set beresp.ttl = {{static_ttl}}s;
-            } elseif (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/.*") {
+            } elseif (req.url ~ "{{url_base_regex}}turpentine/esi/getEsiBlock/.*") {
                 call remove_cache_headers;
                 if (req.url ~ "/{{esi_cache_type_param}}/per-client/" &&
                         req.http.Cookie ~ "frontend=") {
@@ -196,6 +199,16 @@ sub vcl_fetch {
                 }
                 set beresp.ttl = std.duration(regsub(req.url,
                     ".*/{{esi_ttl_param}}/([0-9]+)/.*", "\1s"), 300s);
+            } elseif (req.url ~ "{{url_base_regex}}turpentine/esi/getAjaxBlock/.*") {
+                call remove_cache_headers;
+                if (req.url ~ "/{{esi_cache_type_param}}/per-client/" &&
+                        req.http.Cookie ~ "frontend=") {
+                    set beresp.http.X-Varnish-Session = regsub(req.http.Cookie,
+                        "^.*?frontend=([^;]*);*.*$", "\1");
+                }
+                set beresp.ttl = std.duration(regsub(req.url,
+                    ".*/{{esi_ttl_param}}/([0-9]+)/.*", "\1s"), 300s);
+                return (hit_for_pass);
             } else {
                 call remove_cache_headers;
                 {{url_ttls}}
