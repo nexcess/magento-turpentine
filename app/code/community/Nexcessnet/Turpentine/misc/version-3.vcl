@@ -40,8 +40,6 @@ sub vcl_recv {
         }
     }
 
-    set req.http.X-Turpentine-Secret-Handshake = "{{secret_handshake}}";
-
     if (req.request != "GET" &&
             req.request != "HEAD" &&
             req.request != "PUT" &&
@@ -68,6 +66,7 @@ sub vcl_recv {
     if (!{{enable_caching}} || req.http.Authorization) {
         return (pipe);
     }
+    set req.http.X-Turpentine-Secret-Handshake = "{{secret_handshake}}";
     if (req.url ~ "{{url_base_regex}}{{admin_frontname}}") {
         set req.backend = admin;
         return (pipe);

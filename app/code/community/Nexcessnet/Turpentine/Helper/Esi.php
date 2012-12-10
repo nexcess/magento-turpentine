@@ -84,10 +84,20 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
         return self::ESI_TTL_PARAM;
     }
 
+    /**
+     * Get name of action to retrieve ESI block
+     *
+     * @return string
+     */
     public function getEsiBlockActionName() {
         return self::ESI_ACTION_NAME;
     }
 
+    /**
+     * Get name of action to retrieve AJAX block
+     *
+     * @return string
+     */
     public function getAjaxBlockActionName() {
         return self::AJAX_ACTION_NAME;
     }

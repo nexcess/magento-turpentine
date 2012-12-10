@@ -175,6 +175,17 @@
                 </observers>
             </admin_system_config_changed_section_turpentine_vcl>
 
+            <!-- AJAX Events -->
+            <core_block_abstract_to_html_before>
+                <observers>
+                    <turpentine_ajax_core_block_abstract_to_html_before>
+                        <type>singleton</type>
+                        <class>turpentine/observer_esi</class>
+                        <method>injectAjax</method>
+                    </turpentine_ajax_core_block_abstract_to_html_before>
+                </observers>
+            </core_block_abstract_to_html_before>
+
             <!-- ESI Events -->
             <core_block_abstract_to_html_before>
                 <observers>
