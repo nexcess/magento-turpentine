@@ -102,7 +102,6 @@ the page and may differ between different visitors/clients.
  (usually localhost/127.0.0.1). It should be possible to work around this using
  Apache's [mod_remoteip](http://httpd.apache.org/docs/trunk/mod/mod_remoteip.html)
  or [mod_rpaf](http://www.stderr.net/apache/rpaf/).
- - Flash messages usually do not display, or display sporadically
  - Changing to a different store language has no effect
 
 ## Demo

@@ -70,6 +70,11 @@
 
 ### RELEASE-0.1.7
 
+  * Added AJAX injection for very short lived and/or frequently changed blocks
+  (like the flash messages). This should resolve the issue with flash messages
+  not displaying or displaying sporadically. To enable for other blocks, change
+  the *setEsiOptions* method in the ``turpentine_esi.xml`` layout file to
+  *setAjaxOptions*. Note that AJAX injected blocks are not cached at all
   * Added TTL extension for cache hits. Cached object's TTL will be extended by a
   small amount on cache hits to keep frequently used cache objects from expiring
   (unless the cache is flushed), allowing for lower TTL values to keep the cache
