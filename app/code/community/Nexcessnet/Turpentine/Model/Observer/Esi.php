@@ -144,9 +144,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             //esi data is the data needed to regenerate the ESI'd block
             $esiData = $this->_getEsiData( $blockObject, $esiOptions )->toArray();
             ksort( $esiData );
-            $esiUrl = Mage::getUrl( 'turpentine/esi/' .
-                    Mage::helper( 'turpentine/esi' )
-                        ->getEsiBlockActionName(),
+            $esiUrl = Mage::getUrl( 'turpentine/esi/getBlock',
                 array(
                 $cacheTypeParam => $esiOptions[$cacheTypeParam],
                 $ttlParam       => $esiOptions[$ttlParam],

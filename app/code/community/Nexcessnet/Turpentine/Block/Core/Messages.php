@@ -63,16 +63,23 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * @return string
      */
     protected function _toHtml() {
-        if( Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() &&
-                $this->_hasTemplateSet() && $this->_hasInjectOptions() ) {
+        if( $this->_hasTemplateSet() && $this->_hasInjectOptions() &&
+            ( $this->getAjaxOptions() &&
+                Mage::helper( 'turpentine/ajax' )->shouldResponseUseAjax() ) ||
+            ( $this->getEsiOptions() &&
+                Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() ) ) {
             return $this->renderView();
         } else {
-            foreach( array( 'core', 'catalog', 'checkout', 'customer' ) as $storagePrefix ) {
-                $storageType = sprintf( '%s/session', $storagePrefix );
-                $storage = Mage::getSingleton( $storageType );
-                if( $storage ) {
-                    $this->addStorageType( $storageType );
-                    $this->addMessages( $storage->getMessages( true, true ) );
+            if( Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() ||
+                    Mage::helper( 'turpentine/ajax' )->shouldResponseUseAjax() ) {
+                foreach( array( 'core', 'catalog', 'checkout', 'customer' )
+                        as $storagePrefix ) {
+                    $storageType = sprintf( '%s/session', $storagePrefix );
+                    $storage = Mage::getSingleton( $storageType );
+                    if( $storage ) {
+                        $this->addStorageType( $storageType );
+                        $this->addMessages( $storage->getMessages( true, true ) );
+                    }
                 }
             }
             if( $this->_singleRenderType !== self::NO_SINGLE_RENDER_TYPE ) {

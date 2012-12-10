@@ -35,7 +35,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
      *
      * @return null
      */
-    public function getEsiBlockAction() {
+    public function getBlockAction() {
         $resp = $this->getResponse();
         if( Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() ) {
             $req = $this->getRequest();
@@ -73,45 +73,6 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         }
     }
 
-    public function getAjaxBlockAction() {
-        $resp = $this->getResponse();
-        if( Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() ) {
-            $req = $this->getRequest();
-            $esiDataParamValue = $req->getParam(
-                Mage::helper( 'turpentine/esi' )->getEsiDataParam() );
-            $esiDataArray = unserialize( Mage::helper( 'turpentine/data' )
-                ->decrypt( $esiDataParamValue ) );
-            if( !$esiDataArray ) {
-                Mage::log( 'Invalid ESI data in URL: ' . $esiDataParamValue, Zend_Log::WARN );
-                $resp->setHttpResponseCode( 500 );
-                $resp->setBody( 'ESI data is not valid' );
-                //this wouldn't be cached anyway but we'll set this just in case
-                Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
-            } else {
-                $esiData = new Varien_Object( $esiDataArray );
-                $origRequest = Mage::app()->getRequest();
-                Mage::app()->setCurrentStore(
-                    Mage::app()->getStore( $esiData->getStoreId() ) );
-                Mage::app()->setRequest( $this->_getDummyRequest() );
-                $block = $this->_getEsiBlock( $esiData );
-                if( $block ) {
-                    $block->setAjaxOptions( false );
-                    $resp->setBody( $block->toHtml() );
-                    Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
-                } else {
-                    $resp->setHttpResponseCode( 404 );
-                    $resp->setBody( 'ESI block not found' );
-                    Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
-                }
-                Mage::app()->setRequest( $origRequest );
-            }
-        } else {
-            $resp->setHttpResponseCode( 403 );
-            $resp->setBody( 'ESI includes are not enabled' );
-            Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
-        }
-    }
-
     /**
      * Need to disable this flag to prevent setting the last URL but we
      * don't want to completely break sessions.
@@ -121,10 +82,10 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
      * @return null
      */
     public function postDispatch() {
-        $flag = $this->getFlag( '', self::FLAG_NO_START_SESSION );
-        $this->setFlag( '', self::FLAG_NO_START_SESSION, true );
+        $flag = $this->getFlag( 'getBlock', self::FLAG_NO_START_SESSION );
+        $this->setFlag( 'getBlock', self::FLAG_NO_START_SESSION, true );
         parent::postDispatch();
-        $this->setFlag( '', self::FLAG_NO_START_SESSION, $flag );
+        $this->setFlag( 'getBlock', self::FLAG_NO_START_SESSION, $flag );
     }
 
     /**

@@ -180,7 +180,7 @@
                 <observers>
                     <turpentine_ajax_core_block_abstract_to_html_before>
                         <type>singleton</type>
-                        <class>turpentine/observer_esi</class>
+                        <class>turpentine/observer_ajax</class>
                         <method>injectAjax</method>
                     </turpentine_ajax_core_block_abstract_to_html_before>
                 </observers>
