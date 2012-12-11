@@ -19,11 +19,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-$esiDebugEnabled = (bool)Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled();
+$ajaxDebugEnabled = (bool)Mage::helper( 'turpentine/ajax' )->getAjaxDebugEnabled();
 $blockTag = sprintf( 'turpentine-ajax-block-%s',
     sha1( $this->getNameInLayout() ) );
 
-if( $esiDebugEnabled ) {
+if( $ajaxDebugEnabled ) {
     echo sprintf( '<!-- AJAX START [%s] -->', $this->getNameInLayout() ) . PHP_EOL;
 }
 /**
@@ -47,6 +47,6 @@ new Ajax.Request("%s", {
     $blockTag,
     $this->getAjaxUrl(),
     $blockTag ) . PHP_EOL;
-if( $esiDebugEnabled ) {
+if( $ajaxDebugEnabled ) {
     echo sprintf( '<!-- AJAX END [%s] -->', $this->getNameInLayout() ) . PHP_EOL;
 }

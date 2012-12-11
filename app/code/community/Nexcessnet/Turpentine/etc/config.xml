@@ -28,6 +28,7 @@
             <general>
                 <varnish_debug>0</varnish_debug>
                 <esi_debug>0</esi_debug>
+                <ajax_debug>0</ajax_debug>
                 <block_debug>0</block_debug>
             </general>
             <servers>
