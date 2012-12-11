@@ -38,6 +38,9 @@ echo sprintf( '<div id="%s" style="display: none">
 <script type="text/javascript">
 new Ajax.Request("%s", {
     method: "get",
+    onCreate: function(request) {
+        request.transport.setRequestHeader = Prototype.emptyFunction;
+    },
     on200: function(response) {
         Element.replace($("%s"), response.responseText);
     }
