@@ -79,7 +79,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      */
     public function checkRedirectUrl( $eventObject ) {
         $url = $eventObject->getTransport()->getUrl();
-        $getBlockUrlPattern = '~/turpentine/esi/getBlock/~';
+        $getBlockUrlPattern = '~/turpentine/esi/get(?:Ajax)?Block/~';
         if( preg_match( $getBlockUrlPattern, $url ) ) {
             if( Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled() ) {
                 Mage::log( 'Caught redirect to ESI getBlock URL, intercepting' );
@@ -167,63 +167,6 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
 
             //flag request for ESI processing
             Mage::getSingleton( 'turpentine/sentinel' )->setEsiFlag( true );
-        } // else handle the block like normal and cache it inline with the page
-    }
-
-    /**
-     * Encode block data in URL then replace with AJAX template
-     *
-     * @link https://github.com/nexcess/magento-turpentine/wiki/ESI_Cache_Policy
-     *
-     * Events: core_block_abstract_to_html_before
-     *
-     * @param  Varien_Object $eventObject
-     * @return null
-     */
-    public function injectAjax( $eventObject ) {
-        $blockObject = $eventObject->getBlock();
-        if( Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() &&
-                $blockObject instanceof Mage_Core_Block_Template &&
-                $ajaxOptions = $blockObject->getAjaxOptions() ) {
-            if( Mage::app()->getStore()->getCode() == 'admin' ) {
-                //admin blocks are not allowed to be cached for now
-                Mage::log( 'Ignoring attempt to AJAX inject adminhtml block: ' .
-                    $blockObject->getNameInLayout(), Zend_Log::WARN );
-                return;
-            }
-            $ttlParam = Mage::helper( 'turpentine/esi' )->getEsiTtlParam();
-            $cacheTypeParam = Mage::helper( 'turpentine/esi' )
-                ->getEsiCacheTypeParam();
-            $dataParam = Mage::helper( 'turpentine/esi' )->getEsiDataParam();
-            $ajaxOptions = array_merge( $this->_getDefaultEsiOptions(),
-                $ajaxOptions );
-            //change the block's template to the stripped down ESI template
-            $blockObject->setTemplate( 'turpentine/ajax.phtml' );
-            //esi data is the data needed to regenerate the ESI'd block
-            $ajaxData = $this->_getEsiData( $blockObject, $ajaxOptions )->toArray();
-            ksort( $ajaxData );
-            $ajaxUrl = Mage::getUrl( 'turpentine/esi/' .
-                    Mage::helper( 'turpentine/esi' )
-                        ->getAjaxBlockActionName(),
-                array(
-                    $ttlParam       => '0',
-                    $cacheTypeParam => 'per-client',
-                    //we probably don't really need to encrypt this but it doesn't hurt
-                    //use core/encryption instead of Mage::encrypt/decrypt because
-                    //EE uses a different method by default
-                    $dataParam      => Mage::helper( 'turpentine/data' )
-                                        ->encrypt( serialize( $ajaxData ) ),
-            ) );
-            $blockObject->setAjaxUrl( $ajaxUrl );
-            // avoid caching the ESI template output to prevent the double-esi-
-            // include/"ESI processing not enabled" bug
-            foreach( array( 'lifetime', 'tags', 'key' ) as $dataKey ) {
-                $blockObject->unsetData( 'cache_' . $dataKey );
-            }
-            if( strlen( $ajaxUrl ) > 2047 ) {
-                Mage::log( 'AJAX url is probably to long (> 2047 characters): ' .
-                    $ajaxUrl, Zend_Log::WARN );
-            }
         } // else handle the block like normal and cache it inline with the page
     }
 

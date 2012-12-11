@@ -75,7 +75,7 @@ sub vcl_recv {
             req.esi_level == 0) {
         error 403 "External ESI requests are not allowed";
     }
-    if (req.url ~ "{{url_base_regex}}turpentine/ajax/getBlock") {
+    if (req.url ~ "{{url_base_regex}}turpentine/esi/getAjaxBlock") {
         return (pass);
     }
     if (req.url ~ "{{url_base_regex}}") {
@@ -198,7 +198,7 @@ sub vcl_fetch {
                 }
                 set beresp.ttl = std.duration(regsub(req.url,
                     ".*/{{esi_ttl_param}}/([0-9]+)/.*", "\1s"), 300s);
-            } elseif (req.url ~ "{{url_base_regex}}turpentine/ajax/getBlock/.*") {
+            } elseif (req.url ~ "{{url_base_regex}}turpentine/esi/getAjaxBlock/.*") {
                 call remove_cache_headers;
                 if (req.http.Cookie ~ "frontend=") {
                     set beresp.http.X-Varnish-Session = regsub(req.http.Cookie,

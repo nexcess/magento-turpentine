@@ -74,6 +74,48 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
     }
 
     /**
+     * Render the block out from the URL encoded data
+     *
+     * @return null
+     */
+    public function getAjaxBlockAction() {
+        $resp = $this->getResponse();
+        if( Mage::helper( 'turpentine/ajax' )->shouldResponseUseAjax() ) {
+            $req = $this->getRequest();
+            $ajaxDataParamValue = $req->getParam(
+                Mage::helper( 'turpentine/ajax' )->getAjaxDataParam() );
+            $ajaxDataArray = unserialize( Mage::helper( 'turpentine/data' )
+                ->decrypt( $ajaxDataParamValue ) );
+            if( !$ajaxDataArray ) {
+                Mage::log( 'Invalid AJAX data in URL: ' . $ajaxDataParamValue,
+                    Zend_Log::WARN );
+                $resp->setHttpResponseCode( 500 );
+                $resp->setBody( 'AJAX data is not valid' );
+            } else {
+                $esiData = new Varien_Object( $ajaxDataArray );
+                $origRequest = Mage::app()->getRequest();
+                Mage::app()->setCurrentStore(
+                    Mage::app()->getStore( $esiData->getStoreId() ) );
+                Mage::app()->setRequest( $this->_getDummyRequest() );
+                $block = $this->_getEsiBlock( $esiData );
+                if( $block ) {
+                    $block->setAjaxOptions( false );
+                    $resp->setBody( $block->toHtml() );
+                } else {
+                    $resp->setHttpResponseCode( 404 );
+                    $resp->setBody( 'AJAX block not found' );
+                }
+                Mage::app()->setRequest( $origRequest );
+            }
+        } else {
+            $resp->setHttpResponseCode( 403 );
+            $resp->setBody( 'AJAX includes are not enabled' );
+        }
+        // ajax is never cached
+        Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
+    }
+
+    /**
      * Need to disable this flag to prevent setting the last URL but we
      * don't want to completely break sessions.
      *
@@ -82,10 +124,10 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
      * @return null
      */
     public function postDispatch() {
-        $flag = $this->getFlag( 'getBlock', self::FLAG_NO_START_SESSION );
-        $this->setFlag( 'getBlock', self::FLAG_NO_START_SESSION, true );
+        $flag = $this->getFlag( '', self::FLAG_NO_START_SESSION );
+        $this->setFlag( '', self::FLAG_NO_START_SESSION, true );
         parent::postDispatch();
-        $this->setFlag( 'getBlock', self::FLAG_NO_START_SESSION, $flag );
+        $this->setFlag( '', self::FLAG_NO_START_SESSION, $flag );
     }
 
     /**

@@ -52,8 +52,9 @@ class Nexcessnet_Turpentine_Model_Observer_Ajax extends
             //esi data is the data needed to regenerate the ESI'd block
             $ajaxData = $this->_getEsiData( $blockObject, $ajaxOptions )->toArray();
             ksort( $ajaxData );
-            $ajaxUrl = Mage::getUrl( 'turpentine/ajax/getBlock',
+            $ajaxUrl = Mage::getUrl( 'turpentine/ajax/getAjaxBlock',
                 array(
+                    '_secure'       => true,
                     //we probably don't really need to encrypt this but it doesn't hurt
                     //use core/encryption instead of Mage::encrypt/decrypt because
                     //EE uses a different method by default

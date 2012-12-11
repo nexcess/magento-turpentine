@@ -175,17 +175,6 @@
                 </observers>
             </admin_system_config_changed_section_turpentine_vcl>
 
-            <!-- AJAX Events -->
-            <core_block_abstract_to_html_before>
-                <observers>
-                    <turpentine_ajax_core_block_abstract_to_html_before>
-                        <type>singleton</type>
-                        <class>turpentine/observer_ajax</class>
-                        <method>injectAjax</method>
-                    </turpentine_ajax_core_block_abstract_to_html_before>
-                </observers>
-            </core_block_abstract_to_html_before>
-
             <!-- ESI Events -->
             <core_block_abstract_to_html_before>
                 <observers>
@@ -194,6 +183,11 @@
                         <class>turpentine/observer_esi</class>
                         <method>injectEsi</method>
                     </turpentine_esi_core_block_abstract_to_html_before>
+                    <turpentine_ajax_core_block_abstract_to_html_before>
+                        <type>singleton</type>
+                        <class>turpentine/observer_ajax</class>
+                        <method>injectAjax</method>
+                    </turpentine_ajax_core_block_abstract_to_html_before>
                 </observers>
             </core_block_abstract_to_html_before>
             <http_response_send_before>
@@ -268,18 +262,6 @@
                     </turpentine_esi_controller_action_postdispatch_checkout_cart_couponpost>
                 </observers>
             </controller_action_postdispatch_checkout_cart_couponpost>
-            <!--
-                This shouldn't be needed anymore with the AJAX messages
-            <core_session_abstract_add_message>
-                <observers>
-                    <turpentine_esi_core_session_abstract_add_message>
-                        <type>singleton</type>
-                        <class>turpentine/observer_ban</class>
-                        <method>banClientEsiCache</method>
-                    </turpentine_esi_core_session_abstract_add_message>
-                </observers>
-            </core_session_abstract_add_message>
-            -->
             <catalog_product_compare_add_product>
                 <observers>
                     <turpentine_esi_catalog_product_compare_add_product>
