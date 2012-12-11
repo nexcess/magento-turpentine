@@ -35,8 +35,6 @@ sub vcl_recv {
         }
     }
 
-    set req.http.X-Turpentine-Secret-Handshake = "{{secret_handshake}}";
-
     if (req.request != "GET" &&
             req.request != "HEAD" &&
             req.request != "PUT" &&
@@ -66,13 +64,17 @@ sub vcl_recv {
     if (req.http.X-Opt-Enable-Caching != "true" || req.http.Authorization) {
         return (pipe);
     }
+    set req.http.X-Turpentine-Secret-Handshake = "{{secret_handshake}}";
     if (req.url ~ "{{url_base_regex}}{{admin_frontname}}") {
         set req.backend = admin;
         return (pipe);
     }
 
-    if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock") {
+    if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") {
         remove req.http.Accept-Encoding;
+    }
+    if (req.url ~ "{{url_base_regex}}turpentine/esi/getAjaxBlock/") {
+        return (pass);
     }
     if (req.url ~ "{{url_base_regex}}") {
         if (req.http.Cookie ~ "frontend=") {
@@ -134,16 +136,18 @@ sub vcl_hash {
         set req.hash += req.http.Accept-Encoding;
     }
     if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") {
-        if (req.url ~ "/cacheType/per-client/" && req.http.Cookie ~ "frontend=") {
+        if (req.url ~ "/{{esi_cache_type_param}}/per-client/" && req.http.Cookie ~ "frontend=") {
             set req.hash += regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1");
         }
     }
     return (hash);
 }
 
-# sub vcl_hit {
-#     return (deliver);
-# }
+sub vcl_hit {
+    if (obj.hits > 0) {
+        set obj.ttl = obj.ttl + {{lru_factor}}s;
+    }
+}
 
 sub vcl_miss {
     if (!(req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") &&
@@ -197,6 +201,14 @@ sub vcl_fetch {
                 }
                 # TODO: make this properly dynamic
                 set beresp.ttl = {{esi_default_ttl}}s;
+            } else if (req.url ~ "{{url_base_regex}}turpentine/esi/getAjaxBlock/") {
+                call remove_cache_headers;
+                if (req.http.Cookie ~ "frontend=") {
+                    set beresp.http.X-Varnish-Session = regsub(req.http.Cookie,
+                        "^.*?frontend=([^;]*);*.*$", "\1");
+                }
+                set beresp.ttl = {{grace_period}}s;
+                return (pass);
             } else {
                 call remove_cache_headers;
                 {{url_ttls}}

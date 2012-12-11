@@ -66,6 +66,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version2
             'esi_ttl_param' => Mage::helper( 'turpentine/esi' )->getEsiTtlParam(),
             'secret_handshake'  => Mage::helper( 'turpentine/varnish' )->getSecretHandshake(),
             'crawler_user_agent_regex'  => $this->_getCrawlerUserAgents(),
+            'lru_factor'    => $this->_getLruFactor(),
             'esi_default_ttl'   => $this->_getEsiDefaultTtl(),
         );
         if( Mage::getStoreConfig( 'turpentine_vcl/normalization/encoding' ) ) {
@@ -80,6 +81,12 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version2
         return $vars;
     }
 
+    /**
+     * Varnish 2.1 can't set the TTL dynamically (yet), so we just make all
+     * blocks have the same TTL (per-client TTL) for now.
+     *
+     * @return string
+     */
     protected function _getEsiDefaultTtl() {
         return Mage::getStoreConfig( 'turpentine_vcl/ttls/esi_per_client' );
     }
