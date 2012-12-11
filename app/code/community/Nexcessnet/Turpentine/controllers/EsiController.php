@@ -101,6 +101,8 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 if( $block ) {
                     $block->setAjaxOptions( false );
                     $resp->setBody( $block->toHtml() );
+                    $resp->setHeader( 'Access-Control-Allow-Origin',
+                        Mage::helper( 'turpentine/ajax' )->getCorsOrigin() );
                 } else {
                     $resp->setHttpResponseCode( 404 );
                     $resp->setBody( 'AJAX block not found' );

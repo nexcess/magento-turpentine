@@ -107,18 +107,4 @@ class Nexcessnet_Turpentine_Model_Observer_Ajax extends
             'registry_keys'     => '',
         );
     }
-
-    /**
-     * Get the CORS origin field from the unsecure base URL
-     *
-     * @return string
-     */
-    protected function _getCorsOrigin() {
-        $baseUrl = Mage::getBaseUrl();
-        $path = parse_url( $baseUrl, PHP_URL_PATH );
-        $domain = parse_url( $baseUrl, PHP_URL_HOST );
-        return substr( $baseUrl, 0,
-            strpos( $baseUrl, $path,
-                strpos( $baseUrl, $domain ) ) );
-    }
 }

@@ -59,4 +59,19 @@ class Nexcessnet_Turpentine_Helper_Ajax extends Mage_Core_Helper_Abstract {
         return (bool)Mage::getStoreConfig(
             'turpentine_varnish/general/ajax_debug' );
     }
+
+    /**
+     * Get the CORS origin field from the unsecure base URL
+     *
+     * @return string
+     */
+    public function getCorsOrigin() {
+        $baseUrl = Mage::getBaseUrl();
+        $path = parse_url( $baseUrl, PHP_URL_PATH );
+        $domain = parse_url( $baseUrl, PHP_URL_HOST );
+        // there has to be a better way to just strip the path off
+        return substr( $baseUrl, 0,
+            strpos( $baseUrl, $path,
+                strpos( $baseUrl, $domain ) ) );
+    }
 }
