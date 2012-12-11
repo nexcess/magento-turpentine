@@ -20,6 +20,8 @@
  */
 
 $esiDebugEnabled = (bool)Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled();
+$blockTag = sprintf( 'turpentine-ajax-block-%s',
+    sha1( $this->getNameInLayout() ) );
 
 if( $esiDebugEnabled ) {
     echo sprintf( '<!-- AJAX START [%s] -->', $this->getNameInLayout() ) . PHP_EOL;
@@ -32,19 +34,19 @@ if( $esiDebugEnabled ) {
  * @link http://prototypejs.org/doc/latest/ajax/Ajax/Request/index.html
  * @link http://prototypejs.org/doc/latest/dom/Element/replace/index.html
  */
-echo sprintf( '<div id="turpentine-ajax-block-%s" style="display: none">
+echo sprintf( '<div id="%s" style="display: none">
 <script type="text/javascript">
 new Ajax.Request("%s", {
     method: "get",
     on200: function(response) {
-        Element.replace($("turpentine-ajax-block-%s"), response.responseText);
+        Element.replace($("%s"), response.responseText);
     }
 });
 </script>
 </div>',
-    $this->getNameInLayout(),
+    $blockTag,
     $this->getAjaxUrl(),
-    $this->getNameInLayout() ) . PHP_EOL;
+    $blockTag ) . PHP_EOL;
 if( $esiDebugEnabled ) {
     echo sprintf( '<!-- AJAX END [%s] -->', $this->getNameInLayout() ) . PHP_EOL;
 }
