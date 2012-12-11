@@ -40,20 +40,14 @@ sub vcl_recv {
         }
     }
 
-    if (req.request != "GET" &&
-            req.request != "HEAD" &&
-            req.request != "PUT" &&
-            req.request != "POST" &&
-            req.request != "TRACE" &&
-            req.request != "DELETE" &&
-            req.request != "OPTIONS") {
-        /* Non-RFC2616 or CONNECT which is weird. */
+    if (req.request !~ "^(GET|HEAD|PUT|POST|TRACE|DELETE|OPTIONS)$") {
+        # Non-RFC2616 or CONNECT which is weird.
         return (pipe);
     }
 
-    if (req.request != "GET" && req.request != "HEAD") {
-        /* We only deal with GET and HEAD by default */
-        return (pipe);
+    if (req.request !~ "^(GET|POST)$") {
+        # We only deal with GET and HEAD by default
+        return (pass);
     }
 
     call remove_double_slashes;
