@@ -24,7 +24,15 @@ $esiDebugEnabled = (bool)Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled();
 if( $esiDebugEnabled ) {
     echo sprintf( '<!-- AJAX START [%s] -->', $this->getNameInLayout() ) . PHP_EOL;
 }
-echo sprintf( '<div id="turpentine-ajax-block-%s">
+/**
+ * Note that the <div/> element is completely replaced with the AJAX response
+ * so that it doesn't alter how the block looks.
+ *
+ * @link http://prototypejs.org/doc/latest/ajax/index.html
+ * @link http://prototypejs.org/doc/latest/ajax/Ajax/Request/index.html
+ * @link http://prototypejs.org/doc/latest/dom/Element/replace/index.html
+ */
+echo sprintf( '<div id="turpentine-ajax-block-%s" style="display: none">
 <script type="text/javascript">
 new Ajax.Request("%s", {
     method: "get",
