@@ -339,7 +339,9 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         }
         $data = rtrim( $data ) . PHP_EOL;
         if( strlen( $data ) >= self::CLI_CMD_LENGTH_LIMIT ) {
-            Mage::throwException( 'Varnish data to write over length limit' );
+            Mage::throwException( sprintf(
+                'Varnish data to write over length limit by %d characters',
+                strlen( $data ) - self::CLI_CMD_LENGTH_LIMIT ) );
         }
         $byteCount = fputs( $this->_varnishConn, $data );
         if( $byteCount !== strlen( $data ) ) {
