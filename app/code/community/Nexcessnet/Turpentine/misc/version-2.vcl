@@ -35,19 +35,13 @@ sub vcl_recv {
         }
     }
 
-    if (req.request != "GET" &&
-            req.request != "HEAD" &&
-            req.request != "PUT" &&
-            req.request != "POST" &&
-            req.request != "TRACE" &&
-            req.request != "DELETE" &&
-            req.request != "OPTIONS") {
-        /* Non-RFC2616 or CONNECT which is weird. */
+    if (!(req.request ~ "^(GET|HEAD|PUT|POST|TRACE|DELETE|OPTIONS)$")) {
+        # Non-RFC2616 or CONNECT which is weird.
         return (pipe);
     }
 
-    if (req.request != "GET" && req.request != "HEAD") {
-        /* We only deal with GET and HEAD by default */
+    if (!(req.request ~ "^(GET|POST)$")) {
+        # We only deal with GET and HEAD by default
         return (pass);
     }
 
@@ -143,11 +137,12 @@ sub vcl_hash {
     return (hash);
 }
 
-sub vcl_hit {
-    if (obj.hits > 0) {
-        set obj.ttl = obj.ttl + {{lru_factor}}s;
-    }
-}
+# This doesn't work in Varnish 2.1
+# sub vcl_hit {
+#     if (obj.hits > 0) {
+#         set obj.ttl = obj.ttl + {{lru_factor}}s;
+#     }
+# }
 
 sub vcl_miss {
     if (!(req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") &&
