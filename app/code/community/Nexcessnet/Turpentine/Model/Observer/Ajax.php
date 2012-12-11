@@ -23,6 +23,25 @@ class Nexcessnet_Turpentine_Model_Observer_Ajax extends
         Nexcessnet_Turpentine_Model_Observer_Esi {
 
     /**
+     * Set the CORS headers if request will use AJAX
+     *
+     * @param Varien_Object $eventObject
+     */
+    public function setAccessControlHeader( $eventObject ) {
+        $response = $eventObject->getResponse();
+        $sentinel = Mage::getSingleton( 'turpentine/sentinel' );
+        if( Mage::helper( 'turpentine/ajax' )->shouldResponseUseAjax() &&
+                $sentinel->getAjaxFlag() &&
+                !Mage::app()->getStore()->isCurrentlySecure() ) {
+            $origin = $this->_getCorsOrigin();
+            $response->setHeader( 'Access-Control-Allow-Origin', $origin );
+            if( Mage::helper( 'turpentine/ajax' )->getAjaxDebugEnabled() ) {
+                Mage::log( 'Set AJAX CORS origin to: ' . $origin );
+            }
+        }
+    }
+
+    /**
      * Encode block data in URL then replace with AJAX template
      *
      * @link https://github.com/nexcess/magento-turpentine/wiki/ESI_Cache_Policy
@@ -71,6 +90,9 @@ class Nexcessnet_Turpentine_Model_Observer_Ajax extends
                 Mage::log( 'AJAX url is probably to long (> 2047 characters): ' .
                     $ajaxUrl, Zend_Log::WARN );
             }
+
+            //flag request as using AJAX
+            Mage::getSingleton( 'turpentine/sentinel' )->setAjaxFlag( true );
         } // else handle the block like normal and cache it inline with the page
     }
 
@@ -84,5 +106,19 @@ class Nexcessnet_Turpentine_Model_Observer_Ajax extends
             'dummy_blocks'      => '',
             'registry_keys'     => '',
         );
+    }
+
+    /**
+     * Get the CORS origin field from the unsecure base URL
+     *
+     * @return string
+     */
+    protected function _getCorsOrigin() {
+        $baseUrl = Mage::getBaseUrl();
+        $path = parse_url( $baseUrl, PHP_URL_PATH );
+        $domain = parse_url( $baseUrl, PHP_URL_HOST );
+        return substr( $baseUrl, 0,
+            strpos( $baseUrl, $path,
+                strpos( $baseUrl, $domain ) ) );
     }
 }

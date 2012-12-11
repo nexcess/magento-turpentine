@@ -35,6 +35,13 @@ class Nexcessnet_Turpentine_Model_Sentinel extends Mage_Core_Model_Abstract {
     protected $_esiFlag         = false;
 
     /**
+     * Use AJAX flag
+     *
+     * @var boolean
+     */
+    protected $_ajaxFlag        = false;
+
+    /**
      * Set the flag to cache or not, flag defaults to on
      *
      * @param bool $value=null turn flag on or off, null flips value
@@ -76,5 +83,27 @@ class Nexcessnet_Turpentine_Model_Sentinel extends Mage_Core_Model_Abstract {
      */
     public function getEsiFlag() {
         return $this->_esiFlag;
+    }
+
+    /**
+     * Set the flag to use AJAX or not, flag defaults to off
+     *
+     * @param bool $value=null turn flag on or off, null flips value
+     */
+    public function setAjaxFlag( $value=null ) {
+        if( is_null( $value ) ) {
+            $this->_ajaxFlag = !$this->_ajaxFlag;
+        } else {
+            $this->_ajaxFlag = (bool)$value;
+        }
+    }
+
+    /**
+     * Get the current value of the ajax flag
+     *
+     * @return bool
+     */
+    public function getAjaxFlag() {
+        return $this->_ajaxFlag;
     }
 }
