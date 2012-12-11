@@ -197,6 +197,10 @@
                         <class>turpentine/observer_esi</class>
                         <method>setFlagHeaders</method>
                     </turpentine_esi_http_response_send_before>
+                    <turpentine_ajax_http_response_send_before>
+                        <class>turpentine/observer_ajax</class>
+                        <method>setAccessControlHeader</method>
+                    </turpentine_ajax_http_response_send_before>
                 </observers>
             </http_response_send_before>
             <controller_action_layout_generate_blocks_after>
