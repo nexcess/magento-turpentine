@@ -12,7 +12,6 @@
 
 ## Custom Subroutines
 sub remove_cache_headers {
-    remove beresp.http.Set-Cookie;
     remove beresp.http.Cache-Control;
     remove beresp.http.Expires;
     remove beresp.http.Pragma;
@@ -22,22 +21,6 @@ sub remove_cache_headers {
 
 sub remove_double_slashes {
     set req.url = regsub(req.url, "(.*)//+(.*)", "\1/\2");
-}
-
-sub set_fake_esi_level {
-    if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") {
-        set req.http.X-Varnish-Esi-Level = "1";
-    } else {
-        remove req.http.X-Varnish-Esi-Level;
-    }
-}
-
-sub handle_req_cookie {
-    if (!req.http.X-Varnish-Esi-Level && req.http.X-Varnish-Cookie) {
-        remove req.http.Cookie;
-    } else if (req.http.X-Varnish-Esi-Level && req.http.X-Varnish-Cookie) {
-        set req.http.Cookie = req.http.X-Varnish-Cookie;
-    }
 }
 
 ## Varnish Subroutines
@@ -80,7 +63,7 @@ sub vcl_recv {
     set req.http.X-Opt-Force-Static-Caching = "{{force_cache_static}}";
     set req.http.X-Opt-Enable-Get-Excludes = "{{enable_get_excludes}}";
 
-    if (req.http.X-Opt-Enable-Caching !~ "true" || req.http.Authorization) {
+    if (req.http.X-Opt-Enable-Caching != "true" || req.http.Authorization) {
         return (pipe);
     }
     if (req.url ~ "{{url_base_regex}}{{admin_frontname}}") {
@@ -88,9 +71,7 @@ sub vcl_recv {
         return (pipe);
     }
 
-    call set_fake_esi_level;
-
-    if (req.http.X-Varnish-Esi-Level) {
+    if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock") {
         remove req.http.Accept-Encoding;
     }
     if (req.url ~ "{{url_base_regex}}") {
@@ -105,7 +86,7 @@ sub vcl_recv {
                 return (pass);
             }
         }
-        if (req.http.X-Opt-Force-Static-Caching ~ "true" &&
+        if (req.http.X-Opt-Force-Static-Caching == "true" &&
                 req.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
             remove req.http.Cookie;
             return (lookup);
@@ -113,7 +94,7 @@ sub vcl_recv {
         if (req.url ~ "{{url_base_regex}}(?:{{url_excludes}})") {
             return (pass);
         }
-        if (req.http.X-Opt-Enable-Get-Excludes ~ "true" &&
+        if (req.http.X-Opt-Enable-Get-Excludes == "true" &&
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
             return (pass);
         }
@@ -129,7 +110,13 @@ sub vcl_pipe {
 }
 
 sub vcl_pass {
-    call handle_req_cookie;
+    if (!(req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") &&
+            req.http.X-Varnish-Cookie) {
+        remove req.http.Cookie;
+    } else if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/" &&
+            req.http.X-Varnish-Cookie) {
+        set req.http.Cookie = req.http.X-Varnish-Cookie;
+    }
     return (pass);
 }
 
@@ -146,7 +133,7 @@ sub vcl_hash {
     if (req.http.Accept-Encoding) {
         set req.hash += req.http.Accept-Encoding;
     }
-    if (req.http.X-Varnish-Esi-Level) {
+    if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") {
         if (req.url ~ "/cacheType/per-client/" && req.http.Cookie ~ "frontend=") {
             set req.hash += regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1");
         }
@@ -159,7 +146,13 @@ sub vcl_hash {
 # }
 
 sub vcl_miss {
-    call handle_req_cookie;
+    if (!(req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") &&
+            req.http.X-Varnish-Cookie) {
+        remove req.http.Cookie;
+    } else if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/" &&
+            req.http.X-Varnish-Cookie) {
+        set req.http.Cookie = req.http.X-Varnish-Cookie;
+    }
     return (fetch);
 }
 
@@ -176,41 +169,34 @@ sub vcl_fetch {
             set beresp.http.X-Varnish-Set-Cookie = beresp.http.Set-Cookie;
             remove beresp.http.Set-Cookie;
         }
-        if (!req.http.X-Varnish-Esi-Level &&
+        if (!(req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") &&
                 req.http.X-Varnish-Cookie !~ "frontend=" &&
                 !(client.ip ~ crawler_acl) &&
                 !(req.http.User-Agent ~ "^(?:{{crawler_user_agent_regex}})$")) {
             set beresp.http.X-Varnish-Use-Set-Cookie = "1";
         }
-        if (beresp.http.X-Turpentine-Esi ~ "1") {
+        if (beresp.http.X-Turpentine-Esi == "1") {
             esi;
         }
-        if (beresp.http.X-Turpentine-Cache ~ "0") {
+        if (beresp.http.X-Turpentine-Cache == "0") {
             set beresp.cacheable = false;
             set beresp.ttl = {{grace_period}}s;
             return (pass);
         } else {
             set beresp.cacheable = true;
-            if (req.http.X-Opt-Force-Static-Caching ~ "true" &&
+            if (req.http.X-Opt-Force-Static-Caching == "true" &&
                     bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
                 call remove_cache_headers;
                 set beresp.ttl = {{static_ttl}}s;
-            } else if (req.http.X-Varnish-Esi-Level) {
+            } else if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") {
                 call remove_cache_headers;
-                if (req.url ~ "/cacheType/per-client/" &&
+                if (req.url ~ "/{{esi_cache_type_param}}/per-client/" &&
                         req.http.Cookie ~ "frontend=") {
                     set beresp.http.X-Varnish-Session = regsub(req.http.Cookie,
                         "^.*?frontend=([^;]*);*.*$", "\1");
                 }
-                set req.http.X-Varnish-Ttl = regsub(req.url, ".*/ttl/([0-9]+)/.*","\1");
-                C{
-                    /** Inspired by
-                     * @link http://grosser.it/2009/12/05/setting-dynamic-ttl-from-varnish-headers-in-vcl/
-                     */
-                    VRT_l_beresp_ttl(sp,
-                        atoi(VRT_regsub(sp, 0, VRT_r_req_url(sp), VGC_re_31, "\\1")));
-                }C
-                set beresp.http.X-Varnish-Ttl = beresp.ttl;
+                # TODO: make this properly dynamic
+                set beresp.ttl = {{esi_default_ttl}}s;
             } else {
                 call remove_cache_headers;
                 {{url_ttls}}
@@ -226,7 +212,7 @@ sub vcl_deliver {
         set resp.http.Set-Cookie = resp.http.X-Varnish-Set-Cookie;
     }
     set resp.http.X-Opt-Debug-Headers = "{{debug_headers}}";
-    if (resp.http.X-Opt-Debug-Headers ~ "true") {
+    if (resp.http.X-Opt-Debug-Headers == "true") {
         set resp.http.X-Varnish-Hits = obj.hits;
     } else {
         #remove Varnish fingerprints

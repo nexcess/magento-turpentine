@@ -66,16 +66,21 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version2
             'esi_ttl_param' => Mage::helper( 'turpentine/esi' )->getEsiTtlParam(),
             'secret_handshake'  => Mage::helper( 'turpentine/varnish' )->getSecretHandshake(),
             'crawler_user_agent_regex'  => $this->_getCrawlerUserAgents(),
+            'esi_default_ttl'   => $this->_getEsiDefaultTtl(),
         );
-        if( Mage::getStoreConfig( 'turpentine_control/normalization/encoding' ) ) {
+        if( Mage::getStoreConfig( 'turpentine_vcl/normalization/encoding' ) ) {
             $vars['normalize_encoding'] = $this->_vcl_sub_normalize_encoding();
         }
-        if( Mage::getStoreConfig( 'turpentine_control/normalization/user_agent' ) ) {
+        if( Mage::getStoreConfig( 'turpentine_vcl/normalization/user_agent' ) ) {
             $vars['normalize_user_agent'] = $this->_vcl_sub_normalize_user_agent();
         }
-        if( Mage::getStoreConfig( 'turpentine_control/normalization/host' ) ) {
+        if( Mage::getStoreConfig( 'turpentine_vcl/normalization/host' ) ) {
             $vars['normalize_host'] = $this->_vcl_sub_normalize_host();
         }
         return $vars;
+    }
+
+    protected function _getEsiDefaultTtl() {
+        return Mage::getStoreConfig( 'turpentine_vcl/ttls/esi_per_client' );
     }
 }
