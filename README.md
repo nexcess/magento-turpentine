@@ -33,7 +33,7 @@ to how it works).
 
  - Magento Community Edition 1.6+ (earlier versions may work but have not been
  tested) or Magento Enterprise Edition 1.11+
- - Varnish 3.0+
+ - Varnish 2.1+ (including 3.0+)
 
 ## Installation & Usage
 
@@ -87,6 +87,11 @@ the page and may differ between different visitors/clients.
  will need to be regenerated and cached for the visitor's new session. Any further
  requests will be at full cached-page speed (assuming the pages are already in
  the cache).
+ - **Varnish 2.1 Caveats**: Due to technical limitations, some features are not
+ available when using Varnish 2.1:
+   - TTL extension on cache hits does not work
+   - External ESI requests are not blocked
+   - Per-block TTLs are not honored, all ESI blocks use their default TTL
 
 ## Future Plans
 
@@ -94,7 +99,6 @@ the page and may differ between different visitors/clients.
  be configurable in the Magento system configuration
  - Use standard cache-control headers to tell Varnish about the block and page
  TTLs
- - Re-add Varnish 2.1.x support
 
 ## Known Issues
 

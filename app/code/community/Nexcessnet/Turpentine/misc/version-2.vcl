@@ -189,13 +189,18 @@ sub vcl_fetch {
                 set beresp.ttl = {{static_ttl}}s;
             } else if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") {
                 call remove_cache_headers;
-                if (req.url ~ "/{{esi_cache_type_param}}/per-client/" &&
-                        req.http.Cookie ~ "frontend=") {
-                    set beresp.http.X-Varnish-Session = regsub(req.http.Cookie,
-                        "^.*?frontend=([^;]*);*.*$", "\1");
+                # TODO: make the TTLs properly dynamic
+                if (req.url ~ "/{{esi_cache_type_param}}/per-client/") {
+                    if(req.http.Cookie ~ "frontend=") {
+                        set beresp.http.X-Varnish-Session = regsub(req.http.Cookie,
+                            "^.*?frontend=([^;]*);*.*$", "\1");
+                    }
+                    set beresp.ttl = {{esi_per_client_ttl}}s;
+                } else if (req.url ~ "/{{esi_cache_type_param}}/per-page/") {
+                    set beresp.ttl = {{esi_per_page_ttl}}s;
+                } else {
+                    set beresp.ttl = {{esi_global_ttl}}s;
                 }
-                # TODO: make this properly dynamic
-                set beresp.ttl = {{esi_default_ttl}}s;
             } else if (req.url ~ "{{url_base_regex}}turpentine/esi/getAjaxBlock/") {
                 call remove_cache_headers;
                 if (req.http.Cookie ~ "frontend=") {

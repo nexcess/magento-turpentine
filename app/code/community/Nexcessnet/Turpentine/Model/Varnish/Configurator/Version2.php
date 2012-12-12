@@ -67,7 +67,9 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version2
             'secret_handshake'  => Mage::helper( 'turpentine/varnish' )->getSecretHandshake(),
             'crawler_user_agent_regex'  => $this->_getCrawlerUserAgents(),
             'lru_factor'    => $this->_getLruFactor(),
-            'esi_default_ttl'   => $this->_getEsiDefaultTtl(),
+            'esi_per_client_ttl'    => $this->_getEsiPerClientTtl(),
+            'esi_per_page_ttl'      => $this->_getEsiPerPageTtl(),
+            'esi_global_ttl'        => $this->_getEsiGlobalTtl(),
         );
         if( Mage::getStoreConfig( 'turpentine_vcl/normalization/encoding' ) ) {
             $vars['normalize_encoding'] = $this->_vcl_sub_normalize_encoding();
@@ -82,12 +84,29 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version2
     }
 
     /**
-     * Varnish 2.1 can't set the TTL dynamically (yet), so we just make all
-     * blocks have the same TTL (per-client TTL) for now.
+     * Get the per-client default TTL
      *
      * @return string
      */
-    protected function _getEsiDefaultTtl() {
+    protected function _getEsiPerClientTtl() {
         return Mage::getStoreConfig( 'turpentine_vcl/ttls/esi_per_client' );
+    }
+
+    /**
+     * Get the per-page default TTL
+     *
+     * @return string
+     */
+    protected function _getEsiPerPageTtl() {
+        return Mage::getStoreConfig( 'turpentine_vcl/ttls/esi_per_page' );
+    }
+
+    /**
+     * Get the global default TTL
+     *
+     * @return string
+     */
+    protected function _getEsiGlobalTtl() {
+        return Mage::getStoreConfig( 'turpentine_vcl/ttls/esi_global' );
     }
 }

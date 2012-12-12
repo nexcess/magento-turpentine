@@ -86,3 +86,4 @@
   visitor sessions
   * Fixed ESI injected blocks using the ESI getBlock URL as the current URL
   when rendering
+  * Reduced size of generated VCL to reduce chance of hitting CLI buffer limit
