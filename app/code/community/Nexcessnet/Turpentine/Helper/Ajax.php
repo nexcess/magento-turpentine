@@ -28,7 +28,7 @@ class Nexcessnet_Turpentine_Helper_Ajax extends Mage_Core_Helper_Abstract {
      * @return bool
      */
     public function getAjaxEnabled() {
-        return true;
+        return Mage::helper( 'turpentine/esi' )->getEsiEnabled();
     }
 
     /**

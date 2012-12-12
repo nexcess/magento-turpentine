@@ -68,7 +68,7 @@
   * Fix stale Login/Logout links
   * Add documentation for [SSL Support](https://github.com/nexcess/magento-turpentine/wiki/SSL_Support)
 
-### RELEASE-0.1.7
+### RELEASE-0.2.0
 
   * Added AJAX injection for very short lived and/or frequently changed blocks
   (like the flash messages). This should resolve the issue with flash messages

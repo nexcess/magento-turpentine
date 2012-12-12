@@ -20,7 +20,7 @@
 <config>
     <modules>
         <Nexcessnet_Turpentine>
-            <version>0.1.6</version>
+            <version>0.2.0</version>
         </Nexcessnet_Turpentine>
     </modules>
     <default>
@@ -112,11 +112,16 @@
                     <session>Nexcessnet_Turpentine_Model_Checkout_Session</session>
                 </rewrite>
             </checkout>
+            <!-- This is used by the admin section and causes duplicate messages
+            if rewritten.
+            -->
+            <!--
             <core>
                 <rewrite>
                     <session>Nexcessnet_Turpentine_Model_Core_Session</session>
                 </rewrite>
             </core>
+            -->
             <customer>
                 <rewrite>
                     <session>Nexcessnet_Turpentine_Model_Customer_Session</session>

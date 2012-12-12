@@ -72,7 +72,7 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
         } else {
             if( Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() ||
                     Mage::helper( 'turpentine/ajax' )->shouldResponseUseAjax() ) {
-                foreach( array( 'core', 'catalog', 'checkout', 'customer' )
+                foreach( array( 'catalog', 'checkout', 'customer' )
                         as $storagePrefix ) {
                     $storageType = sprintf( '%s/session', $storagePrefix );
                     $storage = Mage::getSingleton( $storageType );
