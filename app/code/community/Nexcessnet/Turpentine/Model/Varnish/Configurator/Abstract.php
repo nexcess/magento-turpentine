@@ -389,7 +389,8 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     protected function _cleanVcl( $dirtyVcl ) {
         return implode( PHP_EOL,
             array_filter(
-                explode( PHP_EOL, $dirtyVcl ),
+                Mage::helper( 'turpentine/data' )
+                    ->cleanExplode( PHP_EOL, $dirtyVcl ),
                 array( $this, '_cleanVclHelper' )
             )
         );
@@ -402,7 +403,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return bool
      */
     protected function _cleanVclHelper( $line ) {
-        return trim( $line ) && substr( trim( $line ), 0, 1 ) != '#';
+        return $line && substr( $line, 0, 1 ) != '#';
     }
 
     /**
