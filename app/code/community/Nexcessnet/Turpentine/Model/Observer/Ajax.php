@@ -68,8 +68,8 @@ class Nexcessnet_Turpentine_Model_Observer_Ajax extends
                 $blockObject->unsetData( 'cache_' . $dataKey );
             }
             if( strlen( $ajaxUrl ) > 2047 ) {
-                Mage::log( 'AJAX url is probably to long (> 2047 characters): ' .
-                    $ajaxUrl, Zend_Log::WARN );
+                Mage::log( sprintf( 'AJAX url is probably too long (%d > 2047 characters): %s',
+                    strlen( $ajaxUrl ), $ajaxUrl ), Zend_Log::WARN );
             }
         } // else handle the block like normal and cache it inline with the page
     }

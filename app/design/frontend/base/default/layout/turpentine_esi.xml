@@ -105,36 +105,6 @@
         </reference>
     </default>
 
-    <catalog_dummy_handle>
-        <reference name="messages">
-            <action method="setAjaxOptions">
-                <params>
-                    <cacheType>per-client</cacheType>
-                </params>
-            </action>
-        </reference>
-    </catalog_dummy_handle>
-
-    <checkout_dummy_handle>
-        <reference name="messages">
-            <action method="setAjaxOptions">
-                <params>
-                    <cacheType>per-client</cacheType>
-                </params>
-            </action>
-        </reference>
-    </checkout_dummy_handle>
-
-    <customer_dummy_handle>
-        <reference name="messages">
-            <action method="setAjaxOptions">
-                <params>
-                    <cacheType>per-client</cacheType>
-                </params>
-            </action>
-        </reference>
-    </customer_dummy_handle>
-
     <!-- Checkout -->
 
     <!-- We cache the checkout cart page on a per-client basis -->
