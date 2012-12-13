@@ -103,6 +103,32 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     }
 
     /**
+     * Get URL for redirects and dummy requests
+     *
+     * @return string
+     */
+    public function getDummyUrl() {
+        return Mage::getUrl( 'checkout/cart' );
+    }
+
+    /**
+     * Get mock request
+     *
+     * Used to pretend that the request was for the base URL instead of
+     * turpentine/esi/getBlock while rendering ESI blocks. Not perfect, but may
+     * be good enough
+     *
+     * @param  string $url=null
+     * @return Mage_Core_Controller_Request_Http
+     */
+    public function getDummyRequest( $url=null ) {
+        if( $url === null ) {
+            $url = $this->getDummyUrl();
+        }
+        return new Mage_Core_Controller_Request_Http( $url );
+    }
+
+    /**
      * Get the cache type Magento uses
      *
      * @return string

@@ -26,7 +26,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      *
      * Events: http_response_send_before
      *
-     * @param [type] $eventObject [description]
+     * @param  Varien_Object $eventObject
+     * @return null
      */
     public function setFlagHeaders( $eventObject ) {
         $response = $eventObject->getResponse();
@@ -50,7 +51,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      *
      * Events: controller_action_layout_generate_blocks_after
      *
-     * @param  [type] $eventObject [description]
+     * @param  Varien_Object $eventObject
      * @return null
      */
     public function checkCacheFlag( $eventObject ) {
@@ -74,8 +75,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      * On controller redirects, check the target URL and set to home page
      * if it would otherwise go to a getBlock URL
      *
-     * @param  [type] $eventObject [description]
-     * @return [type]
+     * @param  Varien_Object $eventObject
+     * @return null
      */
     public function checkRedirectUrl( $eventObject ) {
         $url = $eventObject->getTransport()->getUrl();
@@ -85,7 +86,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 Mage::log( 'Caught redirect to ESI getBlock URL, intercepting' );
             }
             $eventObject->getTransport()->setUrl(
-                Mage::getBaseUrl() );
+                Mage::helper( 'turpentine/esi' )->getDummyUrl() );
         }
     }
 
@@ -223,6 +224,9 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      * weirdness like the "Log in" link displaying for already logged in
      * visitors on pages that were initially visited by not-logged-in visitors.
      * Not sure of a solution for this yet.
+     *
+     * Above problem is currently solved by EsiController::_swapCustomerHandles()
+     * but it would be best to find a more general solution to this.
      *
      * @param  Mage_Core_Block_Template $block
      * @return array

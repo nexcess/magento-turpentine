@@ -96,7 +96,8 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 $origRequest = Mage::app()->getRequest();
                 Mage::app()->setCurrentStore(
                     Mage::app()->getStore( $esiData->getStoreId() ) );
-                Mage::app()->setRequest( $this->_getDummyRequest() );
+                Mage::app()->setRequest( Mage::helper( 'turpentine/esi' )
+                    ->getDummyRequest() );
                 $block = $this->_getEsiBlock( $esiData );
                 if( $block ) {
                     $block->setAjaxOptions( false );
@@ -130,19 +131,6 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         $this->setFlag( '', self::FLAG_NO_START_SESSION, true );
         parent::postDispatch();
         $this->setFlag( '', self::FLAG_NO_START_SESSION, $flag );
-    }
-
-    /**
-     * Get dummy request to base URL
-     *
-     * Used to pretend that the request was for the base URL instead of
-     * turpentine/esi/getBlock while rendering ESI blocks. Not perfect, but may
-     * be good enough
-     *
-     * @return Mage_Core_Controller_Request_Http
-     */
-    protected function _getDummyRequest() {
-        return new Mage_Core_Controller_Request_Http( Mage::getBaseUrl() );
     }
 
     /**
