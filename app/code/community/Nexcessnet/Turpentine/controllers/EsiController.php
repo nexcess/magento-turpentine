@@ -80,7 +80,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
      */
     public function getAjaxBlockAction() {
         $resp = $this->getResponse();
-        if( Mage::helper( 'turpentine/ajax' )->shouldResponseUseAjax() ) {
+        if( Mage::helper( 'turpentine/ajax' )->getAjaxEnabled() ) {
             $req = $this->getRequest();
             $ajaxDataParamValue = $req->getParam(
                 Mage::helper( 'turpentine/ajax' )->getAjaxDataParam() );
