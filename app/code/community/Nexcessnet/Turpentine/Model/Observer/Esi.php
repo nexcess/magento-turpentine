@@ -191,23 +191,33 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         if( $esiOptions[$cacheTypeParam] == 'per-page' ) {
             $esiData->setParentUrl( Mage::app()->getRequest()->getRequestString() );
         }
-        $esiData->setDummyBlocks( Mage::helper( 'turpentine/data' )
-            ->cleanExplode( ',', $esiOptions['dummy_blocks'] ) );
-        $registryKeys = Mage::helper( 'turpentine/data' )
-            ->cleanExplode( ',', $esiOptions['registry_keys'] );
-        if( count( $registryKeys ) > 0 ) {
-            $registry = array_combine(
-                $registryKeys,
-                array_map( array( 'Mage', 'registry' ), $registryKeys ) );
-            if( !$registry ) {
-                Mage::log( 'Failed to populate ESI data registry', Zend_Log::WARN );
-                $registry = array();
+        if( is_array( $esiOptions['dummy_blocks'] ) ) {
+            $esiData->setDummyBlocks( $esiOptions['dummy_blocks'] );
+        } else {
+            Mage::log( 'Invalid dummy_blocks for block: ' .
+                $blockObject->getNameInLayout(), Zend_Log::WARN );
+        }
+        $simpleRegistry = array();
+        $complexRegistry = array();
+        if( is_array( $esiOptions['registry_keys'] ) ) {
+            foreach( $esiOptions['registry_keys'] as $key => $options ) {
+                $value = Mage::registry( $key );
+                if( $value ) {
+                    if( is_object( $value ) &&
+                            $value instanceof Mage_Core_Model_Abstract ) {
+                        $complexRegistry[$key] =
+                            $this->_getComplexRegistryData( $options, $value );
+                    } else {
+                        $simpleRegistry[$key] = $value;
+                    }
+                }
             }
         } else {
-            $registry = array();
+            Mage::log( 'Invalid registry_keys for block: ' .
+                $blockObject->getNameInLayout(), Zend_Log::WARN );
         }
-        //save the requested registry keys
-        $esiData->setRegistry( $registry );
+        $esiData->setSimpleRegistry( $simpleRegistry );
+        $esiData->setComplexRegistry( $complexRegistry );
         return $esiData;
     }
 
@@ -267,10 +277,30 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      */
     protected function _getDefaultEsiOptions() {
         return array(
-            'dummy_blocks'      => '',
+            'dummy_blocks'      => array(),
             Mage::helper( 'turpentine/esi' )->getEsiCacheTypeParam()
                                 => 'per-client',
-            'registry_keys'     => '',
+            'registry_keys'     => array(),
         );
+    }
+
+    /**
+     * Get the complex registry entry data
+     *
+     * @param  array $valueOptions
+     * @param  mixed $value
+     * @return array
+     */
+    protected function _getComplexRegistryData( $valueOptions, $value ) {
+        $idMethod = @$valueOptions['id_method'] ?
+            $valueOptions['id_method'] : 'getId';
+        $model = @$valueOptions['model'] ?
+            $valueOptions['model'] : Mage::helper( 'turpentine/data' )
+                ->getModelName( $value );
+        $data = array(
+            'model'         => $model,
+            'id'            => $value->{$idMethod}(),
+        );
+        return $data;
     }
 }

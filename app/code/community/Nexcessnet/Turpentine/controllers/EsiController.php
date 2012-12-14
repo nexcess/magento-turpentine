@@ -141,7 +141,11 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
      * @return Mage_Core_Block_Template
      */
     protected function _getEsiBlock( $esiData ) {
-        foreach( $esiData->getRegistry() as $key => $value ) {
+        foreach( $esiData->getSimpleRegistry() as $key => $value ) {
+            Mage::register( $key, $value, true );
+        }
+        foreach( $esiData->getComplexRegistry() as $key => $data ) {
+            $value = Mage::getModel( $data['model'] )->load( $data['id'] );
             Mage::register( $key, $value, true );
         }
         $layout = Mage::getSingleton( 'core/layout' );
@@ -151,7 +155,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         $layoutUpdate = $layout->getUpdate();
         $layoutUpdate->load( $this->_swapCustomerHandles(
             $esiData->getLayoutHandles() ) );
-        foreach( $esiData->getDummyBlocks() as $blockName ) {
+        foreach( $dummyBlocks as $blockName ) {
             $layout->createBlock( 'Mage_Core_Block_Template', $blockName );
         }
         $layout->generateXml();

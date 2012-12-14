@@ -81,8 +81,8 @@ class Nexcessnet_Turpentine_Model_Observer_Ajax extends
      */
     protected function _getDefaultAjaxOptions() {
         return array(
-            'dummy_blocks'      => '',
-            'registry_keys'     => '',
+            'dummy_blocks'      => array(),
+            'registry_keys'     => array(),
         );
     }
 }

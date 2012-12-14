@@ -72,6 +72,20 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
     }
 
     /**
+     * Get the getModel formatted name of a model classname or object
+     *
+     * @param  string|object $model
+     * @return string
+     */
+    public function getModelName( $model ) {
+        if( is_object( $model ) ) {
+            $model = get_class( $model );
+        }
+        return strtolower( preg_replace(
+            '~^[^_]+_([^_]+)_Model_(.+)$~', '$1/$2', $model ) );
+    }
+
+    /**
      * The actual recursive implementation of getChildBlockNames
      *
      * @param  Mage_Core_Model_Layout_Element $blockNode
