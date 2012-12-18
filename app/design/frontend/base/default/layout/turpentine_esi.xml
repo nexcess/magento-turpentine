@@ -103,6 +103,9 @@
             <action method="setEsiOptions">
                 <params>
                     <cacheType>global</cacheType>
+                    <registry_keys>
+                        <current_category/>
+                    </registry_keys>
                 </params>
             </action>
         </reference>

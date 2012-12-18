@@ -54,7 +54,8 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 $origRequest = Mage::app()->getRequest();
                 Mage::app()->setCurrentStore(
                     Mage::app()->getStore( $esiData->getStoreId() ) );
-                Mage::app()->setRequest( Mage::helper( 'turpentine/esi' )->
+                $appShim = Mage::getModel( 'turpentine/shim_mage_core_app' );
+                $appShim->shim_setRequest( Mage::helper( 'turpentine/esi' )->
                     getDummyRequest() );
                 $block = $this->_getEsiBlock( $esiData );
                 if( $block ) {
@@ -65,7 +66,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                     $resp->setHttpResponseCode( 404 );
                     $resp->setBody( 'ESI block not found' );
                 }
-                Mage::app()->setRequest( $origRequest );
+                $appShim->shim_setRequest( $origRequest );
             }
         } else {
             $resp->setHttpResponseCode( 403 );
@@ -97,7 +98,8 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 $origRequest = Mage::app()->getRequest();
                 Mage::app()->setCurrentStore(
                     Mage::app()->getStore( $esiData->getStoreId() ) );
-                Mage::app()->setRequest( Mage::helper( 'turpentine/esi' )
+                $appShim = Mage::getModel( 'turpentine/shim_mage_core_app' );
+                $appShim->shim_setRequest( Mage::helper( 'turpentine/esi' )
                     ->getDummyRequest() );
                 $block = $this->_getEsiBlock( $esiData );
                 if( $block ) {
@@ -109,7 +111,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                     $resp->setHttpResponseCode( 404 );
                     $resp->setBody( 'AJAX block not found' );
                 }
-                Mage::app()->setRequest( $origRequest );
+                $appShim->shim_setRequest( $origRequest );
             }
         } else {
             $resp->setHttpResponseCode( 403 );
@@ -155,7 +157,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         $layoutUpdate = $layout->getUpdate();
         $layoutUpdate->load( $this->_swapCustomerHandles(
             $esiData->getLayoutHandles() ) );
-        foreach( $dummyBlocks as $blockName ) {
+        foreach( $esiData->getDummyBlocks() as $blockName ) {
             $layout->createBlock( 'Mage_Core_Block_Template', $blockName );
         }
         $layout->generateXml();
@@ -165,7 +167,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         $nodesToGenerate = Mage::helper( 'turpentine/data' )
             ->getChildBlockNames( $blockNode );
         Mage::getModel( 'turpentine/shim_mage_core_layout' )
-            ->generateFullBlock( $blockNode );
+            ->shim_generateFullBlock( $blockNode );
         foreach( $nodesToGenerate as $nodeName ) {
             foreach( $layout->getNode()->xpath( sprintf(
                     '//reference[@name=\'%s\']', $nodeName ) ) as $node ) {

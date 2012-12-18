@@ -24,6 +24,20 @@
  * @link http://magedev.com/2010/10/15/adding-event-observer-on-the-fly/
  */
 class Nexcessnet_Turpentine_Model_Shim_Mage_Core_App extends Mage_Core_Model_App {
+
+    /**
+     * Request setter
+     *
+     * This is needed because there is no setRequest in CE < 1.7 and EE < 1.12
+     *
+     * @param Mage_Core_Controller_Request_Http $request
+     * @return Mage_Core_Model_App
+     */
+    public function shim_setRequest(Mage_Core_Controller_Request_Http $request) {
+        Mage::app()->_request = $request;
+        return $this;
+    }
+
     /**
      * Adds new observer for specified event
      *
@@ -35,9 +49,9 @@ class Nexcessnet_Turpentine_Model_Shim_Mage_Core_App extends Mage_Core_Model_App
      * @param string $method name of the method to call
      * @return null
      */
-    public function addEventObserver( $area, $eventName, $obsName, $type=null, $class=null, $method=null ) {
+    public function shim_addEventObserver( $area, $eventName, $obsName, $type=null, $class=null, $method=null ) {
         $eventConfig = new Varien_Simplexml_Config();
-        $eventConfig->loadDom( $this->_getConfigDom( $eventName, $obsName,
+        $eventConfig->loadDom( $this->_shim_getConfigDom( $eventName, $obsName,
             $type, $class, $method ) );
         Mage::getConfig()->extend( $eventConfig, true );
         //This wouldn't work if PHP had a sane object model
@@ -54,7 +68,7 @@ class Nexcessnet_Turpentine_Model_Shim_Mage_Core_App extends Mage_Core_Model_App
      * @param string $method
      * @return DOMDocument
      */
-    protected function _getConfigDom( $eventName, $obsName, $type=null, $class=null, $method=null ) {
+    protected function _shim_getConfigDom( $eventName, $obsName, $type=null, $class=null, $method=null ) {
         $dom = new DOMDocument("1.0");
         $config = $dom->createElement("config");
         $observers = $config->appendChild($dom->createElement('global'))
