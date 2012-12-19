@@ -82,7 +82,7 @@
                     <!--
                     Rewritten because it doesn't use a template we can replace
                     with an ESI include tag, just dumps out a block of
-                    hard-coded HTML
+                    hard-coded HTML and also frequently skips the toHtml method
                     -->
                     <messages>Nexcessnet_Turpentine_Block_Core_Messages</messages>
                 </rewrite>
