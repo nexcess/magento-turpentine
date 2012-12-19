@@ -18,17 +18,6 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 -->
 <layout version="0.1.0">
-    <!--
-    Editing XML files sucks, I want to move this to the configuration
-    interface once I think of a good way to without losing functionality
-    and ease-of-use.
-
-    Maybe something like:
-        in turpentine_varnish/esi/blocks:
-            $BLOCK_NAME[,$CACHE_TYPE[,$TTL[,$REGISTRY_KEYS]]]
-        with $REGISTRY_KEYS being separated by | (pipe)
-        ex: header,per-client,300,key1|key2|key3
-    -->
     <default>
         <!--
         A default Magento site includes a logged in user's name in the welcome
