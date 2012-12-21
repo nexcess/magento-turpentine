@@ -27,4 +27,24 @@ class Nexcessnet_Turpentine_Model_Session extends Mage_Core_Model_Session_Abstra
             sprintf( '%s_session_init', $namespace ),
             array( sprintf( '%s_session', $namespace ) => $this ) );
     }
+
+    public function saveMessages( $messages ) {
+        $this->setMessages( array_merge( $this->getMessages(), $messages ) );
+    }
+
+    public function loadMessages() {
+        $this->getMessages();
+    }
+
+    public function getMessages() {
+        $messages = @unserialize( $this->getData( 'messages' ) );
+        if( !is_array( $messages ) ) {
+            $messages = array();
+        }
+        return $messages;
+    }
+
+    public function setMessages( $messages ) {
+        $this->setData( 'messages', serialize( $messages ) );
+    }
 }

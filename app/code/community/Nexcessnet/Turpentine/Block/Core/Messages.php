@@ -134,20 +134,23 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
     }
 
     /**
+     * Preserve messages for later display
+     *
+     * @return null
+     */
+    protected function _saveMessages() {
+        Mage::getSingleton( 'turpentine/session' )
+            ->saveMessages( $this->getNameInLayout(), $this->getMessages() );
+    }
+
+    /**
      * Add messages to display
      *
      * @return null
      */
     protected function _loadMessages() {
-        foreach( array( 'catalog', 'checkout', 'customer' )
-                as $storagePrefix ) {
-            $storageType = sprintf( '%s/session', $storagePrefix );
-            $storage = Mage::getSingleton( $storageType );
-            if( $storage ) {
-                $this->addStorageType( $storageType );
-                $this->addMessages( $storage->getMessages( true ) );
-            }
-        }
+        $this->addMessages( Mage::getSingleton( 'turpentine/session' )
+            ->loadMessages() );
     }
 
     /**
