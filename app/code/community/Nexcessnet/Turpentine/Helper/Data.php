@@ -86,16 +86,31 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
     }
 
     /**
+     * Check config to see if Turpentine should handle the flash messages
+     *
+     * @return bool
+     */
+    public function useFlashMessagesFix() {
+        return true;
+        return (bool)Mage::getStoreConfig(
+            'turpentine_varnish/general/ajax_messages' );
+    }
+
+    /**
      * The actual recursive implementation of getChildBlockNames
      *
      * @param  Mage_Core_Model_Layout_Element $blockNode
      * @return array
      */
     protected function _getChildBlockNames( $blockNode ) {
-        $blockNames = array( (string)$blockNode['name'] );
-        foreach( $blockNode->xpath( './block | ./reference' ) as $childBlockNode ) {
-            $blockNames = array_merge( $blockNames,
-                $this->_getChildBlockNames( $childBlockNode ) );
+        if( $blockNode instanceof Mage_Core_Model_Layout_Element ) {
+            $blockNames = array( (string)$blockNode['name'] );
+            foreach( $blockNode->xpath( './block | ./reference' ) as $childBlockNode ) {
+                $blockNames = array_merge( $blockNames,
+                    $this->_getChildBlockNames( $childBlockNode ) );
+            }
+        } else {
+            $blockNames = array();
         }
         return $blockNames;
     }

@@ -31,7 +31,17 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * Hold the message type to call getHtml with
      * @var mixed
      */
-    protected $_singleRenderType = self::NO_SINGLE_RENDER_TYPE;
+    protected $_singleRenderType    = self::NO_SINGLE_RENDER_TYPE;
+
+    /**
+     * Sentinel to check if the toHtml method was skipped (getGroupedHtml was
+     * called directly)
+     *
+     * Better name for this var would be '_magentoDevsAreDumb'
+     *
+     * @var boolean
+     */
+    protected $_directCall          = false;
 
     /**
      * Override this in case some dumb layout decides to use it instead of the
@@ -44,6 +54,8 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
         if( $type !== self::NO_SINGLE_RENDER_TYPE ) {
             $this->_singleRenderType = $type;
         }
+        $this->_directCall = true;
+        $this->_loadLayoutOptions();
         return $this->toHtml();
     }
 
@@ -54,7 +66,20 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * @return string
      */
     public function getGroupedHtml() {
+        $this->_directCall = true;
+        $this->_loadLayoutOptions();
         return $this->toHtml();
+    }
+
+    /**
+     * Load layout options
+     *
+     * @return null
+     */
+    protected function _loadLayoutOptions() {
+        $this->setAjaxOptions( array(
+            'cacheType'         => 'per-client',
+        ) );
     }
 
     /**
@@ -63,33 +88,16 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * @return string
      */
     protected function _toHtml() {
-        if( $this->_hasTemplateSet() && $this->_hasInjectOptions() &&
-            ( $this->getAjaxOptions() &&
-                Mage::helper( 'turpentine/ajax' )->shouldResponseUseAjax() ) ||
-            ( $this->getEsiOptions() &&
-                Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() ) ) {
-            return $this->renderView();
-        } else {
-            if( Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() ||
-                    Mage::helper( 'turpentine/ajax' )->shouldResponseUseAjax() ) {
-                foreach( array( 'catalog', 'checkout', 'customer' )
-                        as $storagePrefix ) {
-                    $storageType = sprintf( '%s/session', $storagePrefix );
-                    $storage = Mage::getSingleton( $storageType );
-                    if( $storage ) {
-                        $this->addStorageType( $storageType );
-                        $this->addMessages( $storage->getMessages( true, true ) );
-                    }
-                }
-            }
-            if( $this->_singleRenderType !== self::NO_SINGLE_RENDER_TYPE ) {
-                $html = parent::getHtml( $this->_singleRenderType );
-                $this->_singleRenderType = self::NO_SINGLE_RENDER_TYPE;
-            } else {
-                $html = parent::getGroupedHtml();
-            }
-            return $html;
+        if( $this->_directCall ) {
         }
+        if( $this->_shouldUseInjection() ) {
+            $html = $this->renderView();
+        } else {
+            $this->_loadMessages();
+            $html = $this->_real_toHtml();
+        }
+        $this->_directCall = false;
+        return $html;
     }
 
     /**
@@ -102,6 +110,19 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
     }
 
     /**
+     * Check if the block has injection options, and if they should be used
+     *
+     * @return boolean
+     */
+    protected function _shouldUseInjection() {
+        return $this->_hasTemplateSet() &&
+            ($this->getEsiOptions() &&
+                Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi()) ||
+            ($this->getAjaxOptions() &&
+                Mage::helper( 'turpentine/ajax' )->shouldResponseUseAjax());
+    }
+
+    /**
      * Check if this block has a template set
      *
      * This should be false unless we're rendering with the ajax/esi option stuff
@@ -110,5 +131,37 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      */
     protected function _hasTemplateSet() {
         return (bool)$this->getTemplate();
+    }
+
+    /**
+     * Add messages to display
+     *
+     * @return null
+     */
+    protected function _loadMessages() {
+        foreach( array( 'catalog', 'checkout', 'customer' )
+                as $storagePrefix ) {
+            $storageType = sprintf( '%s/session', $storagePrefix );
+            $storage = Mage::getSingleton( $storageType );
+            if( $storage ) {
+                $this->addStorageType( $storageType );
+                $this->addMessages( $storage->getMessages( true ) );
+            }
+        }
+    }
+
+    /**
+     * Render output using parent methods
+     *
+     * @return string
+     */
+    protected function _real_toHtml() {
+        if( $this->_singleRenderType !== self::NO_SINGLE_RENDER_TYPE ) {
+            $html = parent::getHtml( $this->_singleRenderType );
+            $this->_singleRenderType = self::NO_SINGLE_RENDER_TYPE;
+        } else {
+            $html = parent::getGroupedHtml();
+        }
+        return $html;
     }
 }

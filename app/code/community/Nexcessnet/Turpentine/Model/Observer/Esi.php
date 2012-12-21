@@ -267,6 +267,9 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 }
             }
         }
+        if( !$activeHandles ) {
+            $activeHandles[] = 'default';
+        }
         return array_unique( $activeHandles );
     }
 

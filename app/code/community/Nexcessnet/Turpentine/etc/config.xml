@@ -97,36 +97,6 @@
             <turpentine>
                 <class>Nexcessnet_Turpentine_Model</class>
             </turpentine>
-            <!--
-            These have to be rewritten to prevent Magento from clearing
-            the messages before the ajax request has a chance to render them
-            since by default the messages are cleared on every single request
-            -->
-            <catalog>
-                <rewrite>
-                    <session>Nexcessnet_Turpentine_Model_Catalog_Session</session>
-                </rewrite>
-            </catalog>
-            <checkout>
-                <rewrite>
-                    <session>Nexcessnet_Turpentine_Model_Checkout_Session</session>
-                </rewrite>
-            </checkout>
-            <!-- This is used by the admin section and causes duplicate messages
-            if rewritten.
-            -->
-            <!--
-            <core>
-                <rewrite>
-                    <session>Nexcessnet_Turpentine_Model_Core_Session</session>
-                </rewrite>
-            </core>
-            -->
-            <customer>
-                <rewrite>
-                    <session>Nexcessnet_Turpentine_Model_Customer_Session</session>
-                </rewrite>
-            </customer>
         </models>
         <cache>
             <types>

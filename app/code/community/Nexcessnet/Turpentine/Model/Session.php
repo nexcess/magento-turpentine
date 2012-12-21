@@ -19,19 +19,12 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-class Nexcessnet_Turpentine_Model_Shim_Mage_Core_Layout extends Mage_Core_Model_Layout {
-    /**
-     * Generate a full block instead of just it's decendents
-     *
-     * @param  Mage_Core_Model_Layout_Element $blockNode
-     * @return null
-     */
-    public function shim_generateFullBlock( $blockNode ) {
-        $layout = Mage::getSingleton( 'core/layout' );
-        if( !( $parent = $blockNode->getParent() ) ) {
-            $parent = new Varien_Object();
-        }
-        $layout->_generateBlock( $blockNode, $parent );
-        return $layout->generateBlocks( $blockNode );
+class Nexcessnet_Turpentine_Model_Session extends Mage_Core_Model_Session_Abstract {
+    public function __construct() {
+        $namespace = 'turpentine';
+        $this->init( $namespace );
+        Mage::dispatchEvent(
+            sprintf( '%s_session_init', $namespace ),
+            array( sprintf( '%s_session', $namespace ) => $this ) );
     }
 }
