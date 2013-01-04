@@ -54,7 +54,7 @@ class Nexcessnet_Turpentine_Model_Observer_Ajax extends
             ksort( $ajaxData );
             $ajaxUrl = Mage::getUrl( 'turpentine/esi/getAjaxBlock',
                 array(
-                    '_secure'       => true,
+                    '_secure'       => Mage::app()->getStore()->isCurrentlySecure(),
                     //we probably don't really need to encrypt this but it doesn't hurt
                     //use core/encryption instead of Mage::encrypt/decrypt because
                     //EE uses a different method by default
