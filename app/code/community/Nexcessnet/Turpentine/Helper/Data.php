@@ -91,7 +91,6 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
      * @return bool
      */
     public function useFlashMessagesFix() {
-        return true;
         return (bool)Mage::getStoreConfig(
             'turpentine_varnish/general/ajax_messages' );
     }

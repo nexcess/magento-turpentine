@@ -44,6 +44,65 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
     protected $_directCall          = false;
 
     /**
+     * List of session types to load messages from for the "messages" block.
+     * Must be listed here because there's no other way to get this info.
+     * @var array
+     */
+    protected $_messageStorageTypes = array(
+        'catalog',
+        'checkout',
+        'tag',
+        'customer',
+        'review',
+        'wishlist',
+    );
+
+    public function _prepareLayout() {
+        if( $this->_fixMessages() ) {
+            /* do nothing */
+            return $this;
+        } else {
+            return parent::_prepareLayout();
+        }
+    }
+
+    /**
+     * Set messages collection
+     *
+     * @param   Mage_Core_Model_Message_Collection $messages
+     * @return  Mage_Core_Block_Messages
+     */
+    public function setMessages( Mage_Core_Model_Message_Collection $messages ) {
+        parent::setMessages( $messages );
+        $this->_saveMessages( $messages->getItems() );
+        return $this;
+    }
+
+    /**
+     * Add messages to display
+     *
+     * @param Mage_Core_Model_Message_Collection $messages
+     * @return Mage_Core_Block_Messages
+     */
+    public function addMessages( Mage_Core_Model_Message_Collection $messages ) {
+        parent::addMessages( $messages );
+        $this->_saveMessages( $messages->getItems() );
+        return $this;
+    }
+
+    /**
+     * Adding new message to message collection
+     *
+     * @param   Mage_Core_Model_Message_Abstract $message
+     * @return  Mage_Core_Block_Messages
+     */
+    public function addMessage( Mage_Core_Model_Message_Abstract $message ) {
+        parent::addMessage( $message );
+        $this->_saveMessages( array( $message ) );
+        return $this;
+    }
+
+    /**
      * Override this in case some dumb layout decides to use it instead of the
      * standard toHtml stuff
      *
@@ -51,12 +110,8 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * @return string
      */
     public function getHtml( $type=self::NO_SINGLE_RENDER_TYPE ) {
-        if( $type !== self::NO_SINGLE_RENDER_TYPE ) {
-            $this->_singleRenderType = $type;
-        }
-        $this->_directCall = true;
-        $this->_loadLayoutOptions();
-        return $this->toHtml();
+        $this->_singleRenderType = $type;
+        return $this->_handleDirectCall()->toHtml();
     }
 
     /**
@@ -66,9 +121,7 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * @return string
      */
     public function getGroupedHtml() {
-        $this->_directCall = true;
-        $this->_loadLayoutOptions();
-        return $this->toHtml();
+        return $this->getHtml( self::NO_SINGLE_RENDER_TYPE );
     }
 
     /**
@@ -76,10 +129,15 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      *
      * @return null
      */
-    protected function _loadLayoutOptions() {
-        $this->setAjaxOptions( array(
-            'cacheType'         => 'per-client',
-        ) );
+    protected function _handleDirectCall() {
+        $this->_directCall = true;
+        if( $this->_fixMessages() ) {
+            $this->getLayout()->addBlock( $this, $this->getNameInLayout() );
+            $this->setAjaxOptions( array(
+                'cacheType'         => 'per-client',
+            ) );
+        }
+        return $this;
     }
 
     /**
@@ -89,11 +147,17 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      */
     protected function _toHtml() {
         if( $this->_directCall ) {
+            /* do  nothing for now */
         }
-        if( $this->_shouldUseInjection() ) {
-            $html = $this->renderView();
+        if( $this->_fixMessages() ) {
+            if( $this->_shouldUseInjection() ) {
+                $html = $this->renderView();
+            } else {
+                $this->_loadMessages();
+                $this->_loadSavedMessages();
+                $html = $this->_real_toHtml();
+            }
         } else {
-            $this->_loadMessages();
             $html = $this->_real_toHtml();
         }
         $this->_directCall = false;
@@ -106,7 +170,10 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * @return boolean
      */
     protected function _hasInjectOptions() {
-        return $this->getEsiOptions() || $this->getAjaxOptions();
+        return ($this->getEsiOptions() &&
+                Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi()) ||
+            ($this->getAjaxOptions() &&
+                Mage::helper( 'turpentine/ajax' )->shouldResponseUseAjax());
     }
 
     /**
@@ -116,10 +183,8 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      */
     protected function _shouldUseInjection() {
         return $this->_hasTemplateSet() &&
-            ($this->getEsiOptions() &&
-                Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi()) ||
-            ($this->getAjaxOptions() &&
-                Mage::helper( 'turpentine/ajax' )->shouldResponseUseAjax());
+            $this->_hasInjectOptions() &&
+            Mage::app()->getStore()->getCode() !== 'admin';
     }
 
     /**
@@ -138,9 +203,11 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      *
      * @return null
      */
-    protected function _saveMessages() {
-        Mage::getSingleton( 'turpentine/session' )
-            ->saveMessages( $this->getNameInLayout(), $this->getMessages() );
+    protected function _saveMessages( $messages ) {
+        if( $this->_fixMessages() && !$this->_isAjaxRequest() ) {
+            Mage::getSingleton( 'turpentine/session' )
+                ->saveMessages( $this->getNameInLayout(), $messages );
+        }
     }
 
     /**
@@ -149,8 +216,51 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * @return null
      */
     protected function _loadMessages() {
-        $this->addMessages( Mage::getSingleton( 'turpentine/session' )
-            ->loadMessages() );
+        if( $this->getNameInLayout() == 'messages' ) {
+            foreach( $this->_messageStorageTypes as $type ) {
+                $storage = sprintf( '%s/session', $type );
+                $this->addStorageType( $storage );
+                $this->_loadMessagesFromStorage( $storage );
+            }
+        } else {
+            $this->_loadMessagesFromStorage( 'core/session' );
+        }
+    }
+
+    /**
+     * Load messages saved to turpentine/session
+     *
+     * @return null
+     */
+    protected function _loadSavedMessages() {
+        $session = Mage::getSingleton( 'turpentine/session' );
+        foreach( $session->loadMessages( $this->getNameInLayout() ) as $msg ) {
+            $this->getMessageCollection()->add( $msg );
+        }
+        $this->_clearMessages();
+    }
+
+    /**
+     * Load messages from the specified session storage
+     *
+     * @param  string $type
+     * @return null
+     */
+    protected function _loadMessagesFromStorage( $type ) {
+        foreach( Mage::getSingleton( $type )
+                    ->getMessages( true )->getItems() as $msg ) {
+            $this->addMessage( $msg );
+        }
+    }
+
+    /**
+     * Clear messages saved to turpentine/session
+     *
+     * @return null
+     */
+    protected function _clearMessages() {
+        Mage::getSingleton( 'turpentine/session' )
+            ->clearMessages( $this->getNameInLayout() );
     }
 
     /**
@@ -166,5 +276,33 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
             $html = parent::getGroupedHtml();
         }
         return $html;
+    }
+
+    /**
+     * Check if we should fix the messages behavior to work with turpentine,
+     * disable-able for compatibility with other extensions
+     *
+     * @return bool
+     */
+    protected function _fixMessages() {
+        return Mage::helper( 'turpentine/data' )
+                ->useFlashMessagesFix() &&
+            Mage::app()->getStore()->getCode() !== 'admin';
+    }
+
+    /**
+     * Check if this is an AJAX request
+     *
+     * Not very accurate, currently just checks if the module/controller/action
+     * looks like the dummy request that is set by the esi controller
+     *
+     * @return boolean
+     */
+    protected function _isAjaxRequest() {
+        $liveReq = Mage::app()->getRequest();
+        $dummyReq = Mage::helper( 'turpentine/esi' )->getDummyRequest();
+        return $liveReq->getModuleName() === $dummyReq->getModuleName() &&
+            $liveReq->getControllerName() === $dummyReq->getControllerName() &&
+            $liveReq->getActionName() === $dummyReq->getActionName();
     }
 }

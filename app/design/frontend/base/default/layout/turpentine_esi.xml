@@ -80,6 +80,9 @@
                 </params>
             </action>
         </reference>
+        <!-- This doesn't actually do anything because Magento doesn't use
+        the layout for the messages block, its output is directly placed in
+        the templates -->
         <reference name="messages">
             <action method="setAjaxOptions">
                 <params>

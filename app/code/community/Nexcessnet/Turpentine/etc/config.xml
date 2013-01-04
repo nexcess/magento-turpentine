@@ -30,6 +30,7 @@
                 <esi_debug>0</esi_debug>
                 <ajax_debug>0</ajax_debug>
                 <block_debug>0</block_debug>
+                <ajax_messages>1</ajax_messages>
             </general>
             <servers>
                 <version>auto</version>
@@ -202,6 +203,15 @@
             to have to edit xml just to add new events to trigger esi cache
             clear
             -->
+            <core_session_abstract_add_message>
+                <observers>
+                    <turpentine_esi_core_session_abstract_add_message>
+                        <type>singleton</type>
+                        <class>turpentine/observer_ban</class>
+                        <method>banClientEsiCache</method>
+                    </turpentine_esi_core_session_abstract_add_message>
+                </observers>
+            </core_session_abstract_add_message>
             <checkout_cart_add_product_complete>
                 <observers>
                     <turpentine_esi_checkout_cart_add_product_complete>
@@ -211,7 +221,7 @@
                     </turpentine_esi_checkout_cart_add_product_complete>
                 </observers>
             </checkout_cart_add_product_complete>
-            <checkout_cart_after_save>
+            <checkout_cart_save_after>
                 <observers>
                     <turpentine_esi_checkout_cart_after_save>
                         <type>singleton</type>
@@ -219,7 +229,7 @@
                         <method>banClientEsiCache</method>
                     </turpentine_esi_checkout_cart_after_save>
                 </observers>
-            </checkout_cart_after_save>
+            </checkout_cart_save_after>
             <checkout_onepage_controller_success_action>
                 <observers>
                     <turpentine_esi_checkout_onepage_controller_success_action>
@@ -229,7 +239,7 @@
                     </turpentine_esi_checkout_onepage_controller_success_action>
                 </observers>
             </checkout_onepage_controller_success_action>
-            <controller_action_postdispatch_checkout_cart_couponpost>
+            <controller_action_postdispatch_checkout_cart_couponPost>
                 <observers>
                     <turpentine_esi_controller_action_postdispatch_checkout_cart_couponpost>
                         <type>singleton</type>
@@ -237,7 +247,7 @@
                         <method>banClientEsiCache</method>
                     </turpentine_esi_controller_action_postdispatch_checkout_cart_couponpost>
                 </observers>
-            </controller_action_postdispatch_checkout_cart_couponpost>
+            </controller_action_postdispatch_checkout_cart_couponPost>
             <catalog_product_compare_add_product>
                 <observers>
                     <turpentine_esi_catalog_product_compare_add_product>

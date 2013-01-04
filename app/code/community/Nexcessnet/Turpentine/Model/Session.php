@@ -20,31 +20,76 @@
  */
 
 class Nexcessnet_Turpentine_Model_Session extends Mage_Core_Model_Session_Abstract {
+    protected $_namespace = 'turpentine';
+
     public function __construct() {
-        $namespace = 'turpentine';
-        $this->init( $namespace );
+        $this->init( $this->_namespace );
         Mage::dispatchEvent(
-            sprintf( '%s_session_init', $namespace ),
-            array( sprintf( '%s_session', $namespace ) => $this ) );
+            sprintf( '%s_session_init', $this->_namespace ),
+            array( sprintf( '%s_session', $this->_namespace ) => $this ) );
     }
 
-    public function saveMessages( $messages ) {
-        $this->setMessages( array_merge( $this->getMessages(), $messages ) );
+    /**
+     * Save the messages for a given block to the session
+     *
+     * @param  string $blockName
+     * @param  array $messages
+     * @return null
+     */
+    public function saveMessages( $blockName, $messages ) {
+        $allMessages = $this->getMessages();
+        $allMessages[$blockName] = array_merge(
+            $this->loadMessages( $blockName ), $messages );
+        $this->setMessages( $allMessages );
     }
 
-    public function loadMessages() {
-        $this->getMessages();
+    /**
+     * Retrieve the messages for a given messages block
+     *
+     * @param  string $blockName
+     * @return array
+     */
+    public function loadMessages( $blockName ) {
+        $messages = $this->getMessages();
+        if( is_array( @$messages[$blockName] ) ) {
+            return $messages[$blockName];
+        } else {
+            return array();
+        }
     }
 
-    public function getMessages() {
-        $messages = @unserialize( $this->getData( 'messages' ) );
+    /**
+     * Clear the messages stored for a block
+     *
+     * @param  string $blockName
+     * @return null
+     */
+    public function clearMessages( $blockName ) {
+        $messages = $this->getMessages();
+        unset( $messages[$blockName] );
+        $this->setMessages( $messages );
+    }
+
+    /**
+     * Retrieve the stored messages
+     *
+     * @param  boolean $clear=false
+     * @return array
+     */
+    public function getMessages( $clear=false ) {
+        $messages = $this->getData( 'messages' );
         if( !is_array( $messages ) ) {
             $messages = array();
         }
         return $messages;
     }
 
+    /**
+     * Store messages
+     *
+     * @param array $messages
+     */
     public function setMessages( $messages ) {
-        $this->setData( 'messages', serialize( $messages ) );
+        $this->setData( 'messages', $messages );
     }
 }
