@@ -248,6 +248,15 @@
                     </turpentine_esi_controller_action_postdispatch_checkout_cart_couponpost>
                 </observers>
             </controller_action_postdispatch_checkout_cart_couponPost>
+            <controller_action_postdispatch_checkout_cart_updatePost>
+                <observers>
+                    <turpentine_ban_controller_action_postdispatch_checkout_cart_updatePost>
+                        <type>singleton</type>
+                        <class>turpentine/observer_ban</class>
+                        <method>banClientEsiCache</method>
+                    </turpentine_ban_controller_action_postdispatch_checkout_cart_updatePost>
+                </observers>
+            </controller_action_postdispatch_checkout_cart_updatePost>
             <catalog_product_compare_add_product>
                 <observers>
                     <turpentine_esi_catalog_product_compare_add_product>
