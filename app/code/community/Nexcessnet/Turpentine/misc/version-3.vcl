@@ -47,7 +47,7 @@ sub vcl_recv {
         return (pipe);
     }
 
-    if (req.request !~ "^(GET|POST)$") {
+    if (req.request !~ "^(GET|HEAD)$") {
         # We only deal with GET and HEAD by default
         return (pass);
     }
