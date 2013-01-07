@@ -10,7 +10,7 @@ connect-changelog:
 connect-pkg:
 	./build/build_package.py -d build/mage-package.xml
 
-all: connect-desc connect-pkg
+all: connect-desc connect-changelog connect-pkg
 
 clean:
 	rm -f ./build/*.tgz ./build/*.html ./package.xml
