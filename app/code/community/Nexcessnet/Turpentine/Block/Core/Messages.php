@@ -132,10 +132,15 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
     protected function _handleDirectCall() {
         $this->_directCall = true;
         if( $this->_fixMessages() ) {
-            $this->getLayout()->addBlock( $this, $this->getNameInLayout() );
-            $this->setAjaxOptions( array(
-                'cacheType'         => 'per-client',
-            ) );
+            $layout = $this->getLayout();
+            $layout->getUpdate()->load( 'default' );
+            $layout->generateXml();
+            $layoutShim = Mage::getSingleton( 'turpentine/shim_mage_core_layout' );
+            foreach( $layout->getNode()->xpath(
+                    sprintf( '//reference[@name=\'%s\']/action',
+                        $this->getNameInLayout() ) ) as $node ) {
+                $layoutShim->shim_generateAction( $node );
+            }
         }
         return $this;
     }
