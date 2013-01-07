@@ -87,3 +87,19 @@
   * Fixed ESI injected blocks using the ESI getBlock URL as the current URL
   when rendering
   * Reduced size of generated VCL to reduce chance of hitting CLI buffer limit
+
+### RELEASE-0.2.1
+
+  * Changed the syntax for dummy blocks and registry keys in the ``setAjaxOptions``
+  and ``setEsiOptions`` layout methods, see the wiki for the new syntax
+  * Improved serialization of registry items in ESI/AJAX blocks
+  * Fixed AJAX requests always being over HTTPS even if the main page was
+  requested over HTTP
+  * Changed the dummy URL to "/checkout/cart" instead of "/"
+  * Fixed AJAX injection for *messages* block, which didn't use the standard
+  layout method for block definitions. This also includes a new option to
+  "Fix Flash Messages" which allows for disabling the new behavior for compatiblity
+  with other AJAX extensions
+  * Fixed POST request caching, which sometimes caused POST requests to fail the
+  first time, and then succeed (bug introduced in RELEASE-0.2.0)
+  * Fixed CE 1.6 + EE 1.11 incompatibility introduced in RELEASE-0.2.0

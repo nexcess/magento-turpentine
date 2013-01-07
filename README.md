@@ -93,13 +93,6 @@ the page and may differ between different visitors/clients.
    - External ESI requests are not blocked
    - Per-block TTLs are not honored, all ESI blocks use their default TTL
 
-## Future Plans
-
- - Get rid of the layout method for defining ESI blocks to cache, this should
- be configurable in the Magento system configuration
- - Use standard cache-control headers to tell Varnish about the block and page
- TTLs
-
 ## Known Issues
 
  - Logging and statistics will show all requests as coming from the same IP address
