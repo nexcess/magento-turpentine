@@ -32,6 +32,19 @@
                 <block_debug>0</block_debug>
                 <ajax_messages>1</ajax_messages>
             </general>
+            <purging>
+                <esi_purge_events><![CDATA[core_session_abstract_add_message
+checkout_cart_add_product_complete
+checkout_cart_save_after
+checkout_onepage_controller_success_action
+controller_action_postdispatch_checkout_cart_couponPost
+controller_action_postdispatch_checkout_cart_updatePost
+catalog_product_compare_add_product
+sales_quote_save_after
+customer_login
+customer_logout
+poll_vote_add]]></esi_purge_events>
+            </purging>
             <servers>
                 <version>auto</version>
                 <server_list>127.0.0.1:6082</server_list>
@@ -197,111 +210,18 @@
                 </observers>
             </controller_response_redirect>
 
-            <!-- ESI cache clear events -->
             <!--
-            Need to make these a config option, using the mage app shim. Is dumb
-            to have to edit xml just to add new events to trigger esi cache
-            clear
+            Load the ESI client cache clear events from stored config at
+            runtime
             -->
-            <core_session_abstract_add_message>
+            <controller_front_init_before>
                 <observers>
-                    <turpentine_esi_core_session_abstract_add_message>
-                        <type>singleton</type>
-                        <class>turpentine/observer_ban</class>
-                        <method>banClientEsiCache</method>
-                    </turpentine_esi_core_session_abstract_add_message>
+                    <turpentine_esi_controller_front_init_before>
+                        <class>turpentine/observer_esi</class>
+                        <method>loadCacheClearEvents</method>
+                    </turpentine_esi_controller_front_init_before>
                 </observers>
-            </core_session_abstract_add_message>
-            <checkout_cart_add_product_complete>
-                <observers>
-                    <turpentine_esi_checkout_cart_add_product_complete>
-                        <type>singleton</type>
-                        <class>turpentine/observer_ban</class>
-                        <method>banClientEsiCache</method>
-                    </turpentine_esi_checkout_cart_add_product_complete>
-                </observers>
-            </checkout_cart_add_product_complete>
-            <checkout_cart_save_after>
-                <observers>
-                    <turpentine_esi_checkout_cart_after_save>
-                        <type>singleton</type>
-                        <class>turpentine/observer_ban</class>
-                        <method>banClientEsiCache</method>
-                    </turpentine_esi_checkout_cart_after_save>
-                </observers>
-            </checkout_cart_save_after>
-            <checkout_onepage_controller_success_action>
-                <observers>
-                    <turpentine_esi_checkout_onepage_controller_success_action>
-                        <type>singleton</type>
-                        <class>turpentine/observer_ban</class>
-                        <method>banClientEsiCache</method>
-                    </turpentine_esi_checkout_onepage_controller_success_action>
-                </observers>
-            </checkout_onepage_controller_success_action>
-            <controller_action_postdispatch_checkout_cart_couponPost>
-                <observers>
-                    <turpentine_esi_controller_action_postdispatch_checkout_cart_couponpost>
-                        <type>singleton</type>
-                        <class>turpentine/observer_ban</class>
-                        <method>banClientEsiCache</method>
-                    </turpentine_esi_controller_action_postdispatch_checkout_cart_couponpost>
-                </observers>
-            </controller_action_postdispatch_checkout_cart_couponPost>
-            <controller_action_postdispatch_checkout_cart_updatePost>
-                <observers>
-                    <turpentine_ban_controller_action_postdispatch_checkout_cart_updatePost>
-                        <type>singleton</type>
-                        <class>turpentine/observer_ban</class>
-                        <method>banClientEsiCache</method>
-                    </turpentine_ban_controller_action_postdispatch_checkout_cart_updatePost>
-                </observers>
-            </controller_action_postdispatch_checkout_cart_updatePost>
-            <catalog_product_compare_add_product>
-                <observers>
-                    <turpentine_esi_catalog_product_compare_add_product>
-                        <type>singleton</type>
-                        <class>turpentine/observer_ban</class>
-                        <method>banClientEsiCache</method>
-                    </turpentine_esi_catalog_product_compare_add_product>
-                </observers>
-            </catalog_product_compare_add_product>
-            <sales_quote_save_after>
-                <observers>
-                    <turpentine_esi_sales_quote_save_after>
-                        <type>singleton</type>
-                        <class>turpentine/observer_ban</class>
-                        <method>banClientEsiCache</method>
-                    </turpentine_esi_sales_quote_save_after>
-                </observers>
-            </sales_quote_save_after>
-            <customer_login>
-                <observers>
-                    <turpentine_esi_customer_login>
-                        <type>singleton</type>
-                        <class>turpentine/observer_ban</class>
-                        <method>banClientEsiCache</method>
-                    </turpentine_esi_customer_login>
-                </observers>
-            </customer_login>
-            <customer_logout>
-                <observers>
-                    <turpentine_esi_customer_logout>
-                        <type>singleton</type>
-                        <class>turpentine/observer_ban</class>
-                        <method>banClientEsiCache</method>
-                    </turpentine_esi_customer_logout>
-                </observers>
-            </customer_logout>
-            <poll_vote_add>
-                <observers>
-                    <turpentine_esi_poll_vote_add>
-                        <type>singleton</type>
-                        <class>turpentine/observer_ban</class>
-                        <method>banClientEsiCache</method>
-                    </turpentine_esi_poll_vote_add>
-                </observers>
-            </poll_vote_add>
+            </controller_front_init_before>
 
             <!-- Varnish cache clear events -->
             <catalog_product_save_commit_after>

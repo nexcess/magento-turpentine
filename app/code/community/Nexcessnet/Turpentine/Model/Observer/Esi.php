@@ -91,6 +91,22 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
     }
 
     /**
+     * Load the cache clear events from stored config
+     *
+     * @param  Varien_Object $eventObject
+     * @return null
+     */
+    public function loadCacheClearEvents( $eventObject ) {
+        $events = Mage::helper( 'turpentine/esi' )->getCacheClearEvents();
+        $appShim = Mage::getSingleton( 'turpentine/shim_mage_core_app' );
+        foreach( $events as $ccEvent ) {
+            $appShim->shim_addEventObserver( 'global', $ccEvent,
+                'turpentine_ban_' . $ccEvent, 'singleton',
+                'turpentine/observer_ban', 'banClientEsiCache' );
+        }
+    }
+
+    /**
      * Encode block data in URL then replace with ESI template
      *
      * @link https://github.com/nexcess/magento-turpentine/wiki/ESI_Cache_Policy

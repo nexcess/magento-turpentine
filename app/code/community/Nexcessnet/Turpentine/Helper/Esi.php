@@ -136,4 +136,14 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     public function getMageCacheName() {
         return self::MAGE_CACHE_NAME;
     }
+
+    /**
+     * Get the list of events that should cause the ESI cache to be cleared
+     *
+     * @return array
+     */
+    public function getCacheClearEvents() {
+        return Mage::helper( 'turpentine/data' )->cleanExplode( PHP_EOL,
+            Mage::getStoreConfig( 'turpentine_varnish/purging/esi_purge_events' ) );
+    }
 }
