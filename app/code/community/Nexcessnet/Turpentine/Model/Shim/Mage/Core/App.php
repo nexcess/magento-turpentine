@@ -34,7 +34,13 @@ class Nexcessnet_Turpentine_Model_Shim_Mage_Core_App extends Mage_Core_Model_App
      * @return Mage_Core_Model_App
      */
     public function shim_setRequest(Mage_Core_Controller_Request_Http $request) {
-        Mage::app()->_request = $request;
+        $app = $this->_shim_getApp();
+        if( method_exists( $app, 'setRequest' ) ) {
+            // use the real setRequest if it's available
+            $app->setRequest( $request );
+        } else {
+            $app->_request = $request;
+        }
         return $this;
     }
 
@@ -47,20 +53,23 @@ class Nexcessnet_Turpentine_Model_Shim_Mage_Core_App extends Mage_Core_Model_App
      * @param string $type (model|singleton)
      * @param string $class identifier of the observing model class
      * @param string $method name of the method to call
-     * @return null
+     * @return Mage_Core_Model_App
      */
-    public function shim_addEventObserver( $area, $eventName, $obsName, $type=null, $class=null, $method=null ) {
+    public function shim_addEventObserver( $area, $eventName, $obsName,
+            $type=null, $class=null, $method=null ) {
         $eventConfig = new Varien_Simplexml_Config();
-        $eventConfig->loadDom( $this->_shim_getConfigDom( $eventName, $obsName,
-            $type, $class, $method ) );
+        $eventConfig->loadDom( $this->_shim_getConfigDom(
+            $area, $eventName, $obsName, $type, $class, $method ) );
         Mage::getConfig()->extend( $eventConfig, true );
-        //This wouldn't work if PHP had a sane object model
-        Mage::app()->_events[$area][$eventName] = null;
+        // this wouldn't work if PHP had a sane object model
+        $this->_shim_getApp()->_events[$area][$eventName] = null;
+        return $this;
     }
 
     /**
      * Prepares event DOM node used for updating configuration
      *
+     * @param string $area (global|admin...)
      * @param string $eventName
      * @param string $obsName
      * @param string $type
@@ -68,25 +77,33 @@ class Nexcessnet_Turpentine_Model_Shim_Mage_Core_App extends Mage_Core_Model_App
      * @param string $method
      * @return DOMDocument
      */
-    protected function _shim_getConfigDom( $eventName, $obsName, $type=null, $class=null, $method=null ) {
-        $dom = new DOMDocument("1.0");
-        $config = $dom->createElement("config");
-        $observers = $config->appendChild($dom->createElement('global'))
-               ->appendChild($dom->createElement("events"))
-               ->appendChild($dom->createElement($eventName))
-               ->appendChild($dom->createElement("observers"));
-        $observer = $dom->createElement($obsName);
-        if ($class) {
-            if ($method) {
-                if ($type) {
-                    $observer->appendChild($dom->createElement('type', $type));
-                }
-                $observer->appendChild($dom->createElement('class', $class));
-                $observer->appendChild($dom->createElement('method', $method));
+    protected function _shim_getConfigDom( $area, $eventName, $obsName,
+            $type=null, $class=null, $method=null ) {
+        $dom = new DOMDocument( '1.0' );
+        $config = $dom->createElement( 'config' );
+        $observers = $config->appendChild( $dom->createElement( $area ) )
+               ->appendChild( $dom->createElement( 'events' ) )
+               ->appendChild( $dom->createElement( $eventName ) )
+               ->appendChild( $dom->createElement( 'observers' ) );
+        $observer = $dom->createElement( $obsName );
+        if( $class && $method ) {
+            if( $type ) {
+                $observer->appendChild( $dom->createElement( 'type', $type ) );
             }
+            $observer->appendChild( $dom->createElement( 'class', $class ) );
+            $observer->appendChild( $dom->createElement( 'method', $method ) );
         }
-        $observers->appendChild($observer);
-        $dom->appendChild($config);
+        $observers->appendChild( $observer );
+        $dom->appendChild( $config );
         return $dom;
+    }
+
+    /**
+     * Get the real app
+     *
+     * @return Mage_Core_Model_App
+     */
+    protected function _shim_getApp() {
+        return Mage::app();
     }
 }
