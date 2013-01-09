@@ -1,0 +1,178 @@
+<?php
+
+/**
+ * Nexcess.net Turpentine Extension for Magento
+ * Copyright (C) 2012  Nexcess.net L.L.C.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
+
+    /**
+     * Key to store the URL queue under in the cache
+     *
+     * @var string
+     */
+    const CRAWLER_URLS_CACHE_ID = 'turpentine_crawler_url_queue';
+
+    /**
+     * Crawler client singleton
+     *
+     * @var Varien_Http_Client
+     */
+    protected $_crawlerClient = null;
+
+    /**
+     * Get the execution time used so far
+     *
+     * @return int
+     */
+    public function getRunTime() {
+        $usage = getrusage();
+        return $usage['ru_utime.tv_sec'];
+    }
+
+    /**
+     * Get the max execution time (or 0 if unlimited)
+     *
+     * @return int
+     */
+    public function getAllowedRunTime() {
+        return ini_get( 'max_execution_time' );
+    }
+
+    /**
+     * Add a single URL to the queue, returns whether it was actually added
+     * to the queue or not (false if it was already in the queue)
+     *
+     * @param string $url
+     * @return bool
+     */
+    public function addUrlToCrawlerQueue( $url ) {
+        return $this->addUrlsToCrawlerQueue( array( $url ) );
+    }
+
+    /**
+     * Add a list of URLs to the queue, returns how many unique URLs were
+     * actually added to the queue
+     *
+     * @param array $urls
+     * @return int
+     */
+    public function addUrlsToCrawlerQueue( array $urls ) {
+        $oldQueue = $this->_readUrlQueue();
+        $newQueue = array_unique( array_merge( $oldQueue, $urls ) );
+        $this->_writeUrlQueue( $newQueue );
+        $diff = count( $newQueue ) - count( $oldQueue );
+        return $diff;
+    }
+
+    /**
+     * Pop a URL to crawl off the queue, or null if no URLs left
+     *
+     * @return string|null
+     */
+    public function getNextUrl() {
+        $urls = $this->_readUrlQueue();
+        $nextUrl = array_shift( $urls );
+        $this->_writeUrlQueue( $urls );
+        return $nextUrl;
+    }
+
+    /**
+     * Get the crawler http client
+     *
+     * @return Varien_Http_Client
+     */
+    public function getCrawlerClient() {
+        if( is_null( $this->_crawlerClient ) ) {
+            $this->_crawlerClient = new Varien_Http_Client( null, array(
+                'useragent'     => sprintf(
+                    'Nexcessnet_Turpentine/%s Magento/%s Varien_Http_Client',
+                    Mage::helper( 'turpentine/data' )->getVersion(),
+                    Mage::getVersion() ),
+                'keepalive'     => true,
+            ) );
+            $this->_crawlerClient->setCookie( 'frontend', 'no-session' );
+        }
+        return $this->_crawlerClient;
+    }
+
+    /**
+     * Get if the crawler is enabled
+     *
+     * @return bool
+     */
+    public function getCrawlerEnabled() {
+        return Mage::getStoreConfig( 'turpentine_varnish/general/crawler_enable' );
+    }
+
+    public function getCrawlerDebugEnabled() {
+        return Mage::getStoreConfig( 'turpentine_varnish/general/crawler_debug' );
+    }
+
+    /**
+     * Get the list of all URLs
+     *
+     * @return array
+     */
+    public function getAllUrls() {
+        $urls = array();
+        $models = array(
+            'sitemap/catalog_category',
+            'sitemap/catalog_product',
+            'sitemap/cms_page',
+        );
+        foreach( Mage::app()->getStores() as $storeId => $store ) {
+            $baseUrl = $store->getBaseUrl( Mage_Core_Model_Store::URL_TYPE_LINK );
+            $urls[] = $baseUrl;
+            foreach( $models as $model ) {
+                foreach( Mage::getResourceModel( $model )
+                            ->getCollection( $storeId ) as $item ) {
+                    $urls[] = $baseUrl . $item->getUrl();
+                }
+            }
+        }
+        return $urls;
+    }
+
+    /**
+     * Get the crawler URL queue from the cache
+     *
+     * @return array
+     */
+    protected function _readUrlQueue() {
+        $readQueue = @unserialize(
+            Mage::app()->loadCache( self::CRAWLER_URLS_CACHE_ID ) );
+        if( !is_array( $readQueue ) ) {
+            // return array();
+            return $this->getAllUrls();
+        } else {
+            return $readQueue;
+        }
+    }
+
+    /**
+     * Save the crawler URL queue to the cache
+     *
+     * @param  array  $urls
+     * @return null
+     */
+    protected function _writeUrlQueue( array $urls ) {
+        return Mage::app()->saveCache(
+            serialize( $urls ), self::CRAWLER_URLS_CACHE_ID );
+    }
+}
