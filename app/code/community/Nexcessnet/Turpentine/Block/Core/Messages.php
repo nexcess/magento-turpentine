@@ -31,7 +31,7 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * Hold the message type to call getHtml with
      * @var mixed
      */
-    protected $_singleRenderType    = self::NO_SINGLE_RENDER_TYPE;
+    protected $_singleRenderType    = null;
 
     /**
      * Sentinel to check if the toHtml method was skipped (getGroupedHtml was
@@ -111,7 +111,7 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      */
     public function getHtml( $type=self::NO_SINGLE_RENDER_TYPE ) {
         $this->_singleRenderType = $type;
-        return $this->_handleDirectCall()->toHtml();
+        return $this->_handleDirectCall( 'getHtml' )->toHtml();
     }
 
     /**
@@ -121,7 +121,7 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * @return string
      */
     public function getGroupedHtml() {
-        return $this->getHtml( self::NO_SINGLE_RENDER_TYPE );
+        return $this->_handleDirectCall( 'getGroupedHtml' )->toHtml();
     }
 
     /**
@@ -129,8 +129,11 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      *
      * @return null
      */
-    protected function _handleDirectCall() {
-        $this->_directCall = true;
+    protected function _handleDirectCall( $methodCalled ) {
+        // this doesn't actually do anything because _real_toHtml() won't be
+        // called in this request context (unless the flash message isn't
+        // actually supposed to be ajax/esi'd in)
+        $this->_directCall = $methodCalled;
         if( $this->_fixMessages() ) {
             $layout = $this->getLayout();
             $layout->getUpdate()->load( 'default' );
@@ -151,9 +154,6 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * @return string
      */
     protected function _toHtml() {
-        if( $this->_directCall ) {
-            /* do  nothing for now */
-        }
         if( $this->_fixMessages() ) {
             if( $this->_shouldUseInjection() ) {
                 $html = $this->renderView();
@@ -274,11 +274,26 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * @return string
      */
     protected function _real_toHtml() {
-        if( $this->_singleRenderType !== self::NO_SINGLE_RENDER_TYPE ) {
-            $html = parent::getHtml( $this->_singleRenderType );
-            $this->_singleRenderType = self::NO_SINGLE_RENDER_TYPE;
-        } else {
-            $html = parent::getGroupedHtml();
+        if( !$this->_directCall ) {
+            switch( $this->getNameInLayout() ) {
+                case 'global_messages':
+                    $this->_directCall = 'getHtml';
+                    break;
+                case 'messages':
+                default:
+                    $this->_directCall = 'getGroupedHtml';
+                    break;
+            }
+        }
+        switch( $this->_directCall ) {
+            case 'getHtml':
+                $html = parent::getHtml( $this->_singleRenderType );
+                $this->_singleRenderType = self::NO_SINGLE_RENDER_TYPE;
+                break;
+            case 'getGroupedHtml':
+            default:
+                $html = parent::getGroupedHtml();
+                break;
         }
         return $html;
     }
