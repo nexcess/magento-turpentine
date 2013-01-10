@@ -33,23 +33,31 @@ if( $ajaxDebugEnabled ) {
  * @link http://prototypejs.org/doc/latest/ajax/index.html
  * @link http://prototypejs.org/doc/latest/ajax/Ajax/Request/index.html
  * @link http://prototypejs.org/doc/latest/dom/Element/replace/index.html
+ * @link http://madrobby.github.com/scriptaculous/effect-appear/
  */
 echo sprintf( '<div id="%s" style="display: none">
 <script type="text/javascript">
-new Ajax.Request("%s", {
-    method: "get",
-    onCreate: function(request) {
-        request.transport.setRequestHeader = Prototype.emptyFunction;
-    },
-    on200: function(response) {
-        Element.replace($("%s"), response.responseText);
+new Ajax.Updater(
+    "%s",
+    "%s",
+    {
+        method: "get",
+        evalScripts: true,
+        onComplete: function(transport) {
+            $("%s").appear({
+                duration: 0.3
+            });
+        }
     }
-});
+);
 </script>
-</div>',
+</div>
+',
+    $blockTag,
     $blockTag,
     $this->getAjaxUrl(),
-    $blockTag ) . PHP_EOL;
+    $blockTag
+);
 if( $ajaxDebugEnabled ) {
     echo sprintf( '<!-- AJAX END [%s] -->', $this->getNameInLayout() ) . PHP_EOL;
 }
