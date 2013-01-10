@@ -131,22 +131,25 @@ class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
      */
     public function getAllUrls() {
         $urls = array();
-        $models = array(
-            'sitemap/catalog_category',
-            'sitemap/catalog_product',
-            'sitemap/cms_page',
-        );
+        $origStore = Mage::app()->getStore();
         foreach( Mage::app()->getStores() as $storeId => $store ) {
+            Mage::app()->setCurrentStore( $store );
             $baseUrl = $store->getBaseUrl( Mage_Core_Model_Store::URL_TYPE_LINK );
             $urls[] = $baseUrl;
-            foreach( $models as $model ) {
-                foreach( Mage::getResourceModel( $model )
-                            ->getCollection( $storeId ) as $item ) {
-                    $urls[] = $baseUrl . $item->getUrl();
+            foreach( Mage::getModel( 'catalog/category' )
+                        ->getCollection( $storeId ) as $cat ) {
+                $urls[] = $cat->getUrl();
+                foreach( $cat->getProductCollection( $storeId )
+                            ->addUrlRewrite( $cat->getId() ) as $prod ) {
+                    $urls[] = $prod->getProductUrl();
                 }
             }
+            foreach( Mage::getResourceModel( 'sitemap/cms_page' )->getCollection( $storeId ) as $item ) {
+                $urls[] = $baseUrl . $item->getUrl();
+            }
         }
-        return $urls;
+        Mage::app()->setCurrentStore( $origStore );
+        return array_unique( $urls );
     }
 
     /**

@@ -62,6 +62,14 @@ class Nexcessnet_Turpentine_Helper_Debug extends Mage_Core_Helper_Abstract {
         $this->log( 'TRACEBACK: END ** %s **', $btuuid );
     }
 
+    public function logValue( $value, $name=null ) {
+        if( is_null( $name ) ) {
+            $name = 'VALUE';
+        }
+        $this->log( '%s => %s', $name,
+            $this->_backtrace_formatArgsHelper( $value ) );
+    }
+
     /**
      * Format a list of function arguments for the backtrace
      *
