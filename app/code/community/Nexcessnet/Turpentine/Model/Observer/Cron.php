@@ -26,7 +26,14 @@ class Nexcessnet_Turpentine_Model_Observer_Cron extends Varien_Event_Observer {
      *
      * @var int
      */
-    const MAX_CRAWL_TIME    = 120;
+    const MAX_CRAWL_TIME    = 300;
+
+    /**
+     * Amount of time of execution time to leave for other cron processes
+     *
+     * @var int
+     */
+    const EXEC_TIME_BUFFER  = 15;
 
     /**
      * Crawl available URLs in the queue until we get close to max_execution_time
@@ -42,7 +49,7 @@ class Nexcessnet_Turpentine_Model_Observer_Cron extends Varien_Event_Observer {
             if( $maxRunTime === 0 ) {
                 $maxRunTime = self::MAX_CRAWL_TIME;
             }
-            while( ( $helper->getRunTime() < ( $maxRunTime - 5 ) ) &&
+            while( ( $helper->getRunTime() < ( $maxRunTime - self::EXEC_TIME_BUFFER ) ) &&
                     $url = $helper->getNextUrl() ) {
                 if( !$this->_crawlUrl( $url ) ) {
                     Mage::log(

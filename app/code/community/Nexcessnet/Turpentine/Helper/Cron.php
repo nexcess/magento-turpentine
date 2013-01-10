@@ -93,6 +93,15 @@ class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
     }
 
     /**
+     * Get the current URL queue
+     *
+     * @return array
+     */
+    public function getUrlQueue() {
+        return $this->_readUrlQueue();
+    }
+
+    /**
      * Get the crawler http client
      *
      * @return Varien_Http_Client
@@ -120,6 +129,11 @@ class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
         return Mage::getStoreConfig( 'turpentine_varnish/general/crawler_enable' );
     }
 
+    /**
+     * Get if crawler debugging is enabled
+     *
+     * @return bool
+     */
     public function getCrawlerDebugEnabled() {
         return Mage::getStoreConfig( 'turpentine_varnish/general/crawler_debug' );
     }
