@@ -73,6 +73,13 @@ class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
      * @return int
      */
     public function addUrlsToCrawlerQueue( array $urls ) {
+        // TODO: remove this debug message
+        if( $this->getCrawlerDebugEnabled() ) {
+            foreach( $urls as $url ) {
+                Mage::helper( 'turpentine/debug' )->log(
+                    'Adding URL to queue: %s', $url );
+            }
+        }
         $oldQueue = $this->_readUrlQueue();
         $newQueue = array_unique( array_merge( $oldQueue, $urls ) );
         $this->_writeUrlQueue( $newQueue );
@@ -164,6 +171,51 @@ class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
         }
         Mage::app()->setCurrentStore( $origStore );
         return array_unique( $urls );
+    }
+
+    /**
+     * Add URLs to the queue by product model
+     *
+     * @param Mage_Catalog_Model_Product $product
+     * @return int
+     */
+    public function addProductToCrawlerQueue( $product ) {
+        $productUrls = array();
+        $origStore = Mage::app()->getStore();
+        foreach( Mage::app()->getStores() as $storeId => $store ) {
+            Mage::app()->setCurrentStore( $store );
+            $baseUrl = $store->getBaseUrl(
+                Mage_Core_Model_Store::URL_TYPE_LINK );
+            $productUrls[] = $product->getProductUrl();
+            foreach( $product->getCategoryIds() as $catId ) {
+                $cat = Mage::getModel( 'catalog/category' )->load( $catId );
+                $productUrls[] = rtrim( $baseUrl, '/' ) . '/' .
+                    ltrim( $product->getUrlModel()
+                        ->getUrlPath( $product, $cat ), '/' );
+            }
+        }
+        Mage::app()->setCurrentStore( $origStore );
+        return $this->addUrlsToCrawlerQueue( $productUrls );
+    }
+
+    /**
+     * Add URLs to the queue by category model
+     *
+     * @param Mage_Catalog_Model_Category $category
+     * @return int
+     */
+    public function addCategoryToCrawlerQueue( $category ) {
+        // TODO: implement this
+    }
+
+    /**
+     * Add URLs to queue by CMS page ID
+     *
+     * @param int $cmsPageId
+     * @return int
+     */
+    public function addCmsPageToCrawlerQueue( $cmsPageId ) {
+        // TODO: implement this
     }
 
     /**
