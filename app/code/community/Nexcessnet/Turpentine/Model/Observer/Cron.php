@@ -85,7 +85,14 @@ class Nexcessnet_Turpentine_Model_Observer_Cron extends Varien_Event_Observer {
         if( Mage::helper( 'turpentine/cron' )->getCrawlerDebugEnabled() ) {
             Mage::log( 'TURPENTINE: Crawling URL: ' . $url );
         }
-        $response = $client->request();
+        try {
+            $response = $client->request();
+        } catch( Exception $e ) {
+            Mage::log( sprintf( 'TURPENTINE: Error crawling URL (%s): %s',
+                    $url, $e->getMessage() ),
+                Zend_Log::WARN );
+            return false;
+        }
         return $response->isSuccessful();
     }
 }
