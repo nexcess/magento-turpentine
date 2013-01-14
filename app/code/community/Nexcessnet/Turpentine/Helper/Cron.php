@@ -205,7 +205,14 @@ class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
      * @return int
      */
     public function addCategoryToCrawlerQueue( $category ) {
-        // TODO: implement this
+        $catUrls = array();
+        $origStore = Mage::app()->getStore();
+        foreach( Mage::app()->getStores() as $storeId => $store ) {
+            Mage::app()->setCurrentStore( $store );
+            $catUrls[] = $category->getUrl();
+        }
+        Mage::app()->setCurrentStore( $origStore );
+        return $this->addUrlsToCrawlerQueue( $catUrls );
     }
 
     /**
@@ -215,7 +222,17 @@ class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
      * @return int
      */
     public function addCmsPageToCrawlerQueue( $cmsPageId ) {
-        // TODO: implement this
+        $page = Mage::getModel( 'cms/page' )->load( $cmsPageId );
+        $pageUrls = array();
+        $origStore = Mage::app()->getStore();
+        foreach( Mage::app()->getStores() as $storeId => $store ) {
+            Mage::app()->setCurrentStore( $store );
+            $page->setStoreId( $storeId );
+            $pageUrls[] = Mage::getUrl( null,
+                array( '_direct' => $page->getIdentifier() ) );
+        }
+        Mage::app()->setCurrentStore( $origStore );
+        return $this->addUrlsToCrawlerQueue( $pageUrls );
     }
 
     /**
