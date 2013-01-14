@@ -22,12 +22,13 @@ to how it works).
  - Configure cache TTL by URL and individual block's TTL
  - Ability to force static asset (css, js, etc) caching
  - Supports multiple Varnish instances for clustered usage
- - Hole-punching via Varnish ESI support
+ - Hole-punching via Varnish ESI support and/or AJAX
  - Automatic cache clearing on actions (clearing product/catalog/cms page after saving)
  - Non-root Magento installs (i.e. putting Magento in /store/ instead of /)
- - Web crawler support for warming the cache
+ - External web crawler support for warming the cache
+ - Builtin crawler for automatically warming flushed cache pages
  - [SSL support](https://github.com/nexcess/magento-turpentine/wiki/SSL_Support) through
- [Pound](http://www.apsis.ch/pound)
+ [Pound](http://www.apsis.ch/pound) or [Nginx](http://nginx.org/)
 
 ## Requirements
 
@@ -100,6 +101,7 @@ the page and may differ between different visitors/clients.
  Apache's [mod_remoteip](http://httpd.apache.org/docs/trunk/mod/mod_remoteip.html)
  or [mod_rpaf](http://www.stderr.net/apache/rpaf/).
  - Changing to a different store language has no effect
+ - The cache does not differentiate between mobile and desktop (full) browsers
 
 ## Demo
 

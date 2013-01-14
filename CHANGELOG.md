@@ -103,3 +103,21 @@
   * Fixed POST request caching, which sometimes caused POST requests to fail the
   first time, and then succeed (bug introduced in RELEASE-0.2.0)
   * Fixed CE 1.6 + EE 1.11 incompatibility introduced in RELEASE-0.2.0
+
+### RELEASE-0.3.0
+
+The new site crawler functionality in this release adds a new User-Agent to the
+default *Crawler User Agents* setting: "Nexcessnet_Turpentine/.*"
+It is strongly recommended to manually add this new user agent string to the
+*Crawler User Agents* setting after upgrading as Magento won't automatically
+update the config setting with the new default value if the config has been
+saved before.
+This does not apply to new installs.
+
+  * Added built-in crawler for automatically warming the cache. Also automatically
+  warms pages that are flushed on save (product/category/CMS pages)
+  * Removed hard-coded "messages" block AJAX options, the ESI/AJAX options for
+  the "messages" block can now be configured in the ESI layout file like any
+  other block
+  * Made ESI client-cache ban (clear) events configurable. See the new "ESI
+  Client Cache Purge Events" option
