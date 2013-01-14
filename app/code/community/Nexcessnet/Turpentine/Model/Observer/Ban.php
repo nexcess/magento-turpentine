@@ -110,6 +110,7 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
                     ( $item->getOriginalInventoryQty() <= 0 &&
                         $item->getQty() > 0 &&
                         $item->getQtyCorrection() > 0 ) ) {
+                $cronHelper = Mage::helper( 'turpentine/cron' );
                 $parentIds = array_merge(
                     Mage::getModel( 'catalog/product_type_configurable' )
                         ->getParentIdsByChild( $item->getProductId() ),
@@ -120,7 +121,9 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
                     $parentProduct = Mage::getModel( 'catalog/product' )
                         ->load( $parentId );
                     $urlPatterns[] = $parentProduct->getUrlKey();
-                    // TODO: need to queue the parentProducts too
+                    if( $cronHelper->getCrawlerEnabled() ) {
+                        $cronHelper->addProductToCrawlerQueue( $parentProduct );
+                    }
                 }
                 $product = Mage::getModel( 'catalog/product' )
                     ->load( $item->getProductId() );
@@ -129,7 +132,6 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
                 $result = $this->_getVarnishAdmin()->flushUrl( $pattern );
                 Mage::dispatchEvent( 'turpentine_ban_product_cache_check_stock',
                     $result );
-                $cronHelper = Mage::helper( 'turpentine/cron' );
                 if( $this->_checkResult( $result ) &&
                         $cronHelper->getCrawlerEnabled() ) {
                     $cronHelper->addProductToCrawlerQueue( $product );

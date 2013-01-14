@@ -244,7 +244,10 @@ class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
         $readQueue = @unserialize(
             Mage::app()->loadCache( self::CRAWLER_URLS_CACHE_ID ) );
         if( !is_array( $readQueue ) ) {
-            // return array();
+            // This is the first time the queue has been read since the last
+            // cache flush (or the queue is corrupt)
+            // Returning an empty array here would be the proper behavior,
+            // but causes the queue to not be saved on the full cache flush event
             return $this->getAllUrls();
         } else {
             return $readQueue;
