@@ -31,6 +31,8 @@
                 <ajax_debug>0</ajax_debug>
                 <block_debug>0</block_debug>
                 <ajax_messages>1</ajax_messages>
+                <crawler_enable>1</crawler_enable>
+                <crawler_debug>0</crawler_debug>
             </general>
             <purging>
                 <esi_purge_events><![CDATA[core_session_abstract_add_message
@@ -58,7 +60,7 @@ poll_vote_add]]></esi_purge_events>
                 <frontend_timeout>300</frontend_timeout>
                 <admin_timeout>21600</admin_timeout>
                 <crawlers>127.0.0.1</crawlers>
-                <crawler_user_agents>ApacheBench/.*,.*Googlebot.*,JoeDog/.*Siege.*,magespeedtest\.com</crawler_user_agents>
+                <crawler_user_agents>ApacheBench/.*,.*Googlebot.*,JoeDog/.*Siege.*,magespeedtest\.com,Nexcessnet_Turpentine/.*</crawler_user_agents>
             </backend>
             <normalization>
                 <encoding>1</encoding>
@@ -296,6 +298,15 @@ poll_vote_add]]></esi_purge_events>
                     </turpentine_varnish_adminhtml_cache_refresh_type>
                 </observers>
             </adminhtml_cache_refresh_type>
+            <!-- Cron/Crawler events -->
+            <turpentine_ban_all_cache>
+                <observers>
+                    <turpentine_cron_turpentine_ban_all_cache>
+                        <class>turpentine/observer_cron</class>
+                        <method>queueAllUrls</method>
+                    </turpentine_cron_turpentine_ban_all_cache>
+                </observers>
+            </turpentine_ban_all_cache>
         </events>
     </global>
     <frontend>
@@ -371,4 +382,16 @@ poll_vote_add]]></esi_purge_events>
             </resources>
         </acl>
     </adminhtml>
+    <crontab>
+        <jobs>
+            <turpentine_crawl_urls>
+                <schedule>
+                    <cron_expr>0,10,20,30,40,50 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>turpentine/observer_cron::crawlUrls</model>
+                </run>
+            </turpentine_crawl_urls>
+        </jobs>
+    </crontab>
 </config>

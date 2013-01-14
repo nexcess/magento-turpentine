@@ -22,6 +22,12 @@
 class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
 
     /**
+     * Contains a newly generated v4 uuid whenever read, possibly not available
+     * on all kernels
+     */
+    const UUID_SOURCE   = '/proc/sys/kernel/random/uuid';
+
+    /**
      * encryption singleton thing
      *
      * @var Mage_Core_Model_Encryption
@@ -39,6 +45,50 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
     public function cleanExplode( $token, $data ) {
         return array_filter( array_map( 'trim',
             explode( $token, trim( $data ) ) ) );
+    }
+
+    public function generateUuid() {
+        if( is_readable( self::UUID_SOURCE ) ) {
+            $uuid = trim( file_get_contents( self::UUID_SOURCE ) );
+        } elseif( function_exists( 'mt_rand' ) ) {
+            /**
+             * Taken from stackoverflow answer, possibly not the fastest or
+             * strictly standards compliant
+             * @link http://stackoverflow.com/a/2040279
+             */
+            $uuid = sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+                // 32 bits for "time_low"
+                mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),
+
+                // 16 bits for "time_mid"
+                mt_rand( 0, 0xffff ),
+
+                // 16 bits for "time_hi_and_version",
+                // four most significant bits holds version number 4
+                mt_rand( 0, 0x0fff ) | 0x4000,
+
+                // 16 bits, 8 bits for "clk_seq_hi_res",
+                // 8 bits for "clk_seq_low",
+                // two most significant bits holds zero and one for variant DCE1.1
+                mt_rand( 0, 0x3fff ) | 0x8000,
+
+                // 48 bits for "node"
+                mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff )
+            );
+        } else {
+            // chosen by dice roll, guaranteed to be random
+            $uuid = '4';
+        }
+        return $uuid;
+    }
+
+    /**
+     * Get the Turpentine version
+     *
+     * @return string
+     */
+    public function getVersion() {
+        return Mage::getConfig()->getModuleConfig( 'Nexcessnet_Turpentine' )->version;
     }
 
     /**

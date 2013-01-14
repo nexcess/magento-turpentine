@@ -20,59 +20,26 @@
  */
 
 class Nexcessnet_Turpentine_Model_Observer_Debug extends Varien_Event_Observer {
-    public function eventDebug( $eventObject ) {
-        $this->log( 'EVENT: %s', $eventObject->getEvent()->getName() );
+
+    /**
+     * Log an occurance of a specific event
+     *
+     * @param  Varien_Object $eventObject
+     * @return null
+     */
+    public function logEvent( $eventObject ) {
+        Mage::helper( 'turpentine/debug' )->log( 'EVENT: %s',
+            $eventObject->getEvent()->getName() );
     }
 
-    public function log( $message ) {
-        $args = func_get_args();
-        array_shift( $args );
-        Mage::log( vsprintf( $message, $args ) );
-    }
-
-    public function backtrace() {
-        $tb = debug_backtrace();
-        array_shift( $tb );
-        $this->log( 'TRACEBACK: START: ' . $_SERVER['REQUEST_URI'] );
-        for( $i=0; $i < count($tb); $i++ ) {
-            $line = $tb[$i];
-            $this->log( 'TRACEBACK: #%02d: %s:%d',
-                $i, $line['file'], $line['line'] );
-            $this->log( 'TRACEBACK: ==> %s%s%s(%s)',
-                (is_object( @$line['object'] ) ? get_class( $line['object'] ) : @$line['class'] ),
-                @$line['type'],
-                $line['function'],
-                $this->_backtrace_formatArgs( $line['args'] ) );
-        }
-        $this->log( 'TRACEBACK: END: ' . $_SERVER['REQUEST_URI'] );
-    }
-
-    protected function _backtrace_formatArgs( $args ) {
-        return implode( ', ',
-            array_map(
-                array( $this, '_backtrace_formatArgsHelper' ),
-                $args
-            )
-        );
-    }
-
-    protected function _backtrace_formatArgsHelper( $arg ) {
-        $value = $arg;
-        if( is_object( $arg ) ) {
-            $value = sprintf( 'OBJECT(%s)', get_class( $arg ) );
-        } elseif( is_resource( $arg ) ) {
-            $value = 'RESOURCE';
-        } elseif( is_array( $arg ) ) {
-            $value = 'ARRAY[%s](%s)';
-            $c = array();
-            foreach( $arg as $k => $v ) {
-                $c[] = sprintf( '%s => %s', $k,
-                    $this->_backtrace_formatArgsHelper( $v ) );
-            }
-            $value = sprintf( $value, count( $arg ), implode( ', ', $c ) );
-        } elseif( is_string( $arg ) ) {
-            $value = sprintf( '\'%s\'', $arg );
-        }
-        return $value;
+    /**
+     * Log a backtrace on an event
+     *
+     * @param  Varien_Object $eventObject
+     * @return null
+     */
+    public function logBackTrace( $eventObject ) {
+        $this->logEvent( $eventObject );
+        Mage::helper( 'turpentine/debug' )->logBackTrace();
     }
 }
