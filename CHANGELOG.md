@@ -124,3 +124,5 @@ This does not apply to new installs.
   * Enabling the *Normalize User-Agent* setting now also differentiates between
   desktop and mobile browsers, for caching different output for desktop and mobile
   browsers
+  * Fixed *messages* block not correctly updating the layout if the layout cache
+  was enabled
