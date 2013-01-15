@@ -136,7 +136,15 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
         $this->_directCall = $methodCalled;
         if( $this->_fixMessages() ) {
             $layout = $this->getLayout();
-            $layout->getUpdate()->load( 'default' );
+            $layoutUpdate = $layout->getUpdate()->load( 'default' );
+            if( Mage::app()->useCache( 'layout' ) ) {
+                // this is skipped in the layout update load() if the "layout"
+                // cache is enabled, which seems to cause the esi layout stuff
+                // to not load, so we manually do it here
+                foreach( $layoutUpdate->getHandles() as $handle ) {
+                    $layoutUpdate->merge( $handle );
+                }
+            }
             $layout->generateXml();
             $layoutShim = Mage::getSingleton( 'turpentine/shim_mage_core_layout' );
             foreach( $layout->getNode()->xpath(
