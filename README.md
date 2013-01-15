@@ -1,5 +1,7 @@
 # Nexcess.net Turpentine Extension for Magento
 
+[![Build Status](https://travis-ci.org/nexcess/magento-turpentine.png)](https://travis-ci.org/nexcess/magento-turpentine)
+
 Turpentine is a Magento extension to improve Magento's compatibility with
 [Varnish](https://www.varnish-cache.org/), a very-fast caching reverse-proxy. By
 default, Varnish doesn't cache requests with cookies and Magento sends the
@@ -18,7 +20,7 @@ to how it works).
  - Requires very little configuration for impressive results
  - Able to apply new Varnish VCLs (configurations) on the fly, without
  restarting/changing Varnish's config files or flushing the cache
- - Exclude URL paths, request parameters (__SID, __store, etc) from caching
+ - Exclude URL paths, request parameters (SID, store, etc) from caching
  - Configure cache TTL by URL and individual block's TTL
  - Ability to force static asset (css, js, etc) caching
  - Supports multiple Varnish instances for clustered usage
@@ -90,9 +92,9 @@ the page and may differ between different visitors/clients.
  the cache).
  - **Varnish 2.1 Caveats**: Due to technical limitations, some features are not
  available when using Varnish 2.1:
-   - TTL extension on cache hits does not work
-   - External ESI requests are not blocked
-   - Per-block TTLs are not honored, all ESI blocks use their default TTL
+    - TTL extension on cache hits does not work
+    - External ESI requests are not blocked
+    - Per-block TTLs are not honored, all ESI blocks use their default TTL
 
 ## Known Issues
 

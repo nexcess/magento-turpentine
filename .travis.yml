@@ -5,5 +5,8 @@ php:
     - 5.3
     - 5.4
 
+install:
+    - sudo apt-get install -qq python-markdown libxml-xpath-perl
+
 script:
-    - make connect-pkg
+    - make all

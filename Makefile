@@ -2,10 +2,10 @@ SHELL := /bin/bash
 .PHONY: connect-desc connect-pkg all clean
 
 connect-desc:
-	markdown2 README.md > build/magento-connect-desc-$(shell ./util/get-version.sh).html
+	markdown_py -o html5 -f "build/magento-connect-desc-$(shell ./util/get-version.sh).html" README.md
 
 connect-changelog:
-	markdown2 CHANGELOG.md > build/magento-connect-changelog-$(shell ./util/get-version.sh).html
+	markdown_py -o html5 -f "build/magento-connect-changelog-$(shell ./util/get-version.sh).html" CHANGELOG.md
 
 connect-pkg:
 	./build/build_package.py -d build/mage-package.xml
