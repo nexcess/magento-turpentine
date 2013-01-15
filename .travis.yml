@@ -6,4 +6,4 @@ php:
     - 5.4
 
 script:
-    - make all
+    - make connect-pkg
