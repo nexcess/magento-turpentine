@@ -121,3 +121,6 @@ This does not apply to new installs.
   other block
   * Made ESI client-cache ban (clear) events configurable. See the new "ESI
   Client Cache Purge Events" option
+  * Enabling the *Normalize User-Agent* setting now also differentiates between
+  desktop and mobile browsers, for caching different output for desktop and mobile
+  browsers

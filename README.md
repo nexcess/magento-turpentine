@@ -101,7 +101,6 @@ the page and may differ between different visitors/clients.
  Apache's [mod_remoteip](http://httpd.apache.org/docs/trunk/mod/mod_remoteip.html)
  or [mod_rpaf](http://www.stderr.net/apache/rpaf/).
  - Changing to a different store language has no effect
- - The cache does not differentiate between mobile and desktop (full) browsers
 
 ## Demo
 
