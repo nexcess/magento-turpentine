@@ -461,8 +461,14 @@ EOS;
      * @return string
      */
     protected function _vcl_sub_normalize_user_agent() {
+        /**
+         * Mobile regex from
+         * @link http://magebase.com/magento-tutorials/magento-design-exceptions-explained/
+         */
         $tpl = <<<EOS
-if (req.http.User-Agent ~ "MSIE") {
+if (req.http.User-Agent ~ "iP(?:hone|ad|od)|BlackBerry|Palm|Googlebot-Mobile|Mobile|mobile|mobi|Windows Mobile|Safari Mobile|Android|Opera (?:Mini|Mobi)") {
+        set req.http.X-Normalized-User-Agent = "mobile";
+    } else if (req.http.User-Agent ~ "MSIE") {
         set req.http.X-Normalized-User-Agent = "msie";
     } else if (req.http.User-Agent ~ "Firefox") {
         set req.http.X-Normalized-User-Agent = "firefox";
@@ -470,14 +476,10 @@ if (req.http.User-Agent ~ "MSIE") {
         set req.http.X-Normalized-User-Agent = "safari";
     } else if (req.http.User-Agent ~ "Chrome") {
         set req.http.X-Normalized-User-Agent = "chrome";
-    } else if (req.http.User-Agent ~ "Opera Mini/") {
-        set req.http.X-Normalized-User-Agent = "opera-mini";
-    } else if (req.http.User-Agent ~ "Opera Mobi/") {
-        set req.http.X-Normalized-User-Agent = "opera-mobile";
     } else if (req.http.User-Agent ~ "Opera") {
         set req.http.X-Normalized-User-Agent = "opera";
     } else {
-        set req.http.X-Normalized-User-Agent = "nomatch";
+        set req.http.X-Normalized-User-Agent = "other";
     }
 
 EOS;
