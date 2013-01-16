@@ -2,7 +2,7 @@ SHELL := /bin/bash
 .PHONY: connect-desc connect-pkg all clean
 
 connect-desc:
-	markdown_py -o html5 -f "build/magento-connect-desc-$(shell ./util/get-version.sh).html" README.md
+	grep -v 'Build Status' README.md | markdown_py -o html5 -f "build/magento-connect-desc-$(shell ./util/get-version.sh).html"
 
 connect-changelog:
 	markdown_py -o html5 -f "build/magento-connect-changelog-$(shell ./util/get-version.sh).html" CHANGELOG.md

@@ -1,5 +1,4 @@
 # Nexcess.net Turpentine Extension for Magento
-
 [![Build Status](https://travis-ci.org/nexcess/magento-turpentine.png)](https://travis-ci.org/nexcess/magento-turpentine)
 
 Turpentine is a Magento extension to improve Magento's compatibility with
