@@ -130,3 +130,8 @@ This does not apply to new installs.
   * Enabled continuous-integration builds for PHP 5.2, 5.3, and 5.4 through
   [Travis-CI](https://travis-ci.org/nexcess/magento-turpentine). This is only
   relevant to developers and has no effect on users of the extension
+
+### RELEASE-0.3.1
+
+  * Fixed generated VCL to work with multi-store/multi-site setups with different
+  URL paths

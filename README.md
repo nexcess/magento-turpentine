@@ -11,7 +11,8 @@ modifies Magento's behaviour to significantly improve the cache hit rate.
 Note that this extension is still in **beta** so use on a production site should
 be considered carefully. There are already some sites using it in production,
 but it is certainly not *stable* yet (ESI support brought significant changes
-to how it works).
+to how it works) so it should be carefully tested on a development site before
+being deployed on a production site.
 
 ## Features
 
@@ -28,6 +29,7 @@ to how it works).
  - Non-root Magento installs (i.e. putting Magento in /store/ instead of /)
  - External web crawler support for warming the cache
  - Builtin crawler for automatically warming flushed cache pages
+ - Multi-store/multi-site support
  - [SSL support](https://github.com/nexcess/magento-turpentine/wiki/SSL_Support) through
  [Pound](http://www.apsis.ch/pound) or [Nginx](http://nginx.org/)
 
@@ -71,11 +73,8 @@ pull the block content from a separate URL. Varnish then does another request to
 that URL to get the content for that block, which can be cached separately from
 the page and may differ between different visitors/clients.
 
-## Notes
+## Notes and Caveats
 
- - This extension is currently in **beta**. There are some sites using it in
- production but you should carefully test it on your own dev site before pushing
- to production.
  - Turpentine will **not** help (directly) with the speed of "actions" like adding things
  to the cart or checking out. It only caches, so it can only speed up page load
  speed for site browsing. It will remove a lot of load on the backend though so
@@ -89,7 +88,13 @@ the page and may differ between different visitors/clients.
  will need to be regenerated and cached for the visitor's new session. Any further
  requests will be at full cached-page speed (assuming the pages are already in
  the cache).
- - **Varnish 2.1 Caveats**: Due to technical limitations, some features are not
+ - Multi-store/multi-site setups that use the same *URL path and domain combo*
+ will not work. Specifically they will always use the default site/store and
+ changing via the dropdown menu will not do anything. Examples:
+    - example.com/store/en/ and example.com/store/de/ works
+    - en.example.com/store/ and de.example.com/store/ works
+    - example.com/store/ for both EN and DE **does not** work
+ - **Varnish 2.1**: Due to technical limitations, some features are not
  available when using Varnish 2.1:
     - TTL extension on cache hits does not work
     - External ESI requests are not blocked
@@ -101,7 +106,6 @@ the page and may differ between different visitors/clients.
  (usually localhost/127.0.0.1). It should be possible to work around this using
  Apache's [mod_remoteip](http://httpd.apache.org/docs/trunk/mod/mod_remoteip.html)
  or [mod_rpaf](http://www.stderr.net/apache/rpaf/).
- - Changing to a different store language has no effect
 
 ## Demo
 
