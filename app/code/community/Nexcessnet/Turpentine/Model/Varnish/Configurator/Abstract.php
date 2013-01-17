@@ -189,9 +189,28 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     public function getBaseUrlPathRegex() {
-        return '^' . parse_url(
-                Mage::getStoreConfig( 'web/unsecure/base_url' ), PHP_URL_PATH ) .
-            '(?:(?:index|litespeed)\\.php/)?';
+        $pattern = '^(?:%s)(?:(?:index|litespeed)\\.php/)?';
+        return sprintf( $pattern, implode( '|',
+            array_map( create_function( '$x', 'return preg_quote($x,"|");' ),
+                $this->_getBaseUrlPaths() ) ) );
+    }
+
+    /**
+     * Get the path part of each store's base URL
+     *
+     * @return array
+     */
+    protected function _getBaseUrlPaths() {
+        $paths = array();
+        foreach( Mage::app()->getStores() as $storeId => $store ) {
+            $paths[] = parse_url( $store->getBaseUrl(
+                    Mage_Core_Model_Store::URL_TYPE_LINK, false ),
+                PHP_URL_PATH );
+            $paths[] = parse_url( $store->getBaseUrl(
+                    Mage_Core_Model_Store::URL_TYPE_LINK, true ),
+                PHP_URL_PATH );
+        }
+        return array_unique( $paths );
     }
 
     /**
