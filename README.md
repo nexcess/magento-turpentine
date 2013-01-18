@@ -91,9 +91,10 @@ the page and may differ between different visitors/clients.
  - Multi-store/multi-site setups that use the same *URL path and domain combo*
  will not work. Specifically they will always use the default site/store and
  changing via the dropdown menu will not do anything. Examples:
-    - example.com/store/en/ and example.com/store/de/ works
-    - en.example.com/store/ and de.example.com/store/ works
-    - example.com/store/ for both EN and DE **does not** work
+    - example.com/store/en/ and example.com/store/de/ works (same domain, different paths)
+    - example.com/store/ and example.com/store/substore/ works (same domain, different paths)
+    - en.example.com/store/ and de.example.com/store/ works (different domain, same paths)
+    - example.com/store/ for both EN and DE **does not** work (same domain and paths)
  - **Varnish 2.1**: Due to technical limitations, some features are not
  available when using Varnish 2.1:
     - TTL extension on cache hits does not work
