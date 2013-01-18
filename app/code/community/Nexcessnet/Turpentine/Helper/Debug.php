@@ -20,6 +20,18 @@
  */
 
 class Nexcessnet_Turpentine_Helper_Debug extends Mage_Core_Helper_Abstract {
+    /**
+     * Dump a variable to output with <pre/> tags and disable cache flag
+     *
+     * @param mixed
+     */
+    public function dump( $value ) {
+        Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
+        $this->logValue( $value );
+        echo '<pre>' . PHP_EOL;
+        var_dump( $value );
+        echo '</pre>' . PHP_EOL;
+    }
 
     /**
      * Log message through Magento's logging facility, works like sprintf
