@@ -47,6 +47,11 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
             explode( $token, trim( $data ) ) ) );
     }
 
+    /**
+     * Generate a v4 UUID
+     *
+     * @return string
+     */
     public function generateUuid() {
         if( is_readable( self::UUID_SOURCE ) ) {
             $uuid = trim( file_get_contents( self::UUID_SOURCE ) );

@@ -23,7 +23,7 @@ class Nexcessnet_Turpentine_Helper_Debug extends Mage_Core_Helper_Abstract {
     /**
      * Dump a variable to output with <pre/> tags and disable cache flag
      *
-     * @param mixed
+     * @param mixed $value
      */
     public function dump( $value ) {
         Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
@@ -74,6 +74,13 @@ class Nexcessnet_Turpentine_Helper_Debug extends Mage_Core_Helper_Abstract {
         $this->log( 'TRACEBACK: END ** %s **', $btuuid );
     }
 
+    /**
+     * Like var_dump to the log
+     *
+     * @param  mixed $value
+     * @param  string $name=null
+     * @return null
+     */
     public function logValue( $value, $name=null ) {
         if( is_null( $name ) ) {
             $name = 'VALUE';
