@@ -101,6 +101,9 @@ sub vcl_recv {
 }
 
 sub vcl_pipe {
+    # since we're not going to do any stuff to the response we pretend the
+    # request didn't pass through Varnish
+    remove req.http.X-Turpentine-Secret-Handshake;
     set req.http.Connection = "close";
     return (pipe);
 }
