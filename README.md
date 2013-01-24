@@ -97,7 +97,6 @@ the page and may differ between different visitors/clients.
     - example.com/store/ for both EN and DE **does not** work (same domain and paths)
  - **Varnish 2.1**: Due to technical limitations, some features are not
  available when using Varnish 2.1:
-    - TTL extension on cache hits does not work
     - External ESI requests are not blocked
     - Per-block TTLs are not honored, all ESI blocks use their default TTL
 

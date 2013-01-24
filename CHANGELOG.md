@@ -135,3 +135,10 @@ This does not apply to new installs.
 
   * Fixed generated VCL to work with multi-store/multi-site setups with different
   URL paths
+
+### RELEASE-0.3.2
+
+  * Fixed Turpentine not correctly detecting and disabling output on requests
+  with HTTP Authorization
+  * Removed cached object TTL extension (added in RELEASE-0.2.0) due to issues
+  with cached object contention at high load

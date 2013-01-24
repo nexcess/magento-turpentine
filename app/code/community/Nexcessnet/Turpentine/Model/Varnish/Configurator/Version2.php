@@ -66,7 +66,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version2
             'esi_ttl_param' => Mage::helper( 'turpentine/esi' )->getEsiTtlParam(),
             'secret_handshake'  => Mage::helper( 'turpentine/varnish' )->getSecretHandshake(),
             'crawler_user_agent_regex'  => $this->_getCrawlerUserAgents(),
-            'lru_factor'    => $this->_getLruFactor(),
+            // 'lru_factor'    => $this->_getLruFactor(),
             'esi_per_client_ttl'    => $this->_getEsiPerClientTtl(),
             'esi_per_page_ttl'      => $this->_getEsiPerPageTtl(),
             'esi_global_ttl'        => $this->_getEsiGlobalTtl(),

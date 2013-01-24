@@ -49,7 +49,7 @@ sub vcl_recv {
 
     if (req.request !~ "^(GET|HEAD)$") {
         # We only deal with GET and HEAD by default
-        return (pass);
+        return (pipe);
     }
 
     call remove_double_slashes;
@@ -91,7 +91,7 @@ sub vcl_recv {
             return (lookup);
         }
         if (req.url ~ "{{url_base_regex}}(?:{{url_excludes}})") {
-            return (pass);
+            return (pipe);
         }
         if ({{enable_get_excludes}} &&
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
@@ -141,11 +141,12 @@ sub vcl_hash {
     return (hash);
 }
 
-sub vcl_hit {
-    if (obj.hits > 0) {
-        set obj.ttl = obj.ttl + {{lru_factor}}s;
-    }
-}
+# This seems to cause cache object contention issues
+# sub vcl_hit {
+#     if (obj.hits > 0) {
+#         set obj.ttl = obj.ttl + {{lru_factor}}s;
+#     }
+# }
 
 sub vcl_miss {
     if (req.esi_level == 0 && req.http.X-Varnish-Cookie) {

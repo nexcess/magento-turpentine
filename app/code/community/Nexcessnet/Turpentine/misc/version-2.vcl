@@ -42,7 +42,7 @@ sub vcl_recv {
 
     if (!(req.request ~ "^(GET|HEAD)$")) {
         # We only deal with GET and HEAD by default
-        return (pass);
+        return (pipe);
     }
 
     call remove_double_slashes;
@@ -88,7 +88,7 @@ sub vcl_recv {
             return (lookup);
         }
         if (req.url ~ "{{url_base_regex}}(?:{{url_excludes}})") {
-            return (pass);
+            return (pipe);
         }
         if (req.http.X-Opt-Enable-Get-Excludes == "true" &&
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
