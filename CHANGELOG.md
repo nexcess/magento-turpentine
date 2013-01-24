@@ -138,7 +138,11 @@ This does not apply to new installs.
 
 ### RELEASE-0.3.2
 
-  * Fixed Turpentine not correctly detecting and disabling output on requests
+  * Fixed Turpentine not correctly detecting and disabling ESI/AJAX on requests
   with HTTP Authorization
+  * Fixed some requests being passed through Varnish instead of piped resulting
+  in incorrect handling of response output
   * Removed cached object TTL extension (added in RELEASE-0.2.0) due to issues
   with cached object contention at high load
+  * Improved warm-cache.sh script to handle different platforms better and
+  take advantage of multiple processors/cores
