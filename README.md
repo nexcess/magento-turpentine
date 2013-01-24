@@ -1,5 +1,5 @@
 # Nexcess.net Turpentine Extension for Magento
-[![Build Status](https://travis-ci.org/nexcess/magento-turpentine.png)](https://travis-ci.org/nexcess/magento-turpentine)
+[![Build Status](https://travis-ci.org/nexcess/magento-turpentine.png?branch=master,devel)](https://travis-ci.org/nexcess/magento-turpentine)
 
 Turpentine is a Magento extension to improve Magento's compatibility with
 [Varnish](https://www.varnish-cache.org/), a very-fast caching reverse-proxy. By
