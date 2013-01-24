@@ -101,7 +101,8 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
                 $result[$socketName] = 'Failed to load configurator';
             } else {
                 $vcl = $cfgr->generate();
-                $vclName = hash( 'sha256', microtime() );
+                $vclName = Mage::helper( 'turpentine/data' )
+                    ->secureHash( microtime() );
                 try {
                     $socket->vcl_inline( $vclName, $vcl );
                     sleep( 1 ); //this is probably not really needed

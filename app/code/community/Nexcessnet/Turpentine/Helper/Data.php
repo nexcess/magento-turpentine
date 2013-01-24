@@ -117,6 +117,17 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
     }
 
     /**
+     * Get SHA256 hash of a string, salted with encryption key
+     *
+     * @param  string $data
+     * @return string
+     */
+    public function secureHash( $data ) {
+        $salt = (string)Mage::getConfig()->getNode('global/crypt/key');
+        return hash( 'sha256', sprintf( '%s:%s', $salt, $data ) );
+    }
+
+    /**
      * Get a list of child blocks inside the given block
      *
      * @param  Mage_Core_Model_Layout_Element $blockNode

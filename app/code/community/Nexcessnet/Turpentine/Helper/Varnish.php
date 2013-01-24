@@ -80,8 +80,8 @@ class Nexcessnet_Turpentine_Helper_Varnish extends Mage_Core_Helper_Abstract {
          * cause ESI injection despite the request not passing through Varnish
          * for ESI parsing/handling.
          */
-        // return sha1( Mage::helper( 'turpentine/data' )->encrypt(
-        //     Mage::getStoreConfig( 'turpentine_varnish/servers/auth_key' ) ) );
+        // return Mage::helper( 'turpentine/data' )->secureHash(
+        //     Mage::getStoreConfig( 'turpentine_varnish/servers/auth_key' ) );
     }
 
     /**
