@@ -35,8 +35,7 @@ being deployed on a production site.
 
 ## Requirements
 
- - Magento Community Edition 1.6+ (earlier versions may work but have not been
- tested) or Magento Enterprise Edition 1.11+
+ - Magento Community Edition 1.6+ or Magento Enterprise Edition 1.11+
  - Varnish 2.1+ (including 3.0+)
 
 ## Installation & Usage
@@ -99,6 +98,15 @@ the page and may differ between different visitors/clients.
  available when using Varnish 2.1:
     - External ESI requests are not blocked
     - Per-block TTLs are not honored, all ESI blocks use their default TTL
+ - The core parts of Turpentine (caching and ESI/AJAX injection) work under Magento CE 1.5, but a significant
+ portion of the functionality doesn't work due to changes to event names. That
+ said, it would be possible to use Turpentine with Magento CE 1.5 with an understanding
+ that it is not supported and what actions need to be taken manually. A
+ short and non-comprehensive list of things that don't work under CE 1.5:
+    - *Cache flushing*: This includes when flushing the cache via System > Cache
+    Management and the automatic cache flushes on product/category saves.
+    - *Cache warming*: Due to the missing flush events, no URLs are ever added
+    to the warming URL queue.
 
 ## Known Issues
 
