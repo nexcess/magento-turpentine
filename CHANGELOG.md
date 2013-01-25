@@ -146,3 +146,7 @@ This does not apply to new installs.
   with cached object contention at high load
   * Improved warm-cache.sh script to handle different platforms better and
   take advantage of multiple processors/cores
+  * Added advanced session validation. Varnish will now respect the Magento settings
+  for validating the User-Agent, X-Forwarded-For, and Via headers, and the remote
+  IP address with respect to sessions (under System > Configuration > General >
+  Web > Session Validation Settings).
