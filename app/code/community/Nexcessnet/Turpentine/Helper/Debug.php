@@ -126,6 +126,8 @@ class Nexcessnet_Turpentine_Helper_Debug extends Mage_Core_Helper_Abstract {
             $value = sprintf( $value, count( $arg ), implode( ', ', $c ) );
         } elseif( is_string( $arg ) ) {
             $value = sprintf( '\'%s\'', $arg );
+        } elseif( is_bool( $arg ) ) {
+            $value = $arg ? 'TRUE' : 'FALSE';
         }
         return $value;
     }

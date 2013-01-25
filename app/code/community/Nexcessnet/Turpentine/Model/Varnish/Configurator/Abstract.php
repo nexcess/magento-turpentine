@@ -400,6 +400,34 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     }
 
     /**
+     * Get the advanced session validation restrictions
+     *
+     * Note that if User-Agent Normalization is on then the normalized user-agent
+     * is used for user-agent validation instead of the full user-agent
+     *
+     * @return string
+     */
+    protected function _getAdvancedSessionValidationTargets() {
+        $validation = array();
+        if( Mage::getStoreConfig( 'web/session/use_remote_addr' ) ) {
+            $validation[] = 'client.ip';
+        }
+        if( Mage::getStoreConfig( 'web/session/use_http_via' ) ) {
+            $validation[] = 'req.http.Via';
+        }
+        if( Mage::getStoreConfig( 'web/session/use_http_x_forwarded_for' ) ) {
+            $validation[] = 'req.http.X-Forwarded-For';
+        }
+        if( Mage::getStoreConfig(
+                    'web/session/use_http_user_agent' ) &&
+                !Mage::getStoreConfig(
+                    'turpentine_vcl/normalization/user_agent' ) ) {
+            $validation[] = 'req.http.User-Agent';
+        }
+        return $validation;
+    }
+
+    /**
      * Remove empty and commented out lines from the generated VCL
      *
      * @param  string $dirtyVcl generated vcl
