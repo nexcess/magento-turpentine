@@ -57,6 +57,15 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
         'wishlist',
     );
 
+    /**
+     * Storage for used types of message storages
+     *
+     * Added for compatibility with Magento 1.5
+     *
+     * @var array
+     */
+    protected $_usedStorageTypes = array( 'core/session' );
+
     public function _prepareLayout() {
         if( $this->_fixMessages() ) {
             /* do nothing */
@@ -122,6 +131,17 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      */
     public function getGroupedHtml() {
         return $this->_handleDirectCall( 'getGroupedHtml' )->toHtml();
+    }
+
+    /**
+     * Add used storage type
+     *
+     * Method added for compatibility with Magento 1.5
+     *
+     * @param string $type
+     */
+    public function addStorageType( $type ) {
+        $this->_usedStorageTypes[] = $type;
     }
 
     /**
