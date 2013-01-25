@@ -51,7 +51,7 @@ then if you still need help, open a bug report in GitHub's
 
 ## How it works
 
-The extension works in two parts, page caching and block (ESI) caching. A
+The extension works in two parts, page caching and block (ESI/AJAX) caching. A
 simplified look at how they work:
 
 For pages, Varnish first checks whether the visitor sent a ``frontend`` cookie.
@@ -67,7 +67,7 @@ For blocks, the extension listens for the ``core_block_abstract_to_html_before``
 event in Magento. When this event is triggered, the extension looks at the block
 attached to it and if an [ESI policy](https://github.com/nexcess/magento-turpentine/wiki/ESI_Cache_Policy)
 has been defined for the block then the
-block's template is replaced with a simple ESI template that tells Varnish to
+block's template is replaced with a simple ESI (or AJAX) template that tells Varnish to
 pull the block content from a separate URL. Varnish then does another request to
 that URL to get the content for that block, which can be cached separately from
 the page and may differ between different visitors/clients.
