@@ -42,7 +42,7 @@ sub vcl_recv {
 
     if (!(req.request ~ "^(GET|HEAD)$")) {
         # We only deal with GET and HEAD by default
-        return (pass);
+        return (pipe);
     }
 
     call remove_double_slashes;
@@ -88,7 +88,7 @@ sub vcl_recv {
             return (lookup);
         }
         if (req.url ~ "{{url_base_regex}}(?:{{url_excludes}})") {
-            return (pass);
+            return (pipe);
         }
         if (req.http.X-Opt-Enable-Get-Excludes == "true" &&
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
@@ -101,6 +101,9 @@ sub vcl_recv {
 }
 
 sub vcl_pipe {
+    # since we're not going to do any stuff to the response we pretend the
+    # request didn't pass through Varnish
+    remove req.http.X-Turpentine-Secret-Handshake;
     set req.http.Connection = "close";
     return (pipe);
 }
@@ -132,6 +135,7 @@ sub vcl_hash {
     if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") {
         if (req.url ~ "/{{esi_cache_type_param}}/per-client/" && req.http.Cookie ~ "frontend=") {
             set req.hash += regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1");
+            {{advanced_session_validation}}
         }
     }
     return (hash);

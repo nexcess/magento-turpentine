@@ -47,6 +47,11 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
             explode( $token, trim( $data ) ) ) );
     }
 
+    /**
+     * Generate a v4 UUID
+     *
+     * @return string
+     */
     public function generateUuid() {
         if( is_readable( self::UUID_SOURCE ) ) {
             $uuid = trim( file_get_contents( self::UUID_SOURCE ) );
@@ -109,6 +114,17 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
      */
     public function decrypt( $data ) {
         return $this->_getCrypt()->decrypt( base64_decode( $data ) );
+    }
+
+    /**
+     * Get SHA256 hash of a string, salted with encryption key
+     *
+     * @param  string $data
+     * @return string
+     */
+    public function secureHash( $data ) {
+        $salt = (string)Mage::getConfig()->getNode('global/crypt/key');
+        return hash( 'sha256', sprintf( '%s:%s', $salt, $data ) );
     }
 
     /**

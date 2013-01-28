@@ -49,7 +49,7 @@ sub vcl_recv {
 
     if (req.request !~ "^(GET|HEAD)$") {
         # We only deal with GET and HEAD by default
-        return (pass);
+        return (pipe);
     }
 
     call remove_double_slashes;
@@ -91,7 +91,7 @@ sub vcl_recv {
             return (lookup);
         }
         if (req.url ~ "{{url_base_regex}}(?:{{url_excludes}})") {
-            return (pass);
+            return (pipe);
         }
         if ({{enable_get_excludes}} &&
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
@@ -104,6 +104,9 @@ sub vcl_recv {
 }
 
 sub vcl_pipe {
+    # since we're not going to do any stuff to the response we pretend the
+    # request didn't pass through Varnish
+    unset req.http.X-Turpentine-Secret-Handshake;
     set req.http.Connection = "close";
     return (pipe);
 }
@@ -133,16 +136,18 @@ sub vcl_hash {
     if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") {
         if (req.url ~ "/{{esi_cache_type_param}}/per-client/" && req.http.Cookie ~ "frontend=") {
             hash_data(regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1"));
+            {{advanced_session_validation}}
         }
     }
     return (hash);
 }
 
-sub vcl_hit {
-    if (obj.hits > 0) {
-        set obj.ttl = obj.ttl + {{lru_factor}}s;
-    }
-}
+# This seems to cause cache object contention issues
+# sub vcl_hit {
+#     if (obj.hits > 0) {
+#         set obj.ttl = obj.ttl + {{lru_factor}}s;
+#     }
+# }
 
 sub vcl_miss {
     if (req.esi_level == 0 && req.http.X-Varnish-Cookie) {

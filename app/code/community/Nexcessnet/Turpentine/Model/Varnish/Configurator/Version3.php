@@ -36,6 +36,14 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
         return $this->_cleanVcl( $vcl );
     }
 
+    protected function _getAdvancedSessionValidation() {
+        $validation = '';
+        foreach( $this->_getAdvancedSessionValidationTargets() as $target ) {
+            $validation .= sprintf( 'hash_data(%s);' . PHP_EOL, $target );
+        }
+        return $validation;
+    }
+
     /**
      * Build the list of template variables to apply to the VCL template
      *
@@ -66,7 +74,8 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
             'esi_ttl_param' => Mage::helper( 'turpentine/esi' )->getEsiTtlParam(),
             'secret_handshake'  => Mage::helper( 'turpentine/varnish' )->getSecretHandshake(),
             'crawler_user_agent_regex'  => $this->_getCrawlerUserAgents(),
-            'lru_factor'    => $this->_getLruFactor(),
+            // 'lru_factor'    => $this->_getLruFactor(),
+            'advanced_session_validation'   => $this->_getAdvancedSessionValidation(),
         );
         if( Mage::getStoreConfig( 'turpentine_vcl/normalization/encoding' ) ) {
             $vars['normalize_encoding'] = $this->_vcl_sub_normalize_encoding();

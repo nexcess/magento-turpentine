@@ -1,7 +1,7 @@
-# Nexcess.net Turpentine Extension for Magento
+# [Nexcess.net](https://www.nexcess.net/) Turpentine Extension for Magento
 [![Build Status](https://travis-ci.org/nexcess/magento-turpentine.png?branch=master,devel)](https://travis-ci.org/nexcess/magento-turpentine)
 
-Turpentine is a Magento extension to improve Magento's compatibility with
+Turpentine is a [Magento](https://www.magentocommerce.com/) extension to improve Magento's compatibility with
 [Varnish](https://www.varnish-cache.org/), a very-fast caching reverse-proxy. By
 default, Varnish doesn't cache requests with cookies and Magento sends the
 *frontend* cookie with every request causing a (near) zero hit-rate for Varnish's cache.
@@ -35,8 +35,7 @@ being deployed on a production site.
 
 ## Requirements
 
- - Magento Community Edition 1.6+ (earlier versions may work but have not been
- tested) or Magento Enterprise Edition 1.11+
+ - Magento Community Edition 1.6+ or Magento Enterprise Edition 1.11+
  - Varnish 2.1+ (including 3.0+)
 
 ## Installation & Usage
@@ -52,7 +51,7 @@ then if you still need help, open a bug report in GitHub's
 
 ## How it works
 
-The extension works in two parts, page caching and block (ESI) caching. A
+The extension works in two parts, page caching and block (ESI/AJAX) caching. A
 simplified look at how they work:
 
 For pages, Varnish first checks whether the visitor sent a ``frontend`` cookie.
@@ -68,7 +67,7 @@ For blocks, the extension listens for the ``core_block_abstract_to_html_before``
 event in Magento. When this event is triggered, the extension looks at the block
 attached to it and if an [ESI policy](https://github.com/nexcess/magento-turpentine/wiki/ESI_Cache_Policy)
 has been defined for the block then the
-block's template is replaced with a simple ESI template that tells Varnish to
+block's template is replaced with a simple ESI (or AJAX) template that tells Varnish to
 pull the block content from a separate URL. Varnish then does another request to
 that URL to get the content for that block, which can be cached separately from
 the page and may differ between different visitors/clients.
@@ -97,9 +96,17 @@ the page and may differ between different visitors/clients.
     - example.com/store/ for both EN and DE **does not** work (same domain and paths)
  - **Varnish 2.1**: Due to technical limitations, some features are not
  available when using Varnish 2.1:
-    - TTL extension on cache hits does not work
     - External ESI requests are not blocked
     - Per-block TTLs are not honored, all ESI blocks use their default TTL
+ - The core parts of Turpentine (caching and ESI/AJAX injection) work under Magento CE 1.5, but a significant
+ portion of the functionality doesn't work due to changes to event names. That
+ said, it would be possible to use Turpentine with Magento CE 1.5 with an understanding
+ that it is not supported and what actions need to be taken manually. A
+ short and non-comprehensive list of things that don't work under CE 1.5:
+    - *Cache flushing*: This includes when flushing the cache via System > Cache
+    Management and the automatic cache flushes on product/category saves.
+    - *Cache warming*: Due to the missing flush events, no URLs are ever added
+    to the warming URL queue.
 
 ## Known Issues
 
