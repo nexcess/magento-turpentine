@@ -118,6 +118,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      */
     public function injectEsi( $eventObject ) {
         $blockObject = $eventObject->getBlock();
+        $dataHelper = Mage::helper( 'turpentine/data' );
+        $esiHelper = Mage::helper( 'turpentine/esi' );
         if( Mage::helper( 'turpentine/esi' )->getEsiBlockLogEnabled() ) {
             Mage::log( 'Checking ESI block candidate: ' .
                 $blockObject->getNameInLayout() );
@@ -168,8 +170,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 //we probably don't really need to encrypt this but it doesn't hurt
                 //use core/encryption instead of Mage::encrypt/decrypt because
                 //EE uses a different method by default
-                $dataParam      => Mage::helper( 'turpentine/data' )
-                                    ->encrypt( serialize( $esiData ) ),
+                $dataParam      => $dataHelper->freeze( $esiData ),
             ) );
             $blockObject->setEsiUrl( $esiUrl );
             // avoid caching the ESI template output to prevent the double-esi-

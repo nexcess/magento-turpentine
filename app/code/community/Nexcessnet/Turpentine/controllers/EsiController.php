@@ -40,10 +40,10 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         $cacheFlag = false;
         if( Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() ) {
             $req = $this->getRequest();
+            $dataHelper = Mage::helper( 'turpentine/data' );
             $esiDataParamValue = $req->getParam(
                 Mage::helper( 'turpentine/esi' )->getEsiDataParam() );
-            $esiDataArray = unserialize( Mage::helper( 'turpentine/data' )
-                ->decrypt( $esiDataParamValue ) );
+            $esiDataArray = $dataHelper->thaw( $esiDataParamValue );
             if( !$esiDataArray ) {
                 Mage::log( 'Invalid ESI data in URL: ' . $esiDataParamValue,
                     Zend_Log::WARN );
@@ -84,10 +84,10 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         $resp = $this->getResponse();
         if( Mage::helper( 'turpentine/ajax' )->getAjaxEnabled() ) {
             $req = $this->getRequest();
+            $dataHelper = Mage::helper( 'turpentine/data' );
             $ajaxDataParamValue = $req->getParam(
                 Mage::helper( 'turpentine/ajax' )->getAjaxDataParam() );
-            $ajaxDataArray = unserialize( Mage::helper( 'turpentine/data' )
-                ->decrypt( $ajaxDataParamValue ) );
+            $ajaxDataArray = $dataHelper->thaw( $ajaxDataParamValue );
             if( !$ajaxDataArray ) {
                 Mage::log( 'Invalid AJAX data in URL: ' . $ajaxDataParamValue,
                     Zend_Log::WARN );

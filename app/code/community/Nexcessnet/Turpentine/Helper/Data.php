@@ -28,6 +28,14 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
     const UUID_SOURCE   = '/proc/sys/kernel/random/uuid';
 
     /**
+     * Compression level for serialization compression
+     *
+     * Testing showed no significant difference between levels 1 and 9 so using
+     * 1 since it's faster
+     */
+    const COMPRESSION_LEVEL = 1;
+
+    /**
      * encryption singleton thing
      *
      * @var Mage_Core_Model_Encryption
@@ -93,27 +101,69 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
      * @return string
      */
     public function getVersion() {
-        return Mage::getConfig()->getModuleConfig( 'Nexcessnet_Turpentine' )->version;
+        return Mage::getConfig()
+            ->getModuleConfig( 'Nexcessnet_Turpentine' )->version;
     }
 
     /**
-     * Encrypt using Magento CE standard encryption (even on Magento EE)
+     * Base64 encode a string
      *
-     * @param  string $data
+     * NOTE this changes the last 2 characters to be friendly to URLs
+     *     / => .
+     *     + => -
+     *
+     * @param  string $str
      * @return string
      */
-    public function encrypt( $data ) {
-        return base64_encode( $this->_getCrypt()->encrypt( $data ) );
+    public function urlBase64Encode( $str ) {
+        return str_replace(
+            array( '/', '+' ),
+            array( '.', '-' ),
+            base64_encode( $str ) );
     }
 
     /**
-     * Decrypt using Mage CE standard encryption (even on Magento EE)
+     * Base64 decode a string, counterpart to urlBase64Encode
      *
-     * @param  string $data
+     * @param  string $str
      * @return string
      */
-    public function decrypt( $data ) {
-        return $this->_getCrypt()->decrypt( base64_decode( $data ) );
+    public function urlBase64Decode( $str ) {
+        return base64_decode(
+            str_replace(
+                array( '.', '-' ),
+                array( '/', '+' ),
+                $str ) );
+    }
+
+    /**
+     * Serialize a variable into a string that can be used in a URL
+     *
+     * Using gzdeflate to avoid the checksum/metadata overhead in gzencode and
+     * gzcompress
+     *
+     * @param  mixed $data
+     * @return string
+     */
+    public function freeze( $data ) {
+        return $this->urlBase64Encode(
+            $this->_getCrypt()->encrypt(
+                gzdeflate(
+                    serialize( $data ),
+                    self::COMPRESSION_LEVEL ) ) );
+    }
+
+    /**
+     * Unserialize data
+     *
+     * @param  string $data
+     * @return mixed
+     */
+    public function thaw( $data ) {
+        return unserialize(
+            gzinflate(
+                $this->_getCrypt()->decrypt(
+                    $this->urlBase64Decode( $data ) ) ) );
     }
 
     /**
@@ -123,7 +173,7 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
      * @return string
      */
     public function secureHash( $data ) {
-        $salt = (string)Mage::getConfig()->getNode('global/crypt/key');
+        $salt = $this->_getCryptKey();
         return hash( 'sha256', sprintf( '%s:%s', $salt, $data ) );
     }
 
@@ -183,13 +233,25 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
     /**
      * Get encryption singleton thing
      *
+     * Not using core/cryption because it auto-base64 encodes stuff which we
+     * don't want in this case
+     *
      * @return Mage_Core_Model_Encryption
      */
     protected function _getCrypt() {
         if( is_null( $this->_crypt ) ) {
-            $this->_crypt = Mage::getModel( 'core/encryption' );
-            $this->_crypt->setHelper( Mage::helper( 'core' ) );
+            $this->_crypt = Varien_Crypt::factory()
+                ->init( $this->_getCryptKey() );
         }
         return $this->_crypt;
+    }
+
+    /**
+     * Get Magento's encryption key
+     *
+     * @return string
+     */
+    protected function _getCryptKey() {
+        return (string)Mage::getConfig()->getNode( 'global/crypt/key' );
     }
 }

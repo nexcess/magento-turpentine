@@ -35,6 +35,7 @@ class Nexcessnet_Turpentine_Model_Observer_Ajax extends
     public function injectAjax( $eventObject ) {
         $blockObject = $eventObject->getBlock();
         $ajaxHelper = Mage::helper( 'turpentine/ajax' );
+        $dataHelper = Mage::helper( 'turpentine/data' );
         if( $ajaxHelper->shouldResponseUseAjax() &&
                 $blockObject instanceof Mage_Core_Block_Template &&
                 $ajaxOptions = $blockObject->getAjaxOptions() ) {
@@ -58,8 +59,7 @@ class Nexcessnet_Turpentine_Model_Observer_Ajax extends
                     //we probably don't really need to encrypt this but it doesn't hurt
                     //use core/encryption instead of Mage::encrypt/decrypt because
                     //EE uses a different method by default
-                    $dataParam      => Mage::helper( 'turpentine/data' )
-                                        ->encrypt( serialize( $ajaxData ) ),
+                    $dataParam      => $dataHelper->freeze( $ajaxData ),
             ) );
             $blockObject->setAjaxUrl( $ajaxUrl );
             // avoid caching the ESI template output to prevent the double-esi-
