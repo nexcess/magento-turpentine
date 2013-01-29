@@ -134,59 +134,56 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
     public function injectEsi( $eventObject ) {
         $blockObject = $eventObject->getBlock();
         $dataHelper = Mage::helper( 'turpentine/data' );
+        $varnishHelper = Mage::helper( 'turpentine/varnish' );
         $esiHelper = Mage::helper( 'turpentine/esi' );
-        if( Mage::helper( 'turpentine/esi' )->getEsiBlockLogEnabled() ) {
+        if( $esiHelper->getEsiBlockLogEnabled() ) {
             Mage::log( 'Checking ESI block candidate: ' .
                 $blockObject->getNameInLayout() );
         }
-        if( Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() &&
+        if( $esiHelper->shouldResponseUseEsi() &&
                 $blockObject instanceof Mage_Core_Block_Template &&
                 $esiOptions = $blockObject->getEsiOptions() ) {
             if( Mage::app()->getStore()->getCode() == 'admin' ) {
-                //admin blocks are not allowed to be cached for now
-                Mage::log( 'Ignoring attempt to ESI inject adminhtml block: ' .
+                // admin blocks are not allowed to be cached for now
+                Mage::log( 'Ignoring attempt to inject adminhtml block: ' .
                     $blockObject->getNameInLayout(), Zend_Log::WARN );
                 return;
             }
-            $ttlParam = Mage::helper( 'turpentine/esi' )->getEsiTtlParam();
-            $cacheTypeParam = Mage::helper( 'turpentine/esi' )
-                ->getEsiCacheTypeParam();
-            $dataParam = Mage::helper( 'turpentine/esi' )->getEsiDataParam();
-            $esiOptions = array_merge( $this->_getDefaultEsiOptions(),
-                $esiOptions );
-            if( !isset( $esiOptions[$ttlParam] ) ) {
-                //set default esi ttl by cache type
-                switch( $esiOptions[$cacheTypeParam] ) {
-                    case 'global':
-                        $ttlKey = 'turpentine_vcl/ttls/esi_global';
-                        break;
-                    case 'per-page':
-                        $ttlKey = 'turpentine_vcl/ttls/esi_per_page';
-                        break;
-                    case 'per-client':
-                        $ttlKey = 'turpentine_vcl/ttls/esi_per_client';
-                        //TODO: may need to set session id like parent url
-                        break;
-                    default:
-                        Mage::throwException( 'Invalid block cache_type: ' .
-                            $esiOptions[$cacheTypeParam] );
-                }
-                $esiOptions[$ttlParam] = Mage::getStoreConfig( $ttlKey );
+            $ttlParam = $esiHelper->getEsiTtlParam();
+            $cacheTypeParam = $esiHelper->getEsiCacheTypeParam();
+            $scopeParam = $esiHelper->getEsiScopeParam();
+            $dataParam = $esiHelper->getEsiDataParam();
+            $methodParam = $esiHelper->getEsiMethodParam();
+
+            $esiOptions = $this->_getDefaultEsiOptions( $esiOptions );
+
+            // change the block's template to the stripped down ESI template
+            switch( $esiOptions[$methodParam] ) {
+                case 'ajax':
+                    $blockObject->setTemplate( 'turpentine/ajax.phtml' );
+                    break;
+
+                case 'esi':
+                default:
+                    $blockObject->setTemplate( 'turpentine/esi.phtml' );
+                    // flag request for ESI processing
+                    Mage::register( 'turpentine_esi_flag', true, true );
             }
-            //change the block's template to the stripped down ESI template
-            $blockObject->setTemplate( 'turpentine/esi.phtml' );
-            //esi data is the data needed to regenerate the ESI'd block
+
+            // esi data is the data needed to regenerate the ESI'd block
             $esiData = $this->_getEsiData( $blockObject, $esiOptions )->toArray();
             ksort( $esiData );
-            $esiUrl = Mage::getUrl( 'turpentine/esi/getBlock',
-                array(
+            $urlOptions = array(
+                $methodParam    => $esiOptions[$methodParam],
                 $cacheTypeParam => $esiOptions[$cacheTypeParam],
                 $ttlParam       => $esiOptions[$ttlParam],
-                //we probably don't really need to encrypt this but it doesn't hurt
-                //use core/encryption instead of Mage::encrypt/decrypt because
-                //EE uses a different method by default
                 $dataParam      => $dataHelper->freeze( $esiData ),
-            ) );
+            );
+            if( $esiOptions[$methodParam] == 'ajax' ) {
+                $urlOptions['_secure'] = Mage::app()->getStore()
+                    ->isCurrentlySecure();
+            }
+            $esiUrl = Mage::getUrl( 'turpentine/esi/getBlock', $urlOptions );
             $blockObject->setEsiUrl( $esiUrl );
             // avoid caching the ESI template output to prevent the double-esi-
             // include/"ESI processing not enabled" bug
@@ -194,12 +191,10 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 $blockObject->unsetData( 'cache_' . $dataKey );
             }
             if( strlen( $esiUrl ) > 2047 ) {
-                Mage::log( sprintf( 'ESI url is probably too long (%d > 2047 characters): %s',
+                Mage::log( sprintf(
+                    'ESI url is probably too long (%d > 2047 characters): %s',
                     strlen( $esiUrl ), $esiUrl ), Zend_Log::WARN );
             }
-
-            // flag request for ESI processing
-            Mage::register( 'turpentine_esi_flag', true, true );
         } // else handle the block like normal and cache it inline with the page
     }
 
@@ -211,8 +206,10 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      * @return Varien_Object
      */
     protected function _getEsiData( $blockObject, $esiOptions ) {
-        $cacheTypeParam = Mage::helper( 'turpentine/esi' )
-            ->getEsiCacheTypeParam();
+        $esiHelper = Mage::helper( 'turpentine/esi' );
+        $cacheTypeParam = $esiHelper->getEsiCacheTypeParam();
+        $scopeParam = $esiHelper->getEsiScopeParam();
+        $methodParam = $esiHelper->getEsiMethodParam();
         $esiData = new Varien_Object();
         $esiData->setStoreId( Mage::app()->getStore()->getId() );
         $esiData->setDesignPackage( Mage::getDesign()->getPackageName() );
@@ -220,7 +217,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $esiData->setNameInLayout( $blockObject->getNameInLayout() );
         $esiData->setBlockType( get_class( $blockObject ) );
         $esiData->setLayoutHandles( $this->_getBlockLayoutHandles( $blockObject ) );
-        if( $esiOptions[$cacheTypeParam] == 'per-page' ) {
+        $esiData->setEsiMethod( $esiOptions[$methodParam] );
+        if( $esiOptions[$scopeParam] == 'page' ) {
             $esiData->setParentUrl( Mage::app()->getRequest()->getRequestString() );
         }
         if( is_array( $esiOptions['dummy_blocks'] ) ) {
@@ -310,13 +308,36 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      *
      * @return array
      */
-    protected function _getDefaultEsiOptions() {
-        return array(
+    protected function _getDefaultEsiOptions( $options ) {
+        $esiHelper = Mage::helper( 'turpentine/esi' );
+        $defaults = array(
+            $esiHelper->getEsiMethodParam()         => 'esi',
+            $esiHelper->getEsiScopeParam()          => 'global',
+            $esiHelper->getEsiCacheTypeParam()      => 'public',
             'dummy_blocks'      => array(),
-            Mage::helper( 'turpentine/esi' )->getEsiCacheTypeParam()
-                                => 'per-client',
             'registry_keys'     => array(),
         );
+        $options = array_merge( $defaults, $options );
+
+        // set the default TTL
+        if( !isset( $esiOptions[$ttlParam] ) ) {
+            if( $esiOptions[$cacheTypeParam] == 'private' ) {
+                switch( $esiOptions[$methodParam] ) {
+                    case 'ajax':
+                        $esiOptions[$ttlParam] = '0';
+                        break;
+
+                    case 'esi':
+                    default:
+                        $esiOptions[$ttlParam] = $esiHelper->getDefaultEsiTtl();
+                        break;
+                }
+            } else {
+                $esiOptions[$ttlParam] = $varnishHelper->getDefaultTtl();
+            }
+        }
+
+        return $options;
     }
 
     /**

@@ -40,9 +40,9 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         $cacheFlag = false;
         if( Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() ) {
             $req = $this->getRequest();
+            $esiHelper = Mage::helper( 'turpentine/esi' );
             $dataHelper = Mage::helper( 'turpentine/data' );
-            $esiDataParamValue = $req->getParam(
-                Mage::helper( 'turpentine/esi' )->getEsiDataParam() );
+            $esiDataParamValue = $req->getParam( $esiHelper->getEsiDataParam() );
             $esiDataArray = $dataHelper->thaw( $esiDataParamValue );
             if( !$esiDataArray ) {
                 Mage::log( 'Invalid ESI data in URL: ' . $esiDataParamValue,
@@ -62,6 +62,10 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                     $block->setEsiOptions( false );
                     $resp->setBody( $block->toHtml() );
                     $cacheFlag = true;
+                    if( $esiData->getEsiMethod() == 'ajax' ) {
+                        $resp->setHeader( 'Access-Control-Allow-Origin',
+                            $esiHelper->getCorsOrigin() );
+                    }
                 } else {
                     $resp->setHttpResponseCode( 404 );
                     $resp->setBody( 'ESI block not found' );

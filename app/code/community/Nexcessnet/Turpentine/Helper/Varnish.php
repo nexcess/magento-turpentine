@@ -135,4 +135,13 @@ class Nexcessnet_Turpentine_Helper_Varnish extends Mage_Core_Helper_Abstract {
     public function getMageCacheName() {
         return self::MAGE_CACHE_NAME;
     }
+
+    /**
+     * Get the configured default object TTL
+     *
+     * @return string
+     */
+    public function getDefaultTtl() {
+        return Mage::getStoreConfig( 'turpentine_vcl/ttls/default_ttl' );
+    }
 }

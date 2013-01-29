@@ -20,9 +20,11 @@
  */
 
 class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
-    const ESI_DATA_PARAM            = 'esiData';
+    const ESI_DATA_PARAM            = 'data';
     const ESI_TTL_PARAM             = 'ttl';
-    const ESI_CACHE_TYPE_PARAM      = 'cacheType';
+    const ESI_CACHE_TYPE_PARAM      = 'access';
+    const ESI_SCOPE_PARAM           = 'scope';
+    const ESI_METHOD_PARAM          = 'method';
     const MAGE_CACHE_NAME           = 'turpentine_esi_blocks';
 
     /**
@@ -74,12 +76,30 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     }
 
     /**
+     * Get the URL param name for the ESI block scope
+     *
+     * @return string
+     */
+    public function getEsiScopeParam() {
+        return self::ESI_SCOPE_PARAM;
+    }
+
+    /**
      * Get the URL param name for the ESI block TTL
      *
      * @return string
      */
     public function getEsiTtlParam() {
         return self::ESI_TTL_PARAM;
+    }
+
+    /**
+     * Get the URL param name for the ESI inclusion method
+     *
+     * @return string
+     */
+    public function getEsiMethodParam() {
+        return self::ESI_METHOD_PARAM;
     }
 
     /**
@@ -145,5 +165,29 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     public function getCacheClearEvents() {
         return Mage::helper( 'turpentine/data' )->cleanExplode( PHP_EOL,
             Mage::getStoreConfig( 'turpentine_varnish/purging/esi_purge_events' ) );
+    }
+
+    /**
+     * Get the default private ESI block TTL
+     *
+     * @return string
+     */
+    public function getDefaultEsiTtl() {
+        return Mage::getStoreConfig( 'web/cookie/cookie_lifetime' );
+    }
+
+    /**
+     * Get the CORS origin field from the unsecure base URL
+     *
+     * @return string
+     */
+    public function getCorsOrigin() {
+        $baseUrl = Mage::getBaseUrl();
+        $path = parse_url( $baseUrl, PHP_URL_PATH );
+        $domain = parse_url( $baseUrl, PHP_URL_HOST );
+        // there has to be a better way to just strip the path off
+        return substr( $baseUrl, 0,
+            strpos( $baseUrl, $path,
+                strpos( $baseUrl, $domain ) ) );
     }
 }
