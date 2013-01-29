@@ -27,7 +27,7 @@
         <reference name="header">
             <action method="setEsiOptions">
                 <params>
-                    <cacheType>per-client</cacheType>
+                    <access>private</access>
                 </params>
             </action>
         </reference>
@@ -36,51 +36,55 @@
         <reference name="cart_sidebar">
             <action method="setEsiOptions">
                 <params>
-                    <cacheType>per-client</cacheType>
+                    <access>private</access>
                 </params>
             </action>
         </reference>
         <reference name="catalog.compare.sidebar">
             <action method="setEsiOptions">
                 <params>
-                    <cacheType>per-client</cacheType>
+                    <access>private</access>
                 </params>
             </action>
         </reference>
         <reference name="right.reports.product.viewed">
             <action method="setEsiOptions">
                 <params>
-                    <cacheType>per-client</cacheType>
+                    <access>private</access>
                 </params>
             </action>
         </reference>
         <reference name="right.reports.product.compared">
             <action method="setEsiOptions">
                 <params>
-                    <cacheType>per-client</cacheType>
+                    <access>private</access>
                 </params>
             </action>
         </reference>
         <reference name="right.poll">
             <action method="setEsiOptions">
                 <params>
-                    <cacheType>per-client</cacheType>
+                    <access>private</access>
                 </params>
             </action>
         </reference>
 
         <!-- Messages are cached on a per-client basis -->
         <reference name="global_messages">
-            <action method="setAjaxOptions">
+            <action method="setEsiOptions">
                 <params>
-                    <cacheType>per-client</cacheType>
+                    <access>private</access>
+                    <method>ajax</method>
+                    <ttl>0</ttl>
                 </params>
             </action>
         </reference>
         <reference name="messages">
-            <action method="setAjaxOptions">
+            <action method="setEsiOptions">
                 <params>
-                    <cacheType>per-client</cacheType>
+                    <access>private</access>
+                    <method>ajax</method>
+                    <ttl>0</ttl>
                 </params>
             </action>
         </reference>
@@ -88,7 +92,9 @@
         <reference name="footer">
             <action method="setEsiOptions">
                 <params>
-                    <cacheType>global</cacheType>
+                    <!-- this is the default but we specifically set it so
+                    it actually gets picked up -->
+                    <access>public</access>
                 </params>
             </action>
         </reference>
@@ -101,7 +107,7 @@
         <reference name="checkout.cart">
             <action method="setEsiOptions">
                 <params>
-                    <cacheType>per-client</cacheType>
+                    <access>private</access>
                 </params>
             </action>
         </reference>
@@ -187,8 +193,10 @@
         <reference name="customer_account_dashboard">
             <action method="setEsiOptions">
                 <params>
-                    <cacheType>per-client</cacheType>
-                    <dummy_blocks>head</dummy_blocks>
+                    <access>private</access>
+                    <dummy_blocks>
+                        <head/>
+                    </dummy_blocks>
                 </params>
             </action>
         </reference>
@@ -214,8 +222,10 @@
         <reference name="sales.order.history">
             <action method="setEsiOptions">
                 <params>
-                    <cacheType>per-client</cacheType>
-                    <dummy_blocks>root</dummy_blocks>
+                    <access>private</access>
+                    <dummy_blocks>
+                        <root/>
+                    </dummy_blocks>
                 </params>
             </action>
         </reference>
