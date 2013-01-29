@@ -150,3 +150,10 @@ This does not apply to new installs.
   for validating the User-Agent, X-Forwarded-For, and Via headers, and the remote
   IP address with respect to sessions (under System > Configuration > General >
   Web > Session Validation Settings).
+
+### RELEASE-0.3.3
+
+  * Improved serialization of ESI/AJAX data in URLs. ESI/AJAX URLs should now be
+  50-75% shorter
+  * Fixed rare cases of invalid characters in ESI/AJAX URLs, which would cause
+  the block to not load or display an error message
