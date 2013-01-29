@@ -31,13 +31,12 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      */
     public function setFlagHeaders( $eventObject ) {
         $response = $eventObject->getResponse();
-        $sentinel = Mage::getSingleton( 'turpentine/sentinel' );
         if( Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() ) {
             $response->setHeader( 'X-Turpentine-Esi',
-                $sentinel->getEsiFlag() ? '1' : '0' );
+                Mage::registry( 'turpentine_esi_flag' ) ? '1' : '0' );
             if( Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled() ) {
                 Mage::log( 'Set ESI flag header to: ' .
-                    ( $sentinel->getEsiFlag() ? '1' : '0' ) );
+                    ( Mage::registry( 'turpentine_esi_flag' ) ? '1' : '0' ) );
             }
         }
     }
@@ -61,8 +60,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 foreach( $node->attributes() as $attr => $value ) {
                     if( $attr == 'value' ) {
                         if( !(string)$value ) {
-                            Mage::getSingleton( 'turpentine/sentinel' )
-                                ->setCacheFlag( false );
+                            Mage::register( 'turpentine_nocache_flag', true, true );
                             return; //only need to set the flag once
                         }
                     }
@@ -200,8 +198,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                     strlen( $esiUrl ), $esiUrl ), Zend_Log::WARN );
             }
 
-            //flag request for ESI processing
-            Mage::getSingleton( 'turpentine/sentinel' )->setEsiFlag( true );
+            // flag request for ESI processing
+            Mage::register( 'turpentine_esi_flag', true, true );
         } // else handle the block like normal and cache it inline with the page
     }
 

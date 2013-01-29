@@ -26,7 +26,7 @@ class Nexcessnet_Turpentine_Helper_Debug extends Mage_Core_Helper_Abstract {
      * @param mixed $value
      */
     public function dump( $value ) {
-        Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
+        Mage::register( 'turpentine_nocache_flag', true, true );
         $this->logValue( $value );
         echo '<pre>' . PHP_EOL;
         var_dump( $value );

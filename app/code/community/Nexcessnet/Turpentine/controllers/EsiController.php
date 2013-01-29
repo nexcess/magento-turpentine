@@ -72,7 +72,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             $resp->setHttpResponseCode( 403 );
             $resp->setBody( 'ESI includes are not enabled' );
         }
-        Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( $cacheFlag );
+        Mage::register( 'turpentine_nocache_flag', !$cacheFlag, true );
     }
 
     /**
@@ -118,7 +118,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             $resp->setBody( 'AJAX includes are not enabled' );
         }
         // ajax is never cached
-        Mage::getSingleton( 'turpentine/sentinel' )->setCacheFlag( false );
+        Mage::register( 'turpentine_nocache_flag', true, true );
     }
 
     /**
