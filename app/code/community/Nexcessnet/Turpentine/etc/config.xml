@@ -28,7 +28,6 @@
             <general>
                 <varnish_debug>0</varnish_debug>
                 <esi_debug>0</esi_debug>
-                <ajax_debug>0</ajax_debug>
                 <block_debug>0</block_debug>
                 <ajax_messages>1</ajax_messages>
                 <crawler_enable>1</crawler_enable>
@@ -177,11 +176,6 @@ poll_vote_add]]></esi_purge_events>
                         <class>turpentine/observer_esi</class>
                         <method>injectEsi</method>
                     </turpentine_esi_core_block_abstract_to_html_before>
-                    <turpentine_ajax_core_block_abstract_to_html_before>
-                        <type>singleton</type>
-                        <class>turpentine/observer_ajax</class>
-                        <method>injectAjax</method>
-                    </turpentine_ajax_core_block_abstract_to_html_before>
                 </observers>
             </core_block_abstract_to_html_before>
             <http_response_send_before>
