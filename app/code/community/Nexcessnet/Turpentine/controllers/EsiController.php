@@ -49,6 +49,16 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                     Zend_Log::WARN );
                 $resp->setHttpResponseCode( 500 );
                 $resp->setBody( 'ESI data is not valid' );
+            } elseif( !$esiHelper->getEsiDebugEnabled() &&
+                    $esiDataArray['esi_method'] !==
+                    $req->getParam( $esiHelper->getEsiMethodParam() ) ) {
+                $resp->setHttpResponseCode( 403 );
+                $resp->setBody( 'ESI method mismatch' );
+                Mage::log( sprintf(
+                        'Blocking change of ESI method: %s -> %s',
+                        $esiDataArray['esi_method'],
+                        $req->getParam( $esiHelper->getEsiMethodParam() ) ),
+                    Zend_Log::WARN );
             } else {
                 $esiData = new Varien_Object( $esiDataArray );
                 $origRequest = Mage::app()->getRequest();
@@ -61,7 +71,9 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 if( $block ) {
                     $block->setEsiOptions( false );
                     $resp->setBody( $block->toHtml() );
-                    $cacheFlag = true;
+                    if( (int)$req->getParam( $esiHelper->getEsiTtlParam() ) > 0 ) {
+                        $cacheFlag = true;
+                    }
                     if( $esiData->getEsiMethod() == 'ajax' ) {
                         $resp->setHeader( 'Access-Control-Allow-Origin',
                             $esiHelper->getCorsOrigin() );
