@@ -19,14 +19,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-$esiDebugEnabled = (bool)Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled();
+$debugEnabled = (bool)Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled();
 
-if( $esiDebugEnabled ) {
+if( $debugEnabled ) {
     echo sprintf( '<!-- ESI START [%s] -->', $this->getNameInLayout() ) . PHP_EOL;
 }
 echo sprintf( '<esi:remove>ESI processing not enabled</esi:remove>
 <!--esi <esi:include src="%s" /> -->',
     $this->getEsiUrl() ) . PHP_EOL;
-if( $esiDebugEnabled ) {
+if( $debugEnabled ) {
     echo sprintf( '<!-- ESI END [%s] -->', $this->getNameInLayout() ) . PHP_EOL;
 }
