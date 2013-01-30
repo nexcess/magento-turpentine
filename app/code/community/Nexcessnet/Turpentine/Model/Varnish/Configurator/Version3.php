@@ -71,6 +71,8 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
                 $this->_getCrawlerIps() ),
             'esi_cache_type_param'  =>
                 Mage::helper( 'turpentine/esi' )->getEsiCacheTypeParam(),
+            'esi_method_param'  =>
+                Mage::helper( 'turpentine/esi' )->getEsiMethodParam(),
             'esi_ttl_param' => Mage::helper( 'turpentine/esi' )->getEsiTtlParam(),
             'secret_handshake'  => Mage::helper( 'turpentine/varnish' )->getSecretHandshake(),
             'crawler_user_agent_regex'  => $this->_getCrawlerUserAgents(),

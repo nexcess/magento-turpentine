@@ -231,7 +231,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getDefaultTtl() {
-        return trim( Mage::getStoreConfig( 'turpentine_vcl/ttls/default_ttl' ) );
+        return Mage::helper( 'turpentine/varnish' )->getDefaultTtl();
     }
 
     /**

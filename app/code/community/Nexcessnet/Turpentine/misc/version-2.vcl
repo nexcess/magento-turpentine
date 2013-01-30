@@ -67,9 +67,6 @@ sub vcl_recv {
     if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") {
         remove req.http.Accept-Encoding;
     }
-    if (req.url ~ "{{url_base_regex}}turpentine/esi/getAjaxBlock/") {
-        return (pass);
-    }
     if (req.url ~ "{{url_base_regex}}") {
         if (req.http.Cookie ~ "frontend=") {
             set req.http.X-Varnish-Cookie = req.http.Cookie;
@@ -133,7 +130,8 @@ sub vcl_hash {
         set req.hash += req.http.Accept-Encoding;
     }
     if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") {
-        if (req.url ~ "/{{esi_cache_type_param}}/per-client/" && req.http.Cookie ~ "frontend=") {
+        if (req.url ~ "/{{esi_cache_type_param}}/private/"
+                && req.http.Cookie ~ "frontend=") {
             set req.hash += regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1");
             {{advanced_session_validation}}
         }
@@ -194,25 +192,20 @@ sub vcl_fetch {
             } else if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") {
                 call remove_cache_headers;
                 # TODO: make the TTLs properly dynamic
-                if (req.url ~ "/{{esi_cache_type_param}}/per-client/") {
+                if (req.url ~ "/{{esi_cache_type_param}}/private/") {
                     if(req.http.Cookie ~ "frontend=") {
                         set beresp.http.X-Varnish-Session = regsub(req.http.Cookie,
                             "^.*?frontend=([^;]*);*.*$", "\1");
                     }
-                    set beresp.ttl = {{esi_per_client_ttl}}s;
-                } else if (req.url ~ "/{{esi_cache_type_param}}/per-page/") {
-                    set beresp.ttl = {{esi_per_page_ttl}}s;
+                    if(req.url ~ "/{{esi_method_param}}/ajax/") {
+                        set beresp.ttl = {{grace_period}}s;
+                        return (pass);
+                    } else {
+                        set beresp.ttl = {{esi_private_ttl}}s;
+                    }
                 } else {
-                    set beresp.ttl = {{esi_global_ttl}}s;
+                    set beresp.ttl = {{esi_public_ttl}}s;
                 }
-            } else if (req.url ~ "{{url_base_regex}}turpentine/esi/getAjaxBlock/") {
-                call remove_cache_headers;
-                if (req.http.Cookie ~ "frontend=") {
-                    set beresp.http.X-Varnish-Session = regsub(req.http.Cookie,
-                        "^.*?frontend=([^;]*);*.*$", "\1");
-                }
-                set beresp.ttl = {{grace_period}}s;
-                return (pass);
             } else {
                 call remove_cache_headers;
                 {{url_ttls}}

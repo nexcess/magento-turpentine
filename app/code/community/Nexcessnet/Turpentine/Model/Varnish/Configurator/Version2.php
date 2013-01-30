@@ -71,13 +71,15 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version2
                 $this->_getCrawlerIps() ),
             'esi_cache_type_param'  =>
                 Mage::helper( 'turpentine/esi' )->getEsiCacheTypeParam(),
+            'esi_method_param'  =>
+                Mage::helper( 'turpentine/esi' )->getEsiMethodParam(),
             'esi_ttl_param' => Mage::helper( 'turpentine/esi' )->getEsiTtlParam(),
             'secret_handshake'  => Mage::helper( 'turpentine/varnish' )->getSecretHandshake(),
             'crawler_user_agent_regex'  => $this->_getCrawlerUserAgents(),
             // 'lru_factor'    => $this->_getLruFactor(),
-            'esi_per_client_ttl'    => $this->_getEsiPerClientTtl(),
-            'esi_per_page_ttl'      => $this->_getEsiPerPageTtl(),
-            'esi_global_ttl'        => $this->_getEsiGlobalTtl(),
+            'esi_private_ttl'   =>
+                Mage::helper( 'turpentine/esi' )->getDefaultEsiTtl(),
+            'esi_public_ttl'    => $this->_getDefaultTtl(),
             'advanced_session_validation'   => $this->_getAdvancedSessionValidation(),
         );
         if( Mage::getStoreConfig( 'turpentine_vcl/normalization/encoding' ) ) {
