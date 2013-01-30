@@ -80,52 +80,6 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
     }
 
     /**
-     * Render the block out from the URL encoded data
-     *
-     * @return null
-     */
-    public function getAjaxBlockAction() {
-        $resp = $this->getResponse();
-        if( Mage::helper( 'turpentine/ajax' )->getAjaxEnabled() ) {
-            $req = $this->getRequest();
-            $dataHelper = Mage::helper( 'turpentine/data' );
-            $ajaxDataParamValue = $req->getParam(
-                Mage::helper( 'turpentine/ajax' )->getAjaxDataParam() );
-            $ajaxDataArray = $dataHelper->thaw( $ajaxDataParamValue );
-            if( !$ajaxDataArray ) {
-                Mage::log( 'Invalid AJAX data in URL: ' . $ajaxDataParamValue,
-                    Zend_Log::WARN );
-                $resp->setHttpResponseCode( 500 );
-                $resp->setBody( 'AJAX data is not valid' );
-            } else {
-                $esiData = new Varien_Object( $ajaxDataArray );
-                $origRequest = Mage::app()->getRequest();
-                Mage::app()->setCurrentStore(
-                    Mage::app()->getStore( $esiData->getStoreId() ) );
-                $appShim = Mage::getModel( 'turpentine/shim_mage_core_app' );
-                $appShim->shim_setRequest( Mage::helper( 'turpentine/esi' )
-                    ->getDummyRequest() );
-                $block = $this->_getEsiBlock( $esiData );
-                if( $block ) {
-                    $block->setAjaxOptions( false );
-                    $resp->setBody( $block->toHtml() );
-                    $resp->setHeader( 'Access-Control-Allow-Origin',
-                        Mage::helper( 'turpentine/ajax' )->getCorsOrigin() );
-                } else {
-                    $resp->setHttpResponseCode( 404 );
-                    $resp->setBody( 'AJAX block not found' );
-                }
-                $appShim->shim_setRequest( $origRequest );
-            }
-        } else {
-            $resp->setHttpResponseCode( 403 );
-            $resp->setBody( 'AJAX includes are not enabled' );
-        }
-        // ajax is never cached
-        Mage::register( 'turpentine_nocache_flag', true, true );
-    }
-
-    /**
      * Need to disable this flag to prevent setting the last URL but we
      * don't want to completely break sessions.
      *

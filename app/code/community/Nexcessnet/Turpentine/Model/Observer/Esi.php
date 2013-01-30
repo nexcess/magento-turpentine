@@ -83,7 +83,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             Mage::app()->getRequest()->getParam( 'uenc' ) );
         $esiHelper = Mage::helper( 'turpentine/esi' );
         $dummyUrl = $esiHelper->getDummyUrl();
-        $getBlockUrlPattern = '~/turpentine/esi/get(?:Ajax)?Block/~';
+        $getBlockUrlPattern = '~/turpentine/esi/getBlock/~';
         if( preg_match( $getBlockUrlPattern, $url ) ||
                 preg_match( $getBlockUrlPattern, $reqUenc ) ) {
             $eventObject->getTransport()->setUrl( $dummyUrl );
