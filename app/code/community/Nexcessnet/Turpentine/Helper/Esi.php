@@ -179,6 +179,8 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     /**
      * Get the CORS origin field from the unsecure base URL
      *
+     * If this isn't added to AJAX responses they won't load properly
+     *
      * @return string
      */
     public function getCorsOrigin() {

@@ -310,6 +310,9 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      */
     protected function _getDefaultEsiOptions( $options ) {
         $esiHelper = Mage::helper( 'turpentine/esi' );
+        $ttlParam = $esiHelper->getEsiTtlParam();
+        $methodParam = $esiHelper->getEsiMethodParam();
+        $cacheTypeParam = $esiHelper->getEsiCacheTypeParam();
         $defaults = array(
             $esiHelper->getEsiMethodParam()         => 'esi',
             $esiHelper->getEsiScopeParam()          => 'global',
@@ -320,20 +323,21 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $options = array_merge( $defaults, $options );
 
         // set the default TTL
-        if( !isset( $esiOptions[$ttlParam] ) ) {
-            if( $esiOptions[$cacheTypeParam] == 'private' ) {
-                switch( $esiOptions[$methodParam] ) {
+        if( !isset( $options[$ttlParam] ) ) {
+            if( $options[$cacheTypeParam] == 'private' ) {
+                switch( $options[$methodParam] ) {
                     case 'ajax':
-                        $esiOptions[$ttlParam] = '0';
+                        $options[$ttlParam] = '0';
                         break;
 
                     case 'esi':
                     default:
-                        $esiOptions[$ttlParam] = $esiHelper->getDefaultEsiTtl();
+                        $options[$ttlParam] = $esiHelper->getDefaultEsiTtl();
                         break;
                 }
             } else {
-                $esiOptions[$ttlParam] = $varnishHelper->getDefaultTtl();
+                $options[$ttlParam] = Mage::helper( 'turpentine/varnish' )
+                    ->getDefaultTtl();
             }
         }
 
