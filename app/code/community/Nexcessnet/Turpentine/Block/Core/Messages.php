@@ -203,10 +203,8 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * @return boolean
      */
     protected function _hasInjectOptions() {
-        return ($this->getEsiOptions() &&
-                Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi()) ||
-            ($this->getAjaxOptions() &&
-                Mage::helper( 'turpentine/ajax' )->shouldResponseUseAjax());
+        return $this->getEsiOptions() &&
+            Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi();
     }
 
     /**
@@ -237,7 +235,7 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * @return null
      */
     protected function _saveMessages( $messages ) {
-        if( $this->_fixMessages() && !$this->_isAjaxRequest() ) {
+        if( $this->_fixMessages() && !$this->_isEsiRequest() ) {
             Mage::getSingleton( 'turpentine/session' )
                 ->saveMessages( $this->getNameInLayout(), $messages );
         }
@@ -346,7 +344,7 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      *
      * @return boolean
      */
-    protected function _isAjaxRequest() {
+    protected function _isEsiRequest() {
         $liveReq = Mage::app()->getRequest();
         $dummyReq = Mage::helper( 'turpentine/esi' )->getDummyRequest();
         return $liveReq->getModuleName() === $dummyReq->getModuleName() &&
