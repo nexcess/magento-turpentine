@@ -93,31 +93,4 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version2
         }
         return $vars;
     }
-
-    /**
-     * Get the per-client default TTL
-     *
-     * @return string
-     */
-    protected function _getEsiPerClientTtl() {
-        return Mage::getStoreConfig( 'turpentine_vcl/ttls/esi_per_client' );
-    }
-
-    /**
-     * Get the per-page default TTL
-     *
-     * @return string
-     */
-    protected function _getEsiPerPageTtl() {
-        return Mage::getStoreConfig( 'turpentine_vcl/ttls/esi_per_page' );
-    }
-
-    /**
-     * Get the global default TTL
-     *
-     * @return string
-     */
-    protected function _getEsiGlobalTtl() {
-        return Mage::getStoreConfig( 'turpentine_vcl/ttls/esi_global' );
-    }
 }

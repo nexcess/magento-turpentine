@@ -342,34 +342,6 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </static_ttl>
-                        <esi_global translate="label" module="turpentine">
-                            <label>ESI Global TTL (seconds)</label>
-                            <frontend_type>text</frontend_type>
-                            <validate>validate-greater-than-zero</validate>
-                            <sort_order>40</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </esi_global>
-                        <esi_per_page translate="label" module="turpentine">
-                            <label>ESI Per-page TTL (seconds)</label>
-                            <frontend_type>text</frontend_type>
-                            <validate>validate-greater-than-zero</validate>
-                            <sort_order>50</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </esi_per_page>
-                        <esi_per_client translate="label" module="turpentine">
-                            <label>ESI Per-client TTL (seconds)</label>
-                            <comment>This should be set relatively low to keep from using large amounts of the available cache storage</comment>
-                            <frontend_type>text</frontend_type>
-                            <validate>validate-greater-than-zero</validate>
-                            <sort_order>60</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </esi_per_client>
                         <!--
                         <lru_factor translate="label" module="turpentine">
                             <label>Cache Hit Extension Time</label>

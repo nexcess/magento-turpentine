@@ -75,7 +75,6 @@
                 <params>
                     <access>private</access>
                     <method>ajax</method>
-                    <ttl>0</ttl>
                 </params>
             </action>
         </reference>
@@ -84,7 +83,6 @@
                 <params>
                     <access>private</access>
                     <method>ajax</method>
-                    <ttl>0</ttl>
                 </params>
             </action>
         </reference>

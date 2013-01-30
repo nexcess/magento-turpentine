@@ -20,14 +20,14 @@
  */
 
 $debugEnabled = (bool)Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled();
-$blockTag = sprintf( 'turpentine-ajax-block-%s',
+$blockTag = sprintf( 'turpentine-esi-block-%s',
     Mage::helper( 'turpentine/data' )->secureHash( $this->getNameInLayout() ) );
 
 if( $debugEnabled ) {
     echo sprintf( '<!-- AJAX START [%s] -->', $this->getNameInLayout() ) . PHP_EOL;
 }
 /**
- * Note that the new content will be inside the "turpentine-ajax-block" div
+ * Note that the new content will be inside the "turpentine-esi-block" div
  * which could possible alter how things are displayed. If this turns out to
  * be an issue we'll have to go back to using Ajax.Request so the container
  * block is completely replaced which means no nice appear effect.
