@@ -28,7 +28,7 @@ checking with a non-default version of PHP.
 """
 
 __title__       = 'build_package.py'
-__version__     = '0.0.2'
+__version__     = '0.0.3'
 __author__      = 'Alex Headley <aheadley@nexcess.net>'
 __license__     = 'GPLv2'
 __copyright__   = 'Copyright (C) 2012  Nexcess.net L.L.C.'
@@ -45,6 +45,7 @@ import subprocess
 class Magento_Packager(object):
     BIN_PHP = os.environ.get('TURPENTINE_BIN_PHP', 'php')
     BIN_XMLLINT = os.environ.get('TURPENTINE_BIN_XMLLINT', 'xmllint')
+    BIN_BASH = os.environ.get('TURPENTINE_BIN_BASH', 'bash')
 
     TARGET_DIRS = {
         'magelocal':        'app/code/local',
@@ -53,6 +54,7 @@ class Magento_Packager(object):
         'magedesign':       'app/design',
         'mageetc':          'app/etc',
     }
+    MAGE_PKG_XML_FILENAME   = 'package.xml'
 
     def __init__(self, base_dir, debug=False):
         self._base_dir = base_dir
@@ -69,20 +71,24 @@ class Magento_Packager(object):
     def do_syntax_check(self):
         self._logger.info('Running syntax check on %d files', len(self._file_list))
         result = True
+        syntax_map = {
+            '.php':     self._php_syntax_check,
+            '.phtml':   self._php_syntax_check,
+            '.xml':     self._xml_syntax_check,
+            '.sh':      self._bash_syntax_check,
+            '.bash':    self._bash_syntax_check,
+        }
+        def unsupported_syntax_check(filename):
+            self._logger.debug('Skipping syntax check for unsupported file: %s',
+                filename)
+            return True
+
         for filename in self._file_list:
-            if filename.endswith('.php'):
-                self._logger.debug('Checking PHP syntax for file: %s', filename)
-                if not self._php_syntax_check(filename):
-                    self._logger.warning('Syntax check failed for file: %s', filename)
-                    result = False
-            elif filename.endswith('.xml'):
-                self._logger.debug('Checking XML syntax for file: %s', filename)
-                if not self._xml_syntax_check(filename):
-                    self._logger.warning('Syntax check failed for file: %s', filename)
-                    result = False
-            else:
-                self._logger.debug('Skipping syntax check for unsupported file: %s',
-                    filename)
+            syntax_check = syntax_map.get(os.path.splitext(filename)[1].lower(),
+                unsupported_syntax_check)
+            if not syntax_check(filename):
+                self._logger.warning('Syntax check failed for file: %s', filename)
+                result = False
         return result
 
     def build_package_xml(self, connect_file):
@@ -110,21 +116,28 @@ class Magento_Packager(object):
         return pkg_dom
 
     def build_tarball(self, pkg_xml, tarball_name=None, keep_pkg_xml=False):
+        manifest_filename = '%s/build/manifest-%s.xml' % \
+            (self._base_dir, pkg_xml.findtext('./version'))
         if tarball_name is None:
             tarball_name = '%s/build/%s-%s.tgz' % (self._base_dir,
                 pkg_xml.findtext('./name'), pkg_xml.findtext('./version'))
         self._logger.info('Writing tarball to: %s', tarball_name)
         cdir = os.getcwd()
         os.chdir(self._base_dir)
-        with open('package.xml', 'w') as xml_file:
+        with open(manifest_filename, 'w') as xml_file:
             ElementTree.ElementTree(pkg_xml).write(xml_file, 'utf-8')
         self._logger.debug('Wrote package XML')
         with tarfile.open(tarball_name, 'w:gz') as tarball:
-            tarball.add('app')
-            tarball.add('package.xml')
+            for filename in self._file_list:
+                alt_filename = filename.replace(self._base_dir + '/', '')
+                self._logger.debug('Adding file to tarball: %s', alt_filename)
+                tarball.add(filename, alt_filename)
+            self._logger.debug('Adding file to tarball: %s',
+                self.MAGE_PKG_XML_FILENAME)
+            tarball.add(manifest_filename, self.MAGE_PKG_XML_FILENAME)
         self._logger.info('Finished writing tarball')
         if not keep_pkg_xml:
-            os.unlink('package.xml')
+            os.unlink(manifest_filename)
         os.chdir(cdir)
         return tarball_name
 
@@ -299,10 +312,16 @@ class Magento_Packager(object):
             return 'UNKNOWN'
 
     def _php_syntax_check(self, filename):
+        self._logger.debug('Checking PHP syntax for file: %s', filename)
         return self._run_quiet(self.BIN_PHP, '-l', filename)
 
     def _xml_syntax_check(self, filename):
+        self._logger.debug('Checking XML syntax for file: %s', filename)
         return self._run_quiet(self.BIN_XMLLINT, '--format', filename)
+
+    def _bash_syntax_check(self, filename):
+        self._logger.debug('Checking Bash syntax for file: %s', filename)
+        return self._run_quiet(self.BIN_BASH, '-n', filename)
 
     def _run_quiet(self, *pargs):
         with open('/dev/null', 'w') as dev_null:
