@@ -151,9 +151,31 @@ This does not apply to new installs.
   IP address with respect to sessions (under System > Configuration > General >
   Web > Session Validation Settings).
 
-### RELEASE-0.3.3
+### RELEASE-0.4.0
+
+There are changes to the ESI layout syntax in this release, any customizations
+that have been done to the ESI layout will need to be updated
 
   * Improved serialization of ESI/AJAX data in URLs. ESI/AJAX URLs should now be
-  50-75% as long
+  50-75% as long as they previously were
   * Fixed rare cases of invalid characters in ESI/AJAX URLs, which would cause
   the block to not load or display an error message
+  * Unified AJAX and ESI code paths. ESI and AJAX includes no longer use
+  duplicated code which will make it easier to add other other inclusion methods
+  in the future and reduces the potential for bugs
+  * Selecting between AJAX and ESI inclusion is now done with the *method*
+  parameter to ``setEsiOptions``, ``setAjaxOptions`` is no longer supported
+  * Added ability to cache AJAX requests
+  * The old *cacheType* parameter for ``setEsiOptions`` in the layout has been
+  split into two new options: *scope* and *access*
+    * *scope* = **global**: the cached object valid for the entire site
+    * *scope* = **page**: the cached object specific to a single page
+    * *access* = **public**: the cached object is valid for any visitor
+    * *access* = **private**: the cached object is valid for a single visitor's session
+  * ESI block default TTL options have been removed. The new default for *public*
+  ESI blocks is the same as the Varnish page TTL and *private* blocks use the
+  session cookie lifetime as the TTL
+  * Turpentine will now detect if there is a difference between how a block
+  should be loaded vs how it is requested (ex. manually changing the *method*
+  parameter for a AJAX block to ESI). If ESI debugging is turned off an error
+  (403) will be returned
