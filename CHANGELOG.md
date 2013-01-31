@@ -169,7 +169,7 @@ that have been done to the ESI layout will need to be updated
   * The old *cacheType* parameter for ``setEsiOptions`` in the layout has been
   split into two new options: *scope* and *access*
     * *scope* = **global**: the cached object valid for the entire site
-    * *scope* = **page**: the cached object specific to a single page
+    * *scope* = **page**: the cached object is specific to a single page
     * *access* = **public**: the cached object is valid for any visitor
     * *access* = **private**: the cached object is valid for a single visitor's session
   * ESI block default TTL options have been removed. The new default for *public*
