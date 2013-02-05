@@ -63,10 +63,15 @@ class Nexcessnet_Turpentine_Helper_Ajax extends Mage_Core_Helper_Abstract {
     /**
      * Get the CORS origin field from the unsecure base URL
      *
+     * @param  string $url=null
      * @return string
      */
-    public function getCorsOrigin() {
-        $baseUrl = Mage::getBaseUrl();
+    public function getCorsOrigin( $url=null ) {
+        if( is_null( $url ) ) {
+            $baseUrl = Mage::getBaseUrl();
+        } else {
+            $baseUrl = $url;
+        }
         $path = parse_url( $baseUrl, PHP_URL_PATH );
         $domain = parse_url( $baseUrl, PHP_URL_HOST );
         // there has to be a better way to just strip the path off
