@@ -55,9 +55,9 @@ The extension works in two parts, page caching and block (ESI/AJAX) caching. A
 simplified look at how they work:
 
 For pages, Varnish first checks whether the visitor sent a ``frontend`` cookie.
-If they didn't, then they are served a served a new page from the backend (Magento),
-regardless of whether that page is already cached. This is so they get a new
-session from Magento. If they already already have a ``frontend`` cookie, then
+If they didn't, then they are served a new page from the backend (Magento),
+regardless of whether that page is already cached, so they get a new
+session from Magento. If they already have a ``frontend`` cookie, then
 they get a (non-session-specific) page from the backend, with any session-specific
 blocks (defined by the ESI policies) filled in via ESI. Note that this is bypassed
 for clients identified as crawlers (see the ``Crawler IP Addresses`` and
@@ -99,7 +99,7 @@ the page and may differ between different visitors/clients.
     - External ESI requests are not blocked
     - Per-block TTLs are not honored, all ESI blocks use their default TTL
  - The core parts of Turpentine (caching and ESI/AJAX injection) work under Magento CE 1.5, but a significant
- portion of the functionality doesn't work due to changes to event names. That
+ portion of the auxillary functionality doesn't work due to changes to event names. That
  said, it would be possible to use Turpentine with Magento CE 1.5 with an understanding
  that it is not supported and what actions need to be taken manually. A
  short and non-comprehensive list of things that don't work under CE 1.5:
