@@ -45,7 +45,7 @@ new Ajax.Updater(
     {
         method: "get",
         evalScripts: true,
-        onComplete: function(transport) {
+        %s: function(transport) {
             $("%s").appear({
                 duration: 0.3
             });
@@ -58,6 +58,7 @@ new Ajax.Updater(
     $blockTag,
     $blockTag,
     $this->getAjaxUrl(),
+    ( $ajaxDebugEnabled ? 'onComplete' : 'onSuccess' ),
     $blockTag
 );
 if( $ajaxDebugEnabled ) {
