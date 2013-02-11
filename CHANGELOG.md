@@ -179,3 +179,5 @@ that have been done to the ESI layout will need to be updated
   should be loaded vs how it is requested (ex. manually changing the *method*
   parameter for a AJAX block to ESI). If ESI debugging is turned off an error
   (403) will be returned
+  * Client-side caching will now be used for static assets, in addtion to
+  Varnish's regular caching (via the Cache-Control header)
