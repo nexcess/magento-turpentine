@@ -58,7 +58,7 @@ new Ajax.Updater(
     $blockTag,
     $blockTag,
     $this->getEsiUrl(),
-    ( $ajaxDebugEnabled ? 'onComplete' : 'onSuccess' ),
+    ( $debugEnabled ? 'onComplete' : 'onSuccess' ),
     $blockTag
 );
 if( $debugEnabled ) {

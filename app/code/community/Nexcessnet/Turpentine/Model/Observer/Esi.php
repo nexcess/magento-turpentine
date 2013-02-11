@@ -88,9 +88,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 preg_match( $getBlockUrlPattern, $reqUenc ) ) {
             $eventObject->getTransport()->setUrl( $dummyUrl );
         } elseif( $reqUenc && Mage::getBaseUrl() == $url ) {
-            $ajaxHelper = Mage::helper( 'turpentine/ajax' );
-            $corsOrigin = $ajaxHelper->getCorsOrigin();
-            if( $corsOrigin != $ajaxHelper->getCorsOrigin( $reqUenc ) ) {
+            $corsOrigin = $esiHelper->getCorsOrigin();
+            if( $corsOrigin != $esiHelper->getCorsOrigin( $reqUenc ) ) {
                 $eventObject->getTransport()->setUrl(
                     $corsOrigin . parse_url( $reqUenc, PHP_URL_PATH ) );
             }
