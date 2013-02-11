@@ -189,6 +189,7 @@ sub vcl_fetch {
                     bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
                 call remove_cache_headers;
                 set beresp.ttl = {{static_ttl}}s;
+                set beresp.http.Cache-Control = "max-age={{static_ttl}}";
             } else if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") {
                 call remove_cache_headers;
                 # TODO: make the TTLs properly dynamic
