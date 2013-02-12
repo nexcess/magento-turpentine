@@ -78,7 +78,7 @@ poll_vote_add]]></esi_purge_events>
                 <url_blacklist><![CDATA[cron\.php]]></url_blacklist>
             </urls>
             <params>
-                <get_params>__SID</get_params>
+                <get_params>__SID,XDEBUG_PROFILE</get_params>
             </params>
             <static>
                 <force_static>1</force_static>
