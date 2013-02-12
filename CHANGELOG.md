@@ -186,4 +186,11 @@ that have been done to the ESI layout will need to be updated
   ESI block includes were on the page
   * Fixed Turpentine ESI request entries in the Magento visitor log. This should
   result in a small speed-up for AJAX requests particularly as most of the time
-  was spent doing the logging
+  token for the request was spent doing the logging
+  * Added custom VCL inclusion. Custom logic can be added to the VCL Turpentine
+  generates by putting it in
+  ``app/code/community/Nexcessnet/Turpentine/misc/custom_include.vcl``. If this
+  file is found, Turpentine will automatically include it. Note that it is not
+  Varnish version-specific like the other templates, users will need to make sure
+  the VCL code used is compatible with the version of Varnish that they use
+
