@@ -184,3 +184,6 @@ that have been done to the ESI layout will need to be updated
   * Improved page rendering performance. Pages that include ESI blocks will now
   render significantly faster (up to 50% in testing), dependant on how many
   ESI block includes were on the page
+  * Fixed Turpentine ESI request entries in the Magento visitor log. This should
+  result in a small speed-up for AJAX requests particularly as most of the time
+  was spent doing the logging
