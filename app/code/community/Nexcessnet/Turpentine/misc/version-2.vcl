@@ -80,7 +80,7 @@ sub vcl_recv {
             }
         }
         if (req.http.X-Opt-Force-Static-Caching == "true" &&
-                req.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
+                req.url ~ ".*\.(?:{{static_extensions}})(?=\?|&|$)") {
             remove req.http.Cookie;
             return (lookup);
         }
@@ -186,7 +186,7 @@ sub vcl_fetch {
         } else {
             set beresp.cacheable = true;
             if (req.http.X-Opt-Force-Static-Caching == "true" &&
-                    bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|$)") {
+                    bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|&|$)") {
                 call remove_cache_headers;
                 set beresp.ttl = {{static_ttl}}s;
                 set beresp.http.Cache-Control = "max-age={{static_ttl}}";
