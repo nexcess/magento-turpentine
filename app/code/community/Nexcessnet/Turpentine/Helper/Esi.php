@@ -196,4 +196,21 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
             strpos( $baseUrl, $path,
                 strpos( $baseUrl, $domain ) ) );
     }
+
+    /**
+     * Get the cache key for the file layouts xml
+     *
+     * @return string
+     */
+    public function getFileLayoutUpdatesXmlCacheKey() {
+        $design = Mage::getDesign();
+        return Mage::helper( 'turpentine/data' )
+            ->getCacheKeyHash( array(
+                'FILE_LAYOUT_UPDATES_XML',
+                $design->getArea(),
+                $design->getPackageName(),
+                $design->getTheme( 'layout' ),
+                Mage::app()->getStore()->getId(),
+            ) );
+    }
 }

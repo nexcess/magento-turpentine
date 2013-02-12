@@ -178,6 +178,16 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
     }
 
     /**
+     * Hash a cache key the same way blocks do
+     *
+     * @param  array $key
+     * @return string
+     */
+    public function getCacheKeyHash( $key ) {
+        return sha1( implode( '|', array_values( $key ) ) );
+    }
+
+    /**
      * Get a list of child blocks inside the given block
      *
      * @param  Mage_Core_Model_Layout_Element $blockNode
