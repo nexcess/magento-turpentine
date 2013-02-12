@@ -181,6 +181,7 @@ sub vcl_fetch {
         }
         set beresp.do_gzip = true;
         if (beresp.http.X-Turpentine-Cache == "0") {
+            call remove_cache_headers;
             set beresp.ttl = {{grace_period}}s;
             return (hit_for_pass);
         } else {

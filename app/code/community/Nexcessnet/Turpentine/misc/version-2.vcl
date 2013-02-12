@@ -180,6 +180,7 @@ sub vcl_fetch {
             esi;
         }
         if (beresp.http.X-Turpentine-Cache == "0") {
+            call remove_cache_headers;
             set beresp.cacheable = false;
             set beresp.ttl = {{grace_period}}s;
             return (pass);
