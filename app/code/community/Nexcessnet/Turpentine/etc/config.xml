@@ -30,7 +30,7 @@
                 <esi_debug>0</esi_debug>
                 <block_debug>0</block_debug>
                 <ajax_messages>1</ajax_messages>
-                <crawler_enable>1</crawler_enable>
+                <crawler_enable>0</crawler_enable>
                 <crawler_debug>0</crawler_debug>
             </general>
             <purging>
@@ -87,6 +87,17 @@ poll_vote_add]]></esi_purge_events>
         </turpentine_vcl>
     </default>
     <global>
+        <ignoredModules>
+            <entities>
+                <!--
+                This disables Magento visitor logging for Turpentine ESI
+                requests. The logging was pointless and caused AJAX blocks to
+                take much more time then they otherwise would to load (most of
+                the time was spent doing database writes)
+                -->
+                <turpentine/>
+            </entities>
+        </ignoredModules>
         <blocks>
             <turpentine>
                 <class>Nexcessnet_Turpentine_Block</class>
