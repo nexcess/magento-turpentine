@@ -4,6 +4,10 @@
 
 import std;
 
+## Custom VCL Logic
+
+{{custom_vcl_include}}
+
 ## Backends
 
 {{default_backend}}

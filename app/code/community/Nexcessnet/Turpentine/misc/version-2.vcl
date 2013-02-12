@@ -1,5 +1,9 @@
 ## Nexcessnet_Turpentine Varnish v2 VCL Template
 
+## Custom VCL Logic
+
+{{custom_vcl_include}}
+
 ## Backends
 
 {{default_backend}}

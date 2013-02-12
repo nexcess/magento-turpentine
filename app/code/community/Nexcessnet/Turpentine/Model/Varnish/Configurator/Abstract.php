@@ -20,6 +20,9 @@
  */
 
 abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
+
+    const VCL_FRAGMENT_FILE = 'custom_include.vcl';
+
     /**
      * Get the correct version of a configurator from a socket
      *
@@ -69,7 +72,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     }
 
     abstract public function generate();
-    abstract protected function _getTemplateVars();
+    // abstract protected function _getTemplateVars();
 
     /**
      * Save the generated config to the file specified in Magento config
@@ -567,5 +570,58 @@ set req.http.Host = "{{normalize_host_target}}";
 EOS;
         return $this->_formatTemplate( $tpl, array(
             'normalize_host_target' => $this->_getNormalizeHostTarget() ) );
+    }
+
+    /**
+     * Build the list of template variables to apply to the VCL template
+     *
+     * @return array
+     */
+    protected function _getTemplateVars() {
+        $vars = array(
+            'default_backend'   => $this->_getDefaultBackend(),
+            'admin_backend'     => $this->_getAdminBackend(),
+            'admin_frontname'   => $this->_getAdminFrontname(),
+            'normalize_host_target' => $this->_getNormalizeHostTarget(),
+            'url_base_regex'    => $this->getBaseUrlPathRegex(),
+            'url_excludes'  => $this->_getUrlExcludes(),
+            'get_param_excludes'    => $this->_getGetParamExcludes(),
+            'default_ttl'   => $this->_getDefaultTtl(),
+            'enable_get_excludes'   => ($this->_getGetParamExcludes() ? 'true' : 'false'),
+            'debug_headers' => $this->_getEnableDebugHeaders(),
+            'grace_period'  => $this->_getGracePeriod(),
+            'force_cache_static'    => $this->_getForceCacheStatic(),
+            'static_extensions' => $this->_getStaticExtensions(),
+            'static_ttl'    => $this->_getStaticTtl(),
+            'url_ttls'      => $this->_getUrlTtls(),
+            'enable_caching'    => $this->_getEnableCaching(),
+            'crawler_acl'   => $this->_vcl_acl( 'crawler_acl',
+                $this->_getCrawlerIps() ),
+            'esi_cache_type_param'  =>
+                Mage::helper( 'turpentine/esi' )->getEsiCacheTypeParam(),
+            'esi_method_param'  =>
+                Mage::helper( 'turpentine/esi' )->getEsiMethodParam(),
+            'esi_ttl_param' => Mage::helper( 'turpentine/esi' )->getEsiTtlParam(),
+            'secret_handshake'  => Mage::helper( 'turpentine/varnish' )
+                ->getSecretHandshake(),
+            'crawler_user_agent_regex'  => $this->_getCrawlerUserAgents(),
+            'lru_factor'    => $this->_getLruFactor(),
+        );
+        if( Mage::getStoreConfig( 'turpentine_vcl/normalization/encoding' ) ) {
+            $vars['normalize_encoding'] = $this->_vcl_sub_normalize_encoding();
+        }
+        if( Mage::getStoreConfig( 'turpentine_vcl/normalization/user_agent' ) ) {
+            $vars['normalize_user_agent'] = $this->_vcl_sub_normalize_user_agent();
+        }
+        if( Mage::getStoreConfig( 'turpentine_vcl/normalization/host' ) ) {
+            $vars['normalize_host'] = $this->_vcl_sub_normalize_host();
+        }
+
+        $customInclude = $this->_getVclTemplateFilename( self::VCL_FRAGMENT_FILE );
+        if( is_readable( $customInclude ) ) {
+            $vars['custom_vcl_include'] = file_get_contents( $customInclude );
+        }
+
+        return $vars;
     }
 }
