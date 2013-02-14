@@ -14,6 +14,8 @@
 
 {{crawler_acl}}
 
+{{debug_acl}}
+
 ## Custom Subroutines
 sub remove_cache_headers {
     remove beresp.http.Cache-Control;
@@ -227,7 +229,7 @@ sub vcl_deliver {
         set resp.http.Set-Cookie = resp.http.X-Varnish-Set-Cookie;
     }
     set resp.http.X-Opt-Debug-Headers = "{{debug_headers}}";
-    if (resp.http.X-Opt-Debug-Headers == "true") {
+    if (resp.http.X-Opt-Debug-Headers == "true" || client.ip ~ debug_acl ) {
         set resp.http.X-Varnish-Hits = obj.hits;
     } else {
         #remove Varnish fingerprints

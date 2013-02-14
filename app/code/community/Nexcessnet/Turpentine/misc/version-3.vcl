@@ -18,6 +18,8 @@ import std;
 
 {{crawler_acl}}
 
+{{debug_acl}}
+
 ## Custom Subroutines
 
 sub remove_cache_headers {
@@ -222,7 +224,7 @@ sub vcl_deliver {
         set resp.http.Set-Cookie = resp.http.X-Varnish-Set-Cookie;
     }
     #GCC should optimize this entire branch away if debug headers are disabled
-    if ({{debug_headers}}) {
+    if ({{debug_headers}} || client.ip ~ debug_acl) {
         set resp.http.X-Varnish-Hits = obj.hits;
     } else {
         #remove Varnish fingerprints

@@ -370,9 +370,19 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     }
 
     /**
-     * Get the regex formatted list of crawler IPs
+     * Get the list of allowed debug IPs
      *
-     * @return string
+     * @return array
+     */
+    protected function _getDebugIps() {
+        return Mage::helper( 'turpentine/data' )->cleanExplode( ',',
+            Mage::getStoreConfig( 'dev/restrict/allow_ips' ) );
+    }
+
+    /**
+     * Get the list of crawler IPs
+     *
+     * @return array
      */
     protected function _getCrawlerIps() {
         return Mage::helper( 'turpentine/data' )->cleanExplode( ',',
@@ -605,7 +615,9 @@ EOS;
             'secret_handshake'  => Mage::helper( 'turpentine/varnish' )
                 ->getSecretHandshake(),
             'crawler_user_agent_regex'  => $this->_getCrawlerUserAgents(),
-            'lru_factor'    => $this->_getLruFactor(),
+            // 'lru_factor'    => $this->_getLruFactor(),
+            'debug_acl'     => $this->_vcl_acl( 'debug_acl',
+                $this->_getDebugIps() ),
         );
         if( Mage::getStoreConfig( 'turpentine_vcl/normalization/encoding' ) ) {
             $vars['normalize_encoding'] = $this->_vcl_sub_normalize_encoding();
