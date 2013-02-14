@@ -194,3 +194,6 @@ that have been done to the ESI layout will need to be updated
   Varnish version-specific like the other templates, users will need to make sure
   the VCL code used is compatible with the version of Varnish that they use
 
+### RELEASE-0.4.1
+
+  * Fixed CMS pages not being automatically flushed on update
