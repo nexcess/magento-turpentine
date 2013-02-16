@@ -80,7 +80,7 @@ sub generate_session {
 #     # make the request anonymous by removing the frontend cookie
 #     if (!req.http.X-Varnish-Esi-Method || req.http.X-Varnish-Esi-Access == "public") {
 #         if (bereq.http.X-Varnish-Cookie) {
-#             unset bereq.http.Cookie;
+#             set bereq.http.Cookie = "frontend=no-session";
 #             set req.http.X-Varnish-ReqIsAnon = "1";
 #         }
 #     } else {
@@ -129,7 +129,7 @@ sub vcl_recv {
         }
         if (req.http.Cookie) {
             # combine multiple Cookie headers into one
-            std.collect(req.http.Cookie);
+            # std.collect(req.http.Cookie);
         }
         # looks like an ESI request, add some extra vars for further processing
         if (req.url ~ "/turpentine/esi/getBlock/") {
@@ -153,10 +153,7 @@ sub vcl_recv {
                 set req.http.Cookie = "frontend=crawler-session";
             # } elsif (!req.http.X-Varnish-Esi-Method) {
             } else {
-                # it's a real user, pass so they get a new session. we don't pipe
-                # so that they can get the benefit of global esi blocks
-                ## return (pass);
-                # yeehaw
+                # it's a real user, make up a new session for them
                 call generate_session;
             }
         }
@@ -230,9 +227,6 @@ sub vcl_hit {
 sub vcl_miss {
     # see sub declaration for why we can't do this
     # call anonymize_request;
-    if (false) {
-        call generate_session;
-    }
 }
 
 sub vcl_fetch {
@@ -316,7 +310,7 @@ sub vcl_deliver {
         # the visitor needs a new session, go ahead and give it to them
         set resp.http.Set-Cookie = resp.http.X-Varnish-Set-Cookie;
     }
-    if (req.http.X-Varnish-Faked-Session) {
+    if (req.http.X-Varnish-Faked-Session == "1") {
         # need to set the set-cookie header since we just made it out of thin air
         set resp.http.Set-Cookie = req.http.Cookie;
     }
