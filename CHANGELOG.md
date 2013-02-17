@@ -197,3 +197,4 @@ that have been done to the ESI layout will need to be updated
 ### RELEASE-0.4.1
 
   * Fixed CMS pages not being automatically flushed on update
+  * Fixed piped requests in Varnish not having headers handled appropriately
