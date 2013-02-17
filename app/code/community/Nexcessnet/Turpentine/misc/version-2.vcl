@@ -1,5 +1,27 @@
 ## Nexcessnet_Turpentine Varnish v2 VCL Template
 
+## Custom C Code
+
+C{
+#include <stdlib.h>
+#include <stdio.h>
+
+void generate_uuid(char* buf) {
+    long a = lrand48();
+    long b = lrand48();
+    long c = lrand48();
+    long d = lrand48();
+    sprintf(buf, "frontend=%08lx-%04lx-%04lx-%04lx-%04lx%08lx",
+        a,
+        b & 0xffff,
+        (b & ( (long)0x0fff0000) >> 16) | 0x4000,
+        (c & 0x0fff) | 0x8000,
+        (c & (long)0xffff0000) >> 16,
+        d
+    );
+}
+}C
+
 ## Custom VCL Logic
 
 {{custom_vcl_include}}
@@ -18,6 +40,7 @@
 
 ## Custom Subroutines
 sub remove_cache_headers {
+    # remove cache headers so we can set our own
     remove beresp.http.Cache-Control;
     remove beresp.http.Expires;
     remove beresp.http.Pragma;
@@ -26,12 +49,45 @@ sub remove_cache_headers {
 }
 
 sub remove_double_slashes {
+    # remove double slashes from the URL, for higher cache hit rate
     set req.url = regsub(req.url, "(.*)//+(.*)", "\1/\2");
 }
+
+sub generate_session {
+    # this is dark magic
+    C{
+        char uuid_buf [46];
+        generate_uuid(uuid_buf);
+        VRT_SetHdr(sp, HDR_REQ,
+            "\007Cookie:",
+            uuid_buf,
+            vrt_magic_string_end
+        );
+    }C
+    # marker so we know to set the Set-Cookie header
+    set req.http.X-Varnish-Faked-Session = "1";
+}
+
+# we can't use this because Magento randomly uses GET requests where it should
+# use POST, ex: adding something to the cart from a category page vs a product
+# page
+# sub anonymize_request {
+#     # make the request anonymous by removing the frontend cookie
+#     if (!req.http.X-Varnish-Esi-Method || req.http.X-Varnish-Esi-Access == "public") {
+#         if (bereq.http.X-Varnish-Cookie) {
+#             set bereq.http.Cookie = "frontend=no-session";
+#             set req.http.X-Varnish-ReqIsAnon = "1";
+#         }
+#     } else {
+#         set bereq.http.Cookie = bereq.http.X-Varnish-Cookie;
+#         set req.http.X-Varnish-ReqIsAnon = "0";
+#     }
+# }
 
 ## Varnish Subroutines
 
 sub vcl_recv {
+    # this always needs to be done so it's up at the top
     if (req.restarts == 0) {
         if (req.http.X-Forwarded-For) {
             set req.http.X-Forwarded-For =
@@ -41,13 +97,8 @@ sub vcl_recv {
         }
     }
 
-    if (!(req.request ~ "^(GET|HEAD|PUT|POST|TRACE|DELETE|OPTIONS)$")) {
-        # Non-RFC2616 or CONNECT which is weird.
-        return (pipe);
-    }
-
+    # We only deal with GET and HEAD by default
     if (!(req.request ~ "^(GET|HEAD)$")) {
-        # We only deal with GET and HEAD by default
         return (pipe);
     }
 
@@ -57,39 +108,64 @@ sub vcl_recv {
     {{normalize_user_agent}}
     {{normalize_host}}
 
+    # varnish 2.1 doesn't support bare booleans so we have to add these
+    # as headers to the req so they've available throught the VCL
     set req.http.X-Opt-Enable-Caching = "{{enable_caching}}";
     set req.http.X-Opt-Force-Static-Caching = "{{force_cache_static}}";
     set req.http.X-Opt-Enable-Get-Excludes = "{{enable_get_excludes}}";
 
+    # we test this here instead of inside the url base regex section
+    # so we can disable caching for the entire site if needed
     if (req.http.X-Opt-Enable-Caching != "true" || req.http.Authorization) {
         return (pipe);
     }
-    set req.http.X-Turpentine-Secret-Handshake = "{{secret_handshake}}";
-    if (req.url ~ "{{url_base_regex}}{{admin_frontname}}") {
-        set req.backend = admin;
-        return (pipe);
-    }
-
-    if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") {
-        remove req.http.Accept-Encoding;
-    }
+    # check if the request is for part of magento
     if (req.url ~ "{{url_base_regex}}") {
-        if (req.http.Cookie ~ "frontend=") {
-            set req.http.X-Varnish-Cookie = req.http.Cookie;
-        } else {
-            if (client.ip ~ crawler_acl || req.http.User-Agent ~ "^(?:{{crawler_user_agent_regex}})$") {
-                set req.http.Cookie = "frontend=no-session";
-                set req.http.X-Varnish-Cookie = req.http.Cookie;
+        # set this so Turpentine can see the request passed through Varnish
+        set req.http.X-Turpentine-Secret-Handshake = "{{secret_handshake}}";
+        # use the special admin backend and pipe if it's for the admin section
+        if (req.url ~ "{{url_base_regex}}{{admin_frontname}}") {
+            set req.backend = admin;
+            return (pipe);
+        }
+        # looks like an ESI request, add some extra vars for further processing
+        if (req.url ~ "/turpentine/esi/getBlock/") {
+            set req.http.X-Varnish-Esi-Method = regsub(
+                req.url, ".*/{{esi_method_param}}/(\w+)/.*", "\1");
+            set req.http.X-Varnish-Esi-Access = regsub(
+                req.url, ".*/{{esi_cache_type_param}}/(\w+)/.*", "\1");
+
+            # throw a forbidden error if debugging is off and a esi block is
+            # requested by the user (does not apply to ajax blocks)
+            # ** req.esi_level is not available in varnish 2.1
+            # if (req.http.X-Varnish-Esi-Method == "esi" && req.esi_level == 0 &&
+            #         !({{debug_headers}} || client.ip ~ debug_acl)) {
+            #     error 403 "External ESI requests are not allowed";
+            # }
+
+            # varnish 2.1 is buggy with compressed esi content
+            remove req.http.Accept-Encoding;
+        }
+        # no frontend cookie was sent to us
+        if (req.http.Cookie !~ "frontend=") {
+            if (client.ip ~ crawler_acl ||
+                    req.http.User-Agent ~ "^(?:{{crawler_user_agent_regex}})$") {
+                # it's a crawler, give it a fake cookie
+                set req.http.Cookie = "frontend=crawler-session";
             } else {
-                #pass so we can get a unique session
-                return (pass);
+                # it's a real user, make up a new session for them
+                call generate_session;
             }
         }
         if (req.http.X-Opt-Force-Static-Caching == "true" &&
                 req.url ~ ".*\.(?:{{static_extensions}})(?=\?|&|$)") {
+            # don't need cookies for static assets
             remove req.http.Cookie;
             return (lookup);
         }
+        # this doesn't need a enable_url_excludes because we can be reasonably
+        # certain that cron.php at least will always be in it, so it will
+        # never be empty
         if (req.url ~ "{{url_base_regex}}(?:{{url_excludes}})") {
             return (pipe);
         }
@@ -108,18 +184,11 @@ sub vcl_pipe {
     # request didn't pass through Varnish
     remove bereq.http.X-Turpentine-Secret-Handshake;
     set bereq.http.Connection = "close";
-    return (pipe);
 }
 
 sub vcl_pass {
-    if (!(req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") &&
-            req.http.X-Varnish-Cookie) {
-        remove req.http.Cookie;
-    } else if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/" &&
-            req.http.X-Varnish-Cookie) {
-        set req.http.Cookie = req.http.X-Varnish-Cookie;
-    }
-    return (pass);
+    # see sub declaration for why we can't do this
+    # call anonymize_request;
 }
 
 sub vcl_hash {
@@ -133,14 +202,13 @@ sub vcl_hash {
         set req.hash += req.http.X-Normalized-User-Agent;
     }
     if (req.http.Accept-Encoding) {
+        # make sure we give back the right encoding
         set req.hash += req.http.Accept-Encoding;
     }
-    if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") {
-        if (req.url ~ "/{{esi_cache_type_param}}/private/"
-                && req.http.Cookie ~ "frontend=") {
-            set req.hash += regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1");
-            {{advanced_session_validation}}
-        }
+    if (req.http.X-Varnish-Esi-Access == "private" &&
+            req.http.Cookie ~ "frontend=") {
+        set req.hash += regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1");
+        {{advanced_session_validation}}
     }
     return (hash);
 }
@@ -153,94 +221,116 @@ sub vcl_hash {
 # }
 
 sub vcl_miss {
-    if (!(req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") &&
-            req.http.X-Varnish-Cookie) {
-        remove req.http.Cookie;
-    } else if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/" &&
-            req.http.X-Varnish-Cookie) {
-        set req.http.Cookie = req.http.X-Varnish-Cookie;
-    }
-    return (fetch);
+    # see sub declaration for why we can't do this
+    # call anonymize_request;
 }
 
 sub vcl_fetch {
+    # set the grace period
     set req.grace = {{grace_period}}s;
-    #TODO: only remove the User-Agent field from this if it exists
-    remove beresp.http.Vary;
 
-    if (beresp.status != 200 && beresp.status != 404) {
-        set beresp.ttl = {{grace_period}}s;
-        return (pass);
-    } else {
-        if (beresp.http.Set-Cookie) {
-            set beresp.http.X-Varnish-Set-Cookie = beresp.http.Set-Cookie;
-            remove beresp.http.Set-Cookie;
-        }
-        if (!(req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") &&
-                req.http.X-Varnish-Cookie !~ "frontend=" &&
-                !(client.ip ~ crawler_acl) &&
-                !(req.http.User-Agent ~ "^(?:{{crawler_user_agent_regex}})$")) {
-            set beresp.http.X-Varnish-Use-Set-Cookie = "1";
-        }
-        if (beresp.http.X-Turpentine-Esi == "1") {
-            esi;
-        }
-        if (beresp.http.X-Turpentine-Cache == "0") {
-            call remove_cache_headers;
-            set beresp.cacheable = false;
+    # if it's part of magento...
+    if (req.url ~ "{{url_base_regex}}") {
+        # we handle the Vary stuff ourselves for now, we'll want to actually
+        # use this eventually for compatibility with downstream proxies
+        # TODO: only remove the User-Agent field from this if it exists
+        remove beresp.http.Vary;
+
+        if (beresp.status != 200 && beresp.status != 404) {
+            # don't cache if it's not a 200 or 404
             set beresp.ttl = {{grace_period}}s;
             return (pass);
         } else {
-            set beresp.cacheable = true;
-            if (req.http.X-Opt-Force-Static-Caching == "true" &&
-                    bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|&|$)") {
-                call remove_cache_headers;
-                set beresp.ttl = {{static_ttl}}s;
-                set beresp.http.Cache-Control = "max-age={{static_ttl}}";
-            } else if (req.url ~ "{{url_base_regex}}turpentine/esi/getBlock/") {
-                call remove_cache_headers;
-                # TODO: make the TTLs properly dynamic
-                if (req.url ~ "/{{esi_cache_type_param}}/private/") {
-                    if(req.http.Cookie ~ "frontend=") {
-                        set beresp.http.X-Varnish-Session = regsub(req.http.Cookie,
-                            "^.*?frontend=([^;]*);*.*$", "\1");
-                    }
-                    if(req.url ~ "/{{esi_method_param}}/ajax/") {
-                        set beresp.ttl = {{grace_period}}s;
-                        return (pass);
+            # if Magento sent us a Set-Cookie header, we'll put it somewhere
+            # else for now
+            if (beresp.http.Set-Cookie) {
+                set beresp.http.X-Varnish-Set-Cookie = beresp.http.Set-Cookie;
+                remove beresp.http.Set-Cookie;
+            }
+            # we'll set our own cache headers if we need them
+            call remove_cache_headers;
+
+            if (!req.http.X-Varnish-Esi-Method &&
+                    req.http.X-Varnish-Cookie !~ "frontend=" &&
+                    !(client.ip ~ crawler_acl) &&
+                    !(req.http.User-Agent ~ "^(?:{{crawler_user_agent_regex}})$")) {
+                # it's a new visitor (not a crawler), need to give it the
+                # set-cookie header later so they get a new session
+                set beresp.http.X-Varnish-Use-Set-Cookie = "1";
+            }
+            if (beresp.http.X-Turpentine-Esi == "1") {
+                esi;
+            }
+            if (beresp.http.X-Turpentine-Cache == "0") {
+                set beresp.cacheable = false;
+                set beresp.ttl = {{grace_period}}s;
+                return (pass);
+            } else {
+                set beresp.cacheable = true;
+                if (req.http.X-Opt-Force-Static-Caching == "true" &&
+                        bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|&|$)") {
+                    # it's a static asset
+                    set beresp.ttl = {{static_ttl}}s;
+                    set beresp.http.Cache-Control = "max-age={{static_ttl}}";
+                } else if (req.http.X-Varnish-Esi-Method) {
+                    # it's a ESI request
+                    # TODO: make the TTLs properly dynamic
+                    if (req.http.X-Varnish-Esi-Access == "private") {
+                        if(req.http.Cookie ~ "frontend=") {
+                            # set this header so we can ban by session from Turpentine
+                            set beresp.http.X-Varnish-Session = regsub(req.http.Cookie,
+                                "^.*?frontend=([^;]*);*.*$", "\1");
+                        }
+                        if(req.http.X-Varnish-Esi-Method == "ajax") {
+                            set beresp.ttl = {{grace_period}}s;
+                            return (pass);
+                        } else {
+                            set beresp.ttl = {{esi_private_ttl}}s;
+                        }
                     } else {
-                        set beresp.ttl = {{esi_private_ttl}}s;
+                        set beresp.ttl = {{esi_public_ttl}}s;
                     }
                 } else {
-                    set beresp.ttl = {{esi_public_ttl}}s;
+                    {{url_ttls}}
                 }
-            } else {
-                call remove_cache_headers;
-                {{url_ttls}}
             }
         }
+        # we've done what we need to, send to the client
+        return (deliver);
     }
-    return (deliver);
+    # else it's not part of Magento so use the default Varnish handling
 }
 
-#https://www.varnish-cache.org/trac/wiki/VCLExampleHitMissHeader
 sub vcl_deliver {
     if (resp.http.X-Varnish-Use-Set-Cookie) {
+        # the visitor needs a new session, go ahead and give it to them
         set resp.http.Set-Cookie = resp.http.X-Varnish-Set-Cookie;
+    }
+    if (req.http.X-Varnish-Faked-Session == "1") {
+        # need to set the set-cookie header since we just made it out of thin air
+        set resp.http.Set-Cookie = req.http.Cookie;
     }
     set resp.http.X-Opt-Debug-Headers = "{{debug_headers}}";
     if (resp.http.X-Opt-Debug-Headers == "true" || client.ip ~ debug_acl ) {
+        # debugging is on, give some extra info
         set resp.http.X-Varnish-Hits = obj.hits;
+        set resp.http.X-Varnish-Anon = req.http.X-Varnish-Anon;
+        set resp.http.X-Varnish-Esi-Method = req.http.X-Varnish-Esi-Method;
+        set resp.http.X-Varnish-Esi-Access = req.http.X-Varnish-Esi-Access;
     } else {
         #remove Varnish fingerprints
         remove resp.http.X-Varnish;
         remove resp.http.Via;
         remove resp.http.X-Powered-By;
         remove resp.http.Server;
+        # TODO: probably don't actually need to remove this one
         remove resp.http.Age;
         remove resp.http.X-Turpentine-Cache;
         remove resp.http.X-Turpentine-Esi;
         remove resp.http.X-Varnish-Session;
+        # this header indicates the session that originally generated a cached
+        # page. it *must* not be sent to a client in production with lax
+        # session validation or that session can be hijacked
         remove resp.http.X-Varnish-Set-Cookie;
         remove resp.http.X-Varnish-Use-Set-Cookie;
     }

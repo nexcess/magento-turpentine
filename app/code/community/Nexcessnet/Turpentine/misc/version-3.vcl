@@ -127,10 +127,6 @@ sub vcl_recv {
             set req.backend = admin;
             return (pipe);
         }
-        if (req.http.Cookie) {
-            # combine multiple Cookie headers into one
-            # std.collect(req.http.Cookie);
-        }
         # looks like an ESI request, add some extra vars for further processing
         if (req.url ~ "/turpentine/esi/getBlock/") {
             set req.http.X-Varnish-Esi-Method = regsub(
@@ -151,7 +147,6 @@ sub vcl_recv {
                     req.http.User-Agent ~ "^(?:{{crawler_user_agent_regex}})$") {
                 # it's a crawler, give it a fake cookie
                 set req.http.Cookie = "frontend=crawler-session";
-            # } elsif (!req.http.X-Varnish-Esi-Method) {
             } else {
                 # it's a real user, make up a new session for them
                 call generate_session;
