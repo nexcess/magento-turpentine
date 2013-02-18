@@ -255,14 +255,6 @@ sub vcl_fetch {
             # we'll set our own cache headers if we need them
             call remove_cache_headers;
 
-            if (!req.http.X-Varnish-Esi-Method &&
-                    req.http.X-Varnish-Cookie !~ "frontend=" &&
-                    !(client.ip ~ crawler_acl) &&
-                    !(req.http.User-Agent ~ "^(?:{{crawler_user_agent_regex}})$")) {
-                # it's a new visitor (not a crawler), need to give it the
-                # set-cookie header later so they get a new session
-                set beresp.http.X-Varnish-Use-Set-Cookie = "1";
-            }
             if (beresp.http.X-Turpentine-Esi == "1") {
                 esi;
             }
@@ -307,10 +299,6 @@ sub vcl_fetch {
 }
 
 sub vcl_deliver {
-    if (resp.http.X-Varnish-Use-Set-Cookie) {
-        # the visitor needs a new session, go ahead and give it to them
-        set resp.http.Set-Cookie = resp.http.X-Varnish-Set-Cookie;
-    }
     if (req.http.X-Varnish-Faked-Session == "1") {
         # need to set the set-cookie header since we just made it out of thin air
         set resp.http.Set-Cookie = req.http.Cookie;
@@ -319,7 +307,7 @@ sub vcl_deliver {
     if (resp.http.X-Opt-Debug-Headers == "true" || client.ip ~ debug_acl ) {
         # debugging is on, give some extra info
         set resp.http.X-Varnish-Hits = obj.hits;
-        set resp.http.X-Varnish-Anon = req.http.X-Varnish-Anon;
+        # set resp.http.X-Varnish-Anon = req.http.X-Varnish-Anon;
         set resp.http.X-Varnish-Esi-Method = req.http.X-Varnish-Esi-Method;
         set resp.http.X-Varnish-Esi-Access = req.http.X-Varnish-Esi-Access;
     } else {
