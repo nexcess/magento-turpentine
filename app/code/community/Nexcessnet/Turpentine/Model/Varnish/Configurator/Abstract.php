@@ -22,6 +22,7 @@
 abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
 
     const VCL_FRAGMENT_FILE = 'custom_include.vcl';
+    const VCL_CUSTOM_C_CODE_FILE    = 'uuid.c';
 
     /**
      * Get the correct version of a configurator from a socket
@@ -620,6 +621,8 @@ EOS;
             // 'lru_factor'    => $this->_getLruFactor(),
             'debug_acl'     => $this->_vcl_acl( 'debug_acl',
                 $this->_getDebugIps() ),
+            'custom_c_code' => file_get_contents(
+                $this->_getVclTemplateFilename( self::VCL_CUSTOM_C_CODE_FILE ) ),
         );
         if( Mage::getStoreConfig( 'turpentine_vcl/normalization/encoding' ) ) {
             $vars['normalize_encoding'] = $this->_vcl_sub_normalize_encoding();
