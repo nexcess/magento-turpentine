@@ -54,6 +54,24 @@ sub generate_session {
     set req.http.X-Varnish-Faked-Session = "1";
 }
 
+sub generate_session_expires {
+    # sets X-Varnish-Cookie-Expires to now + esi_private_ttl in format:
+    #   Tue, 19-Feb-2013 00:14:27 GMT
+    C{
+        time_t now = time(NULL);
+        struct tm now_tm = *localtime(&now);
+        now_tm.tm_sec += {{esi_private_ttl}};
+        mktime(&now_tm);
+        char date_buf [50];
+        strftime(date_buf, sizeof(date_buf)-1, "%a, %d-%b-%Y %H:%M:%S %Z", &now_tm);
+        VRT_SetHdr(sp, HDR_RESP,
+            "\031X-Varnish-Cookie-Expires:",
+            date_buf,
+            vrt_magic_string_end
+        );
+    }C
+}
+
 # we can't use this because Magento randomly uses GET requests where it should
 # use POST, ex: adding something to the cart from a category page vs a product
 # page
@@ -282,7 +300,16 @@ sub vcl_fetch {
 sub vcl_deliver {
     if (req.http.X-Varnish-Faked-Session == "1") {
         # need to set the set-cookie header since we just made it out of thin air
-        set resp.http.Set-Cookie = req.http.Cookie;
+        call generate_session_expires;
+        set resp.http.Set-Cookie = req.http.Cookie "; expires="
+            resp.http.X-Varnish-Cookie-Expires "; path="
+            regsub(regsub(req.url, "{{url_base_regex}}.*", "\1"), "/$", "");
+        if (req.http.Host) {
+            set resp.http.Set-Cookie = resp.http.Set-Cookie
+                "; domain=" regsub(req.http.Host, ":\d+$", "");
+        }
+        set resp.http.Set-Cookie = resp.http.Set-Cookie "; HttpOnly";
+        remove resp.http.X-Varnish-Cookie-Expires;
     }
     set resp.http.X-Opt-Debug-Headers = "{{debug_headers}}";
     if (resp.http.X-Opt-Debug-Headers == "true" || client.ip ~ debug_acl ) {

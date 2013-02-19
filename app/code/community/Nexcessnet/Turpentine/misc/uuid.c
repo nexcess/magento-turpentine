@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include <pthread.h>
 
 static pthread_mutex_t lrand_mutex = PTHREAD_MUTEX_INITIALIZER;
