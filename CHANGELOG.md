@@ -196,5 +196,12 @@ that have been done to the ESI layout will need to be updated
 
 ### RELEASE-0.4.1
 
+  * Removed the need for initial request pass through, Varnish will now generate
+  a session token for new visitors and serve them pages from the cache on their
+  first visit
+  * *public* access ESI blocks are now generated with a shared session token
+  as an additional safeguard against private session information leakage
   * Fixed CMS pages not being automatically flushed on update
   * Fixed piped requests in Varnish not having headers handled appropriately
+  * Added ability to whitelist IP addresses for debug info from Varnish, even
+  if Varnish debugging is disabled
