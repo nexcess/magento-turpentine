@@ -85,21 +85,14 @@ sub generate_session_expires {
     }C
 }
 
-# we can't use this because Magento randomly uses GET requests where it should
-# use POST, ex: adding something to the cart from a category page vs a product
-# page
-# sub anonymize_request {
-#     # make the request anonymous by removing the frontend cookie
-#     if (!req.http.X-Varnish-Esi-Method || req.http.X-Varnish-Esi-Access == "public") {
-#         if (bereq.http.X-Varnish-Cookie) {
-#             set bereq.http.Cookie = "frontend=no-session";
-#             set req.http.X-Varnish-ReqIsAnon = "1";
-#         }
-#     } else {
-#         set bereq.http.Cookie = bereq.http.X-Varnish-Cookie;
-#         set req.http.X-Varnish-ReqIsAnon = "0";
-#     }
-# }
+sub anonymize_request {
+    # make the request anonymous by removing the frontend cookie, a small
+    # additional safe-guard against private info leakage
+    if (bereq.http.Cookie) {
+        set bereq.http.Cookie = "frontend=shared-session";
+        set req.http.X-Varnish-Anon = "1";
+    }
+}
 
 ## Varnish Subroutines
 
@@ -195,10 +188,9 @@ sub vcl_pipe {
     set bereq.http.Connection = "close";
 }
 
-sub vcl_pass {
-    # see sub declaration for why we can't do this
-    # call anonymize_request;
-}
+# sub vcl_pass {
+#     return (pass);
+# }
 
 sub vcl_hash {
     hash_data(req.url);
@@ -232,8 +224,9 @@ sub vcl_hit {
 }
 
 sub vcl_miss {
-    # see sub declaration for why we can't do this
-    # call anonymize_request;
+    if (req.http.X-Varnish-Esi-Access == "public") {
+        call anonymize_request;
+    }
 }
 
 sub vcl_fetch {
@@ -315,13 +308,16 @@ sub vcl_deliver {
             set resp.http.Set-Cookie = resp.http.Set-Cookie +
                 "; domain=" + regsub(req.http.Host, ":\d+$", "");
         }
-        set resp.http.Set-Cookie = resp.http.Set-Cookie + "; HttpOnly";
+        set resp.http.Set-Cookie = resp.http.Set-Cookie + "; httponly";
         unset resp.http.X-Varnish-Cookie-Expires;
+    }
+    if (req.http.X-Varnish-Anon == "1") {
+        unset resp.http.Set-Cookie;
     }
     if ({{debug_headers}} || client.ip ~ debug_acl) {
         # debugging is on, give some extra info
         set resp.http.X-Varnish-Hits = obj.hits;
-        # set resp.http.X-Varnish-Anon = req.http.X-Varnish-Anon;
+        set resp.http.X-Varnish-Anon = req.http.X-Varnish-Anon;
         set resp.http.X-Varnish-Esi-Method = req.http.X-Varnish-Esi-Method;
         set resp.http.X-Varnish-Esi-Access = req.http.X-Varnish-Esi-Access;
     } else {
