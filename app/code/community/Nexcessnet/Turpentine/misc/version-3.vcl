@@ -47,16 +47,23 @@ sub generate_session {
     # generate a UUID and set the Cookie header to `frontend=$UUID`, overwrites
     # any other cookies in the header
     C{
-        char uuid_buf [46];
+        char uuid_buf [50];
         generate_uuid(uuid_buf);
         VRT_SetHdr(sp, HDR_REQ,
-            "\007Cookie:",
+            "\028X-Varnish-Faked-Session:"
             uuid_buf,
             vrt_magic_string_end
         );
     }C
-    # marker so we know to set the Set-Cookie header
-    set req.http.X-Varnish-Faked-Session = "1";
+    if (req.http.Cookie) {
+        # client sent us cookies, just not a frontend cookie. try not to blow
+        # away the extra cookies
+        std.collect(req.http.Cookie);
+        set req.http.Cookie = req.http.X-Varnish-Faked-Session +
+            "; " + req.http.Cookie;
+    } else {
+        set req.http.Cookie = req.http.X-Varnish-Faked-Session;
+    }
 }
 
 sub generate_session_expires {
@@ -298,11 +305,11 @@ sub vcl_fetch {
 }
 
 sub vcl_deliver {
-    if (req.http.X-Varnish-Faked-Session == "1") {
+    if (req.http.X-Varnish-Faked-Session) {
         # need to set the set-cookie header since we just made it out of thin air
         call generate_session_expires;
-        set resp.http.Set-Cookie = req.http.Cookie + "; expires=" +
-            resp.http.X-Varnish-Cookie-Expires + "; path=" +
+        set resp.http.Set-Cookie = req.http.X-Varnish-Faked-Session +
+            "; expires=" + resp.http.X-Varnish-Cookie-Expires + "; path=" +
             regsub(regsub(req.url, "{{url_base_regex}}.*", "\1"), "/$", "");
         if (req.http.Host) {
             set resp.http.Set-Cookie = resp.http.Set-Cookie +
