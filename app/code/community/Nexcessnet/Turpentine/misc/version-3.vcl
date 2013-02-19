@@ -62,9 +62,10 @@ sub generate_session {
 sub generate_session_expires {
     # sets X-Varnish-Cookie-Expires to now + esi_private_ttl in format:
     #   Tue, 19-Feb-2013 00:14:27 GMT
+    # this isn't threadsafe but it shouldn't matter in this case
     C{
         time_t now = time(NULL);
-        struct tm now_tm = *localtime(&now);
+        struct tm now_tm = *gmtime(&now);
         now_tm.tm_sec += {{esi_private_ttl}};
         mktime(&now_tm);
         char date_buf [50];
