@@ -3,7 +3,7 @@
 TEST_URL="$1"
 TMP_FILE="/tmp/load_test_$(cat /proc/sys/kernel/random/uuid).txt"
 
-REPETITIONS=32
+REPETITIONS=64
 CONCURRENCY=128
 
 if [ -z "$TEST_URL" ]; then
@@ -20,9 +20,10 @@ EOF
 fi
 
 echo "Starting load test..."
+echo "Using $CONCURRENCY clients doing $REPETITIONS requests each for $(($CONCURRENCY * $REPETITIONS)) requests total"
 
 for i in $(seq 1 $CONCURRENCY); do
-    { for j in $(seq 1 $REPETITIONS); do curl -sIH 'User-Agent: TestAgent' "$TEST_URL" | grep ^Set-Cookie >> "$TMP_FILE"; done; } &>/dev/null &
+    { for j in $(seq 1 $REPETITIONS); do curl -sIH 'User-Agent: TestAgent' -H 'Accept-Encoding: gzip' "$TEST_URL" | grep ^Set-Cookie >> "$TMP_FILE"; done; } &>/dev/null &
 done
 
 echo -n "Waiting test to finish..."
@@ -41,11 +42,10 @@ non_unique_sids_count="$(echo -n "$non_unique_sids" | wc -l)"
 if [ $non_unique_sids_count -gt 0 ]; then
     echo "Found $non_unique_sids_count duplicated SIDs"
     echo "$non_unique_sids"
-    echo "Full log at: $TMP_FILE"
 else
     echo "No duplicate SIDs found"
-    rm -f "$TMP_FILE"
 fi
+echo "Full log at: $TMP_FILE"
 
 if [ $non_unique_sids_count -gt 0 ]; then
     exit 2
