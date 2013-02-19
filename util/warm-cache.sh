@@ -26,6 +26,8 @@ fi
 
 PROCS=$(grep processor /proc/cpuinfo | wc -l)
 
+echo "Getting URLs from sitemap..."
+
 curl -ks "$SITEMAP_URL" | \
 	$XPATH_BIN '/urlset/url/loc/text()' 2>/dev/null | \
 	sed -r 's~http(s)?:~\nhttp\1:~g' | \
