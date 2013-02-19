@@ -40,5 +40,10 @@ cat "$TMP_URL_FILE" | \
         siege -b -v -c 1 -r once 2>/dev/null | \
     sed -r 's/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g' | \
     grep -E '^HTTP'
+cat "$TMP_URL_FILE" | \
+    xargs -P "$PROCS" -r -n 1 -- \
+        siege -H 'Accept-Encoding: gzip' -b -v -c 1 -r once 2>/dev/null | \
+    sed -r 's/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g' | \
+    grep -E '^HTTP'
 
 rm -f "$TMP_URL_FILE"
