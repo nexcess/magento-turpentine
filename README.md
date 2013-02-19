@@ -55,13 +55,11 @@ The extension works in two parts, page caching and block (ESI/AJAX) caching. A
 simplified look at how they work:
 
 For pages, Varnish first checks whether the visitor sent a ``frontend`` cookie.
-If they didn't, then they are served a new page from the backend (Magento),
-regardless of whether that page is already cached, so they get a new
-session from Magento. If they already have a ``frontend`` cookie, then
-they get a (non-session-specific) page from the backend, with any session-specific
-blocks (defined by the ESI policies) filled in via ESI. Note that this is bypassed
-for clients identified as crawlers (see the ``Crawler IP Addresses`` and
-``Crawler User Agents`` settings).
+If they didn't, then Varnish will generate a new session token for them. The page
+is then served from cache (or fetched from the backend if it's not already in
+the cache), with any blocks with ESI polices filled in via ESI. Note that the
+cookie checking is bypassed for clients identified as crawlers (see the
+``Crawler IP Addresses`` and ``Crawler User Agents`` settings).
 
 For blocks, the extension listens for the ``core_block_abstract_to_html_before``
 event in Magento. When this event is triggered, the extension looks at the block
@@ -79,14 +77,6 @@ the page and may differ between different visitors/clients.
  speed for site browsing. It will remove a lot of load on the backend though so
  for heavily loaded sites it can free up enough backend resources to have a
  noticeable effect on "actions".
- - By design, the first request from a new visitor will not serve them a cached
- page (it will be passed through to the backend so they get a unique session),
- so the page load speed will the same as normal (without Varnish/Turpentine).
- The second request will also
- be somewhat faster than normal, but not full cached-page speed as the ESI blocks
- will need to be regenerated and cached for the visitor's new session. Any further
- requests will be at full cached-page speed (assuming the pages are already in
- the cache).
  - Multi-store/multi-site setups that use the same *URL path and domain combo*
  will not work. Specifically they will always use the default site/store and
  changing via the dropdown menu will not do anything. Examples:
