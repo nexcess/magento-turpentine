@@ -12,7 +12,7 @@ Note that this extension is still in **beta** so use on a production site should
 be considered carefully. There are already some sites using it in production,
 but it is certainly not *stable* yet (ESI support brought significant changes
 to how it works) so it should be carefully tested on a development site before
-being deployed on a production site.
+being deployed in production.
 
 ## Features
 
@@ -20,7 +20,7 @@ being deployed on a production site.
  - Requires very little configuration for impressive results
  - Able to apply new Varnish VCLs (configurations) on the fly, without
  restarting/changing Varnish's config files or flushing the cache
- - Exclude URL paths, request parameters (SID, store, etc) from caching
+ - Exclude URL paths and/or request parameters (SID, store, etc) from caching
  - Configure cache TTL by URL and individual block's TTL
  - Ability to force static asset (css, js, etc) caching
  - Supports multiple Varnish instances for clustered usage
@@ -77,7 +77,7 @@ the page and may differ between different visitors/clients.
  speed for site browsing. It will remove a lot of load on the backend though so
  for heavily loaded sites it can free up enough backend resources to have a
  noticeable effect on "actions".
- - Multi-store/multi-site setups that use the same *URL path and domain combo*
+ - Multi-store/multi-site setups that use the same URL path **and** domain
  will not work. Specifically they will always use the default site/store and
  changing via the dropdown menu will not do anything. Examples:
     - example.com/store/en/ and example.com/store/de/ works (same domain, different paths)
