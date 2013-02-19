@@ -50,7 +50,7 @@ sub generate_session {
         char uuid_buf [50];
         generate_uuid(uuid_buf);
         VRT_SetHdr(sp, HDR_REQ,
-            "\028X-Varnish-Faked-Session:"
+            "\028X-Varnish-Faked-Session:",
             uuid_buf,
             vrt_magic_string_end
         );
