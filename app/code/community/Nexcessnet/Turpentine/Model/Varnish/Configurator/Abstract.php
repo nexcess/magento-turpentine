@@ -22,6 +22,7 @@
 abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
 
     const VCL_FRAGMENT_FILE = 'custom_include.vcl';
+    const VCL_CUSTOM_C_CODE_FILE    = 'uuid.c';
 
     /**
      * Get the correct version of a configurator from a socket
@@ -192,7 +193,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     public function getBaseUrlPathRegex() {
-        $pattern = '^(?:%s)(?:(?:index|litespeed)\\.php/)?';
+        $pattern = '^(%s)(?:(?:index|litespeed)\\.php/)?';
         return sprintf( $pattern, implode( '|',
             array_map( create_function( '$x', 'return preg_quote($x,"|");' ),
                 $this->_getBaseUrlPaths() ) ) );
@@ -213,7 +214,10 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
                     Mage_Core_Model_Store::URL_TYPE_LINK, true ),
                 PHP_URL_PATH );
         }
-        return array_unique( $paths );
+        $paths = array_unique( $paths );
+        usort( $paths, create_function( '$a, $b',
+            'return strlen( $b ) - strlen( $a );' ) );
+        return array_values( $paths );
     }
 
     /**
@@ -463,7 +467,9 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return bool
      */
     protected function _cleanVclHelper( $line ) {
-        return $line && substr( $line, 0, 1 ) != '#';
+        return $line &&
+            ( substr( $line, 0, 1 ) != '#' ||
+            substr( $line, 0, 8 ) == '#include' );
     }
 
     /**
@@ -618,6 +624,10 @@ EOS;
             // 'lru_factor'    => $this->_getLruFactor(),
             'debug_acl'     => $this->_vcl_acl( 'debug_acl',
                 $this->_getDebugIps() ),
+            'custom_c_code' => file_get_contents(
+                $this->_getVclTemplateFilename( self::VCL_CUSTOM_C_CODE_FILE ) ),
+            'esi_private_ttl'   => Mage::helper( 'turpentine/esi' )
+                ->getDefaultEsiTtl(),
         );
         if( Mage::getStoreConfig( 'turpentine_vcl/normalization/encoding' ) ) {
             $vars['normalize_encoding'] = $this->_vcl_sub_normalize_encoding();
