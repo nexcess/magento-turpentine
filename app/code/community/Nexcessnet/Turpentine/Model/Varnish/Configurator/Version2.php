@@ -51,8 +51,6 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version2
      */
     protected function _getTemplateVars() {
         $vars = parent::_getTemplateVars();
-        $vars['esi_private_ttl'] = Mage::helper( 'turpentine/esi' )
-            ->getDefaultEsiTtl();
         $vars['esi_public_ttl'] = $this->_getDefaultTtl();
         $vars['advanced_session_validation'] =
             $this->_getAdvancedSessionValidation();
