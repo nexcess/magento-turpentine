@@ -314,6 +314,7 @@ sub vcl_deliver {
         remove resp.http.Age;
         remove resp.http.X-Turpentine-Cache;
         remove resp.http.X-Turpentine-Esi;
+        remove resp.http.X-Turpentine-Flush-Events;
         remove resp.http.X-Varnish-Session;
         # this header indicates the session that originally generated a cached
         # page. it *must* not be sent to a client in production with lax
