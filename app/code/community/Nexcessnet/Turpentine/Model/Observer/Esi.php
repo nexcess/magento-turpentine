@@ -217,10 +217,15 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $esiData->setBlockType( get_class( $blockObject ) );
         $esiData->setLayoutHandles( $this->_getBlockLayoutHandles( $blockObject ) );
         $esiData->setEsiMethod( $esiOptions[$methodParam] );
-        if( $esiOptions[$cacheTypeParam] == 'private' &&
-                array_key_exists( 'flush_events', $esiOptions ) &&
-                is_array( $esiOptions['flush_events'] ) ) {
-            $esiData->setFlushEvents( array_keys( $esiOptions['flush_events'] ) );
+        if( $esiOptions[$cacheTypeParam] == 'private' ) {
+            if( is_array( @$esiOptions['flush_events'] ) ) {
+                $esiData->setFlushEvents( array_merge(
+                    $esiHelper->getDefaultCacheClearEvents(),
+                    array_keys( $esiOptions['flush_events'] ) ) );
+            } else {
+                $esiData->setFlushEvents(
+                    $esiHelper->getDefaultCacheClearEvents() );
+            }
         }
         if( $esiOptions[$scopeParam] == 'page' ) {
             $esiData->setParentUrl( Mage::app()->getRequest()->getRequestString() );

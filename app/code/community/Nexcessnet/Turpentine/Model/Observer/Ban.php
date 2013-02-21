@@ -34,7 +34,7 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * Flag to prevent doing the ESI cache clear more than once per request
      * @var boolean
      */
-    protected $_esiClearFlag    = false;
+    protected $_esiClearFlag    = array();
 
     /**
      * Clear the ESI block cache for a specific client
@@ -47,26 +47,26 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * @return [type]
      */
     public function banClientEsiCache( $eventObject ) {
+        $eventName = $eventObject->getEvent()->getName();
         if( Mage::helper( 'turpentine/esi' )->getEsiEnabled() &&
-                !$this->_esiClearFlag ) {
+                !in_array( $eventName, $this->_esiClearFlag ) ) {
             $sessionId = Mage::app()->getRequest()->getCookie( 'frontend' );
             if( $sessionId ) {
                 $result = $this->_getVarnishAdmin()->flushExpression(
                     'obj.http.X-Varnish-Session', '~', preg_quote( $sessionId ),
                     '&&', 'obj.http.X-Turpentine-Flush-Events', '~',
-                    preg_quote( $eventObject->getEvent()->getName() ) );
+                    preg_quote( $eventName ) );
                 Mage::dispatchEvent( 'turpentine_ban_client_esi_cache', $result );
                 if( $this->_checkResult( $result ) ) {
-                    if( Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled() ) {
-                        Mage::log( 'Cleared Varnish ESI cache for client: ' .
-                            $sessionId );
-                    }
+                    Mage::helper( 'turpentine/debug' )
+                        ->log( 'Cleared ESI cache for client (%s) on event: %s',
+                            $sessionId, $eventName );
                 } else {
                     Mage::log( 'Failed to clear Varnish ESI cache for client: ' .
                         $sessionId, Zend_Log::WARN );
                 }
             }
-            $this->_esiClearFlag = true;
+            $this->_esiClearFlag[] = $eventName;
         }
     }
 

@@ -165,6 +165,19 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     }
 
     /**
+     * Get the list of cache clear events to include with every ESI block
+     *
+     * @return array
+     */
+    public function getDefaultCacheClearEvents() {
+        $events = array(
+            'customer_login',
+            'customer_logout',
+        );
+        return $events;
+    }
+
+    /**
      * Get the list of events that should cause the ESI cache to be cleared
      *
      * @return array
@@ -177,7 +190,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
             Mage::app()->saveCache( serialize( $events ), $cacheKey,
                 array( 'LAYOUT_GENERAL_CACHE_TAG' ) );
         }
-        return $events;
+        return array_merge( $this->getDefaultCacheClearEvents(), $events );
     }
 
     /**
