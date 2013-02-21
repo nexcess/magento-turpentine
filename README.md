@@ -5,33 +5,32 @@ Turpentine is a [Magento](https://www.magentocommerce.com/) extension to improve
 [Varnish](https://www.varnish-cache.org/), a very-fast caching reverse-proxy. By
 default, Varnish doesn't cache requests with cookies and Magento sends the
 *frontend* cookie with every request causing a (near) zero hit-rate for Varnish's cache.
-Turpentine provides Varnish configuration files (VCLs) to work with Magento and
-modifies Magento's behaviour to significantly improve the cache hit rate.
+Turpentine configures Varnish to work with Magento and modifies Magento's
+behaviour to significantly improve the cache hit rate.
 
 Note that this extension is still in **beta** so use on a production site should
 be considered carefully. There are already some sites using it in production,
-but it is certainly not *stable* yet (ESI support brought significant changes
-to how it works) so it should be carefully tested on a development site before
-being deployed in production.
+but it is certainly not *stable* yet. New features have necessitated backwards-
+incompatible changes to the layout syntax in the past. As such, it should be
+carefully tested on a development site before being deployed in production.
 
 ## Features
 
-  - Full Magento Page Caching
-  - Requires very little configuration for impressive results
-  - Able to apply new Varnish VCLs (configurations) on the fly, without
-  restarting/changing Varnish's config files or flushing the cache
-  - Exclude URL paths and/or request parameters (SID, store, etc) from caching
+  - Full Page Caching, with hole-punching via Varnish ESI and/or AJAX
+  - Very little configuration needed for impressive results, no manual editing
+  of Varnish config required for most cases
+  - Able to generate and apply new Varnish VCLs (configurations) on the fly,
+  without restarting/changing Varnish's config files or flushing the cache
+  - Blacklist requests from caching by URL or parameters (SID, store, etc)
   - Configure cache TTL by URL and individual block's TTL
-  - Ability to force static asset (css, js, etc) caching
   - Supports multiple Varnish instances for clustered usage
-  - Hole-punching via Varnish ESI support and/or AJAX
   - Automatic cache clearing on actions (clearing product/catalog/cms page after saving)
-  - Non-root Magento installs (i.e. putting Magento in /store/ instead of /)
-  - External web crawler support for warming the cache
-  - Builtin crawler for automatically warming flushed cache pages
-  - Multi-store/multi-site support
-  - [SSL support](https://github.com/nexcess/magento-turpentine/wiki/SSL_Support) through
-  [Pound](http://www.apsis.ch/pound) or [Nginx](http://nginx.org/)
+  - Supports non-root Magento installs (i.e. putting Magento in /store/ instead
+  of /) and multi-store/multi-site setups
+  - Support for site-crawlers for cache warming, and includes a (basic)
+  built-in site-crawler
+  - [SSL support](https://github.com/nexcess/magento-turpentine/wiki/SSL_Support)
+  through [Pound](http://www.apsis.ch/pound) or [Nginx](http://nginx.org/)
 
 ## Requirements
 
