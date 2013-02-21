@@ -150,25 +150,6 @@
                         </config_file>
                     </fields>
                 </servers>
-                <purging translate="label" module="turpentine">
-                    <label>Cache Purging</label>
-                    <frontend_type>text</frontend_type>
-                    <sort_order>30</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>0</show_in_website>
-                    <show_in_store>0</show_in_store>
-                    <fields>
-                        <esi_purge_events translate="label" module="turpentine">
-                            <label>ESI Client Cache Purge Events</label>
-                            <frontend_type>textarea</frontend_type>
-                            <comment>A list of events to trigger client ESI cache purges, one per line. This should only need to be changed for compatiblity with other extensions</comment>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </esi_purge_events>
-                    </fields>
-                </purging>
             </groups>
         </turpentine_varnish>
         <turpentine_vcl translate="label" module="turpentine">

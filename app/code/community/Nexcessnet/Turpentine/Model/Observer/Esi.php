@@ -22,13 +22,6 @@
 class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
 
     /**
-     * Cache for layout XML
-     *
-     * @var Mage_Core_Model_Layout_Element|SimpleXMLElement
-     */
-    protected $_layoutXml = null;
-
-    /**
      * Check the ESI flag and set the ESI header if needed
      *
      * Events: http_response_send_before
@@ -224,6 +217,11 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $esiData->setBlockType( get_class( $blockObject ) );
         $esiData->setLayoutHandles( $this->_getBlockLayoutHandles( $blockObject ) );
         $esiData->setEsiMethod( $esiOptions[$methodParam] );
+        if( $esiOptions[$cacheTypeParam] == 'private' &&
+                array_key_exists( 'flush_events', $esiOptions ) &&
+                is_array( $esiOptions['flush_events'] ) ) {
+            $esiData->setFlushEvents( array_keys( $esiOptions['flush_events'] ) );
+        }
         if( $esiOptions[$scopeParam] == 'page' ) {
             $esiData->setParentUrl( Mage::app()->getRequest()->getRequestString() );
         }
@@ -258,50 +256,6 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
     }
 
     /**
-     * Get the layout's XML structure
-     *
-     * This is cached because it's expensive to load for each ESI'd block
-     *
-     * @return Mage_Core_Model_Layout_Element|SimpleXMLElement
-     */
-    protected function _getLayoutXml() {
-        if( is_null( $this->_layoutXml ) ) {
-            if( Mage::app()->useCache( 'layout' ) ) {
-                $cacheKey = Mage::helper( 'turpentine/esi' )
-                    ->getFileLayoutUpdatesXmlCacheKey();
-                $this->_layoutXml = simplexml_load_string(
-                    Mage::app()->loadCache( $cacheKey ) );
-            }
-            // this check is redundant if the layout cache is disabled
-            if( !$this->_layoutXml ) {
-                $this->_layoutXml = $this->_loadLayoutXml();
-            }
-            if( Mage::app()->useCache( 'layout' ) ) {
-                Mage::app()->saveCache( $this->_layoutXml->asXML(),
-                    $cacheKey, array( 'LAYOUT_GENERAL_CACHE_TAG' ) );
-            }
-        }
-        return $this->_layoutXml;
-    }
-
-    /**
-     * Load the layout's XML structure, bypassing any caching
-     *
-     * @return Mage_Core_Model_Layout_Element
-     */
-    protected function _loadLayoutXml() {
-        $design = Mage::getDesign();
-        $layoutXml = Mage::getSingleton( 'core/layout' )
-            ->getUpdate()
-            ->getFileLayoutUpdatesXml(
-                $design->getArea(),
-                $design->getPackageName(),
-                $design->getTheme( 'layout' ),
-                Mage::app()->getStore()->getId() );
-        return $layoutXml;
-    }
-
-    /**
      * Get the active layout handles for this block and any child blocks
      *
      * This is probably kind of slow since it uses a bunch of xpath searches
@@ -323,7 +277,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      */
     protected function _getBlockLayoutHandles( $block ) {
         $layout = $block->getLayout();
-        $layoutXml = $this->_getLayoutXml();
+        $layoutXml = Mage::helper( 'turpentine/esi' )->getLayoutXml();
         $activeHandles = array();
         // get the xml node representing the block we're working on (from the
         // default handle probably)

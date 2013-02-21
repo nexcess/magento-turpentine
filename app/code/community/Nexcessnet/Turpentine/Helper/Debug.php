@@ -128,6 +128,8 @@ class Nexcessnet_Turpentine_Helper_Debug extends Mage_Core_Helper_Abstract {
             $value = sprintf( '\'%s\'', $arg );
         } elseif( is_bool( $arg ) ) {
             $value = $arg ? 'TRUE' : 'FALSE';
+        } elseif( is_null( $arg ) ) {
+            $value = 'NULL';
         }
         return $value;
     }

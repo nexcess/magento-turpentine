@@ -33,19 +33,6 @@
                 <crawler_enable>0</crawler_enable>
                 <crawler_debug>0</crawler_debug>
             </general>
-            <purging>
-                <esi_purge_events><![CDATA[core_session_abstract_add_message
-checkout_cart_add_product_complete
-checkout_cart_save_after
-checkout_onepage_controller_success_action
-controller_action_postdispatch_checkout_cart_couponPost
-controller_action_postdispatch_checkout_cart_updatePost
-catalog_product_compare_add_product
-sales_quote_save_after
-customer_login
-customer_logout
-poll_vote_add]]></esi_purge_events>
-            </purging>
             <servers>
                 <version>auto</version>
                 <server_list>127.0.0.1:6082</server_list>

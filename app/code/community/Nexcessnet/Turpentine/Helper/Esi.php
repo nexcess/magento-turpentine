@@ -28,6 +28,13 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     const MAGE_CACHE_NAME           = 'turpentine_esi_blocks';
 
     /**
+     * Cache for layout XML
+     *
+     * @var Mage_Core_Model_Layout_Element|SimpleXMLElement
+     */
+    protected $_layoutXml = null;
+
+    /**
      * Get whether ESI includes are enabled or not
      *
      * @return bool
@@ -163,8 +170,14 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return array
      */
     public function getCacheClearEvents() {
-        return Mage::helper( 'turpentine/data' )->cleanExplode( PHP_EOL,
-            Mage::getStoreConfig( 'turpentine_varnish/purging/esi_purge_events' ) );
+        $cacheKey = $this->getCacheClearEventsCacheKey();
+        $events = @unserialize( Mage::app()->loadCache( $cacheKey ) );
+        if( is_null( $events ) || $events === false ) {
+            $events = $this->_loadEsiCacheClearEvents();
+            Mage::app()->saveCache( serialize( $events ), $cacheKey,
+                array( 'LAYOUT_GENERAL_CACHE_TAG' ) );
+        }
+        return $events;
     }
 
     /**
@@ -198,6 +211,49 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     }
 
     /**
+     * Get the layout's XML structure
+     *
+     * This is cached because it's expensive to load for each ESI'd block
+     *
+     * @return Mage_Core_Model_Layout_Element|SimpleXMLElement
+     */
+    public function getLayoutXml() {
+        if( is_null( $this->_layoutXml ) ) {
+            if( Mage::app()->useCache( 'layout' ) ) {
+                $cacheKey = $this->getFileLayoutUpdatesXmlCacheKey();
+                $this->_layoutXml = simplexml_load_string(
+                    Mage::app()->loadCache( $cacheKey ) );
+            }
+            // this check is redundant if the layout cache is disabled
+            if( !$this->_layoutXml ) {
+                $this->_layoutXml = $this->_loadLayoutXml();
+            }
+            if( Mage::app()->useCache( 'layout' ) ) {
+                Mage::app()->saveCache( $this->_layoutXml->asXML(),
+                    $cacheKey, array( 'LAYOUT_GENERAL_CACHE_TAG' ) );
+            }
+        }
+        return $this->_layoutXml;
+    }
+
+    /**
+     * Get the cache key for the cache clear events
+     *
+     * @return string
+     */
+    public function getCacheClearEventsCacheKey() {
+        $design = Mage::getDesign();
+        return Mage::helper( 'turpentine/data' )
+            ->getCacheKeyHash( array(
+                'FILE_LAYOUT_ESI_CACHE_EVENTS',
+                $design->getArea(),
+                $design->getPackageName(),
+                $design->getTheme( 'layout' ),
+                Mage::app()->getStore()->getId(),
+            ) );
+    }
+
+    /**
      * Get the cache key for the file layouts xml
      *
      * @return string
@@ -212,5 +268,42 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
                 $design->getTheme( 'layout' ),
                 Mage::app()->getStore()->getId(),
             ) );
+    }
+
+    /**
+     * Load the ESI cache clear events from the layout
+     *
+     * @return array
+     */
+    protected function _loadEsiCacheClearEvents() {
+        $layoutXml = $this->getLayoutXml();
+        $events = $layoutXml->xpath(
+            '//action[@method=\'setEsiOptions\']/params/flush_events/*' );
+        if( $events ) {
+            $events = array_unique( array_map(
+                create_function( '$e',
+                    'return (string)$e->getName();' ),
+                $events ) );
+        } else {
+            $events = array();
+        }
+        return $events;
+    }
+
+    /**
+     * Load the layout's XML structure, bypassing any caching
+     *
+     * @return Mage_Core_Model_Layout_Element
+     */
+    protected function _loadLayoutXml() {
+        $design = Mage::getDesign();
+        $layoutXml = Mage::getSingleton( 'core/layout' )
+            ->getUpdate()
+            ->getFileLayoutUpdatesXml(
+                $design->getArea(),
+                $design->getPackageName(),
+                $design->getTheme( 'layout' ),
+                Mage::app()->getStore()->getId() );
+        return $layoutXml;
     }
 }

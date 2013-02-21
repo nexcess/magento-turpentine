@@ -40,13 +40,8 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * Clear the ESI block cache for a specific client
      *
      * Events:
-     *     checkout_cart_add_product_complete
-     *     checkout_cart_after_save
-     *     checkout_onepage_controller_success_action
-     *     controller_action_postdispatch_checkout_cart_couponpost
-     *     core_session_abstract_add_message
-     *     catalog_product_compare_add_product
-     *     sales_quote_save_after
+     *     the events are applied dynamically according to what events are set
+     *     for the various blocks' esi policies
      *
      * @param  [type] $eventObject [description]
      * @return [type]
@@ -57,11 +52,14 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
             $sessionId = Mage::app()->getRequest()->getCookie( 'frontend' );
             if( $sessionId ) {
                 $result = $this->_getVarnishAdmin()->flushExpression(
-                    'obj.http.X-Varnish-Session', '~', $sessionId );
+                    'obj.http.X-Varnish-Session', '~', preg_quote( $sessionId ),
+                    '&&', 'obj.http.X-Turpentine-Flush-Events', '~',
+                    preg_quote( $eventObject->getEvent()->getName() ) );
                 Mage::dispatchEvent( 'turpentine_ban_client_esi_cache', $result );
                 if( $this->_checkResult( $result ) ) {
                     if( Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled() ) {
-                        Mage::log( 'Cleared Varnish ESI cache for client: ' . $sessionId );
+                        Mage::log( 'Cleared Varnish ESI cache for client: ' .
+                            $sessionId );
                     }
                 } else {
                     Mage::log( 'Failed to clear Varnish ESI cache for client: ' .

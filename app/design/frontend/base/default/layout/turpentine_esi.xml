@@ -28,6 +28,14 @@
             <action method="setEsiOptions">
                 <params>
                     <access>private</access>
+                    <flush_events>
+                        <checkout_cart_add_product_complete/>
+                        <checkout_cart_save_after/>
+                        <checkout_onepage_controller_success_action/>
+                        <sales_quote_save_after/>
+                        <customer_login/>
+                        <customer_logout/>
+                    </flush_events>
                 </params>
             </action>
         </reference>
@@ -37,6 +45,14 @@
             <action method="setEsiOptions">
                 <params>
                     <access>private</access>
+                    <flush_events>
+                        <checkout_cart_add_product_complete/>
+                        <checkout_cart_save_after/>
+                        <checkout_onepage_controller_success_action/>
+                        <sales_quote_save_after/>
+                        <customer_login/>
+                        <customer_logout/>
+                    </flush_events>
                 </params>
             </action>
         </reference>
@@ -44,6 +60,9 @@
             <action method="setEsiOptions">
                 <params>
                     <access>private</access>
+                    <flush_events>
+                        <catalog_product_compare_add_product/>
+                    </flush_events>
                 </params>
             </action>
         </reference>
@@ -51,6 +70,14 @@
             <action method="setEsiOptions">
                 <params>
                     <access>private</access>
+                    <flush_events>
+                        <checkout_cart_add_product_complete/>
+                        <checkout_cart_save_after/>
+                        <checkout_onepage_controller_success_action/>
+                        <sales_quote_save_after/>
+                        <customer_login/>
+                        <customer_logout/>
+                    </flush_events>
                 </params>
             </action>
         </reference>
@@ -58,6 +85,9 @@
             <action method="setEsiOptions">
                 <params>
                     <access>private</access>
+                    <flush_events>
+                        <catalog_product_compare_add_product/>
+                    </flush_events>
                 </params>
             </action>
         </reference>
@@ -65,6 +95,9 @@
             <action method="setEsiOptions">
                 <params>
                     <access>private</access>
+                    <flush_events>
+                        <poll_vote_add/>
+                    </flush_events>
                 </params>
             </action>
         </reference>
@@ -83,6 +116,9 @@
                 <params>
                     <access>private</access>
                     <method>ajax</method>
+                    <flush_events>
+                        <core_session_abstract_add_message/>
+                    </flush_events>
                 </params>
             </action>
         </reference>
@@ -106,6 +142,14 @@
             <action method="setEsiOptions">
                 <params>
                     <access>private</access>
+                    <flush_events>
+                        <checkout_cart_add_product_complete/>
+                        <checkout_cart_save_after/>
+                        <checkout_onepage_controller_success_action/>
+                        <sales_quote_save_after/>
+                        <customer_login/>
+                        <customer_logout/>
+                    </flush_events>
                 </params>
             </action>
         </reference>
