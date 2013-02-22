@@ -225,6 +225,14 @@
                     </turpentine_varnish_catalog_product_save_commit_after>
                 </observers>
             </catalog_product_save_commit_after>
+            <review_save_after>
+                <observers>
+                    <turpentine_varnish_review_save_after>
+                        <class>turpentine/observer_ban</class>
+                        <method>banProductReview</method>
+                    </turpentine_varnish_review_save_after>
+                </observers>
+            </review_save_after>
             <cataloginventory_stock_item_save_after>
                 <observers>
                     <turpentine_varnish_cataloginventory_stock_item_save_after>

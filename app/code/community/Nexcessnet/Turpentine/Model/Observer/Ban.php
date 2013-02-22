@@ -266,6 +266,35 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
     }
 
     /**
+     * Ban a product's reviews page
+     *
+     * @param  Varien_Object $eventObject
+     * @return bool
+     */
+    public function banProductReview( $eventObject ) {
+        $patterns = array();
+        $review = $eventObject->getObject();
+        $products = $review->getProductCollection()->getItems();
+        $productIds = array_unique( array_map(
+            create_function( '$p', 'return $p->getEntityId();' ),
+            $products ) );
+        $patterns[] = sprintf( '/review/product/list/id/(?:%s)/category/',
+            implode( '|', array_unique( $productIds ) ) );
+        $patterns[] = sprintf( '/review/product/view/id/%d/',
+            $review->getEntityId() );
+        $patterns[] = sprintf( '(?:%s)', implode( '|',
+            array_unique( array_map(
+                create_function( '$p',
+                    'return $p->getUrlModel()->formatUrlKey( $p->getName() );' ),
+                $products ) )
+        ) );
+        $urlPattern = implode( '|', $patterns );
+
+        $result = $this->_getVarnishAdmin()->flushUrl( $urlPattern );
+        return $this->_checkResult( $result );
+    }
+
+    /**
      * Check a result from varnish admin action, log if result has errors
      *
      * @param  array $result stored as $socketName => $result
