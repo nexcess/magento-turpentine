@@ -212,3 +212,5 @@ will need to be updated
   * Fixed piped requests in Varnish not having headers handled appropriately
   * Added ability to whitelist IP addresses for debug info from Varnish, even
   if Varnish debugging is disabled
+  * Added flushing on a product page, product review list, and individual review
+  view on review saving (such as changing from 'Pending' to 'Approved')
