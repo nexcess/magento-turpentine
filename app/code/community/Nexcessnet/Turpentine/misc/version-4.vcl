@@ -51,7 +51,6 @@ sub generate_session {
         generate_uuid(uuid_buf);
         VRT_SetHdr(req,
             &VGC_HDR_REQ_X_Varnish_Faked_Session,
-            "\030X-Varnish-Faked-Session:",
             uuid_buf,
             vrt_magic_string_end
         );
