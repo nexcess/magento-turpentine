@@ -85,7 +85,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
     /**
      * VCL config versions, should match config select values
      */
-    static protected $_VERSIONS = array( '2.1', '3.0' );
+    static protected $_VERSIONS = array( '2.1', '3.0', '4.0' );
 
     /**
      * Varnish socket connection
@@ -469,6 +469,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
                 $command = str_replace( 'ban', 'purge', $command );
                 break;
             case '3.0':
+            case '4.0':
                 $command = str_replace( 'purge', 'ban', $command );
                 break;
             default:
@@ -484,11 +485,16 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
      * @return string
      */
     protected function _determineVersion() {
-        $resp = $this->_write( 'help' )->_read();
-        if( strpos( $resp['text'], 'ban.url' ) !== false ) {
-            return '3.0';
-        } elseif( strpos( $resp['text'], 'purge.url' ) !== false &&
-                strpos( $resp['text'], 'banner' ) ) {
+        $helpResp = $this->_write( 'help' )->_read();
+        if( strpos( $helpResp['text'], 'ban.url' ) !== false ) {
+            $bannerResp = $this->_write( 'banner' )->_read();
+            if( strpos( $bannerResp['text'], 'varnish-trunk' ) !== false ) {
+                return '4.0';
+            } else {
+                return '3.0';
+            }
+        } elseif( strpos( $helpResp['text'], 'purge.url' ) !== false &&
+                strpos( $helpResp['text'], 'banner' ) ) {
             return '2.1';
         } else {
             Mage::throwException( 'Unable to determine instance version' );

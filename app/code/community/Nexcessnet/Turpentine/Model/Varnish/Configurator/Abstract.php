@@ -40,6 +40,10 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             return null;
         }
         switch( $version ) {
+            case '4.0':
+                return Mage::getModel(
+                    'turpentine/varnish_configurator_version4',
+                        array( 'socket' => $socket ) );
             case '3.0':
                 return Mage::getModel(
                     'turpentine/varnish_configurator_version3',
