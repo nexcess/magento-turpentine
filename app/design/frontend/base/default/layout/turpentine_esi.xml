@@ -102,14 +102,11 @@
                 <params>
                     <access>private</access>
                     <method>ajax</method>
-                    <!-- I've yet to actually figure out what this block is
-                    used for, and have never seen a message displayed in it so
-                    for now we'll cache it for a short time to help reduce load
-                    on the backend -->
-                    <ttl>60</ttl>
+                    <!-- if this is ever cached we should flush on this event
                     <flush_events>
                         <core_session_abstract_add_message/>
                     </flush_events>
+                    -->
                 </params>
             </action>
         </reference>
@@ -118,6 +115,11 @@
                 <params>
                     <access>private</access>
                     <method>ajax</method>
+                    <!-- if this is ever cached we should flush on this event
+                    <flush_events>
+                        <core_session_abstract_add_message/>
+                    </flush_events>
+                    -->
                 </params>
             </action>
         </reference>
