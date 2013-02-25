@@ -55,7 +55,7 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
                 $result = $this->_getVarnishAdmin()->flushExpression(
                     'obj.http.X-Varnish-Session', '~', preg_quote( $sessionId ),
                     '&&', 'obj.http.X-Turpentine-Flush-Events', '~',
-                    preg_quote( $eventName ) );
+                    '(^|,)' . preg_quote( $eventName ) . '(,|$)' );
                 Mage::dispatchEvent( 'turpentine_ban_client_esi_cache', $result );
                 if( $this->_checkResult( $result ) ) {
                     Mage::helper( 'turpentine/debug' )
