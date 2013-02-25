@@ -267,7 +267,7 @@ sub vcl_fetch {
                     }
                     if (req.http.X-Varnish-Esi-Method == "ajax" &&
                             req.http.X-Varnish-Esi-Access == "public") {
-                        set beresp.http.Cache-Control = "max-age=" +
+                        set beresp.http.Cache-Control = "max-age=" + regsub(
                             req.url, ".*/{{esi_ttl_param}}/(\d+)/.*", "\1");
                     }
                     set beresp.ttl = std.duration(
