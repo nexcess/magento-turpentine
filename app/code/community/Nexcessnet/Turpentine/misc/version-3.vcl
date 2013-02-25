@@ -311,8 +311,6 @@ sub vcl_deliver {
         unset resp.http.Via;
         unset resp.http.X-Powered-By;
         unset resp.http.Server;
-        # TODO: probably don't actually need to remove this one
-        unset resp.http.Age;
         unset resp.http.X-Turpentine-Cache;
         unset resp.http.X-Turpentine-Esi;
         unset resp.http.X-Turpentine-Flush-Events;
@@ -321,6 +319,5 @@ sub vcl_deliver {
         # page. it *must* not be sent to a client in production with lax
         # session validation or that session can be hijacked
         unset resp.http.X-Varnish-Set-Cookie;
-        unset resp.http.X-Varnish-Use-Set-Cookie;
     }
 }
