@@ -115,8 +115,8 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return bool
      */
     public function getEsiDebugEnabled() {
-        return (bool)Mage::getStoreConfig(
-            'turpentine_varnish/general/esi_debug' );
+        return Mage::helper( 'turpentine/varnish' )
+            ->getVarnishDebugEnabled();
     }
 
     /**
