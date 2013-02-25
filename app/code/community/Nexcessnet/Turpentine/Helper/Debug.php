@@ -21,6 +21,43 @@
 
 class Nexcessnet_Turpentine_Helper_Debug extends Mage_Core_Helper_Abstract {
     /**
+     * Handle log* functions
+     *
+     * @param  string $name
+     * @param  array $args
+     * @return mixed
+     */
+    public function __call( $name, $args ) {
+        if( substr( $name, 0, 3 ) === 'log' ) {
+            try {
+                $message = vsprintf( @$args[0], @array_slice( $args, 1 ) );
+            } catch( Exception $e ) {
+                return parent::__call( $name, $args );
+            }
+            switch( substr( $name, 3 ) ) {
+                case 'Error':
+                    return $this->_log( Zend_Log::ERR, $message );
+                case 'Warn':
+                    return $this->_log( Zend_Log::WARN, $message );
+                case 'Notice':
+                    return $this->_log( Zend_Log::NOTICE, $message );
+                case 'Info':
+                    return $this->_log( Zend_Log::INFO, $message );
+                case 'Debug':
+                    if( Mage::helper( 'turpentine/varnish' )
+                            ->getVarnishDebugEnabled() ) {
+                        return $this->_log( Zend_Log::DEBUG, $message );
+                    } else {
+                        return;
+                    }
+                default:
+                    break;
+            }
+        }
+        return parent::__call( $name, $args );
+    }
+
+    /**
      * Dump a variable to output with <pre/> tags and disable cache flag
      *
      * @param mixed $value
@@ -42,8 +79,7 @@ class Nexcessnet_Turpentine_Helper_Debug extends Mage_Core_Helper_Abstract {
      */
     public function log( $message ) {
         $args = func_get_args();
-        array_shift( $args );
-        Mage::log( vsprintf( 'TURPENTINE: ' . $message, $args ) );
+        return call_user_func_array( array( $this, 'logDebug' ), $args );
     }
 
     /**
@@ -87,6 +123,19 @@ class Nexcessnet_Turpentine_Helper_Debug extends Mage_Core_Helper_Abstract {
         }
         $this->log( '%s => %s', $name,
             $this->_backtrace_formatArgsHelper( $value ) );
+    }
+
+    /**
+     * Log a message through Magento's logging facility
+     *
+     * @param  int $level
+     * @param  string $message
+     * @return string
+     */
+    protected function _log( $level, $message ) {
+        $message = 'TURPENTINE: ' . $message;
+        Mage::log( $message, $level );
+        return $message;
     }
 
     /**
