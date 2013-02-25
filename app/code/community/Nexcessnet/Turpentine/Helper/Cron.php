@@ -122,7 +122,7 @@ class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
                     Mage::getVersion() ),
                 'keepalive'     => true,
             ) );
-            $this->_crawlerClient->setCookie( 'frontend', 'no-session' );
+            $this->_crawlerClient->setCookie( 'frontend', 'crawler-session' );
         }
         return $this->_crawlerClient;
     }
