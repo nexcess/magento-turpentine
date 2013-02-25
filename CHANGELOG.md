@@ -211,7 +211,7 @@ will need to be updated
   * Fixed CMS pages not being automatically flushed on update
   * Fixed piped requests in Varnish not having headers handled appropriately
   * Added ability to whitelist IP addresses for debug info from Varnish, even
-  if Varnish debugging is disabled
+  if Varnish debugging is disabled via Magento's developer IP setting
   * Added flushing on a product page, product review list, and individual review
   view on review saving (such as changing from 'Pending' to 'Approved')
   * Combined the Varnish and ESI debug options
