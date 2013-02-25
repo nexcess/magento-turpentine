@@ -34,10 +34,9 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         if( Mage::helper( 'turpentine/esi' )->shouldResponseUseEsi() ) {
             $response->setHeader( 'X-Turpentine-Esi',
                 Mage::registry( 'turpentine_esi_flag' ) ? '1' : '0' );
-            if( Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled() ) {
-                Mage::log( 'Set ESI flag header to: ' .
-                    ( Mage::registry( 'turpentine_esi_flag' ) ? '1' : '0' ) );
-            }
+            Mage::helper( 'turpentine/debug' )->logDebug(
+                'Set ESI flag header to: %s',
+                ( Mage::registry( 'turpentine_esi_flag' ) ? '1' : '0' ) );
         }
     }
 
@@ -96,11 +95,9 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         }
 
         if( $eventObject->getTransport()->getUrl() != $url ) {
-            if( $esiHelper->getEsiDebugEnabled() ) {
-                Mage::log( sprintf(
-                    'ESI redirect fixup triggered, rewriting: %s => %s',
-                    $url, $eventObject->getTransport()->getUrl() ) );
-            }
+            Mage::helper( 'turpentine/debug' )->logDebug(
+                'ESI redirect fixup triggered, rewrote: %s => %s',
+                $url, $eventObject->getTransport()->getUrl() );
         }
     }
 
@@ -136,7 +133,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $varnishHelper = Mage::helper( 'turpentine/varnish' );
         $esiHelper = Mage::helper( 'turpentine/esi' );
         if( $esiHelper->getEsiBlockLogEnabled() ) {
-            Mage::log( 'Checking ESI block candidate: ' .
+            Mage::helper( 'turpentine/debug' )->logInfo(
+                'Checking ESI block candidate: %s',
                 $blockObject->getNameInLayout() );
         }
         if( $esiHelper->shouldResponseUseEsi() &&
@@ -144,8 +142,9 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 $esiOptions = $blockObject->getEsiOptions() ) {
             if( Mage::app()->getStore()->getCode() == 'admin' ) {
                 // admin blocks are not allowed to be cached for now
-                Mage::log( 'Ignoring attempt to inject adminhtml block: ' .
-                    $blockObject->getNameInLayout(), Zend_Log::WARN );
+                Mage::helper( 'turpentine/debug' )->logWarn(
+                    'Ignoring attempt to inject adminhtml block: %s',
+                    $blockObject->getNameInLayout() );
                 return;
             }
             $ttlParam = $esiHelper->getEsiTtlParam();
@@ -190,9 +189,9 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 $blockObject->unsetData( 'cache_' . $dataKey );
             }
             if( strlen( $esiUrl ) > 2047 ) {
-                Mage::log( sprintf(
+                Mage::helper( 'turpentine/debug' )->logWarn(
                     'ESI url is probably too long (%d > 2047 characters): %s',
-                    strlen( $esiUrl ), $esiUrl ), Zend_Log::WARN );
+                    strlen( $esiUrl ), $esiUrl );
             }
         } // else handle the block like normal and cache it inline with the page
     }
@@ -233,8 +232,9 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         if( is_array( $esiOptions['dummy_blocks'] ) ) {
             $esiData->setDummyBlocks( $esiOptions['dummy_blocks'] );
         } else {
-            Mage::log( 'Invalid dummy_blocks for block: ' .
-                $blockObject->getNameInLayout(), Zend_Log::WARN );
+            Mage::helper( 'turpentine/debug' )->logWarn(
+                'Invalid dummy_blocks for block: %s',
+                $blockObject->getNameInLayout() );
         }
         $simpleRegistry = array();
         $complexRegistry = array();
@@ -252,8 +252,9 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 }
             }
         } else {
-            Mage::log( 'Invalid registry_keys for block: ' .
-                $blockObject->getNameInLayout(), Zend_Log::WARN );
+            Mage::helper( 'turpentine/debug' )->logWarn(
+                'Invalid registry_keys for block: %s',
+                $blockObject->getNameInLayout() );
         }
         $esiData->setSimpleRegistry( $simpleRegistry );
         $esiData->setComplexRegistry( $complexRegistry );

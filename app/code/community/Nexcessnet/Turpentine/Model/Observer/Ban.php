@@ -59,11 +59,13 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
                 Mage::dispatchEvent( 'turpentine_ban_client_esi_cache', $result );
                 if( $this->_checkResult( $result ) ) {
                     Mage::helper( 'turpentine/debug' )
-                        ->log( 'Cleared ESI cache for client (%s) on event: %s',
+                        ->logDebug( 'Cleared ESI cache for client (%s) on event: %s',
                             $sessionId, $eventName );
                 } else {
-                    Mage::log( 'Failed to clear Varnish ESI cache for client: ' .
-                        $sessionId, Zend_Log::WARN );
+                    Mage::helper( 'turpentine/debug' )
+                        ->logWarn(
+                            'Failed to clear Varnish ESI cache for client: %s',
+                            $sessionId );
                 }
             }
             $this->_esiClearFlag[] = $eventName;
@@ -304,10 +306,9 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
         $rvalue = true;
         foreach( $result as $socketName => $value ) {
             if( $value !== true ) {
-                Mage::log( sprintf(
+                Mage::helper( 'turpentine/debug' )->logWarn(
                     'Error in Varnish action result for server [%s]: %s',
-                        $socketName, $value ),
-                    Zend_Log::WARN );
+                    $socketName, $value );
                 $rvalue = false;
             }
         }

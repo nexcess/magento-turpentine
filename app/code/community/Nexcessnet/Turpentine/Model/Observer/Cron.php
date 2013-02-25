@@ -52,9 +52,8 @@ class Nexcessnet_Turpentine_Model_Observer_Cron extends Varien_Event_Observer {
             while( ( $helper->getRunTime() < ( $maxRunTime - self::EXEC_TIME_BUFFER ) ) &&
                     $url = $helper->getNextUrl() ) {
                 if( !$this->_crawlUrl( $url ) ) {
-                    Mage::log(
-                        sprintf( 'TURPENTINE: Failed to crawl URL: %s', $url ),
-                        Zend_Log::WARN );
+                    Mage::helper( 'turpentine/debug' )->logWarn(
+                        'Failed to crawl URL: %s', $url );
                 }
             }
         }
@@ -82,15 +81,13 @@ class Nexcessnet_Turpentine_Model_Observer_Cron extends Varien_Event_Observer {
     protected function _crawlUrl( $url ) {
         $client = Mage::helper( 'turpentine/cron' )->getCrawlerClient();
         $client->setUri( $url );
-        if( Mage::helper( 'turpentine/cron' )->getCrawlerDebugEnabled() ) {
-            Mage::log( 'TURPENTINE: Crawling URL: ' . $url );
-        }
+        Mage::helper( 'turpentine/debug' )->logDebug( 'Crawling URL: %s', $url );
         try {
             $response = $client->request();
         } catch( Exception $e ) {
-            Mage::log( sprintf( 'TURPENTINE: Error crawling URL (%s): %s',
-                    $url, $e->getMessage() ),
-                Zend_Log::WARN );
+            Mage::helper( 'turpentine/debug' )->logWarn(
+                'Error crawling URL (%s): %s',
+                $url, $e->getMessage() );
             return false;
         }
         return $response->isSuccessful();

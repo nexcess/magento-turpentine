@@ -42,11 +42,12 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             $req = $this->getRequest();
             $esiHelper = Mage::helper( 'turpentine/esi' );
             $dataHelper = Mage::helper( 'turpentine/data' );
+            $debugHelper = Mage::helper( 'turpentine/debug' );
             $esiDataParamValue = $req->getParam( $esiHelper->getEsiDataParam() );
             $esiDataArray = $dataHelper->thaw( $esiDataParamValue );
             if( !$esiDataArray ) {
-                Mage::log( 'Invalid ESI data in URL: ' . $esiDataParamValue,
-                    Zend_Log::WARN );
+                $debugHelper->logWarn( 'Invalid ESI data in URL: %s',
+                    $esiDataParamValue );
                 $resp->setHttpResponseCode( 500 );
                 $resp->setBody( 'ESI data is not valid' );
             } elseif( !$esiHelper->getEsiDebugEnabled() &&
@@ -54,11 +55,9 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                     $req->getParam( $esiHelper->getEsiMethodParam() ) ) {
                 $resp->setHttpResponseCode( 403 );
                 $resp->setBody( 'ESI method mismatch' );
-                Mage::log( sprintf(
-                        'Blocking change of ESI method: %s -> %s',
-                        $esiDataArray['esi_method'],
-                        $req->getParam( $esiHelper->getEsiMethodParam() ) ),
-                    Zend_Log::WARN );
+                $debugHelper->logWarn( 'Blocking change of ESI method: %s -> %s',
+                    $esiDataArray['esi_method'],
+                    $req->getParam( $esiHelper->getEsiMethodParam() ) );
             } else {
                 $esiData = new Varien_Object( $esiDataArray );
                 $origRequest = Mage::app()->getRequest();

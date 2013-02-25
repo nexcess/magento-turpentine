@@ -34,7 +34,8 @@ class Nexcessnet_Turpentine_Model_Observer_Varnish extends Varien_Event_Observer
             $response->setHeader( 'X-Turpentine-Cache',
                 Mage::registry( 'turpentine_nocache_flag' ) ? '0' : '1' );
             if( Mage::helper( 'turpentine/varnish' )->getVarnishDebugEnabled() ) {
-                Mage::log( 'Set Varnish cache flag header to: ' .
+                Mage::helper( 'turpentine/debug' )->logDebug(
+                    'Set Varnish cache flag header to: ' .
                     ( Mage::registry( 'turpentine_nocache_flag' ) ? '0' : '1' ) );
             }
         }

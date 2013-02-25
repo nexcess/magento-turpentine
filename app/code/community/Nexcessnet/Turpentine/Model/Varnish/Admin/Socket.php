@@ -412,7 +412,8 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
             $cleanedParams ) );
         $response = $this->_write( $data )->_read();
         if( $response['code'] !== $okCode && !is_null( $okCode ) ) {
-            Mage::log( 'Error on Varnish command: ' . $data );
+            Mage::helper( 'turpentine/debug' )->logDebug(
+                'Error on Varnish command: %s', $data );
             Mage::throwException( sprintf(
                 "Got unexpected response code from Varnish: %d\n%s",
                 $response['code'], $response['text'] ) );
