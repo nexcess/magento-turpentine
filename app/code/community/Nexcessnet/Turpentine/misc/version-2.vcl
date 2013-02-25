@@ -259,18 +259,22 @@ sub vcl_fetch {
                     # it's a ESI request
                     # TODO: make the TTLs properly dynamic
                     if (req.http.X-Varnish-Esi-Access == "private") {
-                        if(req.http.Cookie ~ "frontend=") {
+                        if (req.http.Cookie ~ "frontend=") {
                             # set this header so we can ban by session from Turpentine
                             set beresp.http.X-Varnish-Session = regsub(req.http.Cookie,
                                 "^.*?frontend=([^;]*);*.*$", "\1");
                         }
-                        if(req.http.X-Varnish-Esi-Method == "ajax") {
+                        if (req.http.X-Varnish-Esi-Method == "ajax") {
                             set beresp.ttl = {{grace_period}}s;
                             return (pass);
                         } else {
                             set beresp.ttl = {{esi_private_ttl}}s;
                         }
                     } else {
+                        if (req.http.X-Varnish-Esi-Method == "ajax") {
+                            set beresp.http.Cache-Control =
+                                "max-age={{esi_public_ttl}}";
+                        }
                         set beresp.ttl = {{esi_public_ttl}}s;
                     }
                 } else {
@@ -310,8 +314,6 @@ sub vcl_deliver {
         remove resp.http.Via;
         remove resp.http.X-Powered-By;
         remove resp.http.Server;
-        # TODO: probably don't actually need to remove this one
-        remove resp.http.Age;
         remove resp.http.X-Turpentine-Cache;
         remove resp.http.X-Turpentine-Esi;
         remove resp.http.X-Turpentine-Flush-Events;
@@ -320,7 +322,6 @@ sub vcl_deliver {
         # page. it *must* not be sent to a client in production with lax
         # session validation or that session can be hijacked
         remove resp.http.X-Varnish-Set-Cookie;
-        remove resp.http.X-Varnish-Use-Set-Cookie;
     }
     remove resp.http.X-Opt-Debug-Headers;
 }

@@ -265,6 +265,11 @@ sub vcl_fetch {
                         set beresp.http.X-Varnish-Session = regsub(req.http.Cookie,
                             "^.*?frontend=([^;]*);*.*$", "\1");
                     }
+                    if (req.http.X-Varnish-Esi-Method == "ajax" &&
+                            req.http.X-Varnish-Esi-Access == "public") {
+                        set beresp.http.Cache-Control = "max-age=" +
+                            req.url, ".*/{{esi_ttl_param}}/(\d+)/.*", "\1");
+                    }
                     set beresp.ttl = std.duration(
                         regsub(
                             req.url, ".*/{{esi_ttl_param}}/(\d+)/.*", "\1s"),
