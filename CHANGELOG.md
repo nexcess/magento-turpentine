@@ -214,3 +214,6 @@ will need to be updated
   if Varnish debugging is disabled
   * Added flushing on a product page, product review list, and individual review
   view on review saving (such as changing from 'Pending' to 'Approved')
+  * Combined the Varnish and ESI debug options
+  * Made the logging done by the extension consistent, all messages logged by
+  Turpentine will be prefixed with `TURPENTINE:`
