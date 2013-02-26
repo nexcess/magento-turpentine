@@ -46,8 +46,8 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             $esiDataHmac = $req->getParam( $esiHelper->getEsiHmacParam() );
             $esiDataParamValue = $req->getParam( $esiHelper->getEsiDataParam() );
             if( $esiDataHmac !== ( $hmac = $dataHelper->getHmac( $esiDataParamValue ) ) ) {
-                $debugHelper->logWarn( 'ESI data HMAC mismatch: %s != %s',
-                    $esiDataHmac, $hmac );
+                $debugHelper->logWarn( 'ESI data HMAC mismatch, expected (%s) but recieved (%s)',
+                    $hmac, $esiDataHmac );
                 $resp->setHttpResponseCode( 500 );
                 $resp->setBody( 'ESI data is not valid' );
             } elseif( !( $esiDataArray = $dataHelper->thaw( $esiDataParamValue ) ) ) {
