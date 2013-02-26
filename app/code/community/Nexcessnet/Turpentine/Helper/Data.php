@@ -30,10 +30,15 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
     /**
      * Compression level for serialization compression
      *
-     * Testing showed no significant difference between levels 1 and 9 so using
-     * 1 since it's faster
+     * Testing showed no significant (size) difference between levels 1 and 9
+     * so using 1 since it's faster
      */
     const COMPRESSION_LEVEL = 1;
+
+    /**
+     * Hash algorithm to use in various cryptographic methods
+     */
+    const HASH_ALGORITHM    = 'sha256';
 
     /**
      * encryption singleton thing
@@ -174,7 +179,17 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
      */
     public function secureHash( $data ) {
         $salt = $this->_getCryptKey();
-        return hash( 'sha256', sprintf( '%s:%s', $salt, $data ) );
+        return hash( self::HASH_ALGORITHM, sprintf( '%s:%s', $salt, $data ) );
+    }
+
+    /**
+     * Get the HMAC hash for given data
+     *
+     * @param  string $data
+     * @return string
+     */
+    public function getHmac( $data ) {
+        return hash_hmac( self::HASH_ALGORITHM, $data, $this->_getCryptKey() );
     }
 
     /**

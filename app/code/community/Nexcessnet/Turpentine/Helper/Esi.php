@@ -25,6 +25,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     const ESI_CACHE_TYPE_PARAM      = 'access';
     const ESI_SCOPE_PARAM           = 'scope';
     const ESI_METHOD_PARAM          = 'method';
+    const ESI_HMAC_PARAM            = 'hmac';
     const MAGE_CACHE_NAME           = 'turpentine_esi_blocks';
 
     /**
@@ -107,6 +108,15 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      */
     public function getEsiMethodParam() {
         return self::ESI_METHOD_PARAM;
+    }
+
+    /**
+     * Get the URL param name for the ESI HMAC
+     *
+     * @return string
+     */
+    public function getEsiHmacParam() {
+        return self::ESI_HMAC_PARAM;
     }
 
     /**

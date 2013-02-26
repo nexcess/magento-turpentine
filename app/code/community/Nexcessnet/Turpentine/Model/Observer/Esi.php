@@ -152,6 +152,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             $scopeParam = $esiHelper->getEsiScopeParam();
             $dataParam = $esiHelper->getEsiDataParam();
             $methodParam = $esiHelper->getEsiMethodParam();
+            $hmacParam = $esiHelper->getEsiHmacParam();
 
             $esiOptions = $this->_getDefaultEsiOptions( $esiOptions );
 
@@ -171,11 +172,13 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             // esi data is the data needed to regenerate the ESI'd block
             $esiData = $this->_getEsiData( $blockObject, $esiOptions )->toArray();
             ksort( $esiData );
+            $frozenData = $dataHelper->freeze( $esiData );
             $urlOptions = array(
                 $methodParam    => $esiOptions[$methodParam],
                 $cacheTypeParam => $esiOptions[$cacheTypeParam],
                 $ttlParam       => $esiOptions[$ttlParam],
-                $dataParam      => $dataHelper->freeze( $esiData ),
+                $hmacParam      => $dataHelper->getHmac( $frozenData ),
+                $dataParam      => $frozenData,
             );
             if( $esiOptions[$methodParam] == 'ajax' ) {
                 $urlOptions['_secure'] = Mage::app()->getStore()
