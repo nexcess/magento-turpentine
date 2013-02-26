@@ -194,7 +194,7 @@ that have been done to the ESI layout will need to be updated
   Varnish version-specific like the other templates, users will need to make sure
   the VCL code used is compatible with the version of Varnish that they use
 
-### RELEASE-0.4.1
+### RELEASE-0.5.0
 
 There are changes to the ESI layout syntax (again) in this release, any
 customizations that have been done to the ESI layout or added for custom blocks
