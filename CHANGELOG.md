@@ -221,3 +221,9 @@ load load those ESI blocks
   Turpentine will be prefixed with `TURPENTINE:`
   * Added HMAC signing to the encrypted ESI data to prevent possible
   tampering with the ESI data in the request
+  * The `turpentine_esi_custom.xml` file that was previously suggested to be
+  used for custom ESI policies has been removed in favor of Magento's built-in
+  facility for this (`local.xml`). Any ESI policies defined in `turpentine_esi_custom.xml`
+  should be moved the `local.xml` file in the theme's layout directory to
+  prevent issues with the order of defining blocks and setting ESI policies on
+  them.
