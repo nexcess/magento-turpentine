@@ -198,9 +198,9 @@ that have been done to the ESI layout will need to be updated
 
 There are changes to the ESI layout syntax (again) in this release, any
 customizations that have been done to the ESI layout or added for custom blocks
-will need to be updated. Additionally, the Varnish cache will need to be fully
-flushed or cached pages that reference previously cached ESI blocks will not
-load load those ESI blocks
+will need to be updated and moved to the `layout.xml` file. Additionally, the
+Varnish cache will need to be fully flushed or cached pages that reference
+previously cached ESI blocks will not load those blocks
 
   * Added support for event-based partial ESI cache flushing. ESI blocks will
   now only be flushed on the events specified for them in the layout rather than
