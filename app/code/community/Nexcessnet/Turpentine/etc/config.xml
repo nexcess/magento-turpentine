@@ -326,12 +326,6 @@
                 <turpentine_esi module="turpentine">
                     <file>turpentine_esi.xml</file>
                 </turpentine_esi>
-                <!--
-                The user should instead edit this file, creating it if needed
-                -->
-                <turpentine_esi_custom module="turpentine">
-                    <file>turpentine_esi_custom.xml</file>
-                </turpentine_esi_custom>
             </updates>
         </layout>
     </frontend>
