@@ -132,8 +132,9 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $dataHelper = Mage::helper( 'turpentine/data' );
         $varnishHelper = Mage::helper( 'turpentine/varnish' );
         $esiHelper = Mage::helper( 'turpentine/esi' );
+        $debugHelper = Mage::helper( 'turpentine/debug' );
         if( $esiHelper->getEsiBlockLogEnabled() ) {
-            Mage::helper( 'turpentine/debug' )->logInfo(
+            $debugHelper->logInfo(
                 'Checking ESI block candidate: %s',
                 $blockObject->getNameInLayout() );
         }
@@ -142,10 +143,13 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 $esiOptions = $blockObject->getEsiOptions() ) {
             if( Mage::app()->getStore()->getCode() == 'admin' ) {
                 // admin blocks are not allowed to be cached for now
-                Mage::helper( 'turpentine/debug' )->logWarn(
+                $debugHelper->logWarn(
                     'Ignoring attempt to inject adminhtml block: %s',
                     $blockObject->getNameInLayout() );
                 return;
+            } elseif( $esiHelper->getEsiBlockLogEnabled() ) {
+                $debugHelper->logInfo( 'Block check passed, injecting block: %s',
+                    $block->getNameInLayout() );
             }
             $ttlParam = $esiHelper->getEsiTtlParam();
             $cacheTypeParam = $esiHelper->getEsiCacheTypeParam();
