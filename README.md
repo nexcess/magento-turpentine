@@ -18,8 +18,8 @@ carefully tested on a development site before being deployed in production.
 
   - Full Page Caching, with hole-punching via Varnish ESI and/or AJAX, even for
   logged in visitors
-  - Very little configuration needed for impressive results, no manual editing
-  of Varnish config required for most cases
+  - Configurable via standard Magento methods (Admin system configuration and
+  layout XML), no manual editing of Varnish config required for most cases
   - Able to generate and apply new Varnish VCLs (configurations) on the fly,
   without restarting/changing Varnish's config files or flushing the cache
   - Blacklist requests from caching by URL or parameters (SID, store, etc)
