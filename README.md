@@ -16,7 +16,8 @@ carefully tested on a development site before being deployed in production.
 
 ## Features
 
-  - Full Page Caching, with hole-punching via Varnish ESI and/or AJAX
+  - Full Page Caching, with hole-punching via Varnish ESI and/or AJAX, even for
+  logged in visitors
   - Very little configuration needed for impressive results, no manual editing
   of Varnish config required for most cases
   - Able to generate and apply new Varnish VCLs (configurations) on the fly,
