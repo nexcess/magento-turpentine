@@ -49,7 +49,9 @@ class Nexcessnet_Turpentine_Model_Observer_Cron extends Varien_Event_Observer {
             if( $maxRunTime === 0 ) {
                 $maxRunTime = self::MAX_CRAWL_TIME;
             }
-            while( ( $helper->getRunTime() < ( $maxRunTime - self::EXEC_TIME_BUFFER ) ) &&
+            // just in case we have a silly short max_execution_time
+            $maxRunTime = abs( $maxRunTime - self::EXEC_TIME_BUFFER );
+            while( ( $helper->getRunTime() < $maxRunTime ) &&
                     $url = $helper->getNextUrl() ) {
                 if( !$this->_crawlUrl( $url ) ) {
                     Mage::helper( 'turpentine/debug' )->logWarn(
