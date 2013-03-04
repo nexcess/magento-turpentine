@@ -84,7 +84,9 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
     public function banProductPageCache( $eventObject ) {
         if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
             $product = $eventObject->getProduct();
-            $result = $this->_getVarnishAdmin()->flushUrl( $product->getUrlKey() );
+            $urlPattern = Mage::helper( 'turpentine/ban' )
+                ->getProductBanRegex( $product );
+            $result = $this->_getVarnishAdmin()->flushUrl( $urlPattern );
             Mage::dispatchEvent( 'turpentine_ban_product_cache', $result );
             $cronHelper = Mage::helper( 'turpentine/cron' );
             if( $this->_checkResult( $result ) &&
@@ -110,31 +112,21 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
                     ( $item->getOriginalInventoryQty() <= 0 &&
                         $item->getQty() > 0 &&
                         $item->getQtyCorrection() > 0 ) ) {
+                $banHelper = Mage::helper( 'turpentine/ban' );
                 $cronHelper = Mage::helper( 'turpentine/cron' );
-                $parentIds = array_merge(
-                    Mage::getModel( 'catalog/product_type_configurable' )
-                        ->getParentIdsByChild( $item->getProductId() ),
-                    Mage::getModel( 'catalog/product_type_grouped' )
-                        ->getParentIdsByChild( $item->getProductId() ) );
-                $urlPatterns = array();
-                foreach( $parentIds as $parentId ) {
-                    $parentProduct = Mage::getModel( 'catalog/product' )
-                        ->load( $parentId );
-                    $urlPatterns[] = $parentProduct->getUrlKey();
-                    if( $cronHelper->getCrawlerEnabled() ) {
-                        $cronHelper->addProductToCrawlerQueue( $parentProduct );
-                    }
-                }
                 $product = Mage::getModel( 'catalog/product' )
                     ->load( $item->getProductId() );
-                $urlPatterns[] = $product->getUrlKey();
-                $pattern = sprintf( '(?:%s)', implode( '|', $urlPatterns ) );
-                $result = $this->_getVarnishAdmin()->flushUrl( $pattern );
+                $urlPattern = $banHelper->getProductBanRegex( $product );
+                $result = $this->_getVarnishAdmin()->flushUrl( $urlPattern );
                 Mage::dispatchEvent( 'turpentine_ban_product_cache_check_stock',
                     $result );
                 if( $this->_checkResult( $result ) &&
                         $cronHelper->getCrawlerEnabled() ) {
                     $cronHelper->addProductToCrawlerQueue( $product );
+                    foreach( $banHelper->getParentProducts( $product )
+                            as $parentProduct ) {
+                        $cronHelper->addProductToCrawlerQueue( $product );
+                    }
                 }
             }
         }
