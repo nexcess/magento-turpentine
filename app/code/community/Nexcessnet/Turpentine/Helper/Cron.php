@@ -51,7 +51,7 @@ class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
      * @return int
      */
     public function getAllowedRunTime() {
-        return ini_get( 'max_execution_time' );
+        return (int)ini_get( 'max_execution_time' );
     }
 
     /**
