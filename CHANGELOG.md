@@ -227,3 +227,7 @@ previously cached ESI blocks will not load those blocks
   should be moved the `local.xml` file in the theme's layout directory to
   prevent issues with the order of defining blocks and setting ESI policies on
   them.
+
+### RELEASE-0.5.1
+
+  * Fix PHP error when Block Logging is turned on
