@@ -129,7 +129,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             Mage::register( $key, $value, true );
         }
         $layout = Mage::getSingleton( 'core/layout' );
-        $design = Mage::getSingleton( 'core/design_package' )
+        Mage::getSingleton( 'core/design_package' )
             ->setPackageName( $esiData->getDesignPackage() )
             ->setTheme( $esiData->getDesignTheme() );
         $layoutUpdate = $layout->getUpdate();

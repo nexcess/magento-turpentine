@@ -130,7 +130,6 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
     public function injectEsi( $eventObject ) {
         $blockObject = $eventObject->getBlock();
         $dataHelper = Mage::helper( 'turpentine/data' );
-        $varnishHelper = Mage::helper( 'turpentine/varnish' );
         $esiHelper = Mage::helper( 'turpentine/esi' );
         $debugHelper = Mage::helper( 'turpentine/debug' );
         if( $esiHelper->getEsiBlockLogEnabled() ) {
@@ -149,11 +148,10 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 return;
             } elseif( $esiHelper->getEsiBlockLogEnabled() ) {
                 $debugHelper->logInfo( 'Block check passed, injecting block: %s',
-                    $block->getNameInLayout() );
+                    $blockObject->getNameInLayout() );
             }
             $ttlParam = $esiHelper->getEsiTtlParam();
             $cacheTypeParam = $esiHelper->getEsiCacheTypeParam();
-            $scopeParam = $esiHelper->getEsiScopeParam();
             $dataParam = $esiHelper->getEsiDataParam();
             $methodParam = $esiHelper->getEsiMethodParam();
             $hmacParam = $esiHelper->getEsiHmacParam();

@@ -68,6 +68,11 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
      */
     static protected $_VERSIONS = array( '2.1', '3.0' );
 
+    /**
+     * Varnish socket connection
+     *
+     * @var resource
+     */
     protected $_varnishConn = null;
     protected $_host = '127.0.0.1';
     protected $_port = 6082;
@@ -92,7 +97,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
                     $this->setTimeout( $value );
                     break;
                 case 'version':
-                    $this->setVersion( $version );
+                    $this->setVersion( $value );
                     break;
                 default:
                     break;
@@ -242,7 +247,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
      */
     public function quit() {
         $this->_command( 'quit', self::CODE_CLOSE );
-        $this->close();
+        $this->_close();
     }
 
     /**
@@ -305,7 +310,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
             $challenge = substr( $banner['text'], 0, 32 );
             $response = hash( 'sha256', sprintf( "%s\n%s%s\n", $challenge,
                 $this->_authSecret, $challenge ) );
-            $banner = $this->_command( 'auth', self::CODE_OK, $response );
+            $this->_command( 'auth', self::CODE_OK, $response );
         } else if( $banner['code'] !== self::CODE_OK ) {
             Mage::throwException( 'Varnish admin authentication failed: ' .
                 $banner['text'] );
@@ -343,7 +348,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
                 'Varnish data to write over length limit by %d characters',
                 strlen( $data ) - self::CLI_CMD_LENGTH_LIMIT ) );
         }
-        $byteCount = fputs( $this->_varnishConn, $data );
+        $byteCount = fwrite( $this->_varnishConn, $data );
         if( $byteCount !== strlen( $data ) ) {
             Mage::throwException( sprintf( 'Varnish socket write error: %d != %d',
                 $byteCount, strlen( $data ) ) );
@@ -401,7 +406,6 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         //remove $okCode (if it exists)
         array_shift( $params );
         $cleanedParams = array();
-        $useHereDoc = false;
         foreach( $params as $param ) {
             $cp = addcslashes( $param, "\"\\" );
             $cp = str_replace( PHP_EOL, '\n', $cp );

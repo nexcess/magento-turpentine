@@ -85,7 +85,8 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
         $filename = $this->_getVclFilename();
         $dir = dirname( $filename );
         if( !is_dir( $dir ) ) {
-            if( !mkdir( $dir, true ) ) {
+            // this umask is probably redundant, but just in case...
+            if( !mkdir( $dir, 0777 & ~umask(), true ) ) {
                 $err = error_get_last();
                 return array( false, $err );
             }
