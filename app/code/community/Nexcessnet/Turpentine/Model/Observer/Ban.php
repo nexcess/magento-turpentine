@@ -43,8 +43,8 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      *     the events are applied dynamically according to what events are set
      *     for the various blocks' esi policies
      *
-     * @param  [type] $eventObject [description]
-     * @return [type]
+     * @param  Varien_Object $eventObject
+     * @return null
      */
     public function banClientEsiCache( $eventObject ) {
         $eventName = $eventObject->getEvent()->getName();
@@ -78,8 +78,8 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * Events:
      *     catalog_product_save_commit_after
      *
-     * @param  [type] $eventObject [description]
-     * @return [type]
+     * @param  Varien_Object $eventObject
+     * @return null
      */
     public function banProductPageCache( $eventObject ) {
         if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
@@ -100,8 +100,8 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * Events:
      *     cataloginventory_stock_item_save_after
      *
-     * @param  [type] $eventObject [description]
-     * @return [type]
+     * @param  Varien_Object $eventObject
+     * @return null
      */
     public function banProductPageCacheCheckStock( $eventObject ) {
         if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
@@ -146,8 +146,8 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * Events:
      *     catalog_category_save_commit_after
      *
-     * @param  [type] $eventObject [description]
-     * @return [type]
+     * @param  Varien_Object $eventObject
+     * @return null
      */
     public function banCategoryCache( $eventObject ) {
         if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
@@ -169,8 +169,8 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * Events:
      *     clean_media_cache_after
      *
-     * @param  [type] $eventObject [description]
-     * @return [type]
+     * @param  Varien_Object $eventObject
+     * @return null
      */
     public function banMediaCache( $eventObject ) {
         if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
@@ -187,8 +187,8 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * Events:
      *     clean_catalog_images_cache_after
      *
-     * @param  [type] $eventObject [description]
-     * @return [type]
+     * @param  Varien_Object $eventObject
+     * @return null
      */
     public function banCatalogImagesCache( $eventObject ) {
         if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
@@ -205,8 +205,8 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * Events:
      *     cms_page_save_commit_after
      *
-     * @param  [type] $eventObject [description]
-     * @return [type]
+     * @param  Varien_Object $eventObject
+     * @return null
      */
     public function banCmsPageCache( $eventObject ) {
         if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
@@ -229,8 +229,8 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      *     adminhtml_cache_flush_system
      *     adminhtml_cache_flush_all
      *
-     * @param  [type] $eventObject [description]
-     * @return [type]
+     * @param  Varien_Object $eventObject
+     * @return null
      */
     public function banAllCache( $eventObject ) {
         if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
@@ -246,8 +246,8 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * Events:
      *     adminhtml_cache_refresh_type
      *
-     * @param  [type] $eventObject [description]
-     * @return [type]
+     * @param  Varien_Object $eventObject
+     * @return null
      */
     public function banCacheType( $eventObject ) {
         switch( $eventObject->getType() ) {
