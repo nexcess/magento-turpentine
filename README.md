@@ -16,27 +16,27 @@ carefully tested on a development site before being deployed in production.
 
 ## Features
 
-  - Full Page Caching, with hole-punching via Varnish ESI and/or AJAX, even for
+  * Full Page Caching, with hole-punching via Varnish ESI and/or AJAX, even for
   logged in visitors
-  - Configurable via standard Magento methods (Admin system configuration and
+  * Configurable via standard Magento methods (Admin system configuration and
   layout XML), no manual editing of Varnish config required for most cases
-  - Able to generate and apply new Varnish VCLs (configurations) on the fly,
+  * Able to generate and apply new Varnish VCLs (configurations) on the fly,
   without restarting/changing Varnish's config files or flushing the cache
-  - Blacklist requests from caching by URL or parameters (SID, store, etc)
-  - Configure cache TTL by URL and individual block's TTL
-  - Supports multiple Varnish instances for clustered usage
-  - Automatic cache clearing on actions (clearing product/catalog/cms page after saving)
-  - Supports non-root Magento installs (i.e. putting Magento in /store/ instead
+  * Blacklist requests from caching by URL or parameters (SID, store, etc)
+  * Configure cache TTL by URL and individual block's TTL
+  * Supports multiple Varnish instances for clustered usage
+  * Automatic cache clearing on actions (clearing product/catalog/cms page after saving)
+  * Supports non-root Magento installs (i.e. putting Magento in /store/ instead
   of /) and multi-store/multi-site setups
-  - Support for site-crawlers for cache warming, and includes a (basic)
+  * Support for site-crawlers for cache warming, and includes a (basic)
   built-in site-crawler
-  - [SSL support](https://github.com/nexcess/magento-turpentine/wiki/SSL_Support)
+  * [SSL support](https://github.com/nexcess/magento-turpentine/wiki/SSL_Support)
   through [Pound](http://www.apsis.ch/pound) or [Nginx](http://nginx.org/)
 
 ## Requirements
 
-  - Magento Community Edition 1.6+ or Magento Enterprise Edition 1.11+
-  - Varnish 2.1+ (including 3.0+)
+  * Magento Community Edition 1.6+ or Magento Enterprise Edition 1.11+
+  * Varnish 2.1+ (including 3.0+)
 
 ## Installation & Usage
 
@@ -72,35 +72,35 @@ the page and may differ between different visitors/clients.
 
 ## Notes and Caveats
 
-  - Turpentine will **not** help (directly) with the speed of "actions" like adding things
+  * Turpentine will **not** help (directly) with the speed of "actions" like adding things
   to the cart or checking out. It only caches, so it can only speed up page load
   speed for site browsing. It will remove a lot of load on the backend though so
   for heavily loaded sites it can free up enough backend resources to have a
   noticeable effect on "actions".
-  - Multi-store/multi-site setups that use *both* the same URL path **and** domain
+  * Multi-store/multi-site setups that use *both* the same URL path **and** domain
   will not work. Specifically they will always use the default site/store and
   changing via the dropdown menu will not do anything. Examples:
-    - example.com/store/en/ and example.com/store/de/ works (same domain, different paths)
-    - example.com/store/ and example.com/store/substore/ works (same domain, different paths)
-    - en.example.com/store/ and de.example.com/store/ works (different domain, same paths)
-    - example.com/store/ for both EN and DE **does not** work (same domain and paths)
-  - **Varnish 2.1**: Due to technical limitations, some features are not
+    * example.com/store/en/ and example.com/store/de/ works (same domain, different paths)
+    * example.com/store/ and example.com/store/substore/ works (same domain, different paths)
+    * en.example.com/store/ and de.example.com/store/ works (different domain, same paths)
+    * example.com/store/ for both EN and DE **does not** work (same domain and paths)
+  * **Varnish 2.1**: Due to technical limitations, some features are not
   available when using Varnish 2.1:
-    - External ESI requests are not blocked
-    - Per-block TTLs are not honored, all ESI blocks use their default TTL
-  - The core parts of Turpentine (caching and ESI/AJAX injection) work under Magento CE 1.5, but a significant
+    * External ESI requests are not blocked
+    * Per-block TTLs are not honored, all ESI blocks use their default TTL
+  * The core parts of Turpentine (caching and ESI/AJAX injection) work under Magento CE 1.5, but a significant
   portion of the auxillary functionality doesn't work due to changes to event names. That
   said, it would be possible to use Turpentine with Magento CE 1.5 with an understanding
   that it is not supported and what actions need to be taken manually. A
   short and non-comprehensive list of things that don't work under CE 1.5:
-    - *Cache flushing*: This includes when flushing the cache via System > Cache
+    * *Cache flushing*: This includes when flushing the cache via System > Cache
     Management and the automatic cache flushes on product/category saves.
-    - *Cache warming*: Due to the missing flush events, no URLs are ever added
+    * *Cache warming*: Due to the missing flush events, no URLs are ever added
     to the warming URL queue.
 
 ## Known Issues
 
-  - Logging and statistics will show all requests as coming from the same IP address
+  * Logging and statistics will show all requests as coming from the same IP address
   (usually localhost/127.0.0.1). It should be possible to work around this using
   Apache's [mod_remoteip](http://httpd.apache.org/docs/trunk/mod/mod_remoteip.html)
   or [mod_rpaf](http://www.stderr.net/apache/rpaf/).
