@@ -231,3 +231,6 @@ previously cached ESI blocks will not load those blocks
 ### RELEASE-0.5.1
 
   * Fix PHP error when Block Logging is turned on
+  * Saving a child product of a configurable or grouped product will now also
+  cause the parent product(s) to be flushed. This makes saving consistent with
+  the out-of-stock flushing behaviour
