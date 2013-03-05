@@ -149,7 +149,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 return;
             } elseif( $esiHelper->getEsiBlockLogEnabled() ) {
                 $debugHelper->logInfo( 'Block check passed, injecting block: %s',
-                    $block->getNameInLayout() );
+                    $blockObject->getNameInLayout() );
             }
             $ttlParam = $esiHelper->getEsiTtlParam();
             $cacheTypeParam = $esiHelper->getEsiCacheTypeParam();
