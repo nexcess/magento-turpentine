@@ -97,6 +97,9 @@ the page and may differ between different visitors/clients.
     Management and the automatic cache flushes on product/category saves.
     * *Cache warming*: Due to the missing flush events, no URLs are ever added
     to the warming URL queue.
+  * Anonymous blocks are not able to be hole-punched. For CMS pages, it is
+  recommended that you include the block in the page's layout updates XML and
+  give it a name, then it can have an ESI policy like normal
 
 ## Known Issues
 
