@@ -239,3 +239,10 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   * Varnish will now properly distinguish between HTTP and HTTPS responses. This
   should fix warnings in some browsers about mixing secure and insecure content
   when using Varnish+Turpentine behind an SSL proxy
+
+### RELEASE-0.5.2
+
+  * Added profiling calls for more debugging and performance-profiling options
+  * Fixed layout XML caching logic to prevent writing to the cache on every
+  page load, this should result in a small performance improvement on
+  Varnish cache misses
