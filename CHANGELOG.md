@@ -234,3 +234,6 @@ previously cached ESI blocks will not load those blocks
   * Saving a child product of a configurable or grouped product will now also
   cause the parent product(s) to be flushed. This makes saving consistent with
   the out-of-stock flushing behaviour
+  * Varnish will now properly distinguish between HTTP and HTTPS responses. This
+  should fix warnings in some browsers about mixing secure and insecure content
+  when using Varnish+Turpentine behind an SSL proxy
