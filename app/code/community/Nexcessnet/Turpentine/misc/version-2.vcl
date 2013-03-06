@@ -190,6 +190,7 @@ sub vcl_hash {
     } else {
         set req.hash += server.ip;
     }
+    set req.hash += req.http.Ssl-Offloaded;
     if (req.http.X-Normalized-User-Agent) {
         set req.hash += req.http.X-Normalized-User-Agent;
     }

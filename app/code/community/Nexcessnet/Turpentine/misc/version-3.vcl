@@ -190,6 +190,7 @@ sub vcl_hash {
     } else {
         hash_data(server.ip);
     }
+    hash_data(req.http.Ssl-Offloaded);
     if (req.http.X-Normalized-User-Agent) {
         hash_data(req.http.X-Normalized-User-Agent);
     }
