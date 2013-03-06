@@ -9,7 +9,7 @@
    <license>GPLv2</license>
    <license_uri>http://opensource.org/licenses/GPL-2.0</license_uri>
    <version>0.0.3</version>
-   <stability>beta</stability>
+   <stability>stable</stability>
    <notes>Supports Magento v1.6 and later</notes>
    <authors>
       <name>
