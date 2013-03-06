@@ -121,6 +121,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
      * @return Mage_Core_Block_Template
      */
     protected function _getEsiBlock( $esiData ) {
+        Varien_Profiler::start( 'turpentine::controller::esi::_getEsiBlock' );
         foreach( $esiData->getSimpleRegistry() as $key => $value ) {
             Mage::register( $key, $value, true );
         }
@@ -152,6 +153,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 $layout->generateBlocks( $node );
             }
         }
+        Varien_Profiler::stop( 'turpentine::controller::esi::_getEsiBlock' );
         return $layout->getBlock( $esiData->getNameInLayout() );
     }
 

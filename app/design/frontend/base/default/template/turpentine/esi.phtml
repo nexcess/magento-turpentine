@@ -23,6 +23,7 @@ $debugEnabled = (bool)Mage::helper( 'turpentine/esi' )->getEsiDebugEnabled();
 
 if( $debugEnabled ) {
     echo sprintf( '<!-- ESI START [%s] -->', $this->getNameInLayout() ) . PHP_EOL;
+    echo sprintf( '<!-- ESI URL: %s -->', $this->getEsiUrl() ) . PHP_EOL;
 }
 echo sprintf( '<esi:remove>ESI processing not enabled</esi:remove>
 <!--esi <esi:include src="%s" /> -->',
