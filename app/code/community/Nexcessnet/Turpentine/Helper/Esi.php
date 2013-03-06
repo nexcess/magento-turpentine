@@ -245,7 +245,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     public function getLayoutXml() {
         Varien_Profiler::start( 'turpentine::helper::esi::getLayoutXml' );
         if( is_null( $this->_layoutXml ) ) {
-            if( Mage::app()->useCache( 'layout' ) ) {
+            if( $useCache = Mage::app()->useCache( 'layout' ) ) {
                 $cacheKey = $this->getFileLayoutUpdatesXmlCacheKey();
                 $this->_layoutXml = simplexml_load_string(
                     Mage::app()->loadCache( $cacheKey ) );
@@ -253,10 +253,10 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
             // this check is redundant if the layout cache is disabled
             if( !$this->_layoutXml ) {
                 $this->_layoutXml = $this->_loadLayoutXml();
-            }
-            if( Mage::app()->useCache( 'layout' ) ) {
-                Mage::app()->saveCache( $this->_layoutXml->asXML(),
-                    $cacheKey, array( 'LAYOUT_GENERAL_CACHE_TAG' ) );
+                if( $useCache ) {
+                    Mage::app()->saveCache( $this->_layoutXml->asXML(),
+                        $cacheKey, array( 'LAYOUT_GENERAL_CACHE_TAG' ) );
+                }
             }
         }
         Varien_Profiler::stop( 'turpentine::helper::esi::getLayoutXml' );
