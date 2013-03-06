@@ -8,11 +8,10 @@ default, Varnish doesn't cache requests with cookies and Magento sends the
 Turpentine configures Varnish to work with Magento and modifies Magento's
 behaviour to significantly improve the cache hit rate.
 
-Note that this extension is still in **beta** so use on a production site should
-be considered carefully. There are already some sites using it in production,
-but it is certainly not *stable* yet. New features have necessitated backwards-
-incompatible changes to the layout syntax in the past. As such, it should be
-carefully tested on a development site before being deployed in production.
+Note that while this extension is now considered *stable*, it is strongly
+recommended that it be tested on a development/staging site before deploying
+on a production site due to the potential for needing to add custom ESI policies
+for blocks added by other extensions.
 
 ## Features
 
