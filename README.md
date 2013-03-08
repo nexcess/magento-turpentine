@@ -1,8 +1,8 @@
 # [Nexcess.net](https://www.nexcess.net/) Turpentine Extension for Magento
 [![Build Status](https://travis-ci.org/nexcess/magento-turpentine.png?branch=master,devel)](https://travis-ci.org/nexcess/magento-turpentine)
 
-Turpentine is a [Magento](https://www.magentocommerce.com/) extension to improve Magento's compatibility with
-[Varnish](https://www.varnish-cache.org/), a very-fast caching reverse-proxy. By
+Turpentine is a full page cache extension for [Magento](https://www.magentocommerce.com/)
+that works with [Varnish](https://www.varnish-cache.org/), a very fast caching reverse-proxy. By
 default, Varnish doesn't cache requests with cookies and Magento sends the
 *frontend* cookie with every request causing a (near) zero hit-rate for Varnish's cache.
 Turpentine configures Varnish to work with Magento and modifies Magento's
@@ -10,7 +10,7 @@ behaviour to significantly improve the cache hit rate.
 
 Note that while this extension is now considered *stable*, it is strongly
 recommended that it be tested on a development/staging site before deploying
-on a production site due to the potential for needing to add custom ESI policies
+on a production site due to the potential need to add custom ESI policies
 for blocks added by other extensions.
 
 ## Features
