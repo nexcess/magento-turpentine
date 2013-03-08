@@ -22,8 +22,9 @@
 class Nexcessnet_Turpentine_Model_Session extends Mage_Core_Model_Session_Abstract {
     protected $_namespace = 'turpentine';
 
-    public function __construct() {
-        $this->init( $this->_namespace );
+    public function __construct( $data=array() ) {
+        $sessionName = isset( $data['name'] ) ? $data['name'] : null;
+        $this->init( $this->_namespace, $sessionName );
         Mage::dispatchEvent(
             sprintf( '%s_session_init', $this->_namespace ),
             array( sprintf( '%s_session', $this->_namespace ) => $this ) );
