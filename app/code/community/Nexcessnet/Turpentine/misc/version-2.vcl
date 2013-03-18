@@ -154,6 +154,7 @@ sub vcl_recv {
                 req.url ~ ".*\.(?:{{static_extensions}})(?=\?|&|$)") {
             # don't need cookies for static assets
             remove req.http.Cookie;
+            remove req.http.X-Varnish-Faked-Session;
             return (lookup);
         }
         # this doesn't need a enable_url_excludes because we can be reasonably
@@ -295,7 +296,7 @@ sub vcl_deliver {
         call generate_session_expires;
         set resp.http.Set-Cookie = req.http.X-Varnish-Faked-Session "; expires="
             resp.http.X-Varnish-Cookie-Expires "; path="
-            regsub(regsub(req.url, "{{url_base_regex}}.*", "\1"), "/$", "");
+            regsub(regsub(req.url, "{{url_base_regex}}.*", "\1"), "^(.+)/$", "\1");
         if (req.http.Host) {
             set resp.http.Set-Cookie = resp.http.Set-Cookie
                 "; domain=" regsub(req.http.Host, ":\d+$", "");

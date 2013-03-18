@@ -151,6 +151,7 @@ sub vcl_recv {
                 req.url ~ ".*\.(?:{{static_extensions}})(?=\?|&|$)") {
             # don't need cookies for static assets
             unset req.http.Cookie;
+            unset req.http.X-Varnish-Faked-Session;
             return (lookup);
         }
         # this doesn't need a enable_url_excludes because we can be reasonably
