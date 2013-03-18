@@ -44,8 +44,7 @@ sub remove_double_slashes {
 }
 
 sub generate_session {
-    # generate a UUID and set the Cookie header to `frontend=$UUID`, overwrites
-    # any other cookies in the header
+    # generate a UUID and add `frontend=$UUID` to the Cookie header
     C{
         char uuid_buf [50];
         generate_uuid(uuid_buf);
@@ -298,7 +297,7 @@ sub vcl_deliver {
         call generate_session_expires;
         set resp.http.Set-Cookie = req.http.X-Varnish-Faked-Session +
             "; expires=" + resp.http.X-Varnish-Cookie-Expires + "; path=" +
-            regsub(regsub(req.url, "{{url_base_regex}}.*", "\1"), "/$", "");
+            regsub(regsub(req.url, "{{url_base_regex}}.*", "\1"), "^(.+)/$", "\1");
         if (req.http.Host) {
             set resp.http.Set-Cookie = resp.http.Set-Cookie +
                 "; domain=" + regsub(req.http.Host, ":\d+$", "");
