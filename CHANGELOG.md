@@ -246,3 +246,7 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   * Fixed layout XML caching logic to prevent writing to the cache on every
   page load, this should result in a small performance improvement on
   Varnish cache misses
+  * Fixed multiple *frontend* cookies being generated when Magento was installed
+  in the root of a domain (/)
+  * Added support for translating the SID URL param into the *frontend* cookie
+  for sharing sessions across different domains
