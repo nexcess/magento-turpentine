@@ -56,17 +56,22 @@ sub remove_double_slashes {
 }
 
 sub generate_session {
-    # generate a UUID and set the Cookie header to `frontend=$UUID`, overwrites
-    # any other cookies in the header
-    C{
-        char uuid_buf [50];
-        generate_uuid(uuid_buf);
-        VRT_SetHdr(sp, HDR_REQ,
-            "\030X-Varnish-Faked-Session:",
-            uuid_buf,
-            vrt_magic_string_end
-        );
-    }C
+    # generate a UUID and add `frontend=$UUID` to the Cookie header, or use SID
+    # from SID URL param
+    if (req.url ~ ".*[&?]SID=([^&]+).*") {
+        set req.http.X-Varnish-Faked-Session = regsub(
+            req.url, ".*[&?]SID=([^&]+).*", "frontend=\1");
+    } else {
+        C{
+            char uuid_buf [50];
+            generate_uuid(uuid_buf);
+            VRT_SetHdr(sp, HDR_REQ,
+                "\030X-Varnish-Faked-Session:",
+                uuid_buf,
+                vrt_magic_string_end
+            );
+        }C
+    }
     if (req.http.Cookie) {
         # client sent us cookies, just not a frontend cookie. try not to blow
         # away the extra cookies
