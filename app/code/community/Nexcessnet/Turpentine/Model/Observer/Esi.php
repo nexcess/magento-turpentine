@@ -78,7 +78,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
     public function checkRedirectUrl( $eventObject ) {
         $esiHelper = Mage::helper( 'turpentine/esi' );
         $url = $eventObject->getTransport()->getUrl();
-        $referer = Mage::app()->getRequest()->getHeader( 'Referer' );
+        $referer = Mage::helper( 'core/http' )->getHttpReferer();
+        // $referer = Mage::app()->getRequest()->getHeader( 'Referer' );
         $dummyUrl = $esiHelper->getDummyUrl();
         $reqUenc = Mage::helper( 'core' )->urlDecode(
             Mage::app()->getRequest()->getParam( 'uenc' ) );
