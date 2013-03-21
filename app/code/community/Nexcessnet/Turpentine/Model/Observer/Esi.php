@@ -104,24 +104,6 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         }
     }
 
-    protected function _fixupUencUrl( $uencUrl ) {
-        $esiHelper = Mage::helper( 'turpentine/esi' );
-        $corsOrigin = $esiHelper->getCorsOrigin();
-        if( $corsOrigin != $esiHelper->getCorsOrigin( $uencUrl ) ) {
-            return $corsOrigin . parse_url( $uencUrl, PHP_URL_PATH );
-        } else {
-            return $uencUrl;
-        }
-    }
-
-    protected function _checkIsNotEsiUrl( $url ) {
-        return $url && !preg_match( '~/turpentine/esi/getBlock/~', $url );
-    }
-
-    protected function _checkIsEsiUrl( $url ) {
-        return !$this->_checkIsNotEsiUrl( $url );
-    }
-
     /**
      * Load the cache clear events from stored config
      *
@@ -401,5 +383,42 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             'id'            => $value->{$idMethod}(),
         );
         return $data;
+    }
+
+    /**
+     * Fix a URL to ensure it uses Magento's base URL instead of the backend
+     * URL
+     *
+     * @param  string $uencUrl
+     * @return string
+     */
+    protected function _fixupUencUrl( $uencUrl ) {
+        $esiHelper = Mage::helper( 'turpentine/esi' );
+        $corsOrigin = $esiHelper->getCorsOrigin();
+        if( $corsOrigin != $esiHelper->getCorsOrigin( $uencUrl ) ) {
+            return $corsOrigin . parse_url( $uencUrl, PHP_URL_PATH );
+        } else {
+            return $uencUrl;
+        }
+    }
+
+    /**
+     * Check if a URL *is not* for the /turpentine/esi/getBlock/ action
+     *
+     * @param  string $url
+     * @return bool
+     */
+    protected function _checkIsNotEsiUrl( $url ) {
+        return $url && !preg_match( '~/turpentine/esi/getBlock/~', $url );
+    }
+
+    /**
+     * Check if a URL *is* for the /turpentine/esi/getBlock/ action
+     *
+     * @param  string $url
+     * @return bool
+     */
+    protected function _checkIsEsiUrl( $url ) {
+        return !$this->_checkIsNotEsiUrl( $url );
     }
 }
