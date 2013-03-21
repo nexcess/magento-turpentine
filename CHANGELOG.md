@@ -250,3 +250,10 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   in the root of a domain (/)
   * Added support for translating the SID URL param into the *frontend* cookie
   for sharing sessions across different domains
+  * Added utility script to dump Varnish's active VCL (util/dump-active-vcl.sh)
+  for debugging
+  * Improve ESI URL redirect interception, Turpentine should now prefer to
+  redirect to the referring URL instead of defaulting to /checkout/cart/ all
+  the time
+  * Re-enabled visitor logging for ESI/AJAX requests, this fixes product
+  comparison for non-logged-in visitors
