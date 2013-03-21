@@ -73,17 +73,23 @@
         </turpentine_vcl>
     </default>
     <global>
+        <!--
+        This disables Magento visitor logging for Turpentine ESI
+        requests. The logging was pointless and caused AJAX blocks to
+        take much more time then they otherwise would to load (most of
+        the time was spent doing database writes)
+        -->
+        <!-- Disabled because if the visitor doesn't have any entries in the
+        visitor log the product comparison block won't work for non-logged-in
+        visitors.
+        @see Mage/Catalog/controllers/Product/CompareController.php#79
+
         <ignoredModules>
             <entities>
-                <!--
-                This disables Magento visitor logging for Turpentine ESI
-                requests. The logging was pointless and caused AJAX blocks to
-                take much more time then they otherwise would to load (most of
-                the time was spent doing database writes)
-                -->
                 <turpentine/>
             </entities>
         </ignoredModules>
+        -->
         <blocks>
             <turpentine>
                 <class>Nexcessnet_Turpentine_Block</class>
