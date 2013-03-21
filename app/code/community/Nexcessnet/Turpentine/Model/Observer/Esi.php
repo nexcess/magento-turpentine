@@ -76,29 +76,50 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      * @return null
      */
     public function checkRedirectUrl( $eventObject ) {
+        $esiHelper = Mage::helper( 'turpentine/esi' );
         $url = $eventObject->getTransport()->getUrl();
-        // TODO: make sure this actually looks like a URL
+        $referer = Mage::helper( 'core/http' )->getHttpReferer();
+        // $referer = Mage::app()->getRequest()->getHeader( 'Referer' );
+        $dummyUrl = $esiHelper->getDummyUrl();
         $reqUenc = Mage::helper( 'core' )->urlDecode(
             Mage::app()->getRequest()->getParam( 'uenc' ) );
-        $esiHelper = Mage::helper( 'turpentine/esi' );
-        $dummyUrl = $esiHelper->getDummyUrl();
-        $getBlockUrlPattern = '~/turpentine/esi/getBlock/~';
-        if( preg_match( $getBlockUrlPattern, $url ) ||
-                preg_match( $getBlockUrlPattern, $reqUenc ) ) {
-            $eventObject->getTransport()->setUrl( $dummyUrl );
-        } elseif( $reqUenc && Mage::getBaseUrl() == $url ) {
-            $corsOrigin = $esiHelper->getCorsOrigin();
-            if( $corsOrigin != $esiHelper->getCorsOrigin( $reqUenc ) ) {
-                $eventObject->getTransport()->setUrl(
-                    $corsOrigin . parse_url( $reqUenc, PHP_URL_PATH ) );
+
+        if( $this->_checkIsEsiUrl( $url ) ) {
+            if( $this->_checkIsNotEsiUrl( $reqUenc ) &&
+                    Mage::getBaseUrl() == $url ) {
+                $newUrl = $this->_fixupUencUrl( $reqUenc );
+            } elseif( $this->_checkIsNotEsiUrl( $referer ) ) {
+                $newUrl = $referer;
+            } else {
+                $newUrl = $dummyUrl;
             }
+            // TODO: make sure this actually looks like a URL
+            $eventObject->getTransport()->setUrl( $newUrl );
         }
 
         if( $eventObject->getTransport()->getUrl() != $url ) {
             Mage::helper( 'turpentine/debug' )->logDebug(
-                'ESI redirect fixup triggered, rewrote: %s => %s',
+                'Detected redirect to ESI URL, changing: %s => %s',
                 $url, $eventObject->getTransport()->getUrl() );
         }
+    }
+
+    protected function _fixupUencUrl( $uencUrl ) {
+        $esiHelper = Mage::helper( 'turpentine/esi' );
+        $corsOrigin = $esiHelper->getCorsOrigin();
+        if( $corsOrigin != $esiHelper->getCorsOrigin( $uencUrl ) ) {
+            return $corsOrigin . parse_url( $uencUrl, PHP_URL_PATH );
+        } else {
+            return $uencUrl;
+        }
+    }
+
+    protected function _checkIsNotEsiUrl( $url ) {
+        return $url && !preg_match( '~/turpentine/esi/getBlock/~', $url );
+    }
+
+    protected function _checkIsEsiUrl( $url ) {
+        return !$this->_checkIsNotEsiUrl( $url );
     }
 
     /**
