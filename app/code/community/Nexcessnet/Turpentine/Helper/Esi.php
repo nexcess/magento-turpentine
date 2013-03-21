@@ -211,7 +211,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return string
      */
     public function getDefaultEsiTtl() {
-        return Mage::getStoreConfig( 'web/cookie/cookie_lifetime' );
+        return trim( Mage::getStoreConfig( 'web/cookie/cookie_lifetime' ) );
     }
 
     /**
