@@ -331,9 +331,7 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * @return bool
      */
     protected function _fixMessages() {
-        return Mage::helper( 'turpentine/data' )
-                ->useFlashMessagesFix() &&
-            Mage::app()->getStore()->getCode() !== 'admin';
+        return Mage::helper( 'turpentine/esi' )->shouldFixFlashMessages();
     }
 
     /**

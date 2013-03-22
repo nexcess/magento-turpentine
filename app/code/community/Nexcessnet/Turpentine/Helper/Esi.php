@@ -140,6 +140,16 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     }
 
     /**
+     * Check if the flash messages are enabled and we're not in the admin section
+     *
+     * @return bool
+     */
+    public function shouldFixFlashMessages() {
+        return Mage::helper( 'turpentine/data' )->useFlashMessagesFix() &&
+            Mage::app()->getStore()->getCode() !== 'admin';
+    }
+
+    /**
      * Get URL for redirects and dummy requests
      *
      * @return string

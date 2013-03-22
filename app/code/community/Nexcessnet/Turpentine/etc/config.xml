@@ -94,16 +94,24 @@
             <turpentine>
                 <class>Nexcessnet_Turpentine_Block</class>
             </turpentine>
+            <!--
+            The core/messages block is rewritten because it doesn't use a
+            template we can replace with an ESI include tag, just dumps out a
+            block of hard-coded HTML and also frequently skips the toHtml method
+
+            However, since class rewrites aren't conditional and we only want to
+            do this rewrite if the Enable Flash Messages option is enabled the
+            rewrite is actually added at runtime (controller_front_init_before),
+            see observer_esi::addMessagesBlockRewrite . Leaving this rewrite
+            here but commented out for clarity
+            -->
+            <!--
             <core>
                 <rewrite>
-                    <!--
-                    Rewritten because it doesn't use a template we can replace
-                    with an ESI include tag, just dumps out a block of
-                    hard-coded HTML and also frequently skips the toHtml method
-                    -->
                     <messages>Nexcessnet_Turpentine_Block_Core_Messages</messages>
                 </rewrite>
             </core>
+            -->
         </blocks>
         <helpers>
             <turpentine>
@@ -218,6 +226,10 @@
                         <class>turpentine/observer_esi</class>
                         <method>loadCacheClearEvents</method>
                     </turpentine_esi_controller_front_init_before>
+                    <turpentine_esi_controller_front_init_before2>
+                        <class>turpentine/observer_esi</class>
+                        <method>addMessagesBlockRewrite</method>
+                    </turpentine_esi_controller_front_init_before2>
                 </observers>
             </controller_front_init_before>
 

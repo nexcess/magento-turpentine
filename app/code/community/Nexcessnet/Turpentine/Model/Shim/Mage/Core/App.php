@@ -81,7 +81,6 @@ class Nexcessnet_Turpentine_Model_Shim_Mage_Core_App extends Mage_Core_Model_App
         $rewriteConfig->loadDom( $this->_shim_getRewriteDom(
             $type, $module, $class, $rewriteTarget ) );
         $this->_shim_getConfig()->extend( $rewriteConfig, true );
-        $configShim = Mage::getModel( 'turpentine/shim_mage_core_config' );
         $this->_shim_getConfigShim()->shim_setClassNameCache(
             $type, $module, $class, $rewriteTarget );
         return $this;
@@ -131,10 +130,11 @@ class Nexcessnet_Turpentine_Model_Shim_Mage_Core_App extends Mage_Core_Model_App
      */
     protected function _shim_getRewriteDom( $groupType, $group, $class, $className ) {
         $dom = new DOMDocument( '1.0' );
-        $dom->createElement( 'config' );
+        $dom->appendChild( $dom->createElement( 'config' ) )
             ->appendChild( $dom->createElement( 'global' ) )
             ->appendChild( $dom->createElement( $groupType . 's' ) )
             ->appendChild( $dom->createElement( $group ) )
+            ->appendChild( $dom->createElement( 'rewrite' ) )
             ->appendChild( $dom->createElement( $class, $className ) );
         return $dom;
     }
