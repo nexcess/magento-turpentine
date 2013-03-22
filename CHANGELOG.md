@@ -257,3 +257,9 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   the time
   * Re-enabled visitor logging for ESI/AJAX requests, this fixes product
   comparison for non-logged-in visitors
+
+### RELEASE-0.5.3
+
+  * Added runtime model/helper/block rewriting. This negates the need to comment
+  out the `core/messages` block rewrite to *really* disable the flash messages
+  fix when using Turpentine in combination with certain other extensions
