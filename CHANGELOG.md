@@ -263,3 +263,5 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   * Added runtime model/helper/block rewriting. This negates the need to comment
   out the `core/messages` block rewrite to *really* disable the flash messages
   fix when using Turpentine in combination with certain other extensions
+  * Add run-time detection of Varnish cli_buffer param to allow for longer VCLs
+  after increasing the limit at Varnish start up
