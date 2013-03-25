@@ -45,7 +45,7 @@
  */
 class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
 
-    //possible command return codes, from vcli.h
+    // possible command return codes, from vcli.h
     const CODE_SYNTAX       = 100;
     const CODE_UNKNOWN      = 101;
     const CODE_UNIMPL       = 102;
@@ -59,8 +59,9 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
     const CODE_CLOSE        = 500;
 
     const READ_CHUNK_SIZE   = 1024;
-    //varnish default, can be changed at Varnish startup time but it's probably not
-    //worth the trouble to dynamically detect at runtime
+    // varnish default, can only be changed at Varnish startup time
+    // if data to write is over this limit the actual run-time limit is checked
+    // and used
     const CLI_CMD_LENGTH_LIMIT  = 8192;
 
     /**
