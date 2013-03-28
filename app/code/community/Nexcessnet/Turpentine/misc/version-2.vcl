@@ -185,6 +185,12 @@ sub vcl_recv {
         if (req.url ~ "{{url_base_regex}}(?:{{url_excludes}})") {
             return (pipe);
         }
+        if (req.url ~ "\?.*__from_store=") {
+            # user switched stores. we pipe this instead of passing below because
+            # switching stores doesn't redirect (302), just acts like a link to
+            # another page (200) so the Set-Cookie header would be removed
+            return (pipe);
+        }
         if (req.http.X-Opt-Enable-Get-Excludes == "true" &&
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
             return (pass);
@@ -220,6 +226,12 @@ sub vcl_hash {
     if (req.http.Accept-Encoding) {
         # make sure we give back the right encoding
         set req.hash += req.http.Accept-Encoding;
+    }
+    if (req.http.Cookie ~ "currency=") {
+        set req.hash += regsub(req.http.Cookie, ".*currency=([^;]*).*", "\1");
+    }
+    if (req.http.Cookie ~ "store=") {
+        set req.hash += regsub(req.http.Cookie, ".*store=([^;]*).*", "\1");
     }
     if (req.http.X-Varnish-Esi-Access == "private" &&
             req.http.Cookie ~ "frontend=") {
