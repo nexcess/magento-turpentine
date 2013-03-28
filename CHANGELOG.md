@@ -265,3 +265,6 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   fix when using Turpentine in combination with certain other extensions
   * Add run-time detection of Varnish cli_buffer param to allow for longer VCLs
   after increasing the limit at Varnish start up
+  * Added the new *Fix Product List Toolbar* option (under Varnish Options >
+  General) to prevent caching of the products-per-page and product sorting options
+  in the product list toolbar
