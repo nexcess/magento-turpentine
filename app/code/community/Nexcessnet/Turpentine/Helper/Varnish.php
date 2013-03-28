@@ -144,4 +144,15 @@ class Nexcessnet_Turpentine_Helper_Varnish extends Mage_Core_Helper_Abstract {
     public function getDefaultTtl() {
         return Mage::getStoreConfig( 'turpentine_vcl/ttls/default_ttl' );
     }
+
+    /**
+     * Check if the product list toolbar fix is enabled and we're not in the
+     * admin section
+     *
+     * @return bool
+     */
+    public function shouldFixProductListToolbar() {
+        return Mage::helper( 'turpentine/data' )->useProductListToolbarFix() &&
+            Mage::app()->getStore()->getCode() !== 'admin';
+    }
 }

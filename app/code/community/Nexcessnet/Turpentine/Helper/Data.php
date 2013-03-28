@@ -243,6 +243,17 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
     }
 
     /**
+     * Check config to see if Turpentine should apply the product list toolbar
+     * fix
+     *
+     * @return bool
+     */
+    public function useProductListToolbarFix() {
+        return (bool)Mage::getStoreConfig(
+            'turpentine_varnish/general/fix_product_toolbar' );
+    }
+
+    /**
      * The actual recursive implementation of getChildBlockNames
      *
      * @param  Mage_Core_Model_Layout_Element $blockNode

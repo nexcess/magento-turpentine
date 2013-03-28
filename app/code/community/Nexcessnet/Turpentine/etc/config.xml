@@ -29,6 +29,7 @@
                 <varnish_debug>0</varnish_debug>
                 <block_debug>0</block_debug>
                 <ajax_messages>1</ajax_messages>
+                <fix_product_toolbar>0</fix_product_toolbar>
                 <crawler_enable>0</crawler_enable>
                 <crawler_debug>0</crawler_debug>
             </general>
@@ -230,6 +231,10 @@
                         <class>turpentine/observer_esi</class>
                         <method>addMessagesBlockRewrite</method>
                     </turpentine_esi_controller_front_init_before2>
+                    <turpentine_varnish_controller_front_init_before>
+                        <class>turpentine/observer_varnish</class>
+                        <method>addProductListToolbarRewrite</method>
+                    </turpentine_varnish_controller_front_init_before>
                 </observers>
             </controller_front_init_before>
 

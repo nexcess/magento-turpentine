@@ -72,6 +72,16 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </ajax_messages>
+                        <fix_product_toolbar translate="label" module="turpentine">
+                            <label>Fix Product List Toolbar</label>
+                            <comment>Enable this to prevent caching the products-per-page setting in the product list</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>turpentine/config_select_toggle</source_model>
+                            <sort_order>65</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </fix_product_toolbar>
                         <crawler_enable translate="label" module="turpentine">
                             <label>Enable Site Crawler</label>
                             <comment>Enable to allow Turpentine to automatically warm the cache</comment>

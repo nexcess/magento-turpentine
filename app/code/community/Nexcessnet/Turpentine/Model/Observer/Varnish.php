@@ -42,6 +42,20 @@ class Nexcessnet_Turpentine_Model_Observer_Varnish extends Varien_Event_Observer
     }
 
     /**
+     * Add a rewrite for catalog/product_list_toolbar if config option enabled
+     *
+     * @param Varien_Object $eventObject
+     * @return null
+     */
+    public function addProductListToolbarRewrite( $eventObject ) {
+        if( Mage::helper( 'turpentine/varnish' )->shouldFixProductListToolbar() ) {
+            Mage::getSingleton( 'turpentine/shim_mage_core_app' )
+                ->shim_addClassRewrite( 'block', 'catalog', 'product_list_toolbar',
+                    'Nexcessnet_Turpentine_Block_Catalog_Product_List_Toolbar' );
+        }
+    }
+
+    /**
      * Re-apply and save Varnish configuration on config change
      *
      * @param  mixed $eventObject
