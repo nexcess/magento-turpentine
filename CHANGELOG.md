@@ -273,3 +273,6 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   fixes currency handling.
   * Added a new option to disable the automatic application of the new VCL when
   making changes to the *Varnish Options* or *Caching Options* config sections
+  * The *Flush Catalog Images Cache* and *Flush JavaScript/CSS Cache* no longer
+  also flush the corresponding URLs in Varnish. This helps prevent broken images
+  and script links after using those buttons.
