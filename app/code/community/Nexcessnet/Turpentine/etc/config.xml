@@ -272,6 +272,10 @@
                     </turpentine_varnish_catalog_category_save_commit_after>
                 </observers>
             </catalog_category_save_commit_after>
+            <!--
+                This is disabled because it causes broken images on cached pages
+            -->
+            <!--
             <clean_media_cache_after>
                 <observers>
                     <turpentine_varnish_clean_media_cache_after>
@@ -288,6 +292,7 @@
                     </turpentine_varnish_clean_catalog_images_cache_after>
                 </observers>
             </clean_catalog_images_cache_after>
+            -->
             <cms_page_save_commit_after>
                 <observers>
                     <turpentine_varnish_cms_page_save_commit_after>
