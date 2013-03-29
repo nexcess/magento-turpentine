@@ -143,6 +143,14 @@ sub vcl_recv {
             set req.backend = admin;
             return (pipe);
         }
+        if (req.http.Cookie ~ "\bcurrency=") {
+            set req.http.X-Varnish-Currency = regsub(
+                req.http.Cookie, ".*\bcurrency=([^;]*).*", "\1");
+        }
+        if (req.http.Cookie ~ "\bstore=") {
+            set req.http.X-Varnish-Store = regsub(
+                req.http.Cookie, ".*\bstore=([^;]*).*", "\1");
+        }
         # looks like an ESI request, add some extra vars for further processing
         if (req.url ~ "/turpentine/esi/getBlock/") {
             set req.http.X-Varnish-Esi-Method = regsub(
@@ -227,12 +235,9 @@ sub vcl_hash {
         # make sure we give back the right encoding
         set req.hash += req.http.Accept-Encoding;
     }
-    if (req.http.Cookie ~ "currency=") {
-        set req.hash += regsub(req.http.Cookie, ".*currency=([^;]*).*", "\1");
-    }
-    if (req.http.Cookie ~ "store=") {
-        set req.hash += regsub(req.http.Cookie, ".*store=([^;]*).*", "\1");
-    }
+    # make sure data is for the right store and currency based on the *store*
+    # and *currency* cookies
+    set req.hash += "s=" req.http.X-Varnish-Store "&c=" req.http.X-Varnish-Currency;
     if (req.http.X-Varnish-Esi-Access == "private" &&
             req.http.Cookie ~ "frontend=") {
         set req.hash += regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1");
@@ -344,6 +349,8 @@ sub vcl_deliver {
         set resp.http.X-Varnish-Hits = obj.hits;
         set resp.http.X-Varnish-Esi-Method = req.http.X-Varnish-Esi-Method;
         set resp.http.X-Varnish-Esi-Access = req.http.X-Varnish-Esi-Access;
+        set resp.http.X-Varnish-Currency = req.http.X-Varnish-Currency;
+        set resp.http.X-Varnish-Store = req.http.X-Varnish-Store;
     } else {
         # remove Varnish fingerprints
         remove resp.http.X-Varnish;
