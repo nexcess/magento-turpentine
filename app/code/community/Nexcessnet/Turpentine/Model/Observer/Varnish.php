@@ -62,7 +62,8 @@ class Nexcessnet_Turpentine_Model_Observer_Varnish extends Varien_Event_Observer
      * @return null
      */
     public function adminSystemConfigChangedSection( $eventObject ) {
-        if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
+        if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() &&
+                Mage::helper( 'turpentine/data' )->getAutoApplyOnSave() ) {
             $result = Mage::getModel( 'turpentine/varnish_admin' )->applyConfig();
             $session = Mage::getSingleton( 'core/session' );
             foreach( $result as $name => $value ) {

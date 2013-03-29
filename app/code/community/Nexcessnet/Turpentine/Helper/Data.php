@@ -254,6 +254,16 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
     }
 
     /**
+     * Check if Turpentine should apply the new VCL on config changes
+     *
+     * @return bool
+     */
+    public function getAutoApplyOnSave() {
+        return (bool)Mage::getStoreConfig(
+            'turpentine_varnish/general/auto_apply_on_save' );
+    }
+
+    /**
      * The actual recursive implementation of getChildBlockNames
      *
      * @param  Mage_Core_Model_Layout_Element $blockNode
