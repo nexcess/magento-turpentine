@@ -268,3 +268,6 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   * Added the new *Fix Product List Toolbar* option (under Varnish Options >
   General) to prevent caching of the products-per-page and product sorting options
   in the product list toolbar. Note that this option defaults to "Disabled"
+  * Added the *store* and *currency* cookies to the request hash. This allows
+  Varnish to differentiate between multiple stores with the same base URL and
+  fixes currency handling.

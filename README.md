@@ -76,13 +76,6 @@ the page and may differ between different visitors/clients.
   speed for site browsing. It will remove a lot of load on the backend though so
   for heavily loaded sites it can free up enough backend resources to have a
   noticeable effect on "actions".
-  * Multi-store/multi-site setups that use *both* the same URL path **and** domain
-  will not work. Specifically they will always use the default site/store and
-  changing via the dropdown menu will not do anything. Examples:
-    * example.com/store/en/ and example.com/store/de/ works (same domain, different paths)
-    * example.com/store/ and example.com/store/substore/ works (same domain, different paths)
-    * en.example.com/store/ and de.example.com/store/ works (different domain, same paths)
-    * example.com/store/ for both EN and DE **does not** work (same domain and paths)
   * **Varnish 2.1**: Due to technical limitations, some features are not
   available when using Varnish 2.1:
     * External ESI requests are not blocked
