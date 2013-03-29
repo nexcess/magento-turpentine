@@ -48,6 +48,9 @@ If you have an issue, please read the [FAQ](https://github.com/nexcess/magento-t
 then if you still need help, open a bug report in GitHub's
 [issue tracker](https://github.com/nexcess/magento-turpentine/issues).
 
+Please do not use Magento Connect's Reviews or (especially) the Q&A for support.
+There isn't a way for me to reply to reviews and the Q&A moderation is very slow.
+
 ## How it works
 
 The extension works in two parts, page caching and block (ESI/AJAX) caching. A
