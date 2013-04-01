@@ -1,5 +1,5 @@
---- app/code/local/WP/CustomMenu/Block/Navigation.php.orig	2013-04-01 11:02:50.274294518 -0400
-+++ app/code/local/WP/CustomMenu/Block/Navigation.php	2013-04-01 11:03:47.368256720 -0400
+--- a/app/code/local/WP/CustomMenu/Block/Navigation.php	2013-04-01 11:02:50.274294518 -0400
++++ b/app/code/local/WP/CustomMenu/Block/Navigation.php	2013-04-01 11:03:47.368256720 -0400
 @@ -238,4 +238,15 @@
          $html.= '</div>';
          return $html;
@@ -9,10 +9,10 @@
 +     * Added for compatibility with Nexcessnet_Turpentine
 +     */
 +    protected function _toHtml() {
-+	if( Mage::getStoreConfig('custom_menu/general/enabled') &&
-+		$this->getNameInLayout() == 'catalog.topnav' ) {
-+	    $this->setTemplate('webandpeople/custommenu/top.phtml');
-+	}
++        if( Mage::getStoreConfig('custom_menu/general/enabled') &&
++                $this->getNameInLayout() == 'catalog.topnav' ) {
++            $this->setTemplate('webandpeople/custommenu/top.phtml');
++        }
 +        return parent::_toHtml();
 +    }
  }
