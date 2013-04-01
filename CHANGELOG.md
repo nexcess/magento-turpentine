@@ -276,3 +276,5 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   * The *Flush Catalog Images Cache* and *Flush JavaScript/CSS Cache* no longer
   also flush the corresponding URLs in Varnish. This helps prevent broken images
   and script links after using those buttons.
+  * Fixed Varnish ESI parsing failures that some users were experienced. This
+  should prevent the "ESI processing not enabled" seen on some blocks
