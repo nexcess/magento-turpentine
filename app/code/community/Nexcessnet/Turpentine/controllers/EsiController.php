@@ -69,8 +69,15 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 Mage::app()->setCurrentStore(
                     Mage::app()->getStore( $esiData->getStoreId() ) );
                 $appShim = Mage::getModel( 'turpentine/shim_mage_core_app' );
-                $appShim->shim_setRequest( Mage::helper( 'turpentine/esi' )->
-                    getDummyRequest() );
+                if( $referer = Mage::helper( 'core/http' )->getHttpReferer() ) {
+                    $dummyRequest = Mage::helper( 'turpentine/esi' )
+                        ->getDummyRequest( $referer );
+                } else {
+                    $dummyRequest = Mage::helper( 'turpentine/esi' )
+                        ->getDummyRequest();
+                }
+                $appShim->shim_setRequest( $dummyRequest );
+Mage::log( 'getModuleName() -> ' . $dummyRequest->getModuleName() );
                 $block = $this->_getEsiBlock( $esiData );
                 if( $block ) {
                     $block->setEsiOptions( false );
