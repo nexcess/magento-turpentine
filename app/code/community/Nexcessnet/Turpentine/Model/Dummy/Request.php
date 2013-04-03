@@ -40,7 +40,6 @@ class Nexcessnet_Turpentine_Model_Dummy_Request extends
     public function __construct( $uri=null ) {
         $this->_initFakeSuperGlobals();
         $this->_fixupFakeSuperGlobals( $uri );
-        // $this->_fakeRouterInit();
         parent::__construct( $uri );
     }
 
@@ -529,18 +528,50 @@ class Nexcessnet_Turpentine_Model_Dummy_Request extends
         }
     }
 
-    public function _fakeRouterDispatch() {
-        $frontController = Mage::app()->getFrontController();
-        if( $frontController->getRouter( 'standard' )->match( $this ) ) {
-
+    public function fakeRouterDispatch() {
+        if( $this->_cmsRouterMatch() ) {
+            Mage::log( 'CMS router match' );
+        } elseif( $this->_standardRouterMatch() ) {
+            Mage::log( 'standard router match' );
+        } elseif( $this->_defaultRouterMatch() ) {
+            Mage::log( 'default router match' );
         } else {
-            if( $frontController->getRouter( 'default' )->match( $this ) ) {
-
-            }
+            Mage::log( 'no router match' );
         }
     }
 
-    protected function _fakeRouterInit() {
+    /**
+     * Modify request and set to no-route action
+     * If store is admin and specified different admin front name,
+     * change store to default (Possible when enabled Store Code in URL)
+     *
+     * @param Zend_Controller_Request_Http $request
+     * @return boolean
+     */
+    protected function _defaultRouterMatch() {
+        $noRoute        = explode('/', Mage::app()->getStore()->getConfig('web/default/no_route'));
+        $moduleName     = isset($noRoute[0]) ? $noRoute[0] : 'core';
+        $controllerName = isset($noRoute[1]) ? $noRoute[1] : 'index';
+        $actionName     = isset($noRoute[2]) ? $noRoute[2] : 'index';
+
+        if (Mage::app()->getStore()->isAdmin()) {
+            $adminFrontName = (string)Mage::getConfig()->getNode('admin/routers/adminhtml/args/frontName');
+            if ($adminFrontName != $moduleName) {
+                $moduleName     = 'core';
+                $controllerName = 'index';
+                $actionName     = 'noRoute';
+                Mage::app()->setCurrentStore(Mage::app()->getDefaultStoreView());
+            }
+        }
+
+        $this->setModuleName($moduleName)
+            ->setControllerName($controllerName)
+            ->setActionName($actionName);
+
+        return true;
+    }
+
+    protected function _standardRouterMatch() {
         $router = Mage::app()->getFrontController()->getRouter( 'standard' );
 
         // $router->fetchDefault();
@@ -691,6 +722,51 @@ class Nexcessnet_Turpentine_Model_Dummy_Request extends
         // dispatch action
         $this->setDispatched(true);
         // $controllerInstance->dispatch($action);
+
+        return true;
+    }
+
+    protected function _cmsRouterMatch() {
+        $router = Mage::app()->getFrontController()->getRouter( 'cms' );
+
+        $identifier = trim($this->getPathInfo(), '/');
+
+        $condition = new Varien_Object(array(
+            'identifier' => $identifier,
+            'continue'   => true
+        ));
+        Mage::dispatchEvent('cms_controller_router_match_before', array(
+            'router'    => $router,
+            'condition' => $condition
+        ));
+        $identifier = $condition->getIdentifier();
+
+        if ($condition->getRedirectUrl()) {
+            Mage::app()->getFrontController()->getResponse()
+                ->setRedirect($condition->getRedirectUrl())
+                ->sendResponse();
+            $this->setDispatched(true);
+            return true;
+        }
+
+        if (!$condition->getContinue()) {
+            return false;
+        }
+
+        $page   = Mage::getModel('cms/page');
+        $pageId = $page->checkIdentifier($identifier, Mage::app()->getStore()->getId());
+        if (!$pageId) {
+            return false;
+        }
+
+        $this->setModuleName('cms')
+            ->setControllerName('page')
+            ->setActionName('view')
+            ->setParam('page_id', $pageId);
+        $this->setAlias(
+            Mage_Core_Model_Url_Rewrite::REWRITE_REQUEST_PATH_ALIAS,
+            $identifier
+        );
 
         return true;
     }
