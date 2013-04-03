@@ -182,6 +182,8 @@
 
     <!-- We cache the checkout cart page on a per-client basis -->
     <checkout_cart_index>
+        <turpentine_cache_flag value="0"/>
+        <!--
         <reference name="checkout.cart">
             <action method="setEsiOptions">
                 <params>
@@ -192,6 +194,7 @@
                 </params>
             </action>
         </reference>
+        -->
     </checkout_cart_index>
 
     <!-- We never cache anything in the checkout funnel -->
