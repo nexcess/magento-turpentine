@@ -278,3 +278,11 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   and script links after using those buttons.
   * Fixed Varnish ESI parsing failures that some users were experienced. This
   should prevent the "ESI processing not enabled" seen on some blocks
+  * Removed the default ESI policy on the `checkout.cart` block as it was
+  causing the shipping and tax quoting to not update correctly. It will be
+  re-added in a future release once the quote issue is resolved
+  * Added a `X-Turpentine-Block` header to ESI/AJAX responses containing the
+  name of the block rendered
+  * Disabled caching of the product comparison popup in the default ESI policy.
+  This does not affect the product comparison *block*, only the popup window
+  showing the actual comparison
