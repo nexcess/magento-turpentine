@@ -96,7 +96,8 @@
             </action>
         </reference>
 
-        <!-- Messages are cached on a per-client basis -->
+        <!-- Messages are not cached because the "messages cleared" event is
+        not reliable -->
         <reference name="global_messages">
             <action method="setEsiOptions">
                 <params>
@@ -150,6 +151,32 @@
             </action>
         </reference>
     </customer_logged_in>
+
+    <!-- Catalog -->
+
+    <catalog_product_compare_index>
+        <!--
+            This ESI policy can be used to cache the product comparison popup
+            but since it's not likely to ever get a cache hit we just don't cache
+            the popup instead.
+        -->
+        <turpentine_cache_flag value="0"/>
+        <!--
+        <reference name="catalog.compare.list">
+            <action method="setEsiOptions">
+                <params>
+                    <access>private</access>
+                    <flush_events>
+                        <catalog_product_compare_add_product/>
+                        <catalog_product_compare_remove_product/>
+                        <catalog_product_compare_item_collection_clear/>
+                    </flush_events>
+                </params>
+            </action>
+        </reference>
+        -->
+    </catalog_product_compare_index>
+
 
     <!-- Checkout -->
 
