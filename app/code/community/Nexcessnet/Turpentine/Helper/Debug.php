@@ -54,7 +54,8 @@ class Nexcessnet_Turpentine_Helper_Debug extends Mage_Core_Helper_Abstract {
                     break;
             }
         }
-        return parent::__call( $name, $args );
+        // return parent::__call( $name, $args );
+        return null;
     }
 
     /**

@@ -86,6 +86,10 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                         $resp->setHeader( 'X-Turpentine-Flush-Events',
                             implode( ',', $flushEvents ) );
                     }
+                    if( $esiHelper->getEsiDebugEnabled() ) {
+                        $resp->setHeader( 'X-Turpentine-Block',
+                            $block->getNameInLayout() );
+                    }
                 } else {
                     $resp->setHttpResponseCode( 404 );
                     $resp->setBody( 'ESI block not found' );
