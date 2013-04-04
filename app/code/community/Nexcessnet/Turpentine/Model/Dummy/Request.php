@@ -496,6 +496,11 @@ class Nexcessnet_Turpentine_Model_Dummy_Request extends
         return $this;
     }
 
+    /**
+     * Init the fake superglobal vars
+     *
+     * @return null
+     */
     protected function _initFakeSuperGlobals() {
         $this->GET = array();
         $this->POST = $_POST;
@@ -503,6 +508,12 @@ class Nexcessnet_Turpentine_Model_Dummy_Request extends
         $this->ENV = $_ENV;
     }
 
+    /**
+     * Fix up the fake superglobal vars
+     *
+     * @param  string $uri
+     * @return null
+     */
     protected function _fixupFakeSuperGlobals( $uri ) {
         $parsedUrl = parse_url( $uri );
 
@@ -528,6 +539,12 @@ class Nexcessnet_Turpentine_Model_Dummy_Request extends
         }
     }
 
+    /**
+     * Check this request against the cms, standard, and default routers to fill
+     * the module/controller/action/route fields.
+     *
+     * @return null
+     */
     public function fakeRouterDispatch() {
         if( $this->_cmsRouterMatch() ) {
             Mage::helper( 'turpentine/debug' )->logDebug( 'Matched router: cms' );
@@ -541,11 +558,8 @@ class Nexcessnet_Turpentine_Model_Dummy_Request extends
     }
 
     /**
-     * Modify request and set to no-route action
-     * If store is admin and specified different admin front name,
-     * change store to default (Possible when enabled Store Code in URL)
      *
-     * @param Zend_Controller_Request_Http $request
+     *
      * @return boolean
      */
     protected function _defaultRouterMatch() {
@@ -571,6 +585,11 @@ class Nexcessnet_Turpentine_Model_Dummy_Request extends
         return true;
     }
 
+    /**
+     *
+     *
+     * @return bool
+     */
     protected function _standardRouterMatch() {
         $router = Mage::app()->getFrontController()->getRouter( 'standard' );
 
@@ -726,6 +745,11 @@ class Nexcessnet_Turpentine_Model_Dummy_Request extends
         return true;
     }
 
+    /**
+     *
+     *
+     * @return bool
+     */
     protected function _cmsRouterMatch() {
         $router = Mage::app()->getFrontController()->getRouter( 'cms' );
 
