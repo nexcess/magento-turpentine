@@ -530,13 +530,13 @@ class Nexcessnet_Turpentine_Model_Dummy_Request extends
 
     public function fakeRouterDispatch() {
         if( $this->_cmsRouterMatch() ) {
-            Mage::log( 'CMS router match' );
+            Mage::helper( 'turpentine/debug' )->logDebug( 'Matched router: cms' );
         } elseif( $this->_standardRouterMatch() ) {
-            Mage::log( 'standard router match' );
+            Mage::helper( 'turpentine/debug' )->logDebug( 'Matched router: standard' );
         } elseif( $this->_defaultRouterMatch() ) {
-            Mage::log( 'default router match' );
+            Mage::helper( 'turpentine/debug' )->logDebug( 'Matched router: default' );
         } else {
-            Mage::log( 'no router match' );
+            Mage::helper( 'turpentine/debug' )->logDebug( 'No router match' );
         }
     }
 
