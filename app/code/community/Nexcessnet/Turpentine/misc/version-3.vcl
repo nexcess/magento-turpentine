@@ -337,8 +337,7 @@ sub vcl_deliver {
         # need to set the set-cookie header since we just made it out of thin air
         call generate_session_expires;
         set resp.http.Set-Cookie = req.http.X-Varnish-Faked-Session +
-            "; expires=" + resp.http.X-Varnish-Cookie-Expires + "; path=" +
-            regsub(regsub(req.url, "{{url_base_regex}}.*", "\1"), "^(.+)/$", "\1");
+            "; expires=" + resp.http.X-Varnish-Cookie-Expires + "; path=/";
         if (req.http.Host) {
             set resp.http.Set-Cookie = resp.http.Set-Cookie +
                 "; domain=" + regsub(req.http.Host, ":\d+$", "");
