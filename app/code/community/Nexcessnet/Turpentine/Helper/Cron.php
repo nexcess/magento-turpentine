@@ -186,18 +186,23 @@ class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
      * @return int
      */
     public function addProductToCrawlerQueue( $product ) {
+        $products = Mage::helper( 'turpentine/ban' )
+            ->getParentProducts( $childProduct );
+        $products[] = $product;
         $productUrls = array();
         $origStore = Mage::app()->getStore();
-        foreach( Mage::app()->getStores() as $storeId => $store ) {
-            Mage::app()->setCurrentStore( $store );
-            $baseUrl = $store->getBaseUrl(
-                Mage_Core_Model_Store::URL_TYPE_LINK );
-            $productUrls[] = $product->getProductUrl();
-            foreach( $product->getCategoryIds() as $catId ) {
-                $cat = Mage::getModel( 'catalog/category' )->load( $catId );
-                $productUrls[] = rtrim( $baseUrl, '/' ) . '/' .
-                    ltrim( $product->getUrlModel()
-                        ->getUrlPath( $product, $cat ), '/' );
+        foreach( $products as $p ) {
+            foreach( Mage::app()->getStores() as $storeId => $store ) {
+                Mage::app()->setCurrentStore( $store );
+                $baseUrl = $store->getBaseUrl(
+                    Mage_Core_Model_Store::URL_TYPE_LINK );
+                $productUrls[] = $p->getProductUrl();
+                foreach( $p->getCategoryIds() as $catId ) {
+                    $cat = Mage::getModel( 'catalog/category' )->load( $catId );
+                    $productUrls[] = rtrim( $baseUrl, '/' ) . '/' .
+                        ltrim( $p->getUrlModel()
+                            ->getUrlPath( $p, $cat ), '/' );
+                }
             }
         }
         Mage::app()->setCurrentStore( $origStore );
