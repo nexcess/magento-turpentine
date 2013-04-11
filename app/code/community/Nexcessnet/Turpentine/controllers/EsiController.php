@@ -125,6 +125,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
      * @return Mage_Core_Block_Template
      */
     protected function _getEsiBlock( $esiData ) {
+        $block = null;
         Varien_Profiler::start( 'turpentine::controller::esi::_getEsiBlock' );
         foreach( $esiData->getSimpleRegistry() as $key => $value ) {
             Mage::register( $key, $value, true );
@@ -147,18 +148,25 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         $blockNode = current( $layout->getNode()->xpath( sprintf(
             '//block[@name=\'%s\']',
             $esiData->getNameInLayout() ) ) );
-        $nodesToGenerate = Mage::helper( 'turpentine/data' )
-            ->getChildBlockNames( $blockNode );
-        Mage::getModel( 'turpentine/shim_mage_core_layout' )
-            ->shim_generateFullBlock( $blockNode );
-        foreach( $nodesToGenerate as $nodeName ) {
-            foreach( $layout->getNode()->xpath( sprintf(
-                    '//reference[@name=\'%s\']', $nodeName ) ) as $node ) {
-                $layout->generateBlocks( $node );
+        if( $blockNode instanceof Varien_Simplexml_Element ) {
+            $nodesToGenerate = Mage::helper( 'turpentine/data' )
+                ->getChildBlockNames( $blockNode );
+            Mage::getModel( 'turpentine/shim_mage_core_layout' )
+                ->shim_generateFullBlock( $blockNode );
+            foreach( $nodesToGenerate as $nodeName ) {
+                foreach( $layout->getNode()->xpath( sprintf(
+                        '//reference[@name=\'%s\']', $nodeName ) ) as $node ) {
+                    $layout->generateBlocks( $node );
+                }
             }
+            $block = $layout->getBlock( $esiData->getNameInLayout() );
+        } else {
+            Mage::helper( 'turpentine/debug' )->logWarn(
+                'No block node found with @name="%s"',
+                $esiData->getNameInLayout() );
         }
         Varien_Profiler::stop( 'turpentine::controller::esi::_getEsiBlock' );
-        return $layout->getBlock( $esiData->getNameInLayout() );
+        return $block;
     }
 
     /**
