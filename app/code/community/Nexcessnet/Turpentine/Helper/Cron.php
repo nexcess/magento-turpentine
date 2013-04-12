@@ -180,7 +180,7 @@ class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
     }
 
     /**
-     * Add URLs to the queue by product model, also adds parent products
+     * Add URLs to the queue by product model
      *
      * @param Mage_Catalog_Model_Product $product
      * @return int
