@@ -92,6 +92,10 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
             if( $this->_checkResult( $result ) &&
                     $cronHelper->getCrawlerEnabled() ) {
                 $cronHelper->addProductToCrawlerQueue( $product );
+                foreach( $banHelper->getParentProducts( $product )
+                        as $parentProduct ) {
+                    $cronHelper->addProductToCrawlerQueue( $parentProduct );
+                }
             }
         }
     }
@@ -125,7 +129,7 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
                     $cronHelper->addProductToCrawlerQueue( $product );
                     foreach( $banHelper->getParentProducts( $product )
                             as $parentProduct ) {
-                        $cronHelper->addProductToCrawlerQueue( $product );
+                        $cronHelper->addProductToCrawlerQueue( $parentProduct );
                     }
                 }
             }
