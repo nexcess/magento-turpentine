@@ -43,6 +43,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
+/**
+ * @method array help()
+ * @method array ping()
+ * @method array auth()
+ * @method array banner()
+ * @method array vcl_load()
+ * @method array vcl_inline()
+ * @method array vcl_use()
+ * @method array vcl_discard()
+ * @method array vcl_list()
+ * @method array vcl_show()
+ * @method array param_show()
+ * @method array param_set()
+ * @method array ban_url()
+ * @method array ban()
+ * @method array ban_list()
+ */
 class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
 
     // possible command return codes, from vcli.h
