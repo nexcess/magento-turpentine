@@ -165,13 +165,14 @@ class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
                         ->getCollection( $storeId ) as $cat ) {
                 $urls[] = $cat->getUrl();
                 foreach( $cat->getProductCollection( $storeId )
-                            ->addUrlRewrite( $cat->getId() ) as $prod ) {
+                            ->addUrlRewrite( $cat->getId() )
+                            ->addAttributeToFilter( 'visibility', $visibility )
+                                as $prod ) {
                     $urls[] = $prod->getProductUrl();
                 }
             }
             foreach( Mage::getResourceModel( 'sitemap/cms_page' )
-                    ->getCollection( $storeId )
-                    ->addAttributeToFilter( 'visibility', $visibility ) as $item ) {
+                        ->getCollection( $storeId ) as $item ) {
                 $urls[] = $baseUrl . $item->getUrl();
             }
         }
