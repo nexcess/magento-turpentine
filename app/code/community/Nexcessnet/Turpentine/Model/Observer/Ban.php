@@ -83,9 +83,9 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      */
     public function banProductPageCache( $eventObject ) {
         if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
+            $banHelper = Mage::helper( 'turpentine/ban' );
             $product = $eventObject->getProduct();
-            $urlPattern = Mage::helper( 'turpentine/ban' )
-                ->getProductBanRegex( $product );
+            $urlPattern = $banHelper->getProductBanRegex( $product );
             $result = $this->_getVarnishAdmin()->flushUrl( $urlPattern );
             Mage::dispatchEvent( 'turpentine_ban_product_cache', $result );
             $cronHelper = Mage::helper( 'turpentine/cron' );
