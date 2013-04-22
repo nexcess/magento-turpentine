@@ -542,6 +542,9 @@ class Nexcessnet_Turpentine_Model_Dummy_Request extends
     /**
      * Check this request against the cms, standard, and default routers to fill
      * the module/controller/action/route fields.
+     * 
+     * TODO: This whole thing is a gigantic hack. Would be nice to have a
+     * better solution.
      *
      * @return null
      */

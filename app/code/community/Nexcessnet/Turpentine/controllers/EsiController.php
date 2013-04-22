@@ -76,7 +76,6 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                     $dummyRequest = Mage::helper( 'turpentine/esi' )
                         ->getDummyRequest();
                 }
-                $dummyRequest->fakeRouterDispatch();
                 $appShim->shim_setRequest( $dummyRequest );
                 $block = $this->_getEsiBlock( $esiData );
                 if( $block ) {
