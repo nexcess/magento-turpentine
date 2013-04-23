@@ -286,3 +286,20 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   * Disabled caching of the product comparison popup in the default ESI policy.
   This does not affect the product comparison *block*, only the popup window
   showing the actual comparison
+
+### RELEASE-0.5.4
+
+  * Fixed the Varnish-generated *frontend* cookie occasionally being set with
+  the wrong path when Magento was located in a subdirectory instead of the
+  root of the site
+  * The built-in crawler should no longer try to crawl products that are not
+  visible in the frontend
+  * Missing blocks caused by layout changes between different handles should be
+  handled more gracefully by Turpentine now
+  * Parent products will also be banned when a child product goes out of stock
+  or is saved
+  * Fixed CMS URL generation for the built-in crawler
+  * Fixed product stock change check to actually work
+  * Improved the dummy request mock up. It should have all expected fields
+  populated now and changes to it will not affect the global state or original
+  request
