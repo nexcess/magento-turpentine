@@ -20,7 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-require_once 'abstract.php';
+require_once( dirname( $_SERVER['argv'][0] ) . '/abstract.php' );
 
 class Turpentine_Shell_Varnishadm extends Mage_Shell_Abstract {
     /**
