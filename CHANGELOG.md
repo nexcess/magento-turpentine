@@ -303,3 +303,6 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   * Improved the dummy request mock up. It should have all expected fields
   populated now and changes to it will not affect the global state or original
   request
+  * Added a Magento shell script (util/varnishadm.php) that can be used like
+  the real `varnishadm` command for users who aren't able to use real
+  `varnishadm` command
