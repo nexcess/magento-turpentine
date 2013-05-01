@@ -266,7 +266,7 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
     protected function _loadSavedMessages() {
         $session = Mage::getSingleton( 'turpentine/session' );
         foreach( $session->loadMessages( $this->getNameInLayout() ) as $msg ) {
-            $this->getMessageCollection()->add( $msg );
+            parent::addMessage( $msg );
         }
         $this->_clearMessages();
     }
@@ -280,7 +280,7 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
     protected function _loadMessagesFromStorage( $type ) {
         foreach( Mage::getSingleton( $type )
                     ->getMessages( true )->getItems() as $msg ) {
-            $this->addMessage( $msg );
+            parent::addMessage( $msg );
         }
     }
 
@@ -343,10 +343,7 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * @return boolean
      */
     protected function _isEsiRequest() {
-        $liveReq = Mage::app()->getRequest();
-        $dummyReq = Mage::helper( 'turpentine/esi' )->getDummyRequest();
-        return $liveReq->getModuleName() === $dummyReq->getModuleName() &&
-            $liveReq->getControllerName() === $dummyReq->getControllerName() &&
-            $liveReq->getActionName() === $dummyReq->getActionName();
+        return is_subclass_of( Mage::app()->getRequest(),
+            'Nexcessnet_Turpentine_Model_Dummy_Request' );
     }
 }
