@@ -254,8 +254,7 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
                 $this->_loadMessagesFromStorage( $storage );
             }
         } else {
-            $storage = 'core/session';
-            $this->_loadMessagesFromStorage( $storage );
+            $this->_loadMessagesFromStorage( 'core/session' );
         }
     }
 
@@ -344,8 +343,7 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * @return boolean
      */
     protected function _isEsiRequest() {
-        $result = (bool)preg_match( '~/turpentine/esi/getBlock/~',
-            $_SERVER['SCRIPT_URL'] );
-        return $result;
+        return is_subclass_of( Mage::app()->getRequest(),
+            'Nexcessnet_Turpentine_Model_Dummy_Request' );
     }
 }
