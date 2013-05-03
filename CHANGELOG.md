@@ -306,3 +306,4 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   * Added a Magento shell script (util/varnishadm.php) that can be used like
   the real `varnishadm` command for users who aren't able to use real
   `varnishadm` command
+  * Fixed duplicate flash messages in some cases
