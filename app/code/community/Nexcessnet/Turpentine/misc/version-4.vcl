@@ -1,3 +1,20 @@
+# Nexcess.net Turpentine Extension for Magento
+# Copyright (C) 2012  Nexcess.net L.L.C.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 ## Nexcessnet_Turpentine Varnish v4 VCL Template
 
 ## Custom C Code
@@ -46,15 +63,20 @@ sub remove_double_slashes {
 sub generate_session {
     # generate a UUID and set the Cookie header to `frontend=$UUID`, overwrites
     # any other cookies in the header
-    C{
-        char uuid_buf [50];
-        generate_uuid(uuid_buf);
-        VRT_SetHdr(req,
-            &VGC_HDR_REQ_X_Varnish_Faked_Session,
-            uuid_buf,
-            vrt_magic_string_end
-        );
-    }C
+    if (req.url ~ ".*[&?]SID=([^&]+).*") {
+        set req.http.X-Varnish-Faked-Session = regsub(
+            req.url, ".*[&?]SID=([^&]+).*", "frontend=\1");
+    } else {
+        C{
+            char uuid_buf [50];
+            generate_uuid(uuid_buf);
+            VRT_SetHdr(req,
+                &VGC_HDR_REQ_X_Varnish_Faked_Session,
+                uuid_buf,
+                vrt_magic_string_end
+            );
+        }C
+    }
     if (req.http.Cookie) {
         # client sent us cookies, just not a frontend cookie. try not to blow
         # away the extra cookies
@@ -123,6 +145,14 @@ sub vcl_recv {
             set req.backend = admin;
             return (pipe);
         }
+        if (req.http.Cookie ~ "\bcurrency=") {
+            set req.http.X-Varnish-Currency = regsub(
+                req.http.Cookie, ".*\bcurrency=([^;]*).*", "\1");
+        }
+        if (req.http.Cookie ~ "\bstore=") {
+            set req.http.X-Varnish-Store = regsub(
+                req.http.Cookie, ".*\bstore=([^;]*).*", "\1");
+        }
         # looks like an ESI request, add some extra vars for further processing
         if (req.url ~ "/turpentine/esi/getBlock/") {
             set req.http.X-Varnish-Esi-Method = regsub(
@@ -152,12 +182,19 @@ sub vcl_recv {
                 req.url ~ ".*\.(?:{{static_extensions}})(?=\?|&|$)") {
             # don't need cookies for static assets
             unset req.http.Cookie;
+            unset req.http.X-Varnish-Faked-Session;
             return (lookup);
         }
         # this doesn't need a enable_url_excludes because we can be reasonably
         # certain that cron.php at least will always be in it, so it will
         # never be empty
         if (req.url ~ "{{url_base_regex}}(?:{{url_excludes}})") {
+            return (pipe);
+        }
+        if (req.url ~ "\?.*__from_store=") {
+            # user switched stores. we pipe this instead of passing below because
+            # switching stores doesn't redirect (302), just acts like a link to
+            # another page (200) so the Set-Cookie header would be removed
             return (pipe);
         }
         if ({{enable_get_excludes}} &&
@@ -197,6 +234,9 @@ sub vcl_hash {
         # make sure we give back the right encoding
         hash_data(req.http.Accept-Encoding);
     }
+    # make sure data is for the right store and currency based on the *store*
+    # and *currency* cookies
+    hash_data("s=" + req.http.X-Varnish-Store + "&c=" + req.http.X-Varnish-Currency);
     if (req.http.X-Varnish-Esi-Access == "private" &&
             req.http.Cookie ~ "frontend=") {
         hash_data(regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1"));
@@ -234,6 +274,7 @@ sub vcl_fetch {
         if (beresp.status != 200 && beresp.status != 404) {
             # pass anything that isn't a 200 or 404
             set beresp.ttl = {{grace_period}}s;
+            # v4 doesn't seem to have hit_for_pass
             return (deliver);
         } else {
             # if Magento sent us a Set-Cookie header, we'll put it somewhere
@@ -265,6 +306,11 @@ sub vcl_fetch {
                         set beresp.http.X-Varnish-Session = regsub(req.http.Cookie,
                             "^.*?frontend=([^;]*);*.*$", "\1");
                     }
+                    if (req.http.X-Varnish-Esi-Method == "ajax" &&
+                            req.http.X-Varnish-Esi-Access == "public") {
+                        set beresp.http.Cache-Control = "max-age=" + regsub(
+                            req.url, ".*/{{esi_ttl_param}}/(\d+)/.*", "\1");
+                    }
                     set beresp.ttl = std.duration(
                         regsub(
                             req.url, ".*/{{esi_ttl_param}}/(\d+)/.*", "\1s"),
@@ -291,8 +337,7 @@ sub vcl_deliver {
         # need to set the set-cookie header since we just made it out of thin air
         call generate_session_expires;
         set resp.http.Set-Cookie = req.http.X-Varnish-Faked-Session +
-            "; expires=" + resp.http.X-Varnish-Cookie-Expires + "; path=" +
-            regsub(regsub(req.url, "{{url_base_regex}}.*", "\1"), "/$", "");
+            "; expires=" + resp.http.X-Varnish-Cookie-Expires + "; path=/";
         if (req.http.Host) {
             set resp.http.Set-Cookie = resp.http.Set-Cookie +
                 "; domain=" + regsub(req.http.Host, ":\d+$", "");
@@ -305,22 +350,22 @@ sub vcl_deliver {
         set resp.http.X-Varnish-Hits = obj.hits;
         set resp.http.X-Varnish-Esi-Method = req.http.X-Varnish-Esi-Method;
         set resp.http.X-Varnish-Esi-Access = req.http.X-Varnish-Esi-Access;
+        set resp.http.X-Varnish-Currency = req.http.X-Varnish-Currency;
+        set resp.http.X-Varnish-Store = req.http.X-Varnish-Store;
     } else {
         # remove Varnish fingerprints
         unset resp.http.X-Varnish;
         unset resp.http.Via;
         unset resp.http.X-Powered-By;
         unset resp.http.Server;
-        # TODO: probably don't actually need to remove this one
-        unset resp.http.Age;
         unset resp.http.X-Turpentine-Cache;
         unset resp.http.X-Turpentine-Esi;
         unset resp.http.X-Turpentine-Flush-Events;
+        unset resp.http.X-Turpentine-Block;
         unset resp.http.X-Varnish-Session;
         # this header indicates the session that originally generated a cached
         # page. it *must* not be sent to a client in production with lax
         # session validation or that session can be hijacked
         unset resp.http.X-Varnish-Set-Cookie;
-        unset resp.http.X-Varnish-Use-Set-Cookie;
     }
 }
