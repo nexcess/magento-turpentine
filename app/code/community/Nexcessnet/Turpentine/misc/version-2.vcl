@@ -203,6 +203,14 @@ sub vcl_recv {
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
             return (pass);
         }
+		
+		if(req.url ~ "(\?|&)(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=") {
+			# Strip out Google related parameters
+			set req.url=regsuball(req.url,"&(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=([A-z0-9_\-\.%25]+)","");
+			set req.url=regsuball(req.url,"\?(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=([A-z0-9_\-\.%25]+)","?");
+			set req.url=regsub(req.url,"\?&","?");
+			set req.url=regsub(req.url,"\?$","");
+		}		
         return (lookup);
     }
     # else it's not part of magento so do default handling (doesn't help
