@@ -202,14 +202,12 @@ sub vcl_recv {
             # TODO: should this be pass or pipe?
             return (pass);
         }
-		
-		if(req.url ~ "(\?|&)(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=") {
-			# Strip out Google related parameters
-			set req.url=regsuball(req.url,"&(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=([A-z0-9_\-\.%25]+)","");
-			set req.url=regsuball(req.url,"\?(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=([A-z0-9_\-\.%25]+)","?");
-			set req.url=regsub(req.url,"\?&","?");
-			set req.url=regsub(req.url,"\?$","");
-		}		
+        if (req.url ~ "[?&](utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=") {
+            # Strip out Google related parameters
+            set req.url = regsuball(req.url, "(?:(\?)?|&)(?:utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=[^&]+", "\1");
+            set req.url = regsuball(req.url, "(?:(\?)&|\?$)", "\1");
+        }
+
         # everything else checks out, try and pull from the cache
         return (lookup);
     }
