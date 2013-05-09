@@ -51,6 +51,13 @@ then if you still need help, open a bug report in GitHub's
 Please do not use Magento Connect's Reviews or (especially) the Q&A for support.
 There isn't a way for me to reply to reviews and the Q&A moderation is very slow.
 
+## Contributing
+
+If you have a fix or feature for Turpentine, submit a pull request through GitHub
+to the **devel** branch. The *master* branch is only for stable releases. Please
+make sure the new code follows the same style and conventions as already written
+code.
+
 ## How it works
 
 The extension works in two parts, page caching and block (ESI/AJAX) caching. A
