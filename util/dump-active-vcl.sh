@@ -22,4 +22,5 @@
 
 VARNISHADM="${VARNISHADM:-varnishadm}"
 
+# varnishadm vcl.show "$(varnishadm vcl.list | grep '^active' | awk '{print $3}')"
 ${VARNISHADM} vcl.show "$(${VARNISHADM} vcl.list | grep '^active' | awk '{print $3}')"
