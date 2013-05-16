@@ -198,7 +198,7 @@ that have been done to the ESI layout will need to be updated
 
 There are changes to the ESI layout syntax (again) in this release, any
 customizations that have been done to the ESI layout or added for custom blocks
-will need to be updated and moved to the `layout.xml` file. Additionally, the
+will need to be updated and moved to the `local.xml` file. Additionally, the
 Varnish cache will need to be fully flushed or cached pages that reference
 previously cached ESI blocks will not load those blocks
 
