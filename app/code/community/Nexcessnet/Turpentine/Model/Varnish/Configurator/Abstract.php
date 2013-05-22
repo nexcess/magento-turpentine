@@ -21,7 +21,6 @@
 
 abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
 
-    const VCL_FRAGMENT_FILE = 'custom_include.vcl';
     const VCL_CUSTOM_C_CODE_FILE    = 'uuid.c';
 
     /**
@@ -118,6 +117,17 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     protected function _getVclFilename() {
         return $this->_formatTemplate(
             Mage::getStoreConfig( 'turpentine_varnish/servers/config_file' ),
+            array( 'root_dir' => Mage::getBaseDir() ) );
+    }
+
+    /**
+     * Get the name of the custom include VCL file
+     *
+     * @return string
+     */
+    protected function _getCustomIncludeFilename() {
+        return $this->_formatTemplate(
+            Mage::getStoreConfig( 'turpentine_varnish/servers/custom_include_file' ),
             array( 'root_dir' => Mage::getBaseDir() ) );
     }
 
@@ -640,9 +650,9 @@ EOS;
             $vars['normalize_host'] = $this->_vcl_sub_normalize_host();
         }
 
-        $customInclude = $this->_getVclTemplateFilename( self::VCL_FRAGMENT_FILE );
-        if( is_readable( $customInclude ) ) {
-            $vars['custom_vcl_include'] = file_get_contents( $customInclude );
+        $customIncludeFile = $this->_getCustomIncludeFilename();
+        if( is_readable( $customIncludeFile ) ) {
+            $vars['custom_vcl_include'] = file_get_contents( $customIncludeFile );
         }
 
         return $vars;

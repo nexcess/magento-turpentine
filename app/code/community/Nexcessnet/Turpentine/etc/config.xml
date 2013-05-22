@@ -38,6 +38,7 @@
                 <version>auto</version>
                 <server_list>127.0.0.1:6082</server_list>
                 <config_file>{{root_dir}}/var/default.vcl</config_file>
+                <custom_include_file>{{root_dir}}/app/code/community/Nexcessnet/Turpentine/misc/custom_include.vcl</custom_include_file>
             </servers>
         </turpentine_varnish>
         <turpentine_vcl>

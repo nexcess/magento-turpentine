@@ -158,6 +158,15 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </config_file>
+                        <custom_include_file translate="label" module="turpentine">
+                            <label>Custom VCL File Location</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Specify where the Varnish VCL customization file should be saved</comment>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </custom_include_file>
                     </fields>
                 </servers>
             </groups>
