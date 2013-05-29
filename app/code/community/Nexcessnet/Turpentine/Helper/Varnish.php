@@ -155,4 +155,25 @@ class Nexcessnet_Turpentine_Helper_Varnish extends Mage_Core_Helper_Abstract {
         return Mage::helper( 'turpentine/data' )->useProductListToolbarFix() &&
             Mage::app()->getStore()->getCode() !== 'admin';
     }
+
+    /**
+     * Check if the Varnish bypass is enabled
+     *
+     * @return boolean
+     */
+    public function isBypassEnabled() {
+        $cookieName     = Mage::helper( 'turpentine' )->getBypassCookieName();
+        $cookieValue    = (bool)Mage::getModel( 'core/cookie' )->get($cookieName);
+
+        return $cookieValue;
+    }
+
+    /**
+     * Check if the notification about the Varnish bypass must be displayed
+     *
+     * @return boolean
+     */
+    public function shoudDisplayNotice() {
+        return $this->getVarnishEnabled() && $this->isBypassEnabled();
+    }
 }

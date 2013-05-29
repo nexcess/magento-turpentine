@@ -110,6 +110,10 @@ sub generate_session_expires {
 ## Varnish Subroutines
 
 sub vcl_recv {
+    if (req.http.Cookie ~ "varnish_bypass=") {
+        return (pipe);
+    }
+
     # this always needs to be done so it's up at the top
     if (req.restarts == 0) {
         if (req.http.X-Forwarded-For) {

@@ -25,6 +25,13 @@
     -->
     <default>
         <!--
+            New block used to warn users who choose to navigate without Varnish while it's activated.
+        -->
+        <reference name="after_body_start">
+            <block type="turpentine/notices" template="turpentine/notices.phtml" name="turpentine_notices" />
+        </reference>
+
+        <!--
         A default Magento site includes a logged in user's name in the welcome
         message and the number of items in the shopping cart so it must be
         cached per-client.
