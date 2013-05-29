@@ -94,7 +94,16 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * @return Mage_Core_Block_Messages
      */
     public function addMessages( Mage_Core_Model_Message_Collection $messages ) {
-        parent::addMessages( $messages );
+        /**
+         *  If we fix the messages, their information will be added to 'turpentine/session'
+         *  by calling $this->_saveMessages() method and later added to $this->_messages array
+         *  in $this->_loadSavedMessages() method. We don't want to add the message to the $this->_messages
+         *  array invoked by parent::addMessages() as  we would end up with two exactly same messages stored
+         *  in $this->_messages array.
+         */
+        if (!$this->_fixMessages()) {
+            return parent::addMessages( $messages );
+        }
         $this->_saveMessages( $messages->getItems() );
         return $this;
     }
@@ -106,7 +115,9 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      * @return  Mage_Core_Block_Messages
      */
     public function addMessage( Mage_Core_Model_Message_Abstract $message ) {
-        parent::addMessage( $message );
+        if (!$this->_fixMessages()) {
+            return parent::addMessage( $message );
+        }
         $this->_saveMessages( array( $message ) );
         return $this;
     }
