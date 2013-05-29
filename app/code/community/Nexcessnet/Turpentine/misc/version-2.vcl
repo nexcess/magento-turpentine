@@ -102,10 +102,6 @@ sub generate_session_expires {
 ## Varnish Subroutines
 
 sub vcl_recv {
-    if (req.http.Cookie ~ "varnish_bypass=") {
-        return (pipe);
-    }
-
     # this always needs to be done so it's up at the top
     if (req.restarts == 0) {
         if (req.http.X-Forwarded-For) {
@@ -135,7 +131,8 @@ sub vcl_recv {
 
     # we test this here instead of inside the url base regex section
     # so we can disable caching for the entire site if needed
-    if (req.http.X-Opt-Enable-Caching != "true" || req.http.Authorization) {
+    if (req.http.X-Opt-Enable-Caching != "true" || req.http.Authorization ||
+            req.http.Cookie ~ "varnish_bypass={{secret_handshake}}") {
         return (pipe);
     }
     # check if the request is for part of magento
