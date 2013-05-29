@@ -78,7 +78,7 @@
                 ->__('Download the generated VCL file.')?>
         </td>
     </tr>
-    <?php if (Mage::helper( 'turpentine/varnish' )->isBypassEnabled() === false): ?>
+    <?php if(Mage::helper( 'turpentine/varnish' )->isBypassEnabled() === false): ?>
         <tr>
             <td class="scope-label">
                 <button
