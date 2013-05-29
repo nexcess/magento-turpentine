@@ -173,7 +173,7 @@ class Nexcessnet_Turpentine_Helper_Varnish extends Mage_Core_Helper_Abstract {
      *
      * @return boolean
      */
-    public function shoudDisplayNotice() {
+    public function shouldDisplayNotice() {
         return $this->getVarnishEnabled() && $this->isBypassEnabled();
     }
 }
