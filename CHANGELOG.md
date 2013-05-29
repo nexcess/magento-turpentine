@@ -311,3 +311,5 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   *Custom VCL File Location* option
   * Added template parsing to the custom include VCL file, `{{variable}}`
   replacement will now also work in this file
+  * Added a toggle-able Varnish Bypass to Cache Management page for bypassing
+  the cache (including ESI) for a single *admin* session (thanks to @alexandre-jardin)
