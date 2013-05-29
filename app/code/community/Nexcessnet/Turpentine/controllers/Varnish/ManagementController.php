@@ -211,14 +211,15 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
         $cookieModel    = Mage::getModel( 'core/cookie' );
         $adminSession   = Mage::getSingleton( 'adminhtml/session' );
 
-        switch ($type) {
+        switch( $type ) {
             case 'default':
-                $cookieModel->set($cookieName, true);
+                $cookieModel->set( $cookieName,
+                    Mage::helper( 'turpentine/varnish' )->getSecretHandshake() );
                 $adminSession->addSuccess( 'The Varnish bypass cookie has been successfully added.' );
             break;
 
             case 'varnish':
-                $cookieModel->delete($cookieName);
+                $cookieModel->delete( $cookieName );
                 $adminSession->addSuccess( 'The Varnish bypass cookie has been successfully removed.' );
             break;
 
