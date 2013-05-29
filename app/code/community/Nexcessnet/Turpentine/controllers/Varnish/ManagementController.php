@@ -215,16 +215,19 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
             case 'default':
                 $cookieModel->set( $cookieName,
                     Mage::helper( 'turpentine/varnish' )->getSecretHandshake() );
-                $adminSession->addSuccess( 'The Varnish bypass cookie has been successfully added.' );
+                $adminSession->addSuccess( Mage::helper( 'turpentine/data' )
+                    ->__( 'The Varnish bypass cookie has been successfully added.' ) );
             break;
 
             case 'varnish':
                 $cookieModel->delete( $cookieName );
-                $adminSession->addSuccess( 'The Varnish bypass cookie has been successfully removed.' );
+                $adminSession->addSuccess( Mage::helper( 'turpentine/data' )
+                    ->__( 'The Varnish bypass cookie has been successfully removed.' ) );
             break;
 
             default:
-                $adminSession->addError( 'The given navigation type is not supported !' );
+                $adminSession->addError( Mage::helper( 'turpentine/data' )
+                    ->__( 'The given navigation type is not supported!' ) );
             break;
         }
 
