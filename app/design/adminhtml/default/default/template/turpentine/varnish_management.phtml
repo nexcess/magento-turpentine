@@ -1,28 +1,24 @@
 <?php
+
 /**
- * Magento
+ * Nexcess.net Turpentine Extension for Magento
+ * Copyright (C) 2012  Nexcess.net L.L.C.
  *
- * NOTICE OF LICENSE
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
- * This source file is subject to the Academic Free License (AFL 3.0)
- * that is bundled with this package in the file LICENSE_AFL.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/afl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade Magento to newer
- * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
- *
- * @category    design
- * @package     default_default
- * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
- * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
 ?>
 <br />
 <div class="content-header">
@@ -36,7 +32,7 @@
          </tr>
     </table>
 </div>
-<table class="form-list">
+<table class="form-list varnish-management">
     <tr>
         <td class="scope-label">
             <button
@@ -82,5 +78,44 @@
                 ->__('Download the generated VCL file.')?>
         </td>
     </tr>
+    <?php if(Mage::helper( 'turpentine/varnish' )->isBypassEnabled() === false): ?>
+        <tr>
+            <td class="scope-label">
+                <button
+                    onclick="setLocation('<?php echo $this->getSwitchNavigationUrl( 'default' ); ?>')"
+                    type="button"
+                    class="scalable delete">
+                    <span><?php echo Mage::helper( 'turpentine/data' )
+                            ->__('Activate Varnish Bypass') ?></span>
+                </button>
+            </td>
+            <td class="scope-label">
+                <?php echo Mage::helper( 'turpentine/data' )
+                    ->__('Create a cookie to bypass Varnish only for your session.')?>
+            </td>
+        </tr>
+    <?php else: ?>
+        <tr>
+            <td class="scope-label">
+                <button
+                    onclick="setLocation('<?php echo $this->getSwitchNavigationUrl( 'varnish' ); ?>')"
+                    type="button"
+                    class="scalable back">
+                    <span><?php echo Mage::helper( 'turpentine/data' )
+                            ->__('Deactivate Varnish Bypass') ?></span>
+                </button>
+            </td>
+            <td class="scope-label">
+                <?php echo Mage::helper( 'turpentine/data' )
+                    ->__('Remove the bypass cookie and use again Varnish.')?>
+            </td>
+        </tr>
+    <?php endif; ?>
 </table>
 <?php echo $this->getChildHtml(); ?>
+
+<style>
+    .varnish-management button {
+        width: 190px;
+    }
+</style>

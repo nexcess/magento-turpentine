@@ -1,0 +1,36 @@
+<?php
+/**
+ * Nexcess.net Turpentine Extension for Magento
+ * Copyright (C) 2012  Nexcess.net L.L.C.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+?>
+
+<?php if($this->helper( 'turpentine/varnish' )->shoudDisplayNotice()): ?>
+    <div class="varnish-global-notice">
+        <div class="notice-inner">
+            <p>
+                <strong><?php echo $this->__('The cookie that allows bypassing Varnish is present in your browser.'); ?></strong><br />
+                <?php echo $this->__('Remember that this navigation mode should be only activated for testing. You will suffer a decline in overall performance until you delete this cookie.'); ?>
+            </p>
+        </div>
+    </div>
+    <style>
+        .varnish-global-notice { border:1px solid #cfcfcf; border-width:0 0 1px; background:#ffff90; font-size:12px; line-height:1.25; text-align:center; color:#2f2f2f; }
+        .varnish-global-notice .notice-inner { width:860px; margin:0 auto; padding:12px 0 12px 0px; text-align:left; }
+        .varnish-global-notice .notice-inner p { margin:0; padding:10px; }
+    </style>
+<?php endif; ?>

@@ -41,6 +41,13 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
     const HASH_ALGORITHM    = 'sha256';
 
     /**
+     * Cookie name for the Varnish bypass
+     *
+     * @var string
+     */
+    const BYPASS_COOKIE_NAME  = 'varnish_bypass';
+
+    /**
      * encryption singleton thing
      *
      * @var Mage_Core_Model_Encryption
@@ -261,6 +268,15 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
     public function getAutoApplyOnSave() {
         return (bool)Mage::getStoreConfig(
             'turpentine_varnish/general/auto_apply_on_save' );
+    }
+
+    /**
+     * Get the cookie name for the Varnish bypass
+     *
+     * @return string
+     */
+    public function getBypassCookieName() {
+        return self::BYPASS_COOKIE_NAME;
     }
 
     /**
