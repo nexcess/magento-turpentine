@@ -306,7 +306,8 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   * Added a Magento shell script (util/varnishadm.php) that can be used like
   the real `varnishadm` command for users who aren't able to use real
   `varnishadm` command
-  * Fixed duplicate flash messages in some cases
+  * Fixed duplicate flash messages experienced in some cases (thanks to
+  @craigcarnell)
   * Made the `custom_include.vcl` file's location configurable, see the new
   *Custom VCL File Location* option
   * Added template parsing to the custom include VCL file, `{{variable}}`
