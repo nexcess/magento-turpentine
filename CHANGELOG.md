@@ -314,3 +314,5 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   replacement will now also work in this file
   * Added a toggle-able Varnish Bypass to Cache Management page for bypassing
   the cache (including ESI) for a single *admin* session (thanks to @alexandre-jardin)
+  * Varnish will now strip the Google-related parameters from the request to
+  increase cache hit-rate
