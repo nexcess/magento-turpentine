@@ -112,8 +112,18 @@ sub vcl_recv {
         }
     }
 
+    # varnish 2.1 doesn't support bare booleans so we have to add these
+    # as headers to the req so they've available throught the VCL
+    set req.http.X-Opt-Enable-Caching = "{{enable_caching}}";
+    set req.http.X-Opt-Force-Static-Caching = "{{force_cache_static}}";
+    set req.http.X-Opt-Enable-Get-Excludes = "{{enable_get_excludes}}";
+
     # We only deal with GET and HEAD by default
-    if (!(req.request ~ "^(GET|HEAD)$")) {
+    # we test this here instead of inside the url base regex section
+    # so we can disable caching for the entire site if needed
+    if (req.http.X-Opt-Enable-Caching != "true" || req.http.Authorization ||
+            !(req.request ~ "^(GET|HEAD)$") ||
+            req.http.Cookie ~ "varnish_bypass={{secret_handshake}}") {
         return (pipe);
     }
 
@@ -123,18 +133,6 @@ sub vcl_recv {
     {{normalize_user_agent}}
     {{normalize_host}}
 
-    # varnish 2.1 doesn't support bare booleans so we have to add these
-    # as headers to the req so they've available throught the VCL
-    set req.http.X-Opt-Enable-Caching = "{{enable_caching}}";
-    set req.http.X-Opt-Force-Static-Caching = "{{force_cache_static}}";
-    set req.http.X-Opt-Enable-Get-Excludes = "{{enable_get_excludes}}";
-
-    # we test this here instead of inside the url base regex section
-    # so we can disable caching for the entire site if needed
-    if (req.http.X-Opt-Enable-Caching != "true" || req.http.Authorization ||
-            req.http.Cookie ~ "varnish_bypass={{secret_handshake}}") {
-        return (pipe);
-    }
     # check if the request is for part of magento
     if (req.url ~ "{{url_base_regex}}") {
         # set this so Turpentine can see the request passed through Varnish
@@ -191,13 +189,11 @@ sub vcl_recv {
         # this doesn't need a enable_url_excludes because we can be reasonably
         # certain that cron.php at least will always be in it, so it will
         # never be empty
-        if (req.url ~ "{{url_base_regex}}(?:{{url_excludes}})") {
-            return (pipe);
-        }
-        if (req.url ~ "\?.*__from_store=") {
-            # user switched stores. we pipe this instead of passing below because
-            # switching stores doesn't redirect (302), just acts like a link to
-            # another page (200) so the Set-Cookie header would be removed
+        if (req.url ~ "{{url_base_regex}}(?:{{url_excludes}})" ||
+                # user switched stores. we pipe this instead of passing below because
+                # switching stores doesn't redirect (302), just acts like a link to
+                # another page (200) so the Set-Cookie header would be removed
+                req.url ~ "\?.*__from_store=") {
             return (pipe);
         }
         if (req.http.X-Opt-Enable-Get-Excludes == "true" &&
