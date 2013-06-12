@@ -242,9 +242,15 @@ sub vcl_hash {
         # make sure we give back the right encoding
         set req.hash += req.http.Accept-Encoding;
     }
-    # make sure data is for the right store and currency based on the *store*
-    # and *currency* cookies
-    set req.hash += "s=" req.http.X-Varnish-Store "&c=" req.http.X-Varnish-Currency;
+    if (req.http.X-Varnish-Store || req.http.X-Varnish-Currency) {
+        # make sure data is for the right store and currency based on the *store*
+        # and *currency* cookies
+        set req.hash += "s=";
+        set req.hash += req.http.X-Varnish-Store;
+        set req.hash += "&c=";
+        set req.hash += req.http.X-Varnish-Currency;
+    }
+
     if (req.http.X-Varnish-Esi-Access == "private" &&
             req.http.Cookie ~ "frontend=") {
         set req.hash += regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1");
