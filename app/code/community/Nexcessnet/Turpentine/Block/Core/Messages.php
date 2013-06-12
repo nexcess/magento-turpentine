@@ -55,6 +55,7 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
         'customer',
         'review',
         'wishlist',
+        'core',
     );
 
     /**
