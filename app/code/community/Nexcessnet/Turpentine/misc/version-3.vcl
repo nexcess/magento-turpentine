@@ -278,6 +278,16 @@ sub vcl_fetch {
         # we pretty much always want to do this
         set beresp.do_gzip = true;
 
+        # LiteSpeed occasionally just fucks up and doesn't process ESI requests
+        # for some reason, this is an attempt to cover for that
+        if (beresp.http.Server ~ "LiteSpeed" && req.esi_level > 0 &&
+                beresp.status == 404) {
+            if (req.restarts < 5) {
+                return (restart);
+            } else {
+                error 404 "<!-- ESI REQUEST FAILED (LiteSpeed Bug) -->";
+            }
+        }
         if (beresp.status != 200 && beresp.status != 404) {
             # pass anything that isn't a 200 or 404
             set beresp.ttl = {{grace_period}}s;
