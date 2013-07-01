@@ -55,11 +55,6 @@ sub remove_cache_headers {
     unset beresp.http.Age;
 }
 
-sub remove_double_slashes {
-    # remove double slashes from the URL, for higher cache hit rate
-    set req.url = regsub(req.url, "(.*)//+(.*)", "\1/\2");
-}
-
 sub generate_session {
     # generate a UUID and add `frontend=$UUID` to the Cookie header, or use SID
     # from SID URL param
@@ -129,7 +124,8 @@ sub vcl_recv {
         return (pipe);
     }
 
-    call remove_double_slashes;
+    # remove double slashes from the URL, for higher cache hit rate
+    set req.url = regsuball(req.url, "(.*)//+(.*)", "\1/\2");
 
     {{normalize_encoding}}
     {{normalize_user_agent}}
