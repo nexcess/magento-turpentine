@@ -220,7 +220,7 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
                     null, // path
                     null, // domain
                     false, // secure
-                    false ); // httponly
+                    true ); // httponly
                 $adminSession->addSuccess( Mage::helper( 'turpentine/data' )
                     ->__( 'The Varnish bypass cookie has been successfully added.' ) );
             break;
