@@ -36,31 +36,46 @@ if( $debugEnabled ) {
  * @link http://prototypejs.org/doc/latest/ajax/Ajax/Request/index.html
  * @link http://prototypejs.org/doc/latest/dom/Element/replace/index.html
  * @link http://madrobby.github.com/scriptaculous/effect-appear/
+ *
+ * @link http://api.jquery.com/jQuery.ajax/
+ * @link http://api.jquery.com/fadeIn/
  */
-echo sprintf( '<div id="%s" style="display: none">
-<script type="text/javascript">
-new Ajax.Updater(
-    "%s",
-    "%s",
-    {
-        method: "get",
-        evalScripts: true,
-        %s: function(transport) {
-            $("%s").appear({
-                duration: 0.3
-            });
-        }
-    }
-);
-</script>
+$_prototypeFunction = $debugEnabled ? 'onComplete' : 'onSuccess';
+$_jQueryFunction = $debugEnabled ? 'always' : 'done';
+echo <<<HTML
+<div id="$blockTag" style="display: none">
+    <script type="text/javascript">
+        (function() {
+            var blockTag = {$this->helper('core')->jsonEncode($blockTag)}, esiUrl = {$this->helper('core')->jsonEncode($this->getEsiUrl())};
+            if (typeof Ajax === 'object' && typeof Ajax.Updater === 'function') {
+                new Ajax.Updater(
+                    blockTag,
+                    esiUrl,
+                    {
+                        method: "get",
+                        evalScripts: true,
+                        {$_prototypeFunction}: function() {
+                            $(blockTag).appear({
+                                duration: 0.3
+                            });
+                        }
+                    }
+                );
+            } else if (typeof jQuery === 'function') {
+                jQuery.ajax(
+                    {
+                        url: esiUrl,
+                        type: "get",
+                        dataType: "html"
+                    }
+                ).{$_jQueryFunction}(function() {
+                    $(blockTag).fadeIn(300);
+                });
+            }
+        })();
+    </script>
 </div>
-',
-    $blockTag,
-    $blockTag,
-    $this->getEsiUrl(),
-    ( $debugEnabled ? 'onComplete' : 'onSuccess' ),
-    $blockTag
-);
+HTML;
 if( $debugEnabled ) {
     echo sprintf( '<!-- AJAX END [%s] -->', $this->getNameInLayout() ) . PHP_EOL;
 }
