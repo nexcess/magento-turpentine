@@ -125,7 +125,7 @@ class Magento_Packager(object):
         cdir = os.getcwd()
         os.chdir(self._base_dir)
         with open(manifest_filename, 'w') as xml_file:
-            ElementTree.ElementTree(pkg_xml).write(xml_file, 'utf-8')
+            ElementTree.ElementTree(pkg_xml).write(xml_file, 'utf-8', True)
         self._logger.debug('Wrote package XML')
         with tarfile.open(tarball_name, 'w:gz') as tarball:
             for filename in self._file_list:
