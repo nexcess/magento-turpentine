@@ -34,13 +34,20 @@ class Nexcessnet_Turpentine_Model_Dummy_Request extends
      * that information.
      *
      * @param string|Zend_Uri $uri
-     * @return void
-     * @throws Zend_Controller_Request_Exception when invalid URI passed
      */
-    public function __construct( $uri=null ) {
+    public function __construct($uri = null)
+    {
         $this->_initFakeSuperGlobals();
-        $this->_fixupFakeSuperGlobals( $uri );
-        parent::__construct( $uri );
+        $this->_fixupFakeSuperGlobals($uri);
+
+        try {
+            parent::__construct($uri);
+        } catch (Exception $e) {
+            $file = Mage::getStoreConfig('dev/log/exception_file');
+            Mage::log($uri, Zend_Log::DEBUG, $file, true);
+
+            Mage::logException($e);
+        }
     }
 
     /**
@@ -542,7 +549,7 @@ class Nexcessnet_Turpentine_Model_Dummy_Request extends
     /**
      * Check this request against the cms, standard, and default routers to fill
      * the module/controller/action/route fields.
-     * 
+     *
      * TODO: This whole thing is a gigantic hack. Would be nice to have a
      * better solution.
      *
