@@ -280,12 +280,17 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
             implode( '|', array_unique( $productIds ) ) );
         $patterns[] = sprintf( '/review/product/view/id/%d/',
             $review->getEntityId() );
-        $patterns[] = sprintf( '(?:%s)', implode( '|',
-            array_unique( array_map(
-                create_function( '$p',
-                    'return $p->getUrlModel()->formatUrlKey( $p->getName() );' ),
-                $products ) )
-        ) );
+        $productPatterns = array();
+        foreach ( $products as $p ) {
+            $urlKey = $p->getUrlModel()->formatUrlKey( $p->getName() );
+            if ( $urlKey ) {
+                $productPatterns[] = $urlKey;
+            }
+        }
+        if ( !empty($productPatterns) ) {
+            $productPatterns = array_unique( $productPatterns );
+            $patterns[] = sprintf( '(?:%s)', implode( '|', $productPatterns ) );
+        }
         $urlPattern = implode( '|', $patterns );
 
         $result = $this->_getVarnishAdmin()->flushUrl( $urlPattern );

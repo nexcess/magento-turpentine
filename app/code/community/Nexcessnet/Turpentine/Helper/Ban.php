@@ -30,9 +30,16 @@ class Nexcessnet_Turpentine_Helper_Ban extends Mage_Core_Helper_Abstract {
     public function getProductBanRegex( $product ) {
         $urlPatterns = array();
         foreach( $this->getParentProducts( $product ) as $parentProduct ) {
-            $urlPatterns[] = $parentProduct->getUrlKey();
+            if ( $parentProduct->getUrlKey() ) {
+                $urlPatterns[] = $parentProduct->getUrlKey();
+            }
         }
-        $urlPatterns[] = $product->getUrlKey();
+        if ( $product->getUrlKey() ) {
+            $urlPatterns[] = $product->getUrlKey();
+        }
+        if ( empty($urlPatterns) ) {
+            $urlPatterns[] = "##_NEVER_MATCH_##";
+        }
         $pattern = sprintf( '(?:%s)', implode( '|', $urlPatterns ) );
         return $pattern;
     }
