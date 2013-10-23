@@ -41,14 +41,6 @@ C{
 {{debug_acl}}
 
 ## Custom Subroutines
-sub remove_cache_headers {
-    # remove cache headers so we can set our own
-    remove beresp.http.Cache-Control;
-    remove beresp.http.Expires;
-    remove beresp.http.Pragma;
-    remove beresp.http.Cache;
-    remove beresp.http.Age;
-}
 
 sub generate_session {
     # generate a UUID and add `frontend=$UUID` to the Cookie header, or use SID
@@ -285,7 +277,11 @@ sub vcl_fetch {
                 remove beresp.http.Set-Cookie;
             }
             # we'll set our own cache headers if we need them
-            call remove_cache_headers;
+            remove beresp.http.Cache-Control;
+            remove beresp.http.Expires;
+            remove beresp.http.Pragma;
+            remove beresp.http.Cache;
+            remove beresp.http.Age;
 
             if (beresp.http.X-Turpentine-Esi == "1") {
                 esi;

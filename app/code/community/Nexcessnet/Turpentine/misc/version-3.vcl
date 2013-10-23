@@ -46,15 +46,6 @@ import std;
 
 ## Custom Subroutines
 
-sub remove_cache_headers {
-    # remove cache headers so we can set our own
-    unset beresp.http.Cache-Control;
-    unset beresp.http.Expires;
-    unset beresp.http.Pragma;
-    unset beresp.http.Cache;
-    unset beresp.http.Age;
-}
-
 sub generate_session {
     # generate a UUID and add `frontend=$UUID` to the Cookie header, or use SID
     # from SID URL param
@@ -286,7 +277,11 @@ sub vcl_fetch {
                 unset beresp.http.Set-Cookie;
             }
             # we'll set our own cache headers if we need them
-            call remove_cache_headers;
+            unset beresp.http.Cache-Control;
+            unset beresp.http.Expires;
+            unset beresp.http.Pragma;
+            unset beresp.http.Cache;
+            unset beresp.http.Age;
 
             if (beresp.http.X-Turpentine-Esi == "1") {
                 set beresp.do_esi = true;
