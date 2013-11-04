@@ -12,13 +12,13 @@ void generate_uuid(char* buf) {
     long c = lrand48();
     long d = lrand48();
     pthread_mutex_unlock(&lrand_mutex);
-    sprintf(buf, "frontend=%08lx-%04lx-%04lx-%04lx-%04lx%04lx",
+    sprintf(buf, "frontend=%08lx-%04lx-%04lx-%04lx-%04lx%08lx",
         a,
         b & 0xffff,
         (b & ((long)0x0fff0000) >> 16) | 0x4000,
         (c & 0x0fff) | 0x8000,
         (c & (long)0xffff0000) >> 16,
-        d & 0xffff
+        d
     );
     return;
 }
