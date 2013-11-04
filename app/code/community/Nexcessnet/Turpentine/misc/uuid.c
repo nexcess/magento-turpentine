@@ -12,7 +12,7 @@ void generate_uuid(char* buf) {
     long c = lrand48();
     long d = lrand48();
     pthread_mutex_unlock(&lrand_mutex);
-    // SID must match this regex for Kount compat /^\w{1,36}$/
+    // SID must match this regex for Kount compat /^\w{1,32}$/
     sprintf(buf, "frontend=%08lx%04lx%04lx%04lx%04lx%08lx",
         a,
         b & 0xffff,
