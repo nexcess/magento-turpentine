@@ -334,3 +334,4 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   (thanks @ajardin)
   * [#337] Improve layout handle searching for ESI blocks in some cases (thanks
   @sanbornm)
+  * [#356] Fix ESI blocks not rendering child blocks (thanks @magedev)
