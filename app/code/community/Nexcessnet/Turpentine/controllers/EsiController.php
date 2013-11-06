@@ -156,6 +156,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             $esiData->getNameInLayout() ) ) );
         if( $blockNode instanceof Varien_Simplexml_Element ) {
             $nodesToGenerate = Mage::helper( 'turpentine/data' )
+                ->setLayout( $layout )
                 ->getChildBlockNames( $blockNode );
             Mage::getModel( 'turpentine/shim_mage_core_layout' )
                 ->shim_generateFullBlock( $blockNode );
