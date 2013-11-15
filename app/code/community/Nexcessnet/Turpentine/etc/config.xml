@@ -29,6 +29,7 @@
                 <auto_apply_on_save>1</auto_apply_on_save>
                 <varnish_debug>0</varnish_debug>
                 <block_debug>0</block_debug>
+                <flush_debug>0</flush_debug>
                 <ajax_messages>1</ajax_messages>
                 <fix_product_toolbar>0</fix_product_toolbar>
                 <crawler_enable>0</crawler_enable>
