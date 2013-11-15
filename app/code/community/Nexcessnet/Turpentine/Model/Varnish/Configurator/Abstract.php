@@ -549,10 +549,10 @@ if (req.http.User-Agent ~ "iP(?:hone|ad|od)|BlackBerry|Palm|Googlebot-Mobile|Mob
         set req.http.X-Normalized-User-Agent = "msie";
     } else if (req.http.User-Agent ~ "Firefox") {
         set req.http.X-Normalized-User-Agent = "firefox";
-    } else if (req.http.User-Agent ~ "Safari") {
-        set req.http.X-Normalized-User-Agent = "safari";
     } else if (req.http.User-Agent ~ "Chrome") {
         set req.http.X-Normalized-User-Agent = "chrome";
+    } else if (req.http.User-Agent ~ "Safari") {
+        set req.http.X-Normalized-User-Agent = "safari";
     } else if (req.http.User-Agent ~ "Opera") {
         set req.http.X-Normalized-User-Agent = "opera";
     } else {

@@ -213,8 +213,14 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
 
         switch( $type ) {
             case 'default':
-                $cookieModel->set( $cookieName,
-                    Mage::helper( 'turpentine/varnish' )->getSecretHandshake() );
+                $cookieModel->set(
+                    $cookieName,
+                    Mage::helper( 'turpentine/varnish' )->getSecretHandshake(),
+                    null, // period
+                    null, // path
+                    null, // domain
+                    false, // secure
+                    true ); // httponly
                 $adminSession->addSuccess( Mage::helper( 'turpentine/data' )
                     ->__( 'The Varnish bypass cookie has been successfully added.' ) );
             break;

@@ -46,6 +46,7 @@ class Magento_Packager(object):
     BIN_PHP = os.environ.get('TURPENTINE_BIN_PHP', 'php')
     BIN_XMLLINT = os.environ.get('TURPENTINE_BIN_XMLLINT', 'xmllint')
     BIN_BASH = os.environ.get('TURPENTINE_BIN_BASH', 'bash')
+    BIN_GCC = os.environ.get('TURPENTINE_BIN_GCC', 'gcc')
 
     TARGET_DIRS = {
         'magelocal':        'app/code/local',
@@ -77,6 +78,7 @@ class Magento_Packager(object):
             '.xml':     self._xml_syntax_check,
             '.sh':      self._bash_syntax_check,
             '.bash':    self._bash_syntax_check,
+            '.c':       self._gcc_syntax_check,
         }
         def unsupported_syntax_check(filename):
             self._logger.debug('Skipping syntax check for unsupported file: %s',
@@ -125,7 +127,7 @@ class Magento_Packager(object):
         cdir = os.getcwd()
         os.chdir(self._base_dir)
         with open(manifest_filename, 'w') as xml_file:
-            ElementTree.ElementTree(pkg_xml).write(xml_file, 'utf-8')
+            ElementTree.ElementTree(pkg_xml).write(xml_file, 'utf-8', True)
         self._logger.debug('Wrote package XML')
         with tarfile.open(tarball_name, 'w:gz') as tarball:
             for filename in self._file_list:
@@ -322,6 +324,10 @@ class Magento_Packager(object):
     def _bash_syntax_check(self, filename):
         self._logger.debug('Checking Bash syntax for file: %s', filename)
         return self._run_quiet(self.BIN_BASH, '-n', filename)
+
+    def _gcc_syntax_check(self, filename):
+        self._logger.debug('Checking C syntax for file: %s', filename)
+        return self._run_quiet(self.BIN_GCC, '-fsyntax-only', filename)
 
     def _run_quiet(self, *pargs):
         with open('/dev/null', 'w') as dev_null:

@@ -316,3 +316,22 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   the cache (including ESI) for a single *admin* session (thanks to @alexandre-jardin)
   * Varnish will now strip the Google-related parameters from the request to
   increase cache hit-rate
+
+### RELEASE-0.5.5
+
+  * Made VCL templates slightly shorter to help with running into the inline
+  VCL character limit
+  * The `warm-cache.sh` script now respects the `PROC` environment variable for
+  the number of processes to use while warming the cache
+  * [#253] Fixed VCL to correctly identify Chrome on OS X
+  * [#281] Fixed unintentional flushing of full cache in some cases (thanks
+  @jeroenvermeulen)
+  * [#301] Fixed IE caching AJAX ESI includes (thanks @nickbock)
+  * [#320] AJAX ESI should be compatible with themes that use jQuery instead of
+  Prototype (thanks @steverice)
+  * [#334] Bad URIs that cause the dummy request creation to throw an exception
+  will now log the bad URI and hide the exception when debugging is disabled
+  (thanks @ajardin)
+  * [#337] Improve layout handle searching for ESI blocks in some cases (thanks
+  @sanbornm)
+  * [#356] Fix ESI blocks not rendering child blocks (thanks @magedev)

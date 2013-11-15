@@ -19,6 +19,7 @@
 
 SITEMAP_URL="$1"
 TMP_URL_FILE="/tmp/urls_$(cat /proc/sys/kernel/random/uuid).txt"
+PROCS="${PROCS-$(grep processor /proc/cpuinfo | wc -l)}"
 
 echo '<root/>' | xpath -e '*' &>/dev/null
 
@@ -40,8 +41,6 @@ EOF
 
     exit 1
 fi
-
-PROCS=$(grep processor /proc/cpuinfo | wc -l)
 
 echo "Getting URLs from sitemap..."
 

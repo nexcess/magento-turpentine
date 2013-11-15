@@ -292,6 +292,15 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
             foreach( $blockNode->xpath( './block | ./reference' ) as $childBlockNode ) {
                 $blockNames = array_merge( $blockNames,
                     $this->_getChildBlockNames( $childBlockNode ) );
+                if( $this->getLayout() instanceof Varien_Simplexml_Config ) {
+                    foreach( $this->getLayout()->getNode()->xpath( sprintf(
+                        '//reference[@name=\'%s\']', (string)$childBlockNode['name'] ) )
+                            as $childBlockLayoutNode ) {
+                        $blockNames = array_merge( $blockNames,
+                            $this->_getChildBlockNames( $childBlockLayoutNode ) );
+
+                    }
+                }
             }
         } else {
             $blockNames = array();

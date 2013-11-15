@@ -78,24 +78,8 @@
                 ->__('Download the generated VCL file.')?>
         </td>
     </tr>
-    <?php if(Mage::helper( 'turpentine/varnish' )->isBypassEnabled() === false): ?>
-        <tr>
-            <td class="scope-label">
-                <button
-                    onclick="setLocation('<?php echo $this->getSwitchNavigationUrl( 'default' ); ?>')"
-                    type="button"
-                    class="scalable delete">
-                    <span><?php echo Mage::helper( 'turpentine/data' )
-                            ->__('Activate Varnish Bypass') ?></span>
-                </button>
-            </td>
-            <td class="scope-label">
-                <?php echo Mage::helper( 'turpentine/data' )
-                    ->__('Create a cookie to bypass Varnish only for your session.')?>
-            </td>
-        </tr>
-    <?php else: ?>
-        <tr>
+    <tr>
+        <?php if( Mage::helper( 'turpentine/varnish' )->isBypassEnabled() ): ?>
             <td class="scope-label">
                 <button
                     onclick="setLocation('<?php echo $this->getSwitchNavigationUrl( 'varnish' ); ?>')"
@@ -109,8 +93,22 @@
                 <?php echo Mage::helper( 'turpentine/data' )
                     ->__('Remove the bypass cookie and use again Varnish.')?>
             </td>
-        </tr>
-    <?php endif; ?>
+        <?php else: ?>
+            <td class="scope-label">
+                <button
+                    onclick="setLocation('<?php echo $this->getSwitchNavigationUrl( 'default' ); ?>')"
+                    type="button"
+                    class="scalable delete">
+                    <span><?php echo Mage::helper( 'turpentine/data' )
+                            ->__('Activate Varnish Bypass') ?></span>
+                </button>
+            </td>
+            <td class="scope-label">
+                <?php echo Mage::helper( 'turpentine/data' )
+                    ->__('Create a cookie to bypass Varnish only for your session.')?>
+            </td>
+        <?php endif; ?>
+    </tr>
 </table>
 <?php echo $this->getChildHtml(); ?>
 

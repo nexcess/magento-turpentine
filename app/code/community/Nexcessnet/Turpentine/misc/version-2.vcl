@@ -41,19 +41,6 @@ C{
 {{debug_acl}}
 
 ## Custom Subroutines
-sub remove_cache_headers {
-    # remove cache headers so we can set our own
-    remove beresp.http.Cache-Control;
-    remove beresp.http.Expires;
-    remove beresp.http.Pragma;
-    remove beresp.http.Cache;
-    remove beresp.http.Age;
-}
-
-sub remove_double_slashes {
-    # remove double slashes from the URL, for higher cache hit rate
-    set req.url = regsub(req.url, "(.*)//+(.*)", "\1/\2");
-}
 
 sub generate_session {
     # generate a UUID and add `frontend=$UUID` to the Cookie header, or use SID
@@ -127,7 +114,8 @@ sub vcl_recv {
         return (pipe);
     }
 
-    call remove_double_slashes;
+    # remove double slashes from the URL, for higher cache hit rate
+    set req.url = regsuball(req.url, "(.*)//+(.*)", "\1/\2");
 
     {{normalize_encoding}}
     {{normalize_user_agent}}
@@ -289,7 +277,11 @@ sub vcl_fetch {
                 remove beresp.http.Set-Cookie;
             }
             # we'll set our own cache headers if we need them
-            call remove_cache_headers;
+            remove beresp.http.Cache-Control;
+            remove beresp.http.Expires;
+            remove beresp.http.Pragma;
+            remove beresp.http.Cache;
+            remove beresp.http.Age;
 
             if (beresp.http.X-Turpentine-Esi == "1") {
                 esi;
@@ -350,6 +342,9 @@ sub vcl_deliver {
         }
         set resp.http.Set-Cookie = resp.http.Set-Cookie "; HttpOnly";
         remove resp.http.X-Varnish-Cookie-Expires;
+    }
+    if (req.http.X-Varnish-Esi-Method == "ajax" && req.http.X-Varnish-Esi-Access == "private") {
+        set resp.http.Cache-Control = "no-cache";
     }
     set resp.http.X-Opt-Debug-Headers = "{{debug_headers}}";
     if (resp.http.X-Opt-Debug-Headers == "true" || client.ip ~ debug_acl ) {
