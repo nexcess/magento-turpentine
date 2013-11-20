@@ -337,3 +337,5 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   * [#356] Fix ESI blocks not rendering child blocks (thanks @magedev)
   * Changed Varnish-generated session ID format for compatibility with the
   SFC_Kount extension
+  * Failures during advanced registry loading in ESI requests should be handled
+  more gracefully
