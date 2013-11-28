@@ -180,6 +180,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             $dataParam = $esiHelper->getEsiDataParam();
             $methodParam = $esiHelper->getEsiMethodParam();
             $hmacParam = $esiHelper->getEsiHmacParam();
+            $scopeParam = $esiHelper->getEsiScopeParam();
+            $referrerParam = $esiHelper->getEsiReferrerParam();
 
             $esiOptions = $this->_getDefaultEsiOptions( $esiOptions );
 
@@ -211,6 +213,12 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 $urlOptions['_secure'] = Mage::app()->getStore()
                     ->isCurrentlySecure();
             }
+            if( $esiOptions[$scopeParam] == 'page' ) {
+                $urlOptions[$referrerParam]	= Mage::helper('core')->urlEncode(
+                	Mage::getUrl('*/*/*', array('_use_rewrite' => true, '_current'))
+                );
+            }
+            
             $esiUrl = Mage::getUrl( 'turpentine/esi/getBlock', $urlOptions );
             $blockObject->setEsiUrl( $esiUrl );
             // avoid caching the ESI template output to prevent the double-esi-
