@@ -215,7 +215,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             }
             if( $esiOptions[$scopeParam] == 'page' ) {
                 $urlOptions[$referrerParam]	= Mage::helper('core')->urlEncode(
-                	Mage::getUrl('*/*/*', array('_use_rewrite' => true, '_current'))
+                	Mage::getUrl('*/*/*', array('_use_rewrite' => true, '_current' => true))
                 );
             }
             
