@@ -118,6 +118,15 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     public function getEsiHmacParam() {
         return self::ESI_HMAC_PARAM;
     }
+    
+	/** 
+	 * Get referrer param
+	 *
+	 * @return string
+	 */
+	public function getEsiReferrerParam() {
+		return Mage_Core_Controller_Varien_Action::PARAM_NAME_BASE64_URL;
+	}
 
     /**
      * Get whether ESI debugging is enabled or not
