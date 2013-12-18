@@ -43,6 +43,16 @@ class Nexcessnet_Turpentine_Helper_Varnish extends Mage_Core_Helper_Abstract {
     }
 
     /**
+     * Get whether flush logging is enabled or not
+     *
+     * @return bool
+     */
+    public function getFlushDebugEnabled() {
+        return (bool)Mage::getStoreConfig(
+            'turpentine_varnish/general/flush_debug' );
+    }
+
+    /**
      * Check if the request passed through Varnish (has the correct secret
      * handshake header)
      *

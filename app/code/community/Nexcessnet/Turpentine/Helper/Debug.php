@@ -50,6 +50,13 @@ class Nexcessnet_Turpentine_Helper_Debug extends Mage_Core_Helper_Abstract {
                     } else {
                         return;
                     }
+                case 'Flush':
+                    if( Mage::helper( 'turpentine/varnish' )
+                            ->getFlushDebugEnabled() ) {
+                        return $this->_log( Zend_Log::INFO, $message );
+                    } else {
+                        return;
+                    }
                 default:
                     break;
             }
