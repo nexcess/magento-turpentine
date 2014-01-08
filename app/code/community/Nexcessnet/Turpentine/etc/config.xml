@@ -115,6 +115,11 @@
                 </rewrite>
             </core>
             -->
+            <adminhtml>
+                <rewrite>
+                    <cache_grid>Nexcessnet_Turpentine_Block_Adminhtml_Cache_Grid</cache_grid>
+                </rewrite>
+            </adminhtml>
         </blocks>
         <helpers>
             <turpentine>
