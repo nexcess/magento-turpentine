@@ -6,7 +6,7 @@
 
 require_once 'Mage/Adminhtml/controllers/CacheController.php';
 
-class Nexcessnet_Turpentine_CacheController extends Mage_Adminhtml_CacheController
+class Nexcessnet_Turpentine_Adminhtml_CacheController extends Mage_Adminhtml_CacheController
 {
 
     /**
