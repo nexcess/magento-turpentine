@@ -63,6 +63,9 @@ class Nexcessnet_Turpentine_Model_Shim_Mage_Core_App extends Mage_Core_Model_App
         $this->_shim_getConfig()->extend( $eventConfig, true );
         // this wouldn't work if PHP had a sane object model
         $this->_shim_getApp()->_events[$area][$eventName] = null;
+        /* clear the event area cache because by the time this gets executed all <global> events have already been
+           cached in Magento EE 1.11 */
+        $this->_shim_getConfigShim()->unsetEventAreaCache($area);
         return $this;
     }
 
