@@ -57,6 +57,8 @@
  * @method array vcl_show()
  * @method array param_show()
  * @method array param_set()
+ * Warning: ban_url does a non-lurker-friendly ban. This means it is not cleaned
+ *          up from the ban list. A long ban list will slow down Varnish.
  * @method array ban_url()
  * @method array ban()
  * @method array ban_list()
