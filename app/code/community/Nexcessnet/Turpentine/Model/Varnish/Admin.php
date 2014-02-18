@@ -40,6 +40,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
      */
     public function flushUrl( $subPattern ) {
         $result = array();
+        Mage::helper( 'turpentine/debug' )->logFlush( 'flush URL: %s', $subPattern );
         foreach( Mage::helper( 'turpentine/varnish' )->getSockets() as $socket ) {
             $socketName = $socket->getConnectionString();
             try {
@@ -64,6 +65,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
     public function flushExpression() {
         $args = func_get_args();
         $result = array();
+        Mage::helper( 'turpentine/debug' )->logFlush( 'flush expression: %s', implode(' ',$args) );
         foreach( Mage::helper( 'turpentine/varnish' )->getSockets() as $socket ) {
             $socketName = $socket->getConnectionString();
             try {

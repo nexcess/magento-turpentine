@@ -446,6 +446,9 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         $data = implode( ' ', array_merge(
             array( sprintf( '"%s"', $verb ) ),
             $cleanedParams ) );
+        if ( 'ban' === substr( $verb, 0, 3 ) || 'purge' === substr( $verb, 0, 5 ) ) {
+            Mage::helper( 'turpentine/debug' )->logFlush( 'sending socket %s:%s flush command: %s', $this->_host, $this->_port, $data );
+        }
         $response = $this->_write( $data )->_read();
         if( $response['code'] !== $okCode && !is_null( $okCode ) ) {
             Mage::helper( 'turpentine/debug' )->logDebug(
