@@ -217,14 +217,16 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      */
     protected function _getBaseUrlPaths() {
         $paths = array();
+        $linkTypes = array( Mage_Core_Model_Store::URL_TYPE_LINK,
+                            Mage_Core_Model_Store::URL_TYPE_JS,
+                            Mage_Core_Model_Store::URL_TYPE_SKIN,
+                            Mage_Core_Model_Store::URL_TYPE_MEDIA );
         foreach( Mage::app()->getStores() as $store ) {
-            $linkTypes = array( Mage_Core_Model_Store::URL_TYPE_LINK,
-                                Mage_Core_Model_Store::URL_TYPE_JS,
-                                Mage_Core_Model_Store::URL_TYPE_SKIN,
-                                Mage_Core_Model_Store::URL_TYPE_MEDIA );
-            foreach ( $linkTypes as $linkType ) {
-                $paths[] = parse_url( $store->getBaseUrl( $linkType , false ), PHP_URL_PATH );
-                $paths[] = parse_url( $store->getBaseUrl( $linkType , true ), PHP_URL_PATH );
+            foreach( $linkTypes as $linkType ) {
+                $paths[] = parse_url( $store->getBaseUrl( $linkType , false ),
+                    PHP_URL_PATH );
+                $paths[] = parse_url( $store->getBaseUrl( $linkType , true ),
+                    PHP_URL_PATH );
             }
         }
         $paths = array_unique( $paths );
