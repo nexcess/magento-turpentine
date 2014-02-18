@@ -162,9 +162,10 @@ class Nexcessnet_Turpentine_Helper_Varnish extends Mage_Core_Helper_Abstract {
      * @return boolean
      */
     public function isBypassEnabled() {
-        $bypassEnabled = (bool)Mage::getModel( 'core/cookie' )->get(
-                Mage::helper( 'turpentine/data' )->getBypassCookieName() ) ===
-            $this->getSecretHandshake();
+        $cookieName = Mage::helper( 'turpentine/data' )->getBypassCookieName();
+        $cookieValue = Mage::getModel( 'core/cookie' )->get( $cookieName );
+
+        $bypassEnabled = (bool)$cookieValue === (bool)$this->getSecretHandshake();
 
         return $bypassEnabled;
     }
