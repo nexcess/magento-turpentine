@@ -347,3 +347,5 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   * [#391] Added Magento Composer Installer support (thanks @ajardin)
   * [#405] Fixed disabling Varnish bypass (thanks @ajardin)
   * [#438] Implemented ban lurker-friendly bans (thanks @jeroenvermeulen)
+  * [#443] Fixed caching of static assets when the *Add Store Code to Urls* option
+  is enabled (thanks @jeroenvermeulen)
