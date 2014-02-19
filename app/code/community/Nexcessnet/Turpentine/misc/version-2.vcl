@@ -258,6 +258,10 @@ sub vcl_fetch {
     # set the grace period
     set req.grace = {{grace_period}}s;
 
+    # Store the URL in the response object, we need this to do lurker friendly bans later
+    set beresp.http.X-Varnish-Host = req.http.host;
+    set beresp.http.X-Varnish-URL = req.url;
+
     # if it's part of magento...
     if (req.url ~ "{{url_base_regex}}") {
         # we handle the Vary stuff ourselves for now, we'll want to actually
@@ -365,6 +369,8 @@ sub vcl_deliver {
         remove resp.http.X-Turpentine-Flush-Events;
         remove resp.http.X-Turpentine-Block;
         remove resp.http.X-Varnish-Session;
+        remove resp.http.X-Varnish-Host;
+        remove resp.http.X-Varnish-URL;
         # this header indicates the session that originally generated a cached
         # page. it *must* not be sent to a client in production with lax
         # session validation or that session can be hijacked

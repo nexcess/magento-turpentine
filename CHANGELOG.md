@@ -339,3 +339,11 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   SFC_Kount extension
   * Failures during advanced registry loading in ESI requests should be handled
   more gracefully
+
+### RELEASE-0.6.0
+
+  * [#362] Fixed ESI detection for message block (thanks @eth8505)
+  * [#380] Fixed ESI cache flushes not firing in some cases (thanks @gabrielsomoza)
+  * [#391] Added Magento Composer Installer support (thanks @ajardin)
+  * [#405] Fixed disabling Varnish bypass (thanks @ajardin)
+  * [#438] Implemented ban lurker-friendly bans (thanks @jeroenvermeulen)

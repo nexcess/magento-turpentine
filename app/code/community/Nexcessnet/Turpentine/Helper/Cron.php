@@ -162,7 +162,9 @@ class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
             $baseUrl = $store->getBaseUrl( Mage_Core_Model_Store::URL_TYPE_LINK );
             $urls[] = $baseUrl;
             foreach( Mage::getModel( 'catalog/category' )
-                        ->getCollection( $storeId ) as $cat ) {
+                        ->getCollection( $storeId )
+                        ->addIsActiveFilter()
+                            as $cat ) {
                 $urls[] = $cat->getUrl();
                 foreach( $cat->getProductCollection( $storeId )
                             ->addUrlRewrite( $cat->getId() )
