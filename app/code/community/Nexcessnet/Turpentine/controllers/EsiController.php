@@ -70,6 +70,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                     Mage::app()->getStore( $esiData->getStoreId() ) );
                 $appShim = Mage::getModel( 'turpentine/shim_mage_core_app' );
                 if( $referer = $this->_getRefererUrl() ) {
+                    $referer = htmlspecialchars_decode( $referer );
                     $dummyRequest = Mage::helper( 'turpentine/esi' )
                         ->getDummyRequest( $referer );
                 } else {
