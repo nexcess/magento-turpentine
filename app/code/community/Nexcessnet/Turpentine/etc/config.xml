@@ -40,6 +40,18 @@
                 <config_file>{{root_dir}}/var/default.vcl</config_file>
                 <custom_include_file>{{root_dir}}/app/code/community/Nexcessnet/Turpentine/misc/custom_include.vcl</custom_include_file>
             </servers>
+            <miscellaneous>
+                <formkey_fixup_actions><![CDATA[checkout_cart_add
+checkout_cart_addgroup
+checkout_cart_updatepost
+review_product_post
+sendfriend_product_sendmail
+wishlist_index_add
+wishlist_index_update
+wishlist_index_cart
+wishlist_index_send
+catalog_product_compare_add]]></formkey_fixup_actions>
+            </miscellaneous>
         </turpentine_varnish>
         <turpentine_vcl>
             <backend>
@@ -178,6 +190,14 @@
                     </turpentine_varnish_admin_system_config_changed_section_turpentine_vcl>
                 </observers>
             </admin_system_config_changed_section_turpentine_vcl>
+            <controller_action_predispatch>
+                <observers>
+                    <turpentine_varnish_update_formkey_param>
+                        <class>turpentine/observer_varnish</class>
+                        <method>updateFormKeyParam</method>
+                    </turpentine_varnish_update_formkey_param>
+                </observers>
+            </controller_action_predispatch>
 
             <!-- ESI Events -->
             <core_block_abstract_to_html_before>

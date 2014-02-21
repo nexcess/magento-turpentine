@@ -176,4 +176,11 @@ class Nexcessnet_Turpentine_Helper_Varnish extends Mage_Core_Helper_Abstract {
     public function shouldDisplayNotice() {
         return $this->getVarnishEnabled() && $this->isBypassEnabled();
     }
+
+    public function getFormKeyFixupActionsList() {
+        $data = Mage::getStoreConfig(
+            'turpentine_varnish/miscellaneous/formkey_fixup_actions' );
+        $actions = array_filter( explode( PHP_EOL, trim( $data ) ) );
+        return $actions;
+    }
 }
