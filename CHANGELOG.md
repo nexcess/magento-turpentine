@@ -349,3 +349,4 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   * [#438] Implemented ban lurker-friendly bans (thanks @jeroenvermeulen)
   * [#443] Fixed caching of static assets when the *Add Store Code to Urls* option
   is enabled (thanks @jeroenvermeulen)
+  * [#345] Fixed compatibility with Magento CE 1.8 and EE 1.13
