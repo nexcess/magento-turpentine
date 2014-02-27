@@ -2,6 +2,7 @@
 
 app/etc/modules/Nexcessnet_Turpentine.xml       app/etc/modules/Nexcessnet_Turpentine.xml
 app/code/community/Nexcessnet/Turpentine/       app/code/community/Nexcessnet/Turpentine/
+app/code/local/Mage/Core/Model/Session.php      app/code/local/Mage/Core/Model/Session.php
 app/design/adminhtml/default/default/layout/turpentine.xml  app/design/adminhtml/default/default/layout/turpentine.xml
 app/design/adminhtml/default/default/template/turpentine/  app/design/adminhtml/default/default/template/turpentine/
 app/design/frontend/base/default/layout/turpentine_esi.xml   app/design/frontend/base/default/layout/turpentine_esi.xml

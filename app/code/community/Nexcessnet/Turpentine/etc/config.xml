@@ -190,6 +190,7 @@ catalog_product_compare_add]]></formkey_fixup_actions>
                     </turpentine_varnish_admin_system_config_changed_section_turpentine_vcl>
                 </observers>
             </admin_system_config_changed_section_turpentine_vcl>
+            <!--
             <controller_action_predispatch>
                 <observers>
                     <turpentine_varnish_update_formkey_param>
@@ -198,7 +199,7 @@ catalog_product_compare_add]]></formkey_fixup_actions>
                     </turpentine_varnish_update_formkey_param>
                 </observers>
             </controller_action_predispatch>
-
+            -->
             <!-- ESI Events -->
             <core_block_abstract_to_html_before>
                 <observers>
@@ -215,6 +216,10 @@ catalog_product_compare_add]]></formkey_fixup_actions>
                         <class>turpentine/observer_esi</class>
                         <method>setFlagHeaders</method>
                     </turpentine_esi_http_response_send_before>
+                    <turpentine_esi_replace_form_key_placeholder>
+                        <class>turpentine/observer_esi</class>
+                        <method>replaceFormKeyPlaceholder</method>
+                    </turpentine_esi_replace_form_key_placeholder>
                 </observers>
             </http_response_send_before>
             <controller_action_layout_generate_blocks_after>
@@ -257,6 +262,10 @@ catalog_product_compare_add]]></formkey_fixup_actions>
                         <class>turpentine/observer_varnish</class>
                         <method>addProductListToolbarRewrite</method>
                     </turpentine_varnish_controller_front_init_before>
+                    <turpentine_esi_set_replace_form_key_flag>
+                        <class>turpentine/observer_esi</class>
+                        <method>setReplaceFormKeyFlag</method>
+                    </turpentine_esi_set_replace_form_key_flag>
                 </observers>
             </controller_front_init_before>
 

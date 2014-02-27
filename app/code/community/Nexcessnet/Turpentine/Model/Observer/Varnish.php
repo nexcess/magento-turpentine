@@ -102,7 +102,7 @@ class Nexcessnet_Turpentine_Model_Observer_Varnish extends Varien_Event_Observer
      */
     public function updateFormKeyParam( $eventObject ) {
         $helper = Mage::helper( 'turpentine/varnish' );
-        if( $helper->shouldResponseUseVarnish() && $this->_csrfFixupNeeded() ) {
+        if( $helper->shouldResponseUseVarnish() && $helper->csrfFixupNeeded() ) {
             $validActions = $helper->getFormKeyFixupActionsList();
             $action = $eventObject->getEvent()->getControllerAction()
                 ->getFullActionName();
@@ -117,38 +117,5 @@ class Nexcessnet_Turpentine_Model_Observer_Varnish extends Varien_Event_Observer
                 }
             }
         }
-    }
-
-    /**
-     * Check if this is a version of Magento that needs the form_key fix.
-     * Relevant versions are:
-     *
-     *     CE 1.8+
-     *     EE 1.13+
-     *
-     * @return bool
-     */
-    protected function _csrfFixupNeeded() {
-        $result = false;
-        $isEnterprise = false; // ce
-        if( method_exists( 'Mage', 'getEdition' ) ) {
-            if( Mage::getEdition() === Mage::EDITION_ENTERPRISE ) {
-                $isEnterprise = true;
-            }
-        } else {
-            if( Mage::getConfig()->getModuleConfig( 'Enterprise_Enterprise' ) ) {
-                $isEnterprise = true;
-            }
-        }
-        if( $isEnterprise ) {
-            if( version_compare( Mage::getVersion(), '1.13', '>=' ) ) {
-                $result = true;
-            }
-        } else {
-            if( version_compare( Mage::getVersion(), '1.8', '>=' ) ) {
-                $result = true;
-            }
-        }
-        return $result;
     }
 }

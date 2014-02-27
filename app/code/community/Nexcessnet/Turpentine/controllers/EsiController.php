@@ -30,6 +30,17 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         $this->getResponse()->setRedirect( Mage::getBaseUrl() );
     }
 
+    public function getFormKeyAction() {
+        $resp = $this->getResponse();
+        $resp->setBody(
+            Mage::getSingleton( 'core/session' )->real_getFormKey() );
+        $resp->setHeader( 'X-Turpentine-Flush-Events',
+            implode( ',', Mage::helper( 'turpentine/esi' )
+                ->getDefaultCacheClearEvents() ) );
+        $resp->setHeader( 'X-Turpentine-Block', 'form_key' );
+        Mage::register( 'turpentine_nocache_flag', false, true );
+    }
+
     /**
      * Spit out the rendered block from the URL-encoded data
      *
