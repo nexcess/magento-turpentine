@@ -151,8 +151,10 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
     public function setReplaceFormKeyFlag( $eventObject ) {
         $esiHelper = Mage::helper( 'turpentine/esi' );
         $varnishHelper = Mage::helper( 'turpentine/varnish' );
-
-        if( $esiHelper->shouldResponseUseEsi() && $varnishHelper->csrfFixupNeeded() ) {
+        $request = Mage::app()->getRequest();
+        if( $esiHelper->shouldResponseUseEsi() &&
+                $varnishHelper->csrfFixupNeeded() &&
+                !$request->isPost() ) {
             Mage::register( 'replace_form_key', true );
         }
     }
@@ -168,8 +170,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             $esiHelper = Mage::helper( 'turpentine/esi' );
             $response = $eventObject->getResponse();
             $responseBody = $response->getBody();
-            $responseBody = str_replace( '{{replace_form_key}}',
-                $esiHelper->getEsiIncludeFragment(
+            $responseBody = str_replace( '{{form_key_esi_placeholder}}',
+                $esiHelper->buildEsiIncludeFragment(
                     $esiHelper->getFormKeyEsiUrl() ),
                 $responseBody );
             $response->setBody( $responseBody );

@@ -49,7 +49,8 @@ class Mage_Core_Model_Session extends Mage_Core_Model_Session_Abstract
      */
     public function getFormKey()
     {
-        if (Mage::registry('replace_form_key')) {
+        if (Mage::registry('replace_form_key') &&
+                !Mage::app()->getRequest()->getParam('form_key', false)) {
             // flag request for ESI processing
             Mage::register('turpentine_esi_flag', true, true);
             return '{{form_key_esi_placeholder}}';

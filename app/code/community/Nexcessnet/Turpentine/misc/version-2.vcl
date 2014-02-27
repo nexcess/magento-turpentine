@@ -155,6 +155,9 @@ sub vcl_recv {
 
             # varnish 2.1 is buggy with compressed esi content
             remove req.http.Accept-Encoding;
+        } else if (req.url ~ "/turpentine/esi/getFormKey/") {
+            set req.http.X-Varnish-Esi-Method = "esi";
+            set req.http.X-Varnish-Esi-Access = "private";
         }
         # no frontend cookie was sent to us
         if (req.http.Cookie !~ "frontend=") {

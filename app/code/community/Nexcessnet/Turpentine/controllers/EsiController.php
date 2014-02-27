@@ -30,6 +30,11 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         $this->getResponse()->setRedirect( Mage::getBaseUrl() );
     }
 
+    /**
+     * Spit out the form key for this session
+     *
+     * @return null
+     */
     public function getFormKeyAction() {
         $resp = $this->getResponse();
         $resp->setBody(
@@ -39,6 +44,9 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 ->getDefaultCacheClearEvents() ) );
         $resp->setHeader( 'X-Turpentine-Block', 'form_key' );
         Mage::register( 'turpentine_nocache_flag', false, true );
+
+        Mage::helper( 'turpentine/debug' )->logDebug( 'Generated form_key: %s',
+            $resp->getBody() );
     }
 
     /**

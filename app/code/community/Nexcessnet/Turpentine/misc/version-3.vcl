@@ -152,6 +152,9 @@ sub vcl_recv {
                     !({{debug_headers}} || client.ip ~ debug_acl)) {
                 error 403 "External ESI requests are not allowed";
             }
+        } elseif (req.url ~ "/turpentine/esi/getFormKey/") {
+            set req.http.X-Varnish-Esi-Method = "esi";
+            set req.http.X-Varnish-Esi-Access = "private";
         }
         # no frontend cookie was sent to us
         if (req.http.Cookie !~ "frontend=") {
