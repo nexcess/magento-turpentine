@@ -92,30 +92,4 @@ class Nexcessnet_Turpentine_Model_Observer_Varnish extends Varien_Event_Observer
             }
         }
     }
-
-    /**
-     * Replace the form_key URL (and form) param value with the session's correct
-     * value
-     *
-     * @param  mixed $eventObject
-     * @return null
-     */
-    public function updateFormKeyParam( $eventObject ) {
-        $helper = Mage::helper( 'turpentine/varnish' );
-        if( $helper->shouldResponseUseVarnish() && $helper->csrfFixupNeeded() ) {
-            $validActions = $helper->getFormKeyFixupActionsList();
-            $action = $eventObject->getEvent()->getControllerAction()
-                ->getFullActionName();
-            if( in_array( $action, $validActions ) ) {
-                $formKey = Mage::getSingleton( 'core/session' )->getFormKey();
-                $request = Mage::app()->getRequest();
-                Mage::helper( 'turpentine/debug' )->logDebug(
-                    'Action [%s] valid for CSRF fixup, setting form_key to: %s',
-                    $action, $formKey );
-                if( $request->getParam( Mage_Core_Model_Url::FORM_KEY, null ) !== null ) {
-                    $request->setParam( Mage_Core_Model_Url::FORM_KEY, $formKey );
-                }
-            }
-        }
-    }
 }
