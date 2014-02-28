@@ -139,7 +139,7 @@ sub vcl_recv {
                 req.http.Cookie, ".*\bstore=([^;]*).*", "\1");
         }
         # looks like an ESI request, add some extra vars for further processing
-        if (req.url ~ "/turpentine/esi/getBlock/") {
+        if (req.url ~ "/turpentine/esi/get(?:Block|FormKey)/") {
             set req.http.X-Varnish-Esi-Method = regsub(
                 req.url, ".*/{{esi_method_param}}/(\w+)/.*", "\1");
             set req.http.X-Varnish-Esi-Access = regsub(
@@ -155,9 +155,6 @@ sub vcl_recv {
 
             # varnish 2.1 is buggy with compressed esi content
             remove req.http.Accept-Encoding;
-        } else if (req.url ~ "/turpentine/esi/getFormKey/") {
-            set req.http.X-Varnish-Esi-Method = "esi";
-            set req.http.X-Varnish-Esi-Access = "private";
         }
         # no frontend cookie was sent to us
         if (req.http.Cookie !~ "frontend=") {

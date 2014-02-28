@@ -351,7 +351,13 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return string
      */
     public function getFormKeyEsiUrl() {
-        return Mage::getUrl( 'turpentine/esi/getFormKey' );
+        $urlOptions = array(
+            $this->getEsiTtlParam()         => $this->getDefaultEsiTtl(),
+            $this->getEsiMethodParam()      => 'esi',
+            $this->getEsiScopeParam()       => 'global',
+            $this->getEsiCacheTypeParam()   => 'private',
+        );
+        return Mage::getUrl( 'turpentine/esi/getFormKey', $urlOptions );
     }
 
     /**

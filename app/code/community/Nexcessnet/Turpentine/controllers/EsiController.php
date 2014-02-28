@@ -39,6 +39,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         $resp = $this->getResponse();
         $resp->setBody(
             Mage::getSingleton( 'core/session' )->real_getFormKey() );
+        $resp->setHeader( 'X-Turpentine-Cache', '1' );
         $resp->setHeader( 'X-Turpentine-Flush-Events',
             implode( ',', Mage::helper( 'turpentine/esi' )
                 ->getDefaultCacheClearEvents() ) );
