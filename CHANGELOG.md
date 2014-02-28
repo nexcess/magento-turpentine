@@ -342,6 +342,9 @@ This is the first release of Turpentine marked "stable" in Magento Connect
 
 ### RELEASE-0.6.0
 
+This release *requires* a small addition to Varnish's configuration when used with
+Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess/magento-turpentine/wiki/FAQ#wiki-i-upgraded-to-turpentine-06-and-are-the-add-to-cart-buttons-look-broken)
+
   * [#362] Fixed ESI detection for message block (thanks @eth8505)
   * [#380] Fixed ESI cache flushes not firing in some cases (thanks @gabrielsomoza)
   * [#391] Added Magento Composer Installer support (thanks @ajardin)

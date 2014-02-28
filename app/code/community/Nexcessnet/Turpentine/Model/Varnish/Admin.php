@@ -21,6 +21,9 @@
 
 class Nexcessnet_Turpentine_Model_Varnish_Admin {
 
+    const MASK_ESI_SYNTAX       = 0x2;
+    const URL_ESI_SYNTAX_FIX    = 'https://github.com/nexcess/magento-turpentine/wiki/FAQ#wiki-i-upgraded-to-turpentine-06-and-are-the-add-to-cart-buttons-look-broken';
+
     /**
      * Flush all Magento URLs in Varnish cache
      *
@@ -106,6 +109,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
                 $vclName = Mage::helper( 'turpentine/data' )
                     ->secureHash( microtime() );
                 try {
+                    $this->_testEsiSyntaxParam( $socket );
                     $socket->vcl_inline( $vclName, $vcl );
                     sleep( 1 ); //this is probably not really needed
                     $socket->vcl_use( $vclName );
@@ -128,5 +132,36 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
         $sockets = Mage::helper( 'turpentine/varnish' )->getSockets();
         $cfgr = Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract::getFromSocket( $sockets[0] );
         return $cfgr;
+    }
+
+    protected function _testEsiSyntaxParam( $socket ) {
+        $session = Mage::getSingleton( 'adminhtml/session' );
+        $helper = Mage::helper( 'turpentine/varnish' );
+        $result = false;
+
+        if( $helper->csrfFixupNeeded() ) {
+            $value = $socket->param_show( 'esi_syntax' );
+            if( preg_match( '~(\d)\s+\[bitmap\]~', $value['text'], $match ) ) {
+                $value = hexdec( $match[1] );
+                if( $value & self::MASK_ESI_SYNTAX ) { //bitwise intentional
+                    // setting is correct, all is fine
+                    $result = true;
+                } else {
+                    $session->addWarning( 'Varnish <em>esi_syntax</em> param is ' .
+                        'not set correctly, please see <a target="_blank" href="' .
+                        self::URL_ESI_SYNTAX_FIX . '">these instructions</a> ' .
+                        'to fix this warning.' );
+                }
+            } else {
+                // error
+                Mage::helper( 'turpentine/debug' )->logWarning(
+                    'Failed to parse param.show output to check esi_syntax value' );
+                $result = true;
+            }
+        } else {
+            $result = true;
+        }
+
+        return $result;
     }
 }
