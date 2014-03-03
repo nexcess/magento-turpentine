@@ -60,6 +60,7 @@
    <contents>
       <target>
          <target>magecommunity</target>
+         <target>magelocal</target>
          <target>magedesign</target>
          <target>magedesign</target>
          <target>magedesign</target>
@@ -68,6 +69,7 @@
       </target>
       <path>
          <path>Nexcessnet/Turpentine</path>
+         <path>Mage/Core/Model/Session.php</path>
          <path>adminhtml/default/default/layout/turpentine.xml</path>
          <path>adminhtml/default/default/template/turpentine</path>
          <path>frontend/base/default/layout/turpentine_esi.xml</path>
@@ -77,6 +79,7 @@
       <type>
          <type>dir</type>
          <type>file</type>
+         <type>file</type>
          <type>dir</type>
          <type>file</type>
          <type>dir</type>
@@ -85,12 +88,14 @@
       <include>
          <include>~.*~</include>
          <include/>
+         <include/>
          <include>~.*~</include>
          <include/>
          <include>~.*~</include>
          <include/>
       </include>
       <ignore>
+         <ignore/>
          <ignore/>
          <ignore/>
          <ignore/>
