@@ -173,12 +173,27 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         Mage::getSingleton( 'core/design_package' )
             ->setPackageName( $esiData->getDesignPackage() )
             ->setTheme( $esiData->getDesignTheme() );
+
+        // dispatch event for adding handles to layout update
+        Mage::dispatchEvent(
+            'controller_action_layout_load_before',
+            array('action'=>$this, 'layout'=>$layout)
+        );
+
         $layoutUpdate = $layout->getUpdate();
         $layoutUpdate->load( $this->_swapCustomerHandles(
             $esiData->getLayoutHandles() ) );
         foreach( $esiData->getDummyBlocks() as $blockName ) {
             $layout->createBlock( 'Mage_Core_Block_Template', $blockName );
         }
+
+        if(!$this->getFlag('', self::FLAG_NO_DISPATCH_BLOCK_EVENT)) {
+            Mage::dispatchEvent(
+                'controller_action_layout_generate_xml_before',
+                array('action'=>$this, 'layout'=>$layout)
+            );
+        }
+
         $layout->generateXml();
         $blockNode = current( $layout->getNode()->xpath( sprintf(
             '//block[@name=\'%s\']',
@@ -189,11 +204,25 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 ->getChildBlockNames( $blockNode );
             Mage::getModel( 'turpentine/shim_mage_core_layout' )
                 ->shim_generateFullBlock( $blockNode );
+
+            // dispatch event for adding xml layout elements
+            if(!$this->getFlag('', self::FLAG_NO_DISPATCH_BLOCK_EVENT)) {
+                Mage::dispatchEvent(
+                    'controller_action_layout_generate_blocks_before',
+                    array('action'=>$this, 'layout'=>$layout)
+                );
+            }
             foreach( $nodesToGenerate as $nodeName ) {
                 foreach( $layout->getNode()->xpath( sprintf(
                         '//reference[@name=\'%s\']', $nodeName ) ) as $node ) {
                     $layout->generateBlocks( $node );
                 }
+            }
+            if(!$this->getFlag('', self::FLAG_NO_DISPATCH_BLOCK_EVENT)) {
+                Mage::dispatchEvent(
+                    'controller_action_layout_generate_blocks_after',
+                    array('action'=>$this, 'layout'=>$layout)
+                );
             }
             $block = $layout->getBlock( $esiData->getNameInLayout() );
         } else {
@@ -201,6 +230,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 'No block node found with @name="%s"',
                 $esiData->getNameInLayout() );
         }
+        $this->_isLayoutLoaded = true;
         Varien_Profiler::stop( 'turpentine::controller::esi::_getEsiBlock' );
         return $block;
     }
