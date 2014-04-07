@@ -9,23 +9,36 @@ class Nexcessnet_Turpentine_Block_Adminhtml_Cache_Grid extends Mage_Adminhtml_Bl
 {
 
     /**
-     * Decorate status column values
-     *
-     * @return string
+     * Prepare grid collection
      */
-    public function decorateStatus($value, $row, $column, $isExport)
+    protected function _prepareCollection()
     {
-        $class = '';
-        if (isset($this->_invalidatedTypes[$row->getId()])) {
-            $cell = '<span class="grid-severity-minor"><span id="cache_type_'.$row->getId().'">'.$this->__('Invalidated').'</span></span>';
-        } else {
-            if ($row->getStatus()) {
-                $cell = '<span class="grid-severity-notice"><span id="cache_type_'.$row->getId().'">'.$value.'</span></span>';
-            } else {
-                $cell = '<span class="grid-severity-critical"><span id="cache_type_'.$row->getId().'">'.$value.'</span></span>';
+        parent::_prepareCollection();
+        $collection = $this->getCollection();
+        $turpentineEnabled = false;
+        $fullPageEnabled = false;
+        foreach ($collection as $key=>$item)
+        {
+            if($item->getStatus()==1 && ($item->getId()=='turpentine_pages' || $item->getId()=='turpentine_esi_blocks'))
+            {
+                $turpentineEnabled = true;
+            }
+            if($item->getStatus()==1 && $item->getId()=='full_page')
+            {
+                $fullPageEnabled = true;
             }
         }
-        return $cell;
+        if($turpentineEnabled)
+        {
+            $collection->removeItemByKey('full_page');
+        }
+        if($fullPageEnabled)
+        {
+            $collection->removeItemByKey('turpentine_pages');
+            $collection->removeItemByKey('turpentine_esi_blocks');
+        }
+        $this->setCollection($collection);
+        return $this;
     }
 
 }

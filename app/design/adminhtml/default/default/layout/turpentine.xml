@@ -19,9 +19,6 @@
 -->
 <layout version="0.1.0">
     <adminhtml_cache_index>
-        <reference name="head">
-            <action method="addItem"><type>skin_js</type><name>turpentine/cache-fix.js</name><params/></action>
-        </reference>
         <reference name="content">
             <block type="turpentine/management"
                 name="turpentine_management"
