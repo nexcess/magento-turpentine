@@ -149,7 +149,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
      * Generate the ESI block
      *
      * @param  Varien_Object $esiData
-     * @return Mage_Core_Block_Template
+     * @return Mage_Core_Block_Template|null
      */
     protected function _getEsiBlock( $esiData ) {
         $block = null;
@@ -193,43 +193,65 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 array('action'=>$this, 'layout'=>$layout)
             );
         }
-
         $layout->generateXml();
-        $blockNode = current( $layout->getNode()->xpath( sprintf(
-            '//block[@name=\'%s\']',
-            $esiData->getNameInLayout() ) ) );
-        if( $blockNode instanceof Varien_Simplexml_Element ) {
-            $nodesToGenerate = Mage::helper( 'turpentine/data' )
-                ->setLayout( $layout )
-                ->getChildBlockNames( $blockNode );
-            Mage::getModel( 'turpentine/shim_mage_core_layout' )
-                ->shim_generateFullBlock( $blockNode );
 
-            // dispatch event for adding xml layout elements
-            if(!$this->getFlag('', self::FLAG_NO_DISPATCH_BLOCK_EVENT)) {
-                Mage::dispatchEvent(
-                    'controller_action_layout_generate_blocks_before',
-                    array('action'=>$this, 'layout'=>$layout)
-                );
-            }
-            foreach( $nodesToGenerate as $nodeName ) {
-                foreach( $layout->getNode()->xpath( sprintf(
-                        '//reference[@name=\'%s\']', $nodeName ) ) as $node ) {
-                    $layout->generateBlocks( $node );
+        /** @var Nexcessnet_Turpentine_Helper_Data $turpentineHelper */
+        $turpentineHelper = Mage::helper( 'turpentine/data' )
+            ->setLayout( $layout );
+
+        $blockNode = current( $layout->getNode()->xpath(
+                sprintf('//block[@name=\'%s\']',$esiData->getNameInLayout())
+            ) );
+
+        if( ! ($blockNode instanceof Mage_Core_Model_Layout_Element) ) {
+            Mage::helper( 'turpentine/debug' )->logWarn(
+                            'No block node found with @name="%s"',
+                            $esiData->getNameInLayout() );
+            return null;
+        }
+
+        $nodesToGenerate = $turpentineHelper->getChildBlockNames( $blockNode );
+        Mage::getModel( 'turpentine/shim_mage_core_layout' )
+            ->shim_generateFullBlock( $blockNode );
+
+        //find addional blocks that aren't defined in the <block/> but via <reference name="%s">
+        $referenceNodes = $layout->getNode()->xpath( sprintf(
+            '//reference[@name=\'%s\']',
+            $esiData->getNameInLayout() ) );
+        if ($referenceNodes) {
+            foreach ($referenceNodes as $referenceNode) {
+                if ($referenceNode instanceof Mage_Core_Model_Layout_Element) {
+                    $referencesToGenerate = $turpentineHelper
+                        ->getChildBlockNames( $referenceNode );
+                    $nodesToGenerate =
+                        array_merge($nodesToGenerate, $referencesToGenerate);
                 }
             }
-            if(!$this->getFlag('', self::FLAG_NO_DISPATCH_BLOCK_EVENT)) {
-                Mage::dispatchEvent(
-                    'controller_action_layout_generate_blocks_after',
-                    array('action'=>$this, 'layout'=>$layout)
-                );
-            }
-            $block = $layout->getBlock( $esiData->getNameInLayout() );
-        } else {
-            Mage::helper( 'turpentine/debug' )->logWarn(
-                'No block node found with @name="%s"',
-                $esiData->getNameInLayout() );
         }
+
+        // dispatch event for adding xml layout elements
+        if(!$this->getFlag('', self::FLAG_NO_DISPATCH_BLOCK_EVENT)) {
+            Mage::dispatchEvent(
+                'controller_action_layout_generate_blocks_before',
+                array('action'=>$this, 'layout'=>$layout)
+            );
+        }
+
+        foreach( array_unique($nodesToGenerate) as $nodeName ) {
+            foreach( $layout->getNode()->xpath( sprintf(
+                    '//reference[@name=\'%s\']', $nodeName ) ) as $node ) {
+                $layout->generateBlocks( $node );
+            }
+        }
+        $block = $layout->getBlock( $esiData->getNameInLayout() );
+
+        if(!$this->getFlag('', self::FLAG_NO_DISPATCH_BLOCK_EVENT)) {
+            Mage::dispatchEvent(
+                'controller_action_layout_generate_blocks_after',
+                array('action'=>$this, 'layout'=>$layout)
+            );
+        }
+
         $this->_isLayoutLoaded = true;
         Varien_Profiler::stop( 'turpentine::controller::esi::_getEsiBlock' );
         return $block;
