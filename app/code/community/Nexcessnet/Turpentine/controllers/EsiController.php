@@ -173,11 +173,25 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         Mage::getSingleton( 'core/design_package' )
             ->setPackageName( $esiData->getDesignPackage() )
             ->setTheme( $esiData->getDesignTheme() );
+
+        // dispatch event for adding handles to layout update
+        Mage::dispatchEvent(
+            'controller_action_layout_load_before',
+            array('action'=>$this, 'layout'=>$layout)
+        );
+
         $layoutUpdate = $layout->getUpdate();
         $layoutUpdate->load( $this->_swapCustomerHandles(
             $esiData->getLayoutHandles() ) );
         foreach( $esiData->getDummyBlocks() as $blockName ) {
             $layout->createBlock( 'Mage_Core_Block_Template', $blockName );
+        }
+
+        if(!$this->getFlag('', self::FLAG_NO_DISPATCH_BLOCK_EVENT)) {
+            Mage::dispatchEvent(
+                'controller_action_layout_generate_xml_before',
+                array('action'=>$this, 'layout'=>$layout)
+            );
         }
         $layout->generateXml();
 
