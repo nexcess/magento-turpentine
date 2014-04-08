@@ -99,13 +99,14 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
      */
     public function applyConfig() {
         $result = array();
+	    $helper = Mage::helper( 'turpentine' );
         foreach( Mage::helper( 'turpentine/varnish' )->getSockets() as $socket ) {
             $cfgr = Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract::getFromSocket( $socket );
             $socketName = $socket->getConnectionString();
             if( is_null( $cfgr ) ) {
                 $result[$socketName] = 'Failed to load configurator';
             } else {
-                $vcl = $cfgr->generate();
+                $vcl = $cfgr->generate( $helper->shouldStripVclWhitespace('apply') );
                 $vclName = Mage::helper( 'turpentine/data' )
                     ->secureHash( microtime() );
                 try {
