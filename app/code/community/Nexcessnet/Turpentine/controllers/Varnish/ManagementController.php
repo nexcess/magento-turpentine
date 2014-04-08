@@ -157,7 +157,8 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
         } else {
             Mage::dispatchEvent( 'turpentine_varnish_save_config',
                 array( 'cfgr' => $cfgr ) );
-            $result = $cfgr->save( $cfgr->generate() );
+            $result = $cfgr->save( $cfgr->generate(
+	            Mage::helper('turpentine')->shouldStripVclWhitespace('save') ) );
             if( $result[0] ) {
                 $this->_getSession()
                     ->addSuccess( Mage::helper('turpentine')
@@ -183,7 +184,8 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
             $this->_getSession()->addError( $this->__( 'Failed to load configurator' ) );
             $this->_redirect( '*/cache' );
         } else {
-            $vcl = $cfgr->generate();
+            $vcl = $cfgr->generate(
+	            Mage::helper( 'turpentine' )->shouldStripVclWhitespace('download') );
             $this->getResponse()
                 ->setHttpResponseCode( 200 )
                 ->setHeader( 'Content-Type', 'text/plain', true )

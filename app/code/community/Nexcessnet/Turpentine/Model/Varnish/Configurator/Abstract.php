@@ -71,7 +71,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
         $this->_options = array_merge( $this->_options, $options );
     }
 
-    abstract public function generate();
+    abstract public function generate($doClean=true);
     // abstract protected function _getTemplateVars();
 
     /**
