@@ -126,6 +126,11 @@
             <turpentine>
                 <class>Nexcessnet_Turpentine_Model</class>
             </turpentine>
+            <core>
+                <rewrite>
+                    <session>Nexcessnet_Turpentine_Model_Core_Session</session>
+                </rewrite>
+            </core>
         </models>
         <cache>
             <types>
