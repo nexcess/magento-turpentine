@@ -470,6 +470,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
             case '2.1':
                 $command = str_replace( 'ban', 'purge', $command );
                 break;
+	        case '4.0':
             case '3.0':
                 $command = str_replace( 'purge', 'ban', $command );
                 break;
