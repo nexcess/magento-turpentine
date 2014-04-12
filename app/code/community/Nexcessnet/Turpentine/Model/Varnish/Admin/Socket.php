@@ -85,9 +85,15 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
     const CLI_CMD_LENGTH_LIMIT  = 8192;
 
     /**
+     * Regexp to detect the varnish version number
+     * @var string
+     */
+    const REGEXP_VARNISH_VERSION = '/^varnish\-(?P<vmajor>\d)\.(?P<vminor>\d)\.(?P<vsub>\d) revision (?P<vhash>[0-9a-f]+)$/';
+
+    /**
      * VCL config versions, should match config select values
      */
-    static protected $_VERSIONS = array( '2.1', '3.0' );
+    static protected $_VERSIONS = array( '2.1', '3.0', '4.0' );
 
     /**
      * Varnish socket connection
@@ -257,8 +263,8 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
      * @return string
      */
     public function getVersion() {
-        if( is_null( $this->_version ) ) {
-            $this->_version = $this->_determineVersion();
+        if ( !$this->isConnected() ) {
+            $this->_connect();
         }
         return $this->_version;
     }
@@ -331,13 +337,31 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
             $challenge = substr( $banner['text'], 0, 32 );
             $response = hash( 'sha256', sprintf( "%s\n%s%s\n", $challenge,
                 $this->_authSecret, $challenge ) );
-            $this->_command( 'auth', self::CODE_OK, $response );
+            $banner = $this->_command( 'auth', self::CODE_OK, $response );
         } else if( $banner['code'] !== self::CODE_OK ) {
             Mage::throwException( 'Varnish admin authentication failed: ' .
                 $banner['text'] );
         }
 
+        $this->_version = $this->_determineVersion($banner['text']);
+
         return $this->isConnected();
+    }
+
+    protected function _determineVersion($bannerText) {
+        $bannerText = array_filter(explode("\n", $bannerText));
+        if ( count($bannerText)<6 ) {
+            // Varnish 2.0 does not spit out a banner on connect
+            Mage::throwException('Varnish versions before 2.1 are not supported');
+        }
+        if ( count($bannerText)<7 ) {
+            // Varnish before 3.0 does not spit out a version number
+            return '2.1';
+        } elseif ( preg_match(self::REGEXP_VARNISH_VERSION, $bannerText[4], $matches)===1 ) {
+            return $matches['vmajor'] . '.' . $matches['vminor'];
+        } else {
+            Mage::throwException('Unable to detect varnish version');
+        }
     }
 
     /**
@@ -479,22 +503,5 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
                     $this->_version );
         }
         return $command;
-    }
-
-    /**
-     * Guess the Varnish version based on the availability of the 'banner' command
-     *
-     * @return string
-     */
-    protected function _determineVersion() {
-        $resp = $this->_write( 'help' )->_read();
-        if( strpos( $resp['text'], 'ban.url' ) !== false ) {
-            return '3.0';
-        } elseif( strpos( $resp['text'], 'purge.url' ) !== false &&
-                strpos( $resp['text'], 'banner' ) ) {
-            return '2.1';
-        } else {
-            Mage::throwException( 'Unable to determine instance version' );
-        }
     }
 }
