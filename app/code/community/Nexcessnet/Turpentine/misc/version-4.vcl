@@ -129,7 +129,7 @@ sub vcl_recv {
         set req.http.X-Turpentine-Secret-Handshake = "{{secret_handshake}}";
         # use the special admin backend and pipe if it's for the admin section
         if (req.url ~ "{{url_base_regex}}{{admin_frontname}}") {
-            set req.backend = admin;
+            set req.backend_hint = admin;
             return (pipe);
         }
         if (req.http.Cookie ~ "\bcurrency=") {
