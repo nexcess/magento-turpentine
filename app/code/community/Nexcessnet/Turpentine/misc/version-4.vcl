@@ -323,7 +323,7 @@ sub vcl_backend_response {
                         # this is probably faster than bothering with 0 ttl
                         # cache objects
                         set beresp.ttl = {{grace_period}}s;
-                        set beresp.uncacheabl = true;
+                        set beresp.uncacheable = true;
                         return (deliver);
                     }
                 } else {
