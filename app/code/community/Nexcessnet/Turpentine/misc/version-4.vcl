@@ -305,9 +305,9 @@ sub vcl_backend_response {
                 } elseif (bereq.http.X-Varnish-Esi-Method) {
                     # it's a ESI request
                     if (bereq.http.X-Varnish-Esi-Access == "private" &&
-                            req.http.Cookie ~ "frontend=") {
+                            bereq.http.Cookie ~ "frontend=") {
                         # set this header so we can ban by session from Turpentine
-                        set beresp.http.X-Varnish-Session = regsub(req.http.Cookie,
+                        set beresp.http.X-Varnish-Session = regsub(bereq.http.Cookie,
                             "^.*?frontend=([^;]*);*.*$", "\1");
                     }
                     if (bereq.http.X-Varnish-Esi-Method == "ajax" &&
