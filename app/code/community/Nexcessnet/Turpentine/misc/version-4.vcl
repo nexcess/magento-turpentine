@@ -258,8 +258,8 @@ sub vcl_backend_response {
     set beresp.grace = {{grace_period}}s;
 
     # Store the URL in the response object, to be able to do lurker friendly bans later
-    set beresp.http.X-Varnish-Host = req.http.host;
-    set beresp.http.X-Varnish-URL = req.url;
+    set beresp.http.X-Varnish-Host = bereq.http.host;
+    set beresp.http.X-Varnish-URL = bereq.url;
 
     # if it's part of magento...
     if (bereq.url ~ "{{url_base_regex}}") {
