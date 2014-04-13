@@ -238,7 +238,7 @@ sub vcl_hash {
         {{advanced_session_validation}}
 
     }
-    return (hash);
+    return (lookup);
 }
 
 sub vcl_hit {
