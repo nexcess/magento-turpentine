@@ -255,7 +255,7 @@ sub vcl_hit {
 
 sub vcl_backend_response {
     # set the grace period
-    set req.grace = {{grace_period}}s;
+    set beresp.grace = {{grace_period}}s;
 
     # Store the URL in the response object, to be able to do lurker friendly bans later
     set beresp.http.X-Varnish-Host = req.http.host;
