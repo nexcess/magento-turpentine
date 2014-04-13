@@ -57,8 +57,10 @@ sub generate_session {
         C{
             char uuid_buf [50];
             generate_uuid(uuid_buf);
-            VRT_SetHdr(sp, HDR_REQ,
-                "\030X-Varnish-Faked-Session:",
+	        static const struct gethdr_s VGC_HDR_REQ_VARNISH_FAKED_SESSION =
+            { HDR_REQ, "\030X-Varnish-Faked-Session:"};
+            VRT_SetHdr(ctx,
+                &VGC_HDR_REQ_VARNISH_FAKED_SESSION,
                 uuid_buf,
                 vrt_magic_string_end
             );
@@ -86,8 +88,10 @@ sub generate_session_expires {
         mktime(&now_tm);
         char date_buf [50];
         strftime(date_buf, sizeof(date_buf)-1, "%a, %d-%b-%Y %H:%M:%S %Z", &now_tm);
-        VRT_SetHdr(sp, HDR_RESP,
-            "\031X-Varnish-Cookie-Expires:",
+	    static const struct gethdr_s VGC_HDR_RESP_COOKIE_EXPIRES =
+        { HDR_RESP, "\031X-Varnish-Cookie-Expires:"};
+        VRT_SetHdr(ctx,
+            &VGC_HDR_RESP_COOKIE_EXPIRES,
             date_buf,
             vrt_magic_string_end
         );
