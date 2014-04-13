@@ -170,7 +170,7 @@ sub vcl_recv {
             # don't need cookies for static assets
             unset req.http.Cookie;
             unset req.http.X-Varnish-Faked-Session;
-            return (lookup);
+            return (hash);
         }
         # this doesn't need a enable_url_excludes because we can be reasonably
         # certain that cron.php at least will always be in it, so it will
