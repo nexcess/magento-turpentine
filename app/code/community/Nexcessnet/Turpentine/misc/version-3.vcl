@@ -154,7 +154,7 @@ sub vcl_recv {
             }
         }
         # no frontend cookie was sent to us
-        if (req.http.Cookie !~ "frontend=") {
+        if (req.http.Cookie !~ "frontend=" && !req.http.X-Varnish-Esi-Method) {
             if (client.ip ~ crawler_acl ||
                     req.http.User-Agent ~ "^(?:{{crawler_user_agent_regex}})$") {
                 # it's a crawler, give it a fake cookie
