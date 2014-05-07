@@ -256,7 +256,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 );
             }
 
-            $esiUrl = Mage::getUrl( 'turpentine/esi/getBlock', $urlOptions );
+            $esiUrl = $esiHelper->unsecureUrl(Mage::getUrl( 'turpentine/esi/getBlock', $urlOptions ));
             $blockObject->setEsiUrl( $esiUrl );
             // avoid caching the ESI template output to prevent the double-esi-
             // include/"ESI processing not enabled" bug
