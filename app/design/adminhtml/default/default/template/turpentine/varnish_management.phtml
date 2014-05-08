@@ -119,12 +119,12 @@
                     <span><?php echo Mage::helper( 'turpentine/data' )
                                 ->__('Flush matching URLs') ?></span>
                 </button>
-                <input id="pattern" name="pattern" type="text" style="width: 395px; margin-left: 5px;" class="required-entry" value="" />
+                <input id="pattern" name="pattern" type="text" style="width: 295px; margin-left: 5px;" class="required-entry" value="" />
             </form>
             <script type="text/javascript">
                 var partialUrlForm = new varienForm('partial_url_form');
                 new Varien.searchForm('partial_url_form', 'pattern', '<?php echo Mage::helper( 'turpentine/data' )
-                        ->__('Flush URLs matching the given (relative) regex')?>');
+                        ->__('Enter a (relative) regex to flush matching URLs')?>');
             </script>
         </td>
     </tr>
