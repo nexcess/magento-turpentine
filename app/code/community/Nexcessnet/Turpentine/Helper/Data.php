@@ -270,6 +270,32 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
             'turpentine_varnish/general/auto_apply_on_save' );
     }
 
+	/**
+	 * Get config value specifying when to strip VCL whitespaces
+	 *
+	 * @return string
+	 */
+	public function getStripVclWhitespace() {
+		return Mage::getStoreConfig(
+			'turpentine_varnish/general/strip_vcl_whitespace' );
+	}
+
+	/**
+	 * Check if VCL whitespaces should be stripped for the given action
+	 *
+	 * @param string $action can be either "apply", "save" or "download"
+	 * @return bool
+	 */
+	public function shouldStripVclWhitespace($action) {
+		$configValue = $this->getStripVclWhitespace();
+		if ( $configValue==='always' ) {
+			return true;
+		} elseif ( $configValue==='apply' && $action==='apply' ) {
+			return true;
+		}
+		return false;
+	}
+
     /**
      * Get the cookie name for the Varnish bypass
      *
