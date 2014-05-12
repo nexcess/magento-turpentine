@@ -145,7 +145,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
                 $paramName = 'feature';
                 $value = $socket->param_show( $paramName );
                 $value = explode("\n", $value['text']);
-                if ( isset($value[1]) && strpos($value[1], '+esi_disable_xml_check')!==false ) {
+                if ( isset($value[1]) && strpos($value[1], '+esi_ignore_other_elements')!==false ) {
                     $result = true;
                 } else {
                     $session->addWarning( 'Varnish <em>feature</em> param is ' .
