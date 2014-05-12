@@ -338,7 +338,9 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
             $response = hash( 'sha256', sprintf( "%s\n%s%s\n", $challenge,
                 $this->_authSecret, $challenge ) );
             $banner = $this->_command( 'auth', self::CODE_OK, $response );
-        } else if( $banner['code'] !== self::CODE_OK ) {
+        }
+
+        if( $banner['code'] !== self::CODE_OK ) {
             Mage::throwException( 'Varnish admin authentication failed: ' .
                 $banner['text'] );
         }
