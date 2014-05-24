@@ -21,6 +21,8 @@
 
 class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
 
+    protected $pageActionHandles = array();
+
     /**
      * Check the ESI flag and set the ESI header if needed
      *
@@ -340,59 +342,31 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
     }
 
     /**
-     * Get the active layout handles for this block and any child blocks
+     * Save page active handles in order to pass it to the URL
      *
-     * This is probably kind of slow since it uses a bunch of xpath searches
-     * but this was the easiest way to get the info needed. Should be a target
-     * for future optimization
+     * @param $observer
+     */
+    public function beforeLoadLayout( $observer ) {
+        $this->pageActionHandles = $observer->getLayout()->getUpdate()->getHandles();
+    }
+
+    /**
+     * Get page active layout handles
      *
-     * There is an issue with encoding the used handles in the URL, if the used
-     * handles change (ex customer logs in), the cached version of the page will
-     * still have the old handles encoded in it's ESI url. This can lead to
-     * weirdness like the "Log in" link displaying for already logged in
-     * visitors on pages that were initially visited by not-logged-in visitors.
-     * Not sure of a solution for this yet.
-     *
-     * Above problem is currently solved by EsiController::_swapCustomerHandles()
-     * but it would be best to find a more general solution to this.
+     * Returns only main page handles added by controller class, the rest of handles will be added by
+     * controller_action_layout_load_before event subscribers
      *
      * @param  Mage_Core_Block_Template $block
      * @return array
      */
     protected function _getBlockLayoutHandles( $block ) {
-        Varien_Profiler::start( 'turpentine::observer::esi::_getBlockLayoutHandles' );
-        $layout = $block->getLayout();
-        $layoutXml = Mage::helper( 'turpentine/esi' )->getLayoutXml();
-        $activeHandles = array();
-        // get the xml node representing the block we're working on (from the
-        // default handle probably)
-        $blockNode = current( $layout->getNode()->xpath( sprintf(
-            '//block[@name=\'%s\']',
-            $block->getNameInLayout() ) ) );
-        $childBlocks = Mage::helper( 'turpentine/data' )
-            ->getChildBlockNames( $blockNode );
-        foreach( $childBlocks as $blockName ) {
-            foreach( $layout->getUpdate()->getHandles() as $handle ) {
-                // check if this handle has any block or reference tags that
-                // refer to this block or a child block, unless the handle name
-                // is blank
-                if( $handle !== '' &&
-                    $layoutXml->xpath( sprintf(
-                        '//%s//*[@name=\'%s\']', $handle, $blockName ) ) ) {
-                    $activeHandles[] = $handle;
-                }
-            }
-        }
-        if( !$activeHandles ) {
-            $activeHandles[] = 'default';
-        }
-        Varien_Profiler::stop( 'turpentine::observer::esi::_getBlockLayoutHandles' );
-        return array_unique( $activeHandles );
+        return $this->pageActionHandles ?: $block->getLayout()->getUpdate()->getHandles();
     }
 
     /**
      * Get the default ESI options
      *
+     * @param $options
      * @return array
      */
     protected function _getDefaultEsiOptions( $options ) {
