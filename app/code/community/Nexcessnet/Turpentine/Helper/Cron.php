@@ -146,6 +146,15 @@ class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
     }
 
     /**
+     * Get if "crawl all URLs on empty queue" is enabled
+     *
+     * @return bool
+     */
+    public function getCrawlerAllUrlsEnabled() {
+        return Mage::getStoreConfig( 'turpentine_varnish/general/crawler_all_urls' );
+    }
+
+    /**
      * Get the list of all URLs
      *
      * @return array
@@ -259,7 +268,7 @@ class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
             // cache flush (or the queue is corrupt)
             // Returning an empty array here would be the proper behavior,
             // but causes the queue to not be saved on the full cache flush event
-            return $this->getAllUrls();
+            return ( $this->getCrawlerAllUrlsEnabled() ) ? $this->getAllUrls() : array();
         } else {
             return $readQueue;
         }

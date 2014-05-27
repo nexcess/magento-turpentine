@@ -34,6 +34,7 @@
                 <fix_product_toolbar>0</fix_product_toolbar>
                 <crawler_enable>0</crawler_enable>
                 <crawler_debug>0</crawler_debug>
+                <crawler_all_urls>1</crawler_all_urls>
             </general>
             <servers>
                 <version>auto</version>
