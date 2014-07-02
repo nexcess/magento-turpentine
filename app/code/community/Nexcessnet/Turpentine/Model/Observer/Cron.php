@@ -69,7 +69,7 @@ class Nexcessnet_Turpentine_Model_Observer_Cron extends Varien_Event_Observer {
      */
     public function queueAllUrls( $eventObject ) {
         $helper = Mage::helper( 'turpentine/cron' );
-        if( $helper->getCrawlerEnabled() ) {
+        if( $helper->getCrawlerEnabled() && $helper->getCrawlerAllUrlsEnabled() ) {
             $helper->addUrlsToCrawlerQueue( $helper->getAllUrls() );
         }
     }
