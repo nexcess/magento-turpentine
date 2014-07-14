@@ -20,7 +20,7 @@
 ## Custom C Code
 
 C{
-    # @source app/code/community/Nexcessnet/Turpentine/misc/uuid.c
+    // @source app/code/community/Nexcessnet/Turpentine/misc/uuid.c
     {{custom_c_code}}
 }C
 

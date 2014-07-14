@@ -25,5 +25,10 @@ class Nexcessnet_Turpentine_Block_Catalog_Product_List_Toolbar extends
     public function _construct() {
         parent::_construct();
         $this->disableParamsMemorizing();
+        // Remove params that may have been memorized before this fix was active.
+        Mage::getSingleton('catalog/session')->unsSortOrder();
+        Mage::getSingleton('catalog/session')->unsSortDirection();
+        Mage::getSingleton('catalog/session')->unsDisplayMode();
+        Mage::getSingleton('catalog/session')->unsLimitPage();
     }
 }
