@@ -106,6 +106,14 @@ sub vcl_recv {
         }
     }
 
+    # Normalize request data before potentially sending things off to the
+    # backend. This ensures all request types get the same information, most
+    # notably POST requests getting a normalized user agent string to empower
+    # adaptive designs.
+    {{normalize_encoding}}
+    {{normalize_user_agent}}
+    {{normalize_host}}
+
     # We only deal with GET and HEAD by default
     # we test this here instead of inside the url base regex section
     # so we can disable caching for the entire site if needed
@@ -117,10 +125,6 @@ sub vcl_recv {
 
     # remove double slashes from the URL, for higher cache hit rate
     set req.url = regsuball(req.url, "(.*)//+(.*)", "\1/\2");
-
-    {{normalize_encoding}}
-    {{normalize_user_agent}}
-    {{normalize_host}}
 
     # check if the request is for part of magento
     if (req.url ~ "{{url_base_regex}}") {
