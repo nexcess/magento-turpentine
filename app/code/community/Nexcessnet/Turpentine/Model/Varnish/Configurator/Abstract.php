@@ -267,10 +267,14 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             'first_byte_timeout'    => $timeout . 's',
             'between_bytes_timeout' => $timeout . 's',
         );
-        return $this->_vcl_backend( 'default',
-            Mage::getStoreConfig( 'turpentine_vcl/backend/backend_host' ),
-            Mage::getStoreConfig( 'turpentine_vcl/backend/backend_port' ),
-            $default_options );
+        if ( Mage::getStoreConfigFlag( 'turpentine_vcl/backend/loadbalancing' ) ) {
+            return $this->_vcl_director( 'default', $default_options );
+        } else {
+            return $this->_vcl_backend( 'default',
+                Mage::getStoreConfig( 'turpentine_vcl/backend/backend_host' ),
+                Mage::getStoreConfig( 'turpentine_vcl/backend/backend_port' ),
+                $default_options );
+        }
     }
 
     /**
@@ -284,10 +288,14 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             'first_byte_timeout'    => $timeout . 's',
             'between_bytes_timeout' => $timeout . 's',
         );
-        return $this->_vcl_backend( 'admin',
-            Mage::getStoreConfig( 'turpentine_vcl/backend/backend_host' ),
-            Mage::getStoreConfig( 'turpentine_vcl/backend/backend_port' ),
-            $admin_options );
+        if ( Mage::getStoreConfigFlag( 'turpentine_vcl/backend/loadbalancing' ) ) {
+            return $this->_vcl_director( 'admin', $admin_options );
+        } else {
+            return $this->_vcl_backend( 'admin',
+                Mage::getStoreConfig( 'turpentine_vcl/backend/backend_host' ),
+                Mage::getStoreConfig( 'turpentine_vcl/backend/backend_port' ),
+                $admin_options );
+        }
     }
 
     /**
@@ -514,6 +522,99 @@ EOS;
         }
         $str .= '}' . PHP_EOL;
         return $str;
+    }
+
+    /**
+     * Format a VCL director declaration
+     *
+     * @param $name name of the director
+     * @param $backendOptions options for each backend
+     * @return string
+     */
+    protected function _vcl_director( $name, $backendOptions ) {
+        $tpl = <<<EOS
+director {{name}} round-robin {
+{{backends}}
+}
+EOS;
+        $backendNodes = Mage::helper( 'turpentine/data' )->cleanExplode( PHP_EOL,
+            Mage::getStoreConfig( 'turpentine_vcl/backend/backend_nodes' ) );
+        $backends = '';
+        foreach ( $backendNodes as $backendNode ) {
+            $parts = explode( ':', $backendNode, 2 );
+            $host = ( empty($parts[0]) ) ? '127.0.0.1' : $parts[0] ;
+            $port = ( empty($parts[1]) ) ? '80' : $parts[1];
+            $backends .= $this->_vcl_director_backend( $host, $port, $backendOptions );
+        }
+        $vars = array(
+            'name' => $name,
+            'backends' => $backends
+        );
+        return $this->_formatTemplate( $tpl, $vars );
+    }
+
+    /**
+     * Format a VCL backend declaration to put inside director
+     *
+     * @param $host backend host
+     * @param $port backend port
+     * @param array $options extra options for backend
+     * @return string
+     */
+    protected function _vcl_director_backend( $host, $port, $options=array() ) {
+        $tpl = <<<EOS
+    {
+        .backend = {
+            .host = "{{host}}";
+            .port = "{{port}}";
+{{probe}}
+
+EOS;
+        $vars = array(
+            'host'  => $host,
+            'port'  => $port,
+            'probe' => ''
+        );
+        $probeUrl = Mage::getStoreConfig( 'turpentine_vcl/backend/backend_check_url' );
+        if ( !empty( $probeUrl ) ) {
+            $vars['probe'] = $this->_vcl_get_probe( $probeUrl );
+        }
+        $str = $this->_formatTemplate( $tpl, $vars );
+        foreach( $options as $key => $value ) {
+            $str .= sprintf( '            .%s = %s;', $key, $value ) . PHP_EOL;
+        }
+        $str .= <<<EOS
+        }
+    }
+EOS;
+        return $str;
+    }
+
+    /**
+     * Format a VCL probe declaration to put in backend which is in in director
+     *
+     * @param $probeUrl URL to check
+     * @return string
+     */
+    protected function _vcl_get_probe( $probeUrl ) {
+        $urlParts = parse_url( $probeUrl );
+        if ( empty( $urlParts ) ) {
+            return '';
+        } else {
+            $tpl = <<<EOS
+            .probe = {
+                .request =
+                    "GET {{probe_path}} HTTP/1.1"
+                    "Host: {{probe_host}}"
+                    "Connection: close";
+            }
+EOS;
+            $vars = array(
+                'probe_host' => $urlParts['host'],
+                'probe_path' => $urlParts['path']
+            );
+            return $this->_formatTemplate( $tpl, $vars );
+        }
     }
 
     /**

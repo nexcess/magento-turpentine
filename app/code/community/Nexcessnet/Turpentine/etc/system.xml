@@ -198,6 +198,16 @@
                     <show_in_website>0</show_in_website>
                     <show_in_store>0</show_in_store>
                     <fields>
+                        <loadbalancing translate="label" module="turpentine">
+                            <label>Load Balancing</label>
+                            <comment>Enable if you want to use multiple backend hosts</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>turpentine/config_select_toggle</source_model>
+                            <sort_order>05</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </loadbalancing>
                         <backend_host translate="label" module="turpentine">
                             <label>Backend Host</label>
                             <frontend_type>text</frontend_type>
@@ -205,16 +215,46 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
+                            <depends>
+                                <loadbalancing>0</loadbalancing>
+                            </depends>
                         </backend_host>
                         <backend_port translate="label" module="turpentine">
                             <label>Backend Port</label>
                             <frontend_type>text</frontend_type>
                             <validate>validate-greater-than-zero</validate>
+                            <sort_order>15</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <loadbalancing>0</loadbalancing>
+                            </depends>
+                        </backend_port>
+                        <backend_nodes translate="label" module="turpentine">
+                            <label>Backend Web Server List</label>
+                            <frontend_type>textarea</frontend_type>
+                            <comment>Should be a list of HOST:PORT pairs of the Backend Web Servers, one per line</comment>
                             <sort_order>20</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                        </backend_port>
+                            <depends>
+                                <loadbalancing>1</loadbalancing>
+                            </depends>
+                        </backend_nodes>
+                        <backend_check_url translate="label" module="turpentine">
+                            <label>Backend Check URL</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>URL where Varnish can check if a node is available</comment>
+                            <sort_order>25</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <loadbalancing>1</loadbalancing>
+                            </depends>
+                        </backend_check_url>
                         <frontend_timeout translate="label" module="turpentine">
                             <label>Frontend Timeout</label>
                             <frontend_type>text</frontend_type>
