@@ -502,6 +502,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @param  string $name name of the backend
      * @param  string $host backend host
      * @param  string $port backend port
+     * @param  array $options extra options for backend
      * @return string
      */
     protected function _vcl_backend( $name, $host, $port, $options=array() ) {
@@ -525,10 +526,10 @@ EOS;
     }
 
     /**
-     * Format a VCL director declaration
+     * Format a VCL director declaration, for load balancing
      *
-     * @param $name name of the director
-     * @param $backendOptions options for each backend
+     * @param string $name - name of the director
+     * @param array $backendOptions - extra options for each backend
      * @return string
      */
     protected function _vcl_director( $name, $backendOptions ) {
@@ -542,7 +543,7 @@ EOS;
         $backends = '';
         foreach ( $backendNodes as $backendNode ) {
             $parts = explode( ':', $backendNode, 2 );
-            $host = ( empty($parts[0]) ) ? '127.0.0.1' : $parts[0] ;
+            $host = ( empty($parts[0]) ) ? '127.0.0.1' : $parts[0];
             $port = ( empty($parts[1]) ) ? '80' : $parts[1];
             $backends .= $this->_vcl_director_backend( $host, $port, $backendOptions );
         }
@@ -556,9 +557,9 @@ EOS;
     /**
      * Format a VCL backend declaration to put inside director
      *
-     * @param $host backend host
-     * @param $port backend port
-     * @param array $options extra options for backend
+     * @param string $host - backend host
+     * @param string $port - backend port
+     * @param array $options - extra options for backend
      * @return string
      */
     protected function _vcl_director_backend( $host, $port, $options=array() ) {
@@ -591,14 +592,15 @@ EOS;
     }
 
     /**
-     * Format a VCL probe declaration to put in backend which is in in director
+     * Format a VCL probe declaration to put in backend which is in director
      *
-     * @param $probeUrl URL to check
+     * @param string $probeUrl - URL to check if backend is up
      * @return string
      */
     protected function _vcl_get_probe( $probeUrl ) {
         $urlParts = parse_url( $probeUrl );
         if ( empty( $urlParts ) ) {
+            // Malformed URL
             return '';
         } else {
             $tpl = <<<EOS
