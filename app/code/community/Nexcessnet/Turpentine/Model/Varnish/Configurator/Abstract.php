@@ -490,9 +490,10 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     /**
      * Format a VCL backend declaration
      *
-     * @param  string $name name of the backend
-     * @param  string $host backend host
-     * @param  string $port backend port
+     * @param  string $name    name of the backend
+     * @param  string $host    backend host
+     * @param  string $port    backend port
+     * @param  array  $options options
      * @return string
      */
     protected function _vcl_backend( $name, $host, $port, $options=array() ) {
@@ -580,7 +581,7 @@ if (req.http.Accept-Encoding) {
         } else if (req.http.Accept-Encoding ~ "deflate") {
             set req.http.Accept-Encoding = "deflate";
         } else {
-            # unkown algorithm
+            # unknown algorithm
             unset req.http.Accept-Encoding;
         }
     }
