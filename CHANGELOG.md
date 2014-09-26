@@ -353,3 +353,22 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#443] Fixed caching of static assets when the *Add Store Code to Urls* option
   is enabled (thanks @jeroenvermeulen)
   * [#345] Fixed compatibility with Magento CE 1.8 and EE 1.13
+
+### RELEASE-0.6.1
+
+  * [#471] Fixed `addMessage()` in messages block (@arosenhagen)
+  * [#445] Update `Cron.php` for compatibility with MageWorx_XSitemap (@evensisftw)
+  * [#474] Add ESI decoder utility (@jeroenvermeulen)
+  * [#485] Trigger layout events when rendering ESI blocks (@eth8505)
+  * [#490] Fix missing ESI blocks when they are defined in a reference instead
+  of a block (@paales)
+  * [#472] Added `<only_cache_if>` ESI parameter for caching flash message
+  blocks (@jeroenvermeulen)
+  * [#494] Added option to control the stripping of whitespace from generated
+  VCLs (@eth8505)
+  * [#549] Enabling the `fix_product_toolbar` option now clears previously set
+  view preferences (@jeroenvermeulen)
+  * [#529] Added decoding of the referrer to the ESI decoder
+  utility (@jeroenvermeulen)
+  * [#536] Allow `//` (double slash) comments in VCL files and strip them when
+  trimming whitespace (@eth8505)
