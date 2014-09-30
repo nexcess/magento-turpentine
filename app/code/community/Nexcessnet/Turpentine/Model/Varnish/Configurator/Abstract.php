@@ -483,8 +483,8 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      */
     protected function _cleanVclHelper( $line ) {
         return $line &&
-            ( substr( $line, 0, 1 ) != '#' ||
-            substr( $line, 0, 2 ) != '//' ||
+            ( ( substr( $line, 0, 1 ) != '#' &&
+            substr( $line, 0, 2 ) != '//' ) ||
             substr( $line, 0, 8 ) == '#include' );
     }
 
