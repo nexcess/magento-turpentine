@@ -114,8 +114,9 @@ sub vcl_recv {
         return (pipe);
     }
 
-    # remove double slashes from the URL, for higher cache hit rate
-    set req.url = regsuball(req.url, "(.*)//+(.*)", "\1/\2");
+    # replace two or more sequential slashes in the url (before the query string)
+    # with a single slash, for a higher cache hit rate (url is used for hash)
+    set req.url = regsuball(req.url, "([^\?]*)//+(.*)", "\1/\2");
 
     {{normalize_encoding}}
     {{normalize_user_agent}}
