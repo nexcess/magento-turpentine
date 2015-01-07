@@ -1,7 +1,7 @@
 {
     "name": "nexcess/magento-turpentine",
     "type": "magento-module",
-    "license": "GPLv2+",
+    "license": "GPL-2.0+",
     "description": "A Varnish extension for Magento.",
     "homepage": "http://www.magentocommerce.com/magento-connect/2984.html",
     "authors": [
