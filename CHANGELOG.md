@@ -375,4 +375,5 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
 
 ### RELEASE-0.6.2
 
-  * [#635] Fixed typos (@pborelli)    
+  * [#635] Fixed typos (@pborelli)  
+  * [#668] Replace short open tag (@XnS)  
