@@ -372,3 +372,7 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   utility (@jeroenvermeulen)
   * [#536] Allow `//` (double slash) comments in VCL files and strip them when
   trimming whitespace (@eth8505)
+
+### RELEASE-0.6.2
+
+  * [#635] Fixed typos (@pborelli)    
