@@ -110,7 +110,7 @@ sub vcl_recv {
     # we test this here instead of inside the url base regex section
     # so we can disable caching for the entire site if needed
     if (!{{enable_caching}} || req.http.Authorization ||
-        req.request !~ "^(GET|HEAD)$" ||
+        req.request !~ "^(GET|HEAD|OPTIONS)$" ||
         req.http.Cookie ~ "varnish_bypass={{secret_handshake}}") {
         return (pipe);
     }

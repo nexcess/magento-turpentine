@@ -378,4 +378,5 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#635] Fixed typos (@pborelli)  
   * [#668] Replace short open tag (@XnS)
   * [#721] Fix license according to SPDX (@ihor-sviziev)
+  * [#740] Do not return pipe for OPTIONS straight away (@ashsmith)
     
