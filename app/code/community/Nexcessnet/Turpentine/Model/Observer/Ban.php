@@ -218,6 +218,34 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
     }
 
     /**
+     * Ban a specific CMS page revision from cache after edit (enterprise edition only)
+     * Events:
+     *     enterprise_cms_revision_save_commit_after
+     *
+     * @param Varien_Object $eventObject
+     * @return null
+     */
+    public function banCmsPageRevisionCache($eventObject) {
+        if ( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
+            $pageId = $eventObject->getDataObject()->getPageId();
+            $page = Mage::getModel( 'cms/page' )->load( $pageId );
+
+            // Don't do anything if the page isn't found.
+            if( !$page ) {
+                return;
+            }
+            $pageIdentifier = $page->getIdentifier();
+            $result = $this->_getVarnishAdmin()->flushUrl( $pageIdentifier . '(?:\.html?)?$' );
+            Mage::dispatchEvent( 'turpentine_ban_cms_page_cache', $result );
+            $cronHelper = Mage::helper( 'turpentine/cron' );
+            if( $this->_checkResult( $result ) &&
+                $cronHelper->getCrawlerEnabled() ) {
+                $cronHelper->addCmsPageToCrawlerQueue( $pageIdentifier );
+            }
+        }
+    }
+
+    /**
      * Do a full cache flush, corresponds to "Flush Magento Cache" and
      * "Flush Cache Storage" buttons in admin > cache management
      *

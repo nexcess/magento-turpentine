@@ -311,6 +311,15 @@
                     </turpentine_varnish_cms_page_save_commit_after>
                 </observers>
             </cms_page_save_commit_after>
+            <enterprise_cms_revision_save_commit_after>
+                <observers>
+                    <turpentine_varnish_enterprise_cms_revision_save_commit_after>
+                        <class>turpentine/observer_ban</class>
+                        <method>banCmsPageRevisionCache</method>
+                        <type>singleton</type>
+                    </turpentine_varnish_enterprise_cms_revision_save_commit_after>
+                </observers>
+            </enterprise_cms_revision_save_commit_after>
             <adminhtml_cache_flush_system>
                 <observers>
                     <turpentine_varnish_adminhtml_cache_flush_system>
