@@ -382,3 +382,4 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#598] Ensure POST request gets normalized data (@melvyn-sopacua)
   * [#739] Ban CMS Page after a CMS Revision has been updated (@ashsmith)
   * Added fix for community poll problems
+  * [#516] Fixes multiple sessions generated on first page visit (@jharrisonau)
