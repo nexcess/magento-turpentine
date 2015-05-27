@@ -116,6 +116,15 @@
                 </rewrite>
             </core>
             -->
+            <!--
+            Rewrite the poll ActivePoll block, as it uses its own custom 
+            template setting methods.
+            -->
+            <poll>
+                <rewrite>
+                    <activePoll>Nexcessnet_Turpentine_Block_Poll_ActivePoll</activePoll>
+                </rewrite>
+            </poll>
         </blocks>
         <helpers>
             <turpentine>
