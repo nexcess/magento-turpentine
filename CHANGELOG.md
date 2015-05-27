@@ -381,4 +381,4 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#740] Do not return pipe for OPTIONS straight away (@ashsmith)
   * [#598] Ensure POST request gets normalized data (@melvyn-sopacua)
   * [#739] Ban CMS Page after a CMS Revision has been updated (@ashsmith)
-    
+  * Added fix for community poll problems
