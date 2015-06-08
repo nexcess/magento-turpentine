@@ -384,3 +384,5 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * Added fix for community poll problems
   * [#516] Fixes multiple sessions generated on first page visit (@jharrisonau)
   * [#796] Ignore additional GET Parameters in Varnish Cache via Configuration (@thampe)
+  * [#626] Fix for dummy blocks not working (@jeroenvermeulen)
+  
