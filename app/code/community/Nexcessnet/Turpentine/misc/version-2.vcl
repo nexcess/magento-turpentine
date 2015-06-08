@@ -192,11 +192,12 @@ sub vcl_recv {
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
             return (pass);
         }
-        if (req.url ~ "[?&](utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=") {
-            # Strip out Google related parameters
-            set req.url = regsuball(req.url, "(?:(\?)?|&)(?:utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=[^&]+", "\1");
+        if ({{enable_get_ignored}} && req.url ~ "[?&]({{get_param_ignored}})=") {
+            # Strip out ignored GET related parameters
+            set req.url = regsuball(req.url, "(?:(\?)?|&)(?:{{get_param_ignored}})=[^&]+", "\1");
             set req.url = regsuball(req.url, "(?:(\?)&|\?$)", "\1");
         }
+        
 
         return (lookup);
     }

@@ -322,6 +322,14 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             Mage::getStoreConfig( 'turpentine_vcl/params/get_params' ) ) );
     }
 
+    protected function _getIgnoreGetParameters()
+    {
+        /** @var Nexcessnet_Turpentine_Helper_Data $helper */
+        $helper = Mage::helper('turpentine');
+        $ignoredParameters = $helper->cleanExplode(',', Mage::getStoreConfig( 'turpentine_vcl/params/ignore_get_params'));
+        return implode( '|',  $ignoredParameters);
+    }
+
     /**
      * Get the Force Static Caching option
      *
@@ -619,8 +627,10 @@ EOS;
             'url_base_regex'    => $this->getBaseUrlPathRegex(),
             'url_excludes'  => $this->_getUrlExcludes(),
             'get_param_excludes'    => $this->_getGetParamExcludes(),
+            'get_param_ignored' => $this->_getIgnoreGetParameters(),
             'default_ttl'   => $this->_getDefaultTtl(),
             'enable_get_excludes'   => ($this->_getGetParamExcludes() ? 'true' : 'false'),
+            'enable_get_ignored' => ($this->_getIgnoreGetParameters()) ? 'true' : 'false',
             'debug_headers' => $this->_getEnableDebugHeaders(),
             'grace_period'  => $this->_getGracePeriod(),
             'force_cache_static'    => $this->_getForceCacheStatic(),
