@@ -372,3 +372,17 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   utility (@jeroenvermeulen)
   * [#536] Allow `//` (double slash) comments in VCL files and strip them when
   trimming whitespace (@eth8505)
+
+### RELEASE-0.6.2
+
+  * [#635] Fixed typos (@pborelli)  
+  * [#668] Replace short open tag (@XnS)
+  * [#721] Fix license according to SPDX (@ihor-sviziev)
+  * [#740] Do not return pipe for OPTIONS straight away (@ashsmith)
+  * [#598] Ensure POST request gets normalized data (@melvyn-sopacua)
+  * [#739] Ban CMS Page after a CMS Revision has been updated (@ashsmith)
+  * Added fix for community poll problems
+  * [#516] Fixes multiple sessions generated on first page visit (@jharrisonau)
+  * [#796] Ignore additional GET Parameters in Varnish Cache via Configuration (@thampe)
+  * [#626] Fix for dummy blocks not working (@jeroenvermeulen)
+  * [#719) Replace connect20/nexcessnet_turpentine package in composer.json (@ihor-sviziev)

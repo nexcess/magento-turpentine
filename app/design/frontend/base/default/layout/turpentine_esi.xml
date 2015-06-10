@@ -96,6 +96,7 @@
             <action method="setEsiOptions">
                 <params>
                     <access>private</access>
+                    <method>ajax</method>
                     <flush_events>
                         <poll_vote_add/>
                     </flush_events>
