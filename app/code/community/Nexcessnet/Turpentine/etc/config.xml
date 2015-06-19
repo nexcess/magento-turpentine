@@ -20,7 +20,7 @@
 <config>
     <modules>
         <Nexcessnet_Turpentine>
-            <version>0.6.0</version>
+            <version>0.6.2</version>
         </Nexcessnet_Turpentine>
     </modules>
     <default>
@@ -69,6 +69,7 @@
             </urls>
             <params>
                 <get_params>__SID,XDEBUG_PROFILE</get_params>
+                <ignore_get_params>utm_source,utm_medium,utm_campaign,utm_content,utm_term,gclid,cx,ie,cof,siteurl</ignore_get_params>
             </params>
             <static>
                 <force_static>1</force_static>
@@ -116,6 +117,15 @@
                 </rewrite>
             </core>
             -->
+            <!--
+            Rewrite the poll ActivePoll block, as it uses its own custom 
+            template setting methods.
+            -->
+            <poll>
+                <rewrite>
+                    <activePoll>Nexcessnet_Turpentine_Block_Poll_ActivePoll</activePoll>
+                </rewrite>
+            </poll>
         </blocks>
         <helpers>
             <turpentine>
@@ -311,6 +321,15 @@
                     </turpentine_varnish_cms_page_save_commit_after>
                 </observers>
             </cms_page_save_commit_after>
+            <enterprise_cms_revision_save_commit_after>
+                <observers>
+                    <turpentine_varnish_enterprise_cms_revision_save_commit_after>
+                        <class>turpentine/observer_ban</class>
+                        <method>banCmsPageRevisionCache</method>
+                        <type>singleton</type>
+                    </turpentine_varnish_enterprise_cms_revision_save_commit_after>
+                </observers>
+            </enterprise_cms_revision_save_commit_after>
             <adminhtml_cache_flush_system>
                 <observers>
                     <turpentine_varnish_adminhtml_cache_flush_system>

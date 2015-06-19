@@ -90,7 +90,7 @@ the page and may differ between different visitors/clients.
   requests are not blocked, and per-block TTLs in ESI policies are not honored
   (all blocks use the default TTL)
   * The core parts of Turpentine (caching and ESI/AJAX injection) work under Magento CE 1.5, but a significant
-  portion of the auxillary functionality doesn't work due to changes to event names. That
+  portion of the auxiliary functionality doesn't work due to changes to event names. That
   said, it would be possible to use Turpentine with Magento CE 1.5 with an understanding
   that it is not supported and what actions need to be taken manually. Both
   *cache flushing* (both automatic an manual) and *cache warming* (due to

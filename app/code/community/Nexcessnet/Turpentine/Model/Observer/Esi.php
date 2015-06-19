@@ -307,7 +307,11 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             $esiData->setParentUrl( Mage::app()->getRequest()->getRequestString() );
         }
         if( is_array( $esiOptions['dummy_blocks'] ) ) {
-            $esiData->setDummyBlocks( $esiOptions['dummy_blocks'] );
+            $dummyBlocks = array();
+            foreach( $esiOptions['dummy_blocks'] as $key => $value ) {
+                $dummyBlocks[] = ( empty($value) && !is_numeric($key) ) ? $key : $value;
+            }
+            $esiData->setDummyBlocks( $dummyBlocks );
         } else {
             Mage::helper( 'turpentine/debug' )->logWarn(
                 'Invalid dummy_blocks for block: %s',

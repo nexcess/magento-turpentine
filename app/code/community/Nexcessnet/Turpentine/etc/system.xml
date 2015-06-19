@@ -400,8 +400,17 @@
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
+                            <show_in_store>0</show_in_store>                        
                         </get_params>
+                        <ignore_get_params translate="label" module="turpentine">
+                            <label>Ignore GET Parameters</label>
+                            <comment>Comma-separated list of GET variables that will be ignored for caching</comment>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </ignore_get_params>
                     </fields>
                 </params>
                 <static translate="label" module="turpentine">
