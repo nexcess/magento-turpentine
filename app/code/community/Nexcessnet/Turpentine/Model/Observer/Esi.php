@@ -196,7 +196,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         if( $esiHelper->getEsiBlockLogEnabled() ) {
             $debugHelper->logInfo(
                 'Checking ESI block candidate: %s',
-                $blockObject->getNameInLayout() );
+                $blockObject->getNameInLayout() ? $blockObject->getNameInLayout() : $blockObject->getModuleName() );
         }
         if( $esiHelper->shouldResponseUseEsi() &&
                 $blockObject instanceof Mage_Core_Block_Template &&
@@ -205,11 +205,11 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 // admin blocks are not allowed to be cached for now
                 $debugHelper->logWarn(
                     'Ignoring attempt to inject adminhtml block: %s',
-                    $blockObject->getNameInLayout() );
+                    $blockObject->getNameInLayout() ? $blockObject->getNameInLayout() : $blockObject->getModuleName() );
                 return;
             } elseif( $esiHelper->getEsiBlockLogEnabled() ) {
                 $debugHelper->logInfo( 'Block check passed, injecting block: %s',
-                    $blockObject->getNameInLayout() );
+                    $blockObject->getNameInLayout() ? $blockObject->getNameInLayout() : $blockObject->getModuleName() );
             }
             Varien_Profiler::start( 'turpentine::observer::esi::injectEsi' );
             $ttlParam = $esiHelper->getEsiTtlParam();
