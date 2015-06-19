@@ -27,13 +27,14 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
     /**
      * Generate the Varnish 3.0-compatible VCL
      *
+     * @param bool $doClean if true, VCL will be cleaned (whitespaces stripped, etc.)
      * @return string
      */
-    public function generate() {
+    public function generate($doClean=true) {
         $tplFile = $this->_getVclTemplateFilename( self::VCL_TEMPLATE_FILE );
         $vcl = $this->_formatTemplate( file_get_contents( $tplFile ),
             $this->_getTemplateVars() );
-        return $this->_cleanVcl( $vcl );
+        return $doClean ? $this->_cleanVcl( $vcl ) : $vcl;
     }
 
     protected function _getAdvancedSessionValidation() {

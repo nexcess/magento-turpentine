@@ -19,16 +19,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-class Nexcessnet_Turpentine_Block_Catalog_Product_List_Toolbar extends
-    Mage_Catalog_Block_Product_List_Toolbar {
-
-    public function _construct() {
-        parent::_construct();
-        $this->disableParamsMemorizing();
-        // Remove params that may have been memorized before this fix was active.
-        Mage::getSingleton('catalog/session')->unsSortOrder();
-        Mage::getSingleton('catalog/session')->unsSortDirection();
-        Mage::getSingleton('catalog/session')->unsDisplayMode();
-        Mage::getSingleton('catalog/session')->unsLimitPage();
+class Nexcessnet_Turpentine_Model_Config_Select_stripWhitespace {
+    public function toOptionArray() {
+        $helper = Mage::helper('turpentine');
+        return array(
+            array( 'value' => 'always', 'label' => $helper->__( 'Always' ) ),
+            array( 'value' => 'apply', 'label' => $helper->__( 'Only when applying directly to Varnish' ) ),
+            array( 'value' => 'never', 'label' => $helper->__( 'Never' ) ),
+        );
     }
 }

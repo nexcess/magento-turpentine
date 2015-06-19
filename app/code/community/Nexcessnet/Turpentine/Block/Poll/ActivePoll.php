@@ -19,16 +19,16 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-class Nexcessnet_Turpentine_Block_Catalog_Product_List_Toolbar extends
-    Mage_Catalog_Block_Product_List_Toolbar {
+class Nexcessnet_Turpentine_Block_Poll_Activepoll extends Mage_Poll_Block_ActivePoll {
 
-    public function _construct() {
-        parent::_construct();
-        $this->disableParamsMemorizing();
-        // Remove params that may have been memorized before this fix was active.
-        Mage::getSingleton('catalog/session')->unsSortOrder();
-        Mage::getSingleton('catalog/session')->unsSortDirection();
-        Mage::getSingleton('catalog/session')->unsDisplayMode();
-        Mage::getSingleton('catalog/session')->unsLimitPage();
+    public function setTemplate($template)
+    {
+    	$debugHelper = Mage::helper( 'turpentine/debug' );
+    	$debugHelper->logInfo('Set poll template');
+
+        $this->_template = $template;
+        $this->setPollTemplate('turpentine/ajax.phtml', 'poll' );
+        $this->setPollTemplate('turpentine/ajax.phtml', 'results' );         
+        return $this;
     }
 }
