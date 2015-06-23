@@ -126,6 +126,11 @@
                     <activePoll>Nexcessnet_Turpentine_Block_Poll_ActivePoll</activePoll>
                 </rewrite>
             </poll>
+            <adminhtml>
+                <rewrite>
+                    <cache_grid>Nexcessnet_Turpentine_Block_Adminhtml_Cache_Grid</cache_grid>
+                </rewrite>
+            </adminhtml>
         </blocks>
         <helpers>
             <turpentine>
@@ -398,6 +403,7 @@
                 <args>
                     <modules>
                         <turpentine after="Mage_Adminhtml">Nexcessnet_Turpentine</turpentine>
+                        <turpentine before="Mage_Adminhtml">Nexcessnet_Turpentine_Adminhtml</turpentine>
                     </modules>
                 </args>
             </adminhtml>
