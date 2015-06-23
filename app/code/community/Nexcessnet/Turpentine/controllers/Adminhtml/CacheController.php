@@ -4,7 +4,7 @@
  * Date: 08/01/14
  */
 
-require_once 'Mage/Adminhtml/controllers/CacheController.php';
+require_once Mage::getModuleDir('controllers', 'Mage_Adminhtml').DS.'CacheController.php';
 
 class Nexcessnet_Turpentine_Adminhtml_CacheController extends Mage_Adminhtml_CacheController
 {
