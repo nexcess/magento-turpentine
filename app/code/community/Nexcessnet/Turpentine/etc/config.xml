@@ -20,7 +20,7 @@
 <config>
     <modules>
         <Nexcessnet_Turpentine>
-            <version>0.6.2</version>
+            <version>0.6.3</version>
         </Nexcessnet_Turpentine>
     </modules>
     <default>
@@ -136,6 +136,11 @@
             <turpentine>
                 <class>Nexcessnet_Turpentine_Model</class>
             </turpentine>
+            <core>
+                <rewrite>
+                    <session>Nexcessnet_Turpentine_Model_Core_Session</session>
+                </rewrite>
+            </core>
         </models>
         <cache>
             <types>
