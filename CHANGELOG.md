@@ -386,3 +386,7 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#796] Ignore additional GET Parameters in Varnish Cache via Configuration (@thampe)
   * [#626] Fix for dummy blocks not working (@jeroenvermeulen)
   * [#719) Replace connect20/nexcessnet_turpentine package in composer.json (@ihor-sviziev)
+
+### RELEASE-0.6.3
+  * [#499] Use rewrite instead of local Session model for form key handling (@eth8505)  
+
