@@ -389,4 +389,4 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
 
 ### RELEASE-0.6.3
   * [#499] Use rewrite instead of local Session model for form key handling (@eth8505)  
-
+  * [#817]  Damian/cache management extended. Added validations for EE and Full Page cache (@damian-pastorini)
