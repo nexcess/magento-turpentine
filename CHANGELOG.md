@@ -391,4 +391,5 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#499] Use rewrite instead of local Session model for form key handling (@eth8505)  
   * [#817] Damian/cache management extended. Added validations for EE and Full Page cache (@damian-pastorini)
   * [#521] Fix for search input field on search results page (@jeroenvermeulen)
+  * Fix for recently viewed products block in CE 1.9.1 (Issue #801)
 
