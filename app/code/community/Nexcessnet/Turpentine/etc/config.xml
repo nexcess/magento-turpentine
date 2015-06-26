@@ -35,6 +35,10 @@
                 <crawler_enable>0</crawler_enable>
                 <crawler_debug>0</crawler_debug>
             </general>
+            <logging>
+                <use_custom_log_file>0</use_custom_log_file>
+                <custom_log_file_name>turpentine.log</custom_log_file_name>
+            </logging>
             <servers>
                 <version>auto</version>
                 <server_list>127.0.0.1:6082</server_list>

@@ -198,6 +198,20 @@
         </reference>
     </catalogsearch_result_index>
 
+    <!-- fixes issues with 'recently viewed products' in CE 1.9's RWD theme -->
+    <catalog_category_layered_nochildren>
+        <reference name="left.reports.product.viewed">
+                <action method="setEsiOptions">
+                    <params>
+                        <access>private</access>
+                        <flush_events>
+                            <catalog_controller_product_view/>
+                        </flush_events>
+                    </params>
+                </action>
+        </reference>
+    </catalog_category_layered_nochildren>
+
     <!-- Checkout -->
 
     <!-- We cache the checkout cart page on a per-client basis -->
