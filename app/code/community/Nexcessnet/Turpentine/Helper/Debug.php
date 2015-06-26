@@ -135,9 +135,38 @@ class Nexcessnet_Turpentine_Helper_Debug extends Mage_Core_Helper_Abstract {
      */
     protected function _log( $level, $message ) {
         $message = 'TURPENTINE: ' . $message;
-        Mage::log( $message, $level );
+        Mage::log( $message, $level, $this->_getLogFileName() );
         return $message;
     }
+
+	/**
+	 * Get the name of the log file to use
+	 * @return string
+	 */
+	protected function _getLogFileName() {
+		if ( $this->useCustomLogFile() ) {
+			return $this->getCustomLogFileName();
+		}
+		return '';
+	}
+
+	/**
+	 * Check if custom log file should be used
+	 * @return bool
+	 */
+	public function useCustomLogFile() {
+		return Mage::getStoreConfigFlag(
+			'turpentine_varnish/logging/use_custom_log_file' );
+	}
+
+	/**
+	 * Get custom log file name
+	 * @return string
+	 */
+	public function getCustomLogFileName() {
+		return (string)Mage::getStoreConfig(
+			'turpentine_varnish/logging/custom_log_file_name' );
+	}
 
     /**
      * Format a list of function arguments for the backtrace
