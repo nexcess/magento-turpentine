@@ -96,6 +96,7 @@
             <action method="setEsiOptions">
                 <params>
                     <access>private</access>
+                    <method>ajax</method>
                     <flush_events>
                         <poll_vote_add/>
                     </flush_events>
@@ -177,6 +178,39 @@
         -->
     </catalog_product_compare_index>
 
+    <!-- Catalog Search -->
+
+    <!--
+    If the search input box is inside the header, it needs to contain the current search string after searching.
+    The block below overrules the ESI Options for the header on the search results page.
+    We change the scope of the header to "page", so the current URL is passed to the ESI request.
+    We set the TTL to 0, because the same user is probably not going to search for the same string again.
+    -->
+    <catalogsearch_result_index>
+        <reference name="header">
+            <action method="setEsiOptions">
+                <params>
+                    <access>private</access>
+                    <scope>page</scope>
+                    <ttl>0</ttl>
+                </params>
+            </action>
+        </reference>
+    </catalogsearch_result_index>
+
+    <!-- fixes issues with 'recently viewed products' in CE 1.9's RWD theme -->
+    <catalog_category_layered_nochildren>
+        <reference name="left.reports.product.viewed">
+                <action method="setEsiOptions">
+                    <params>
+                        <access>private</access>
+                        <flush_events>
+                            <catalog_controller_product_view/>
+                        </flush_events>
+                    </params>
+                </action>
+        </reference>
+    </catalog_category_layered_nochildren>
 
     <!-- Checkout -->
 

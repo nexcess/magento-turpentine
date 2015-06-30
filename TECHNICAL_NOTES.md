@@ -31,7 +31,7 @@ Turpentine and Magento-Varnish differ most significantly on the final step. To r
 
 ## I got 99 problems...
 
-As mentioned, Magento isn't really designed to easily facilitate the rendering of a single block, or really work with the proxy cache/ESI model which means a number of work arounds are required to make it work.
+As mentioned, Magento isn't really designed to easily facilitate the rendering of a single block, or really work with the proxy cache/ESI model which means a number of workarounds are required to make it work.
 
 ### Generating Session Cookies without PHP
 
@@ -41,7 +41,7 @@ It sounds simple enough, but Varnish doesn't actually have any easy way to gener
 
 ### Serializing Registry Data
 
-To include the registry data required for ESI block rendering in the ESI URL, Turpentine simply takes a list of the needed registry keys (provided in the layout file) for the block and serializes it using PHP's native [`serialize`](http://us3.php.net/serialize) function which turns stores the data in a string which we can then include in the URL as a simple GET parameter. However, a registry key can be associated with any data type, including whole objects. While `serialize` will typically work on objects there are some edge cases (such as XML documents) that cannot be serialized. In order to accomodate these documents, Turpentine considers some objects to be "[complex registry data](https://github.com/nexcess/magento-turpentine/blob/master/app/code/community/Nexcessnet/Turpentine/Model/Observer/Esi.php#L441)" and handles those separately from the standard PHP types like string, int, simple classes, etc. Complex registry data is considered to be Magento "models" that correspond to database records and have `getId` methods (typically things like products, categories, etc). Then Turpentine can simply serialize the model's class and ID, then load the model with the ID instead of serializing the entire object. This neatly sidesteps the whole issue of finding a way to serialize objects that are unserializable.
+To include the registry data required for ESI block rendering in the ESI URL, Turpentine simply takes a list of the needed registry keys (provided in the layout file) for the block and serializes it using PHP's native [`serialize`](http://us3.php.net/serialize) function which turns stores the data in a string which we can then include in the URL as a simple GET parameter. However, a registry key can be associated with any data type, including whole objects. While `serialize` will typically work on objects there are some edge cases (such as XML documents) that cannot be serialized. In order to accommodate these documents, Turpentine considers some objects to be "[complex registry data](https://github.com/nexcess/magento-turpentine/blob/master/app/code/community/Nexcessnet/Turpentine/Model/Observer/Esi.php#L441)" and handles those separately from the standard PHP types like string, int, simple classes, etc. Complex registry data is considered to be Magento "models" that correspond to database records and have `getId` methods (typically things like products, categories, etc). Then Turpentine can simply serialize the model's class and ID, then load the model with the ID instead of serializing the entire object. This neatly sidesteps the whole issue of finding a way to serialize objects that are unserializable.
 
 ### Runtime Events Registration and Class Rewrites
 
