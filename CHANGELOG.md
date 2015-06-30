@@ -393,3 +393,5 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#521] Fix for search input field on search results page (@jeroenvermeulen)
   * Fix for recently viewed products block in CE 1.9.1 (Issue #801)
   * [#522] Custom log file (issue #510) (@eth8505)
+  * [#836] Add OS X .DS_Store and nbproject to gitignore (@cbb7123)
+  * [#832] Fixed duplicated frontend cookie bug (@mabigo)
