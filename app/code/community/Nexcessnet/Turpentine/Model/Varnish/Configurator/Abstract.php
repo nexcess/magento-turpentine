@@ -196,6 +196,26 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     }
 
     /**
+     * Get hosts as regex
+     *
+     * ex: base_url: example.com
+     *     path_regex: (example.com|example.net)
+     *
+     * @return string
+     */
+    public function getAllowedHostsRegex() {
+    	$hosts = array();
+    	foreach( Mage::app()->getStores() as $store ) {
+    		$hosts[] = parse_url( $store->getBaseUrl( Mage_Core_Model_Store::URL_TYPE_WEB , false ), PHP_URL_HOST );
+    	}
+    	 
+    	$hosts = array_values(array_unique( $hosts ));
+    	 
+    	$pattern = '('.implode('|', $hosts).')';
+    	return $pattern;
+    }
+    
+    /**
      * Get the base url path regex
      *
      * ex: base_url: http://example.com/magento/
@@ -625,6 +645,7 @@ EOS;
             'admin_frontname'   => $this->_getAdminFrontname(),
             'normalize_host_target' => $this->_getNormalizeHostTarget(),
             'url_base_regex'    => $this->getBaseUrlPathRegex(),
+        	'allowed_hosts_regex'	=> $this->getAllowedHostsRegex(),
             'url_excludes'  => $this->_getUrlExcludes(),
             'get_param_excludes'    => $this->_getGetParamExcludes(),
             'get_param_ignored' => $this->_getIgnoreGetParameters(),
