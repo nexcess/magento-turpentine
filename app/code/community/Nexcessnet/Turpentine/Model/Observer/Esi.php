@@ -20,6 +20,35 @@
  */
 
 class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
+    /**
+     * Set a cookie with the customer group id when customer logs in
+     *
+     * Events: customer_login
+     *
+     * @param Varien_Object $eventObject
+     * @return null
+     */
+    public function setCustomerGroupCookie( $eventObject ) {
+        $customer = $eventObject->getCustomer();
+        $cookie = Mage::getSingleton('core/cookie');
+        if (Mage::getStoreConfig('persistent/options/enabled')) {
+            $cookie->set('customer_group', $customer->getGroupId(), Mage::getStoreConfig('persistent/options/lifetime'));
+        } else {
+            $cookie->set('customer_group', $customer->getGroupId());
+        }
+    }
+
+    /**
+     * Destroy the cookie with the customer group when customer logs out
+     *
+     * Events: customer_logout
+     *
+     * @param Varien_Object $eventObject
+     * @return null
+     */
+    public function removeCustomerGroupCookie( $eventObject ) {
+        Mage::getSingleton('core/cookie')->delete('customer_group');
+    }
 
     /**
      * Check the ESI flag and set the ESI header if needed
@@ -293,7 +322,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $esiData->setBlockType( get_class( $blockObject ) );
         $esiData->setLayoutHandles( $this->_getBlockLayoutHandles( $blockObject ) );
         $esiData->setEsiMethod( $esiOptions[$methodParam] );
-        if( $esiOptions[$cacheTypeParam] == 'private' ) {
+        if( $esiOptions[$cacheTypeParam] == 'private' || $esiOptions[$cacheTypeParam] == 'customer_group' ) {
             if( is_array( @$esiOptions['flush_events'] ) ) {
                 $esiData->setFlushEvents( array_merge(
                     $esiHelper->getDefaultCacheClearEvents(),
@@ -415,7 +444,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
 
         // set the default TTL
         if( !isset( $options[$ttlParam] ) ) {
-            if( $options[$cacheTypeParam] == 'private' ) {
+            if( $options[$cacheTypeParam] == 'private' || $esiOptions[$cacheTypeParam] == 'customer_group' ) {
                 switch( $options[$methodParam] ) {
                     case 'ajax':
                         $options[$ttlParam] = '0';
