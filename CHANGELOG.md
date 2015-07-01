@@ -396,3 +396,4 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#836] Add OS X .DS_Store and nbproject to gitignore (@cbb7123)
   * [#832] Fixed duplicated frontend cookie bug (@mabigo)
   * [#527] Feature/admin clear specific page (@craigcarnell)
+  * [#838] Added customer_group access option to cache based on customer group (@pejoo)
