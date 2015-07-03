@@ -397,3 +397,4 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#832] Fixed duplicated frontend cookie bug (@mabigo)
   * [#527] Feature/admin clear specific page (@craigcarnell)
   * [#838] Added customer_group access option to cache based on customer group (@pejoo)
+  * [#825]  Fix messages returning a empty "<ul />" (@BarryCarlyon)
