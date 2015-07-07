@@ -46,6 +46,7 @@ import std;
 
 ## Custom Subroutines
 
+/* -- REMOVED 
 sub generate_session {
     # generate a UUID and add `frontend=$UUID` to the Cookie header, or use SID
     # from SID URL param
@@ -72,7 +73,7 @@ sub generate_session {
     } else {
         set req.http.Cookie = req.http.X-Varnish-Faked-Session;
     }
-}
+} 
 
 sub generate_session_expires {
     # sets X-Varnish-Cookie-Expires to now + esi_private_ttl in format:
@@ -92,7 +93,7 @@ sub generate_session_expires {
         );
     }C
 }
-
+-- */
 ## Varnish Subroutines
 
 sub vcl_recv {
@@ -169,7 +170,8 @@ sub vcl_recv {
                 set req.http.Cookie = "frontend=crawler-session";
             } else {
                 # it's a real user, make up a new session for them
-                call generate_session;
+                # call generate_session;
+                return (pipe);
             }
         }
         if ({{force_cache_static}} &&
@@ -351,7 +353,7 @@ sub vcl_fetch {
 sub vcl_deliver {
     if (req.http.X-Varnish-Faked-Session) {
         # need to set the set-cookie header since we just made it out of thin air
-        call generate_session_expires;
+        # call generate_session_expires;
         set resp.http.Set-Cookie = req.http.X-Varnish-Faked-Session +
             "; expires=" + resp.http.X-Varnish-Cookie-Expires + "; path=/";
         if (req.http.Host) {
