@@ -912,6 +912,7 @@ abstract class Mage_Core_Controller_Varien_Action
 		    && $session->getIsNewSession() === true)
 		{
 			$session->setIsNewSession(false);
+			$session->real_getFormKey();
 			return true;
 		}
 		
