@@ -211,7 +211,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     	 
     	$hosts = array_values(array_unique( $hosts ));
     	 
-    	$pattern = '('.implode('|', $hosts).')';
+        $pattern = '('.implode('|', array_map("preg_quote", $hosts)).')';
     	return $pattern;
     }
     
