@@ -444,7 +444,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
 
         // set the default TTL
         if( !isset( $options[$ttlParam] ) ) {
-            if( $options[$cacheTypeParam] == 'private' || $esiOptions[$cacheTypeParam] == 'customer_group' ) {
+            if( $options[$cacheTypeParam] == 'private' || $options[$cacheTypeParam] == 'customer_group' ) {
                 switch( $options[$methodParam] ) {
                     case 'ajax':
                         $options[$ttlParam] = '0';
