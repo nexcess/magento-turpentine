@@ -158,7 +158,7 @@ sub vcl_recv {
             }
         }
         # if host is not allowed in magento pass to backend
-        if (req.url !~ "{{allowed_hosts_regex}}") {
+        if (req.http.host !~ "{{allowed_hosts_regex}}") {
         	return (pass);
         }
         # no frontend cookie was sent to us AND this is not an ESI or AJAX call
