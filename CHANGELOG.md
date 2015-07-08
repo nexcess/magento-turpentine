@@ -399,3 +399,4 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#838] Added customer_group access option to cache based on customer group (@pejoo)
   * [#825] Fix messages returning a empty "ul" (@BarryCarlyon)
   * [#826] Tweak logging for empty getNameInLayout (@BarryCarlyon)
+  * [#843] Check if path isset before using it (@craigcarnell) 
