@@ -386,3 +386,16 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#796] Ignore additional GET Parameters in Varnish Cache via Configuration (@thampe)
   * [#626] Fix for dummy blocks not working (@jeroenvermeulen)
   * [#719) Replace connect20/nexcessnet_turpentine package in composer.json (@ihor-sviziev)
+
+### RELEASE-0.6.3
+  * [#499] Use rewrite instead of local Session model for form key handling (@eth8505)  
+  * [#817] Damian/cache management extended. Added validations for EE and Full Page cache (@damian-pastorini)
+  * [#521] Fix for search input field on search results page (@jeroenvermeulen)
+  * Fix for recently viewed products block in CE 1.9.1 (Issue #801)
+  * [#522] Custom log file (issue #510) (@eth8505)
+  * [#836] Add OS X .DS_Store and nbproject to gitignore (@cbb7123)
+  * [#832] Fixed duplicated frontend cookie bug (@mabigo)
+  * [#527] Feature/admin clear specific page (@craigcarnell)
+  * [#838] Added customer_group access option to cache based on customer group (@pejoo)
+  * [#825] Fix messages returning a empty "ul" (@BarryCarlyon)
+  * [#826] Tweak logging for empty getNameInLayout (@BarryCarlyon)

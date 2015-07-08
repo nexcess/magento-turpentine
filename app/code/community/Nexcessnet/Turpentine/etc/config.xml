@@ -20,7 +20,7 @@
 <config>
     <modules>
         <Nexcessnet_Turpentine>
-            <version>0.6.2</version>
+            <version>0.6.3</version>
         </Nexcessnet_Turpentine>
     </modules>
     <default>
@@ -35,6 +35,10 @@
                 <crawler_enable>0</crawler_enable>
                 <crawler_debug>0</crawler_debug>
             </general>
+            <logging>
+                <use_custom_log_file>0</use_custom_log_file>
+                <custom_log_file_name>turpentine.log</custom_log_file_name>
+            </logging>
             <servers>
                 <version>auto</version>
                 <server_list>127.0.0.1:6082</server_list>
@@ -126,6 +130,11 @@
                     <activePoll>Nexcessnet_Turpentine_Block_Poll_ActivePoll</activePoll>
                 </rewrite>
             </poll>
+            <adminhtml>
+                <rewrite>
+                    <cache_grid>Nexcessnet_Turpentine_Block_Adminhtml_Cache_Grid</cache_grid>
+                </rewrite>
+            </adminhtml>
         </blocks>
         <helpers>
             <turpentine>
@@ -136,6 +145,11 @@
             <turpentine>
                 <class>Nexcessnet_Turpentine_Model</class>
             </turpentine>
+            <core>
+                <rewrite>
+                    <session>Nexcessnet_Turpentine_Model_Core_Session</session>
+                </rewrite>
+            </core>
         </models>
         <cache>
             <types>
@@ -220,6 +234,22 @@
                     </turpentine_esi_controller_action_layout_generate_blocks_after>
                 </observers>
             </controller_action_layout_generate_blocks_after>
+            <customer_login>
+                <observers>
+                    <turpentine_customer_login_cookie>
+                        <class>turpentine/observer_esi</class>
+                        <method>setCustomerGroupCookie</method>
+                    </turpentine_customer_login_cookie>
+                </observers>
+            </customer_login>
+            <customer_logout>
+                <observers>
+                    <turpentine_customer_logout_remove_cookie>
+                        <class>turpentine/observer_esi</class>
+                        <method>removeCustomerGroupCookie</method>
+                    </turpentine_customer_logout_remove_cookie>
+                </observers>
+            </customer_logout>
             <!--
             Magento sometimes sees the last URL as being the
             turpentine/esi/getBlock url, and then redirects to it which is not
