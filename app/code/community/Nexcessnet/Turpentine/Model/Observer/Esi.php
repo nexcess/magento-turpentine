@@ -286,6 +286,10 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             }
 
             $esiUrl = Mage::getUrl( 'turpentine/esi/getBlock', $urlOptions );
+            if( $esiOptions[$methodParam] == 'esi' ) {
+                // setting [web/unsecure/base_url] can be https://... but ESI can never be HTTPS
+                $esiUrl = preg_replace( '|^https://|i', 'http://', $esiUrl );
+            }
             $blockObject->setEsiUrl( $esiUrl );
             // avoid caching the ESI template output to prevent the double-esi-
             // include/"ESI processing not enabled" bug
