@@ -46,7 +46,7 @@ import std;
 
 ## Custom Subroutines
 
-/* -- REMOVED 
+{{generate_session_start}}
 sub generate_session {
     # generate a UUID and add `frontend=$UUID` to the Cookie header, or use SID
     # from SID URL param
@@ -93,7 +93,7 @@ sub generate_session_expires {
         );
     }C
 }
--- */
+{{generate_session_end}}
 ## Varnish Subroutines
 
 sub vcl_recv {
