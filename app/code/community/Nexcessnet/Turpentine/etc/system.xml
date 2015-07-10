@@ -64,7 +64,7 @@
                         </strip_vcl_whitespace>
                         <vcl_fix translate="label comment">
                             <label>Use VCL fix</label>
-                            <comment>When Yes is selected, a VCL fix will be used. If No is selected, an observer will be used to prevent formKey issues.</comment>
+                            <comment>When Enable is selected, a VCL fix will be used to prevent formKey issues. If Disable is selected, an observer will be used.</comment>
                             <frontend_type>select</frontend_type>
                             <sort_order>28</sort_order>
                             <source_model>adminhtml/system_config_source_enabledisable</source_model>

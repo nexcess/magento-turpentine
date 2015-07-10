@@ -356,7 +356,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getGenerateSessionStart() {
-        return Mage::getStoreConfig( 'turpentine_vcl/general/vcl_fix' )
+        return Mage::getStoreConfig( 'turpentine_varnish/general/vcl_fix' )
             ? '/* -- REMOVED' : '';
     }
 
@@ -366,7 +366,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getGenerateSessionEnd() {
-        return Mage::getStoreConfig( 'turpentine_vcl/general/vcl_fix' )
+        return Mage::getStoreConfig( 'turpentine_varnish/general/vcl_fix' )
             ? '-- */' : '';
     }
 
@@ -377,7 +377,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getGenerateSession() {
-        return Mage::getStoreConfig( 'turpentine_vcl/general/vcl_fix' )
+        return Mage::getStoreConfig( 'turpentine_varnish/general/vcl_fix' )
             ? '# call generate_session' : 'call generate_session;';
     }
 
@@ -388,7 +388,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getGenerateSessionExpires() {
-        return Mage::getStoreConfig( 'turpentine_vcl/general/vcl_fix' )
+        return Mage::getStoreConfig( 'turpentine_varnish/general/vcl_fix' )
             ? '# call generate_session_expires' : 'call generate_session_expires;';
     }
 
