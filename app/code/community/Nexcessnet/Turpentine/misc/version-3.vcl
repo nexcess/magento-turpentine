@@ -170,7 +170,7 @@ sub vcl_recv {
                 set req.http.Cookie = "frontend=crawler-session";
             } else {
                 # it's a real user, make up a new session for them
-                # call generate_session;
+                {{generate_session}}# call generate_session;
                 return (pipe);
             }
         }
@@ -354,6 +354,7 @@ sub vcl_deliver {
     if (req.http.X-Varnish-Faked-Session) {
         # need to set the set-cookie header since we just made it out of thin air
         # call generate_session_expires;
+        {{generate_session_expires}}
         set resp.http.Set-Cookie = req.http.X-Varnish-Faked-Session +
             "; expires=" + resp.http.X-Varnish-Cookie-Expires + "; path=/";
         if (req.http.Host) {

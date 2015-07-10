@@ -62,6 +62,16 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </strip_vcl_whitespace>
+                        <vcl_fix translate="label comment">
+                            <label>Use VCL fix</label>
+                            <comment>When Yes is selected, a VCL fix will be used. If No is selected, an observer will be used to prevent formKey issues.</comment>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>28</sort_order>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </vcl_fix>
                         <varnish_debug translate="label" module="turpentine">
                             <label>Enable Debug Info</label>
                             <comment>It is a major security vulnerability, to leave this enabled on production sites</comment>

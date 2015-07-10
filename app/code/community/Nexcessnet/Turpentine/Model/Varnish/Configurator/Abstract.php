@@ -351,6 +351,27 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     }
 
     /**
+     * Get the Generate Session Expires
+     *
+     * @return string
+     */
+    protected function _getGenerateSession() {
+        return Mage::getStoreConfig( 'turpentine_vcl/general/vcl_fix' )
+            ? '# call generate_session' : 'call generate_session;';
+    }
+
+
+    /**
+     * Get the Generate Session Expires
+     *
+     * @return string
+     */
+    protected function _getGenerateSessionExpires() {
+        return Mage::getStoreConfig( 'turpentine_vcl/general/vcl_fix' )
+            ? '# call generate_session_expires' : 'call generate_session_expires;';
+    }
+
+    /**
      * Get the Force Static Caching option
      *
      * @return string
@@ -655,6 +676,8 @@ EOS;
             'debug_headers' => $this->_getEnableDebugHeaders(),
             'grace_period'  => $this->_getGracePeriod(),
             'force_cache_static'    => $this->_getForceCacheStatic(),
+            'generate_session_expires'    => $this->_getGenerateSessionExpires(),
+            'generate_session'    => $this->_getGenerateSession(),
             'static_extensions' => $this->_getStaticExtensions(),
             'static_ttl'    => $this->_getStaticTtl(),
             'url_ttls'      => $this->_getUrlTtls(),
