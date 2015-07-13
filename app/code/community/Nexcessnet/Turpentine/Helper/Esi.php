@@ -181,7 +181,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
         if( $url === null ) {
             $url = $this->getDummyUrl();
         }
-        $request = new Nexcessnet_Turpentine_Model_Dummy_Request( $url );
+        $request = Mage::getModel('turpentine/dummy_request', $url);
         $request->fakeRouterDispatch();
         return $request;
     }
