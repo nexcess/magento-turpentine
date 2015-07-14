@@ -663,7 +663,7 @@ EOS;
                 $tpl = <<<EOS
 if (req.http.X-Forwarded-For) {
     if(req.http.X-Forwarded-For !~ "{{debug_ips}}") {
-        return (synth(999, "Maintenance mode"));
+        error 503;
     }
 } else {
     if (client.ip !~ debug_acl) {
