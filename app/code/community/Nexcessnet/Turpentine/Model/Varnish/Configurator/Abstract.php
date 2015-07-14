@@ -634,6 +634,89 @@ EOS;
     }
 
     /**
+     * Get the allowed IPs when in maintenance mode
+     *
+     * @return string
+     */
+    protected function _vcl_sub_maintenance_allowed_ips() {
+        if((! $this->_getDebugIps()) || ! Mage::getStoreConfig( 'turpentine_vcl/maintenance/custom_vcl_synth' ) ) {
+            return false;
+        }
+
+        switch(Mage::getStoreConfig( 'turpentine_varnish/servers/version' )) {
+            case 4.0:
+                $tpl = <<<EOS
+if (req.http.X-Forwarded-For) {
+    if (req.http.X-Forwarded-For !~ "{{debug_ips}}") {
+        return (synth(999, "Maintenance mode"));
+    }
+}
+else {
+    if (client.ip !~ debug_acl) {
+        return (synth(999, "Maintenance mode"));
+    }
+}
+
+EOS;
+                break;
+            default:
+                $tpl = <<<EOS
+if (req.http.X-Forwarded-For) {
+    if(req.http.X-Forwarded-For !~ "{{debug_ips}}") {
+        return (synth(999, "Maintenance mode"));
+    }
+} else {
+    if (client.ip !~ debug_acl) {
+        error 503;
+    }
+}
+EOS;
+        }
+
+        return $this->_formatTemplate( $tpl, array(
+            'debug_ips' => Mage::getStoreConfig( 'dev/restrict/allow_ips' ) ) );
+    }
+
+    /**
+     * Get the allowed IPs when in maintenance mode
+     *
+     * @return string
+     */
+    protected function _vcl_sub_synth() {
+        if((! $this->_getDebugIps()) || ! Mage::getStoreConfig( 'turpentine_vcl/maintenance/custom_vcl_synth' ) ) {
+            return false;
+        }
+
+        switch(Mage::getStoreConfig( 'turpentine_varnish/servers/version' )) {
+            case 4.0:
+                $tpl = <<<EOS
+sub vcl_synth {
+    if (resp.status == 999) {
+        set resp.status = 404;
+        set resp.http.Content-Type = "text/html; charset=utf-8";
+        synthetic({"{{vcl_synth_content}}"});
+        return (deliver);
+    }
+    return (deliver);
+}
+
+EOS;
+                break;
+            default:
+                $tpl = <<<EOS
+sub vcl_error {
+    set obj.http.Content-Type = "text/html; charset=utf-8";
+    synthetic {"{{vcl_synth_content}}"};
+    return (deliver);
+}
+EOS;
+        }
+
+        return $this->_formatTemplate( $tpl, array(
+            'vcl_synth_content' => Mage::getStoreConfig( 'turpentine_vcl/maintenance/custom_vcl_synth' ) ) );
+    }
+
+    /**
      * Build the list of template variables to apply to the VCL template
      *
      * @return array
@@ -685,6 +768,12 @@ EOS;
         }
         if( Mage::getStoreConfig( 'turpentine_vcl/normalization/host' ) ) {
             $vars['normalize_host'] = $this->_vcl_sub_normalize_host();
+        }
+        if( Mage::getStoreConfig( 'turpentine_vcl/maintenance/enable' ) ) {
+            // in vcl_recv set the allowed IPs otherwise load the vcl_error (v3)/vcl_synth (v4)
+            $vars['maintenance_allowed_ips'] = $this->_vcl_sub_maintenance_allowed_ips();
+            // set the vcl_error from Magento database
+            $vars['vcl_synth'] = $this->_vcl_sub_synth();
         }
 
         $customIncludeFile = $this->_getCustomIncludeFilename();
