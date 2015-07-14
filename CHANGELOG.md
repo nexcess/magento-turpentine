@@ -402,3 +402,5 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#843] Check if path isset before using it (@craigcarnell) 
   * Removed session generation code in VCL - see issue #345
   * [#586] Updated debug helper (@magedev)
+  * [#848] Replace Nexcessnet_Turpentine_Model_Dummy_Request with Magento model (@craigcarnell)  
+  * [#849]  escape | character (@craigcarnell)
