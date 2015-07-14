@@ -526,6 +526,7 @@ class Nexcessnet_Turpentine_Model_Dummy_Request extends
      * @return null
      */
     protected function _fixupFakeSuperGlobals( $uri ) {
+        $uri = str_replace('|', urlencode('|'), $uri);
         $parsedUrl = parse_url( $uri );
 
         if ( isset($parsedUrl['path']) ) {
