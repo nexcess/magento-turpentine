@@ -404,3 +404,4 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#586] Updated debug helper (@magedev)
   * [#848] Replace Nexcessnet_Turpentine_Model_Dummy_Request with Magento model (@craigcarnell)  
   * [#849]  escape | character (@craigcarnell)
+  * Better escaping of double slashes in urls (for better hitrate) (@joolswills)

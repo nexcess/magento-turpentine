@@ -125,7 +125,7 @@ sub vcl_recv {
     }
 
     # remove double slashes from the URL, for higher cache hit rate
-    set req.url = regsuball(req.url, "(.*)//+(.*)", "\1/\2");
+    set req.url = regsuball(req.url, "([^:])//+", "\1/");
 
     # check if the request is for part of magento
     if (req.url ~ "{{url_base_regex}}") {
