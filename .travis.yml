@@ -1,13 +1,16 @@
 language: php
-
 php:
-    - 5.2
     - 5.3
     - 5.4
     - 5.5
+    - 5.6
 
-install:
-    - sudo apt-get install -qq python-markdown libxml-xpath-perl build-essential
+addons:
+  apt:
+    packages:
+    - python-markdown
+    - libxml-xpath-perl
+    - build-essential
 
 script:
     - make all

@@ -204,6 +204,10 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
             $html = $this->_real_toHtml();
         }
         $this->_directCall = false;
+
+        if (count($this->getMessages()) == 0) {
+            return '';
+        }
         return $html;
     }
 

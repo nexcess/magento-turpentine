@@ -83,7 +83,7 @@ if ( $data ):
     <div class="result">
         <pre><?php echo htmlentities( $dataHelper->urlBase64Decode( $processData ) ); ?></pre>
     </div>
-<?
+<?php
     endif;
 endif;
 ?>

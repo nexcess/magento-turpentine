@@ -21,41 +21,116 @@
 
 class Nexcessnet_Turpentine_Helper_Debug extends Mage_Core_Helper_Abstract {
     /**
-     * Handle log* functions
+     * Logs errors
      *
-     * @param  string $name
-     * @param  array $args
-     * @return mixed
+     * @param $message
+     * @return string
      */
-    public function __call( $name, $args ) {
-        if( substr( $name, 0, 3 ) === 'log' ) {
-            try {
-                $message = vsprintf( @$args[0], @array_slice( $args, 1 ) );
-            } catch( Exception $e ) {
-                return parent::__call( $name, $args );
-            }
-            switch( substr( $name, 3 ) ) {
-                case 'Error':
-                    return $this->_log( Zend_Log::ERR, $message );
-                case 'Warn':
-                    return $this->_log( Zend_Log::WARN, $message );
-                case 'Notice':
-                    return $this->_log( Zend_Log::NOTICE, $message );
-                case 'Info':
-                    return $this->_log( Zend_Log::INFO, $message );
-                case 'Debug':
-                    if( Mage::helper( 'turpentine/varnish' )
-                            ->getVarnishDebugEnabled() ) {
-                        return $this->_log( Zend_Log::DEBUG, $message );
-                    } else {
-                        return;
-                    }
-                default:
-                    break;
-            }
+    public function logError( $message )
+    {
+        if ( func_num_args() > 1 ) {
+            $message = $this->_prepareLogMessage( func_get_args() );
         }
-        // return parent::__call( $name, $args );
-        return null;
+
+        return $this->_log( Zend_Log::ERR, $message );
+    }
+
+    /**
+     * Logs warnings
+     *
+     * @param $message
+     * @return string
+     */
+    public function logWarn( $message )
+    {
+        if ( func_num_args() > 1 ) {
+            $message = $this->_prepareLogMessage( func_get_args() );
+        }
+
+        return $this->_log( Zend_Log::WARN, $message );
+    }
+
+    /**
+     * Logs notices
+     *
+     * @param $message
+     * @return string
+     */
+    public function logNotice( $message )
+    {
+        if ( func_num_args() > 1 ) {
+            $message = $this->_prepareLogMessage( func_get_args() );
+        }
+
+        return $this->_log( Zend_Log::NOTICE, $message );
+    }
+
+    /**
+     * Logs info.
+     *
+     * @param $message
+     * @return string
+     */
+    public function logInfo( $message )
+    {
+        if ( func_num_args() > 1 ) {
+            $message = $this->_prepareLogMessage( func_get_args() );
+        }
+
+        return $this->_log( Zend_Log::INFO, $message );
+    }
+
+    /**
+     * Logs debug.
+     *
+     * @param $message
+     * @return string
+     */
+    public function logDebug( $message )
+    {
+        if( ! Mage::helper( 'turpentine/varnish' )->getVarnishDebugEnabled() ) {
+            return;
+        }
+
+        if ( func_num_args() > 1 ) {
+            $message = $this->_prepareLogMessage( func_get_args() );
+        }
+
+        return $this->_log( Zend_Log::DEBUG, $message );
+    }
+
+    /**
+     * Prepares advanced log message.
+     *
+     * @param array $args
+     * @return string
+     */
+    protected function _prepareLogMessage( array $args )
+    {
+        $pattern = $args[0];
+        $substitutes = array_slice( $args, 1 );
+
+        if ( ! $this->_validatePattern( $pattern, $substitutes ) ) {
+            return $pattern;
+        }
+
+        return vsprintf( $pattern, $substitutes );
+    }
+
+    /**
+     * Validates string and attributes for substitution as per sprintf function.
+     *
+     * NOTE: this could be implemented as shown at
+     * http://stackoverflow.com/questions/2053664/how-to-check-that-vsprintf-has-the-correct-number-of-arguments-before-running
+     * although IMHO it's too time consuming to validate the patterns.
+     *
+     * @param string $pattern
+     * @param array $arguments
+     * @return bool
+     */
+    protected function _validatePattern( $pattern, $arguments )
+    {
+        return true;
     }
 
     /**
@@ -135,9 +210,38 @@ class Nexcessnet_Turpentine_Helper_Debug extends Mage_Core_Helper_Abstract {
      */
     protected function _log( $level, $message ) {
         $message = 'TURPENTINE: ' . $message;
-        Mage::log( $message, $level );
+        Mage::log( $message, $level, $this->_getLogFileName() );
         return $message;
     }
+
+	/**
+	 * Get the name of the log file to use
+	 * @return string
+	 */
+	protected function _getLogFileName() {
+		if ( $this->useCustomLogFile() ) {
+			return $this->getCustomLogFileName();
+		}
+		return '';
+	}
+
+	/**
+	 * Check if custom log file should be used
+	 * @return bool
+	 */
+	public function useCustomLogFile() {
+		return Mage::getStoreConfigFlag(
+			'turpentine_varnish/logging/use_custom_log_file' );
+	}
+
+	/**
+	 * Get custom log file name
+	 * @return string
+	 */
+	public function getCustomLogFileName() {
+		return (string)Mage::getStoreConfig(
+			'turpentine_varnish/logging/custom_log_file_name' );
+	}
 
     /**
      * Format a list of function arguments for the backtrace
