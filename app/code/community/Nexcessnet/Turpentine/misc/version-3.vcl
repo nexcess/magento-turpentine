@@ -160,7 +160,7 @@ sub vcl_recv {
         }
         # if host is not allowed in magento pass to backend
         if (req.http.host !~ "{{allowed_hosts_regex}}") {
-        	return (pass);
+            return (pass);
         }
         # no frontend cookie was sent to us AND this is not an ESI or AJAX call
         if (req.http.Cookie !~ "frontend=" && !req.http.X-Varnish-Esi-Method) {
@@ -359,20 +359,19 @@ sub vcl_deliver {
             "; expires=" + resp.http.X-Varnish-Cookie-Expires + "; path=/";
         if (req.http.Host) {
             if (req.http.User-Agent ~ "^(?:{{crawler_user_agent_regex}})$") {
-            	# it's a crawler, no need to share cookies
+                # it's a crawler, no need to share cookies
                 set resp.http.Set-Cookie = resp.http.Set-Cookie +
-                   	"; domain=" + regsub(req.http.Host, ":\d+$", "");
+                "; domain=" + regsub(req.http.Host, ":\d+$", "");
             } else {
-               	# it's a real user, allow sharing of cookies between stores
-            	if(req.http.Host ~ "{{normalize_cookie_regex}}") {
-                	set resp.http.Set-Cookie = resp.http.Set-Cookie +
-                    	"; domain={{normalize_cookie_target}}";
-                    } else {
-                        set resp.http.Set-Cookie = resp.http.Set-Cookie +
-                    	"; domain=" + regsub(req.http.Host, ":\d+$", "");
-                	}
-            	}
-			}
+                # it's a real user, allow sharing of cookies between stores
+                if(req.http.Host ~ "{{normalize_cookie_regex}}") {
+                    set resp.http.Set-Cookie = resp.http.Set-Cookie +
+                    "; domain={{normalize_cookie_target}}";
+                } else {
+                    set resp.http.Set-Cookie = resp.http.Set-Cookie +
+                    "; domain=" + regsub(req.http.Host, ":\d+$", "");
+                }
+            }
         }
         set resp.http.Set-Cookie = resp.http.Set-Cookie + "; httponly";
         unset resp.http.X-Varnish-Cookie-Expires;
