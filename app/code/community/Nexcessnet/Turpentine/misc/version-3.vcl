@@ -357,8 +357,21 @@ sub vcl_deliver {
         set resp.http.Set-Cookie = req.http.X-Varnish-Faked-Session +
             "; expires=" + resp.http.X-Varnish-Cookie-Expires + "; path=/";
         if (req.http.Host) {
-            set resp.http.Set-Cookie = resp.http.Set-Cookie +
-                "; domain=" + regsub(req.http.Host, ":\d+$", "");
+            if (req.http.User-Agent ~ "^(?:{{crawler_user_agent_regex}})$") {
+            	# it's a crawler, no need to share cookies
+                set resp.http.Set-Cookie = resp.http.Set-Cookie +
+                   	"; domain=" + regsub(req.http.Host, ":\d+$", "");
+            } else {
+               	# it's a real user, allow sharing of cookies between stores
+            	if(req.http.Host ~ "{{normalize_cookie_regex}}") {
+                	set resp.http.Set-Cookie = resp.http.Set-Cookie +
+                    	"; domain={{normalize_cookie_target}}";
+                    } else {
+                        set resp.http.Set-Cookie = resp.http.Set-Cookie +
+                    	"; domain=" + regsub(req.http.Host, ":\d+$", "");
+                	}
+            	}
+			}
         }
         set resp.http.Set-Cookie = resp.http.Set-Cookie + "; httponly";
         unset resp.http.X-Varnish-Cookie-Expires;

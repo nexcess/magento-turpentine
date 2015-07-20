@@ -634,6 +634,26 @@ EOS;
     }
 
     /**
+     * Get the hostname for cookie normalization
+     *
+     * @return string
+     */
+    protected function _getNormalizeCookieTarget() {
+        return trim( Mage::getStoreConfig(
+            'turpentine_vcl/normalization/cookie_target' ) );
+    }
+
+    /**
+     * Get the regex for cookie normalization
+     *
+     * @return string
+     */
+    protected function _getNormalizeCookieRegex() {
+        return trim( Mage::getStoreConfig(
+            'turpentine_vcl/normalization/cookie_regex' ) );
+    }
+
+    /**
      * Build the list of template variables to apply to the VCL template
      *
      * @return array
@@ -686,7 +706,13 @@ EOS;
         if( Mage::getStoreConfig( 'turpentine_vcl/normalization/host' ) ) {
             $vars['normalize_host'] = $this->_vcl_sub_normalize_host();
         }
-
+        if( Mage::getStoreConfig( 'turpentine_vcl/normalization/cookie_regex' ) ) {
+            $vars['normalize_cookie_regex'] = $this->_getNormalizeCookieRegex();
+        }
+        if( Mage::getStoreConfig( 'turpentine_vcl/normalization/cookie_target' ) ) {
+            $vars['normalize_cookie_target'] = $this->_getNormalizeCookieTarget();
+        }
+        
         $customIncludeFile = $this->_getCustomIncludeFilename();
         if( is_readable( $customIncludeFile ) ) {
             $vars['custom_vcl_include'] = file_get_contents( $customIncludeFile );
