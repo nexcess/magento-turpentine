@@ -342,14 +342,6 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             Mage::getStoreConfig( 'turpentine_vcl/params/get_params' ) ) );
     }
 
-    protected function _getIgnoreGetParameters()
-    {
-        /** @var Nexcessnet_Turpentine_Helper_Data $helper */
-        $helper = Mage::helper('turpentine');
-        $ignoredParameters = $helper->cleanExplode(',', Mage::getStoreConfig( 'turpentine_vcl/params/ignore_get_params'));
-        return implode( '|',  $ignoredParameters);
-    }
-
     /**
      * Get the Force Static Caching option
      *
@@ -511,18 +503,17 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      */
     protected function _cleanVclHelper( $line ) {
         return $line &&
-            ( ( substr( $line, 0, 1 ) != '#' &&
-            substr( $line, 0, 2 ) != '//' ) ||
+            ( substr( $line, 0, 1 ) != '#' ||
+            substr( $line, 0, 2 ) != '//' ||
             substr( $line, 0, 8 ) == '#include' );
     }
 
     /**
      * Format a VCL backend declaration
      *
-     * @param  string $name    name of the backend
-     * @param  string $host    backend host
-     * @param  string $port    backend port
-     * @param  array  $options options
+     * @param  string $name name of the backend
+     * @param  string $host backend host
+     * @param  string $port backend port
      * @return string
      */
     protected function _vcl_backend( $name, $host, $port, $options=array() ) {
@@ -610,7 +601,7 @@ if (req.http.Accept-Encoding) {
         } else if (req.http.Accept-Encoding ~ "deflate") {
             set req.http.Accept-Encoding = "deflate";
         } else {
-            # unknown algorithm
+            # unkown algorithm
             unset req.http.Accept-Encoding;
         }
     }
@@ -645,13 +636,10 @@ EOS;
             'admin_frontname'   => $this->_getAdminFrontname(),
             'normalize_host_target' => $this->_getNormalizeHostTarget(),
             'url_base_regex'    => $this->getBaseUrlPathRegex(),
-        	'allowed_hosts_regex'	=> $this->getAllowedHostsRegex(),
             'url_excludes'  => $this->_getUrlExcludes(),
             'get_param_excludes'    => $this->_getGetParamExcludes(),
-            'get_param_ignored' => $this->_getIgnoreGetParameters(),
             'default_ttl'   => $this->_getDefaultTtl(),
             'enable_get_excludes'   => ($this->_getGetParamExcludes() ? 'true' : 'false'),
-            'enable_get_ignored' => ($this->_getIgnoreGetParameters()) ? 'true' : 'false',
             'debug_headers' => $this->_getEnableDebugHeaders(),
             'grace_period'  => $this->_getGracePeriod(),
             'force_cache_static'    => $this->_getForceCacheStatic(),
