@@ -104,6 +104,7 @@ sub vcl_recv {
     set req.http.X-Opt-Enable-Caching = "{{enable_caching}}";
     set req.http.X-Opt-Force-Static-Caching = "{{force_cache_static}}";
     set req.http.X-Opt-Enable-Get-Excludes = "{{enable_get_excludes}}";
+    set req.http.X-Opt-Enable-Get-Ignored = "{{enable_get_ignored}}";
 
     # Normalize request data before potentially sending things off to the
     # backend. This ensures all request types get the same information, most
@@ -192,7 +193,7 @@ sub vcl_recv {
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
             return (pass);
         }
-        if ({{enable_get_ignored}} && req.url ~ "[?&]({{get_param_ignored}})=") {
+        if (req.http.X-Opt-Enable-Get-Ignored == "true" && req.url ~ "[?&]({{get_param_ignored}})=") {
             # Strip out ignored GET related parameters
             set req.url = regsuball(req.url, "(?:(\?)?|&)(?:{{get_param_ignored}})=[^&]+", "\1");
             set req.url = regsuball(req.url, "(?:(\?)&|\?$)", "\1");
