@@ -29,6 +29,7 @@
                 <auto_apply_on_save>1</auto_apply_on_save>
                 <strip_vcl_whitespace>always</strip_vcl_whitespace>
                 <varnish_debug>0</varnish_debug>
+                <vcl_fix>1</vcl_fix>
                 <block_debug>0</block_debug>
                 <ajax_messages>1</ajax_messages>
                 <fix_product_toolbar>0</fix_product_toolbar>
@@ -416,6 +417,40 @@
                 </turpentine_esi>
             </updates>
         </layout>
+        <events>
+            <controller_action_predispatch>
+                <observers>
+                    <controller_action_before>
+                        <class>turpentine/observer_esi</class>
+                        <method>hookToControllerActionPreDispatch</method>
+                    </controller_action_before>
+                </observers>
+            </controller_action_predispatch>
+            <!--controller_action_postdispatch>
+                <observers>
+                    <controller_action_after>
+                        <class>turpentine/observer_esi</class>
+                        <method>hookToControllerActionPostDispatch</method>
+                    </controller_action_after>
+                </observers>
+            </controller_action_postdispatch-->
+            <add_to_cart_before>
+                <observers>
+                    <add_to_cart_before>
+                        <class>turpentine/observer_esi</class>
+                        <method>hookToAddToCartBefore</method>
+                    </add_to_cart_before>
+                </observers>
+            </add_to_cart_before>
+            <!--add_to_cart_after>
+                <observers>
+                    <add_to_cart_after>
+                        <class>turpentine/observer_esi</class>
+                        <method>hookToAddToCartAfter</method>
+                    </add_to_cart_after>
+                </observers>
+            </add_to_cart_after-->
+        </events>
     </frontend>
     <admin>
         <routers>
