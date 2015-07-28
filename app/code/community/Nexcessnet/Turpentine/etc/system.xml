@@ -62,6 +62,16 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </strip_vcl_whitespace>
+                        <vcl_fix translate="label comment">
+                            <label>Use VCL fix</label>
+                            <comment>When Enable is selected, a VCL fix will be used to prevent formKey issues. If Disable is selected, an observer will be used.</comment>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>28</sort_order>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </vcl_fix>
                         <varnish_debug translate="label" module="turpentine">
                             <label>Enable Debug Info</label>
                             <comment>It is a major security vulnerability, to leave this enabled on production sites</comment>
@@ -336,6 +346,24 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </host_target>
+                        <cookie_regex translate="label" module="turpentine">
+                            <label>Normalize Cookie Regex</label>
+                            <comment>Cookie regex to match to override initial cookie domain</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </cookie_regex>
+                        <cookie_target translate="label" module="turpentine">
+                            <label>Normalized Cookie Target</label>
+                            <comment>Domain to force cookies to which the regex matches</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </cookie_target>
                     </fields>
                 </normalization>
                 <ttls translate="label" module="turpentine">

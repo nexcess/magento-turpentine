@@ -152,7 +152,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
                 }
             } else {
                 // error
-                Mage::helper( 'turpentine/debug' )->logWarning(
+                Mage::helper( 'turpentine/debug' )->logWarn(
                     'Failed to parse param.show output to check esi_syntax value' );
                 $result = true;
             }
