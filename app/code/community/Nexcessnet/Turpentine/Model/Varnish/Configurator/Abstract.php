@@ -713,7 +713,7 @@ EOS;
             'get_param_ignored' => $this->_getIgnoreGetParameters(),
             'default_ttl'   => $this->_getDefaultTtl(),
             'enable_get_excludes'   => ($this->_getGetParamExcludes() ? 'true' : 'false'),
-            'enable_get_ignored' => ($this->_getIgnoreGetParameters()) ? 'true' : 'false',
+            'enable_get_ignored' => ($this->_getIgnoreGetParameters() ? 'true' : 'false'),
             'debug_headers' => $this->_getEnableDebugHeaders(),
             'grace_period'  => $this->_getGracePeriod(),
             'force_cache_static'    => $this->_getForceCacheStatic(),
