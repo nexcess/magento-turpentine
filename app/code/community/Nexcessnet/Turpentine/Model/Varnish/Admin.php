@@ -169,7 +169,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
 
             if ( $result===false ) {
                 // error
-                Mage::helper( 'turpentine/debug' )->logWarning(
+                Mage::helper( 'turpentine/debug' )->logWarn(
                     sprintf('Failed to parse param.show output to check %s value', $paramName ) );
                 $result = true;
             }
