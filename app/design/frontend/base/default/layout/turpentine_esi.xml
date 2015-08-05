@@ -240,6 +240,24 @@
         <turpentine_cache_flag value="0"/>
     </checkout_onepage_progress>
 
+    <checkout_onepage_progress_billing>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_progress_billing>
+
+    <checkout_onepage_progress_shipping>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_progress_shipping>
+
+    <checkout_onepage_progress_shipping_method>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_progress_shipping_method>
+
+    <checkout_onepage_progress_payment>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_progress_payment>
+
+
+
     <checkout_onepage_paymentmethod>
         <turpentine_cache_flag value="0"/>
     </checkout_onepage_paymentmethod>
