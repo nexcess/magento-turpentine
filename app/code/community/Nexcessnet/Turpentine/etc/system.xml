@@ -280,7 +280,7 @@
                             <label>Crawler IP Addresses</label>
                             <frontend_type>text</frontend_type>
                             <sort_order>50</sort_order>
-                            <comment>Comma-separated list of IPs to serve cached pages to on initial visit</comment>
+                            <comment>Comma-separated list of IP addresses that should bypass Turpentine's frontend cookie requirement. Also useful for performance testing tools as they also typically don't support cookies. Note - if you are using something like Pound to terminate SSL before Varnish, setting this to the same IP could cause users to end up sharing the crawler session.</comment>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
