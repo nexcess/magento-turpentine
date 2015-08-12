@@ -88,6 +88,8 @@
                     <access>private</access>
                     <flush_events>
                         <catalog_product_compare_add_product/>
+                        <catalog_product_compare_remove_product/>
+                        <catalog_product_compare_item_collection_clear/>
                     </flush_events>
                 </params>
             </action>
