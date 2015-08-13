@@ -39,6 +39,11 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             return null;
         }
         switch( $version ) {
+	        case '4.0':
+		        return Mage::getModel(
+			        'turpentine/varnish_configurator_version4',
+			        array( 'socket' => $socket ) );
+
             case '3.0':
                 return Mage::getModel(
                     'turpentine/varnish_configurator_version3',
@@ -798,7 +803,7 @@ EOS;
             'get_param_ignored' => $this->_getIgnoreGetParameters(),
             'default_ttl'   => $this->_getDefaultTtl(),
             'enable_get_excludes'   => ($this->_getGetParamExcludes() ? 'true' : 'false'),
-            'enable_get_ignored' => ($this->_getIgnoreGetParameters()) ? 'true' : 'false',
+            'enable_get_ignored' => ($this->_getIgnoreGetParameters() ? 'true' : 'false'),
             'debug_headers' => $this->_getEnableDebugHeaders(),
             'grace_period'  => $this->_getGracePeriod(),
             'force_cache_static'    => $this->_getForceCacheStatic(),

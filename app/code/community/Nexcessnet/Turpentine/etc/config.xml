@@ -20,7 +20,7 @@
 <config>
     <modules>
         <Nexcessnet_Turpentine>
-            <version>0.6.3</version>
+            <version>0.6.4</version>
         </Nexcessnet_Turpentine>
     </modules>
     <default>
@@ -131,6 +131,18 @@
                     <activePoll>Nexcessnet_Turpentine_Block_Poll_ActivePoll</activePoll>
                 </rewrite>
             </poll>
+
+            <!--
+            Rewrite the compared and viewed product block. Default behavior returns '' if 
+            no items to display, which prevents display of the ESI url, causing caching problems
+            -->
+            <reports>
+                <rewrite>
+                    <product_compared>Nexcessnet_Turpentine_Block_Product_Compared</product_compared>
+                    <product_viewed>Nexcessnet_Turpentine_Block_Product_Viewed</product_viewed>
+                </rewrite>
+            </reports>
+
             <adminhtml>
                 <rewrite>
                     <cache_grid>Nexcessnet_Turpentine_Block_Adminhtml_Cache_Grid</cache_grid>
