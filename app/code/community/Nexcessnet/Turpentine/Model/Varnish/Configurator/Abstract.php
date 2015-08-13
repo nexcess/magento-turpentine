@@ -680,7 +680,8 @@ EOS;
             'normalize_host_target' => $this->_getNormalizeHostTarget() ) );
     }
 
-    /* Get the hostname for cookie normalization
+    /**
+     * Get the hostname for cookie normalization
      *
      * @return string
      */
