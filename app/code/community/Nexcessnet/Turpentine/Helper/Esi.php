@@ -319,6 +319,19 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     }
 
     /**
+     * Fix ESI URL to cover Varnish issues
+     *
+     * @param string $url ESI url
+     * @return string The corrected ESI url, or the original url if no changes needed
+     */
+    public function fixEsiUrl( $url ){
+        if(preg_match('/^https:\/\//i', $url)){
+            $url = 'http://' . substr($url, 8);
+        }
+        return $url;
+    }
+
+    /**
      * Generate an ESI tag to be replaced by the content from the given URL
      *
      * Generated tag looks like:
@@ -328,7 +341,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return string
      */
     public function buildEsiIncludeFragment( $url ) {
-        return sprintf( '<esi:include src="%s" />', $url );
+        return sprintf( '<esi:include src="%s" />', $this->fixEsiUrl( $url ) );
     }
 
     /**
