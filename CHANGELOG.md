@@ -409,3 +409,4 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#596] update docs to make an important notice on Crawler IP Addresses setting under Caching Options (@arosenhagen)
   * [#878] Explicit cache bypass for progress sections (@astorm)
   * [#844] Fix for HTTPS ESI URLs (@jeroenvermeulen)
+  * [#865] Implemented load balancing support (@jeroenvermeulen)
