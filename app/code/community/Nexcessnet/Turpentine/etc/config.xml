@@ -49,8 +49,13 @@
         </turpentine_varnish>
         <turpentine_vcl>
             <backend>
+                <load_balancing>no</load_balancing>
                 <backend_host>127.0.0.1</backend_host>
                 <backend_port>8080</backend_port>
+                <backend_nodes>127.0.0.1:8080</backend_nodes>
+                <backend_probe_url></backend_probe_url>
+                <backend_nodes_admin>127.0.0.1:8080</backend_nodes_admin>
+                <backend_probe_url_admin></backend_probe_url_admin>
                 <frontend_timeout>300</frontend_timeout>
                 <admin_timeout>21600</admin_timeout>
                 <crawlers>127.0.0.1</crawlers>
