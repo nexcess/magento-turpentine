@@ -138,22 +138,39 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
         $result = false;
 
         if( $helper->csrfFixupNeeded() ) {
-            $value = $socket->param_show( 'esi_syntax' );
-            if( preg_match( '~(\d)\s+\[bitmap\]~', $value['text'], $match ) ) {
-                $value = hexdec( $match[1] );
-                if( $value & self::MASK_ESI_SYNTAX ) { //bitwise intentional
-                    // setting is correct, all is fine
+            if ( $socket->getVersion()==='4.0' ) {
+                $paramName = 'feature';
+                $value = $socket->param_show( $paramName );
+                $value = explode("\n", $value['text']);
+                if ( isset($value[1]) && strpos($value[1], '+esi_ignore_other_elements')!==false ) {
                     $result = true;
                 } else {
-                    $session->addWarning( 'Varnish <em>esi_syntax</em> param is ' .
+                    $session->addWarning( 'Varnish <em>feature</em> param is ' .
                         'not set correctly, please see <a target="_blank" href="' .
                         self::URL_ESI_SYNTAX_FIX . '">these instructions</a> ' .
                         'to fix this warning.' );
                 }
             } else {
+                $paramName = 'esi_syntax';
+                $value = $socket->param_show( $paramName );
+                if( preg_match( '~(\d)\s+\[bitmap\]~', $value['text'], $match ) ) {
+                    $value = hexdec( $match[1] );
+                    if( $value & self::MASK_ESI_SYNTAX ) { //bitwise intentional
+                        // setting is correct, all is fine
+                        $result = true;
+                    } else {
+                        $session->addWarning( 'Varnish <em>esi_syntax</em> param is ' .
+                            'not set correctly, please see <a target="_blank" href="' .
+                            self::URL_ESI_SYNTAX_FIX . '">these instructions</a> ' .
+                            'to fix this warning.' );
+                    }
+                }
+            }
+
+            if ( $result===false ) {
                 // error
                 Mage::helper( 'turpentine/debug' )->logWarn(
-                    'Failed to parse param.show output to check esi_syntax value' );
+                    sprintf('Failed to parse param.show output to check %s value', $paramName ) );
                 $result = true;
             }
         } else {

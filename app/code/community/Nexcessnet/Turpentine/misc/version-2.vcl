@@ -119,6 +119,9 @@ sub vcl_recv {
     if (req.http.X-Opt-Enable-Caching != "true" || req.http.Authorization ||
             !(req.request ~ "^(GET|HEAD|OPTIONS)$") ||
             req.http.Cookie ~ "varnish_bypass={{secret_handshake}}") {
+        if (req.url ~ "{{url_base_regex}}{{admin_frontname}}") {
+            set req.backend = admin;
+        }
         return (pipe);
     }
 

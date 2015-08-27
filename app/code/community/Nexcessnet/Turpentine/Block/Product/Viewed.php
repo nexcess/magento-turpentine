@@ -19,14 +19,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-class Nexcessnet_Turpentine_Model_Config_Select_Version {
-    public function toOptionArray() {
-        $helper = Mage::helper('turpentine');
-        return array(
-            array( 'value' => '2.1', 'label' => $helper->__( '2.1.x' ) ),
-            array( 'value' => '3.0', 'label' => $helper->__( '3.0.x' ) ),
-	        array( 'value' => '4.0', 'label' => $helper->__( '4.0.x' ) ),
-            array( 'value' => 'auto', 'label' => $helper->__( 'Auto' ) ),
-        );
+class Nexcessnet_Turpentine_Block_Product_Viewed extends Mage_Reports_Block_Product_Viewed {
+
+    protected function _toHtml()
+    {
+        if (!$this->getCount()) {
+            return $this->renderView();
+        }
+        $this->setRecentlyViewedProducts($this->getItemsCollection());
+        return parent::_toHtml();
     }
 }
