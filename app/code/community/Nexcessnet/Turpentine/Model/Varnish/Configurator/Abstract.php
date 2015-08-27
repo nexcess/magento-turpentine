@@ -219,7 +219,23 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
         $pattern = '('.implode('|', array_map("preg_quote", $hosts)).')';
     	return $pattern;
     }
-    
+
+    /**
+     * Get the Host normalization sub routine
+     *
+     * @return string
+     */
+    protected function _vcl_sub_allowed_hosts_regex() {
+        $tpl = <<<EOS
+# if host is not allowed in magento pass to backend
+        if (req.http.host !~ "{{allowed_hosts_regex}}") {
+            return (pass);
+        }
+EOS;
+        return $this->_formatTemplate( $tpl, array(
+            'allowed_hosts_regex' => $this->getAllowedHostsRegex() ) );
+    }
+
     /**
      * Get the base url path regex
      *
@@ -821,7 +837,6 @@ EOS;
             'admin_frontname'   => $this->_getAdminFrontname(),
             'normalize_host_target' => $this->_getNormalizeHostTarget(),
             'url_base_regex'    => $this->getBaseUrlPathRegex(),
-        	'allowed_hosts_regex'	=> $this->getAllowedHostsRegex(),
             'url_excludes'  => $this->_getUrlExcludes(),
             'get_param_excludes'    => $this->_getGetParamExcludes(),
             'get_param_ignored' => $this->_getIgnoreGetParameters(),
@@ -857,6 +872,11 @@ EOS;
             'esi_private_ttl'   => Mage::helper( 'turpentine/esi' )
                 ->getDefaultEsiTtl(),
         );
+
+        if( (bool)Mage::getStoreConfig( 'turpentine_vcl/urls/bypass_cache_store_url') ) {
+            $vars['allowed_hosts'] = $this->_vcl_sub_allowed_hosts_regex();
+        }
+
         if( Mage::getStoreConfig( 'turpentine_vcl/normalization/encoding' ) ) {
             $vars['normalize_encoding'] = $this->_vcl_sub_normalize_encoding();
         }
