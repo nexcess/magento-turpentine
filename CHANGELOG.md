@@ -410,3 +410,6 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#878] Explicit cache bypass for progress sections (@astorm)
   * [#844] Fix for HTTPS ESI URLs (@jeroenvermeulen)
   * [#865] Implemented load balancing support (@jeroenvermeulen)
+
+### RELEASE-0.6.5
+  * Varnish 4 (@aheadley @aricwatson)
