@@ -49,8 +49,13 @@
         </turpentine_varnish>
         <turpentine_vcl>
             <backend>
+                <load_balancing>no</load_balancing>
                 <backend_host>127.0.0.1</backend_host>
                 <backend_port>8080</backend_port>
+                <backend_nodes>127.0.0.1:8080</backend_nodes>
+                <backend_probe_url></backend_probe_url>
+                <backend_nodes_admin>127.0.0.1:8080</backend_nodes_admin>
+                <backend_probe_url_admin></backend_probe_url_admin>
                 <frontend_timeout>300</frontend_timeout>
                 <admin_timeout>21600</admin_timeout>
                 <crawlers>127.0.0.1</crawlers>
@@ -131,6 +136,18 @@
                     <activePoll>Nexcessnet_Turpentine_Block_Poll_ActivePoll</activePoll>
                 </rewrite>
             </poll>
+
+            <!--
+            Rewrite the compared and viewed product block. Default behavior returns '' if 
+            no items to display, which prevents display of the ESI url, causing caching problems
+            -->
+            <reports>
+                <rewrite>
+                    <product_compared>Nexcessnet_Turpentine_Block_Product_Compared</product_compared>
+                    <product_viewed>Nexcessnet_Turpentine_Block_Product_Viewed</product_viewed>
+                </rewrite>
+            </reports>
+
             <adminhtml>
                 <rewrite>
                     <cache_grid>Nexcessnet_Turpentine_Block_Adminhtml_Cache_Grid</cache_grid>

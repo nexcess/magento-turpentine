@@ -1,3 +1,4 @@
+vcl 4.0;
 # Nexcess.net Turpentine Extension for Magento
 # Copyright (C) 2012  Nexcess.net L.L.C.
 #
@@ -20,7 +21,7 @@
 ## Custom C Code
 
 C{
-    // @source app/code/community/Nexcessnet/Turpentine/misc/uuid.c
+    # @source app/code/community/Nexcessnet/Turpentine/misc/uuid.c
     {{custom_c_code}}
 }C
 
@@ -57,8 +58,10 @@ sub generate_session {
         C{
             char uuid_buf [50];
             generate_uuid(uuid_buf);
-            VRT_SetHdr(sp, HDR_REQ,
-                "\030X-Varnish-Faked-Session:",
+	        static const struct gethdr_s VGC_HDR_REQ_VARNISH_FAKED_SESSION =
+            { HDR_REQ, "\030X-Varnish-Faked-Session:"};
+            VRT_SetHdr(ctx,
+                &VGC_HDR_REQ_VARNISH_FAKED_SESSION,
                 uuid_buf,
                 vrt_magic_string_end
             );
@@ -73,7 +76,7 @@ sub generate_session {
     } else {
         set req.http.Cookie = req.http.X-Varnish-Faked-Session;
     }
-} 
+}
 
 sub generate_session_expires {
     # sets X-Varnish-Cookie-Expires to now + esi_private_ttl in format:
@@ -86,8 +89,10 @@ sub generate_session_expires {
         mktime(&now_tm);
         char date_buf [50];
         strftime(date_buf, sizeof(date_buf)-1, "%a, %d-%b-%Y %H:%M:%S %Z", &now_tm);
-        VRT_SetHdr(sp, HDR_RESP,
-            "\031X-Varnish-Cookie-Expires:",
+	    static const struct gethdr_s VGC_HDR_RESP_COOKIE_EXPIRES =
+        { HDR_RESP, "\031X-Varnish-Cookie-Expires:"};
+        VRT_SetHdr(ctx,
+            &VGC_HDR_RESP_COOKIE_EXPIRES,
             date_buf,
             vrt_magic_string_end
         );
@@ -107,28 +112,21 @@ sub vcl_recv {
         }
     }
 
-    # Normalize request data before potentially sending things off to the
-    # backend. This ensures all request types get the same information, most
-    # notably POST requests getting a normalized user agent string to empower
-    # adaptive designs.
-    {{normalize_encoding}}
-    {{normalize_user_agent}}
-    {{normalize_host}}
-
     # We only deal with GET and HEAD by default
     # we test this here instead of inside the url base regex section
     # so we can disable caching for the entire site if needed
     if (!{{enable_caching}} || req.http.Authorization ||
-        req.request !~ "^(GET|HEAD|OPTIONS)$" ||
+        req.method !~ "^(GET|HEAD|OPTIONS)$" ||
         req.http.Cookie ~ "varnish_bypass={{secret_handshake}}") {
-        if (req.url ~ "{{url_base_regex}}{{admin_frontname}}") {
-            set req.backend = admin;
-        }
         return (pipe);
     }
 
     # remove double slashes from the URL, for higher cache hit rate
-    set req.url = regsuball(req.url, "([^:])//+", "\1/");
+    set req.url = regsuball(req.url, "(.*)//+(.*)", "\1/\2");
+
+    {{normalize_encoding}}
+    {{normalize_user_agent}}
+    {{normalize_host}}
 
     # check if the request is for part of magento
     if (req.url ~ "{{url_base_regex}}") {
@@ -136,7 +134,7 @@ sub vcl_recv {
         set req.http.X-Turpentine-Secret-Handshake = "{{secret_handshake}}";
         # use the special admin backend and pipe if it's for the admin section
         if (req.url ~ "{{url_base_regex}}{{admin_frontname}}") {
-            set req.backend = admin;
+            set req.backend_hint = admin;
             return (pipe);
         }
         if (req.http.Cookie ~ "\bcurrency=") {
@@ -158,7 +156,7 @@ sub vcl_recv {
             # requested by the user (does not apply to ajax blocks)
             if (req.http.X-Varnish-Esi-Method == "esi" && req.esi_level == 0 &&
                     !({{debug_headers}} || client.ip ~ debug_acl)) {
-                error 403 "External ESI requests are not allowed";
+                return (synth(403, "External ESI requests are not allowed"));
             }
         }
         # if host is not allowed in magento pass to backend
@@ -182,7 +180,7 @@ sub vcl_recv {
             # don't need cookies for static assets
             unset req.http.Cookie;
             unset req.http.X-Varnish-Faked-Session;
-            return (lookup);
+            return (hash);
         }
         # this doesn't need a enable_url_excludes because we can be reasonably
         # certain that cron.php at least will always be in it, so it will
@@ -199,15 +197,20 @@ sub vcl_recv {
             # TODO: should this be pass or pipe?
             return (pass);
         }
+        if (req.url ~ "[?&](utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=") {
+            # Strip out Google related parameters
+            set req.url = regsuball(req.url, "(?:(\?)?|&)(?:utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=[^&]+", "\1");
+            set req.url = regsuball(req.url, "(?:(\?)&|\?$)", "\1");
+        }
+
         if ({{enable_get_ignored}} && req.url ~ "[?&]({{get_param_ignored}})=") {
             # Strip out Ignored GET parameters
             set req.url = regsuball(req.url, "(?:(\?)?|&)(?:{{get_param_ignored}})=[^&]+", "\1");
             set req.url = regsuball(req.url, "(?:(\?)&|\?$)", "\1");
         }
 
-
         # everything else checks out, try and pull from the cache
-        return (lookup);
+        return (hash);
     }
     # else it's not part of magento so do default handling (doesn't help
     # things underneath magento but we can't detect that)
@@ -251,13 +254,7 @@ sub vcl_hash {
         {{advanced_session_validation}}
 
     }
-
-    if (req.http.X-Varnish-Esi-Access == "customer_group" &&
-            req.http.Cookie ~ "customer_group=") {
-        hash_data(regsub(req.http.Cookie, "^.*?customer_group=([^;]*);*.*$", "\1"));
-    }
-    
-    return (hash);
+    return (lookup);
 }
 
 sub vcl_hit {
@@ -272,16 +269,16 @@ sub vcl_hit {
 #     return (fetch);
 # }
 
-sub vcl_fetch {
+sub vcl_backend_response {
     # set the grace period
-    set req.grace = {{grace_period}}s;
+    set beresp.grace = {{grace_period}}s;
 
     # Store the URL in the response object, to be able to do lurker friendly bans later
-    set beresp.http.X-Varnish-Host = req.http.host;
-    set beresp.http.X-Varnish-URL = req.url;
+    set beresp.http.X-Varnish-Host = bereq.http.host;
+    set beresp.http.X-Varnish-URL = bereq.url;
 
     # if it's part of magento...
-    if (req.url ~ "{{url_base_regex}}") {
+    if (bereq.url ~ "{{url_base_regex}}") {
         # we handle the Vary stuff ourselves for now, we'll want to actually
         # use this eventually for compatibility with downstream proxies
         # TODO: only remove the User-Agent field from this if it exists
@@ -292,7 +289,8 @@ sub vcl_fetch {
         if (beresp.status != 200 && beresp.status != 404) {
             # pass anything that isn't a 200 or 404
             set beresp.ttl = {{grace_period}}s;
-            return (hit_for_pass);
+            set beresp.uncacheable = true;
+            return (deliver);
         } else {
             # if Magento sent us a Set-Cookie header, we'll put it somewhere
             # else for now
@@ -312,35 +310,37 @@ sub vcl_fetch {
             }
             if (beresp.http.X-Turpentine-Cache == "0") {
                 set beresp.ttl = {{grace_period}}s;
-                return (hit_for_pass);
+                set beresp.uncacheable = true;
+                return (deliver);
             } else {
                 if ({{force_cache_static}} &&
                         bereq.url ~ ".*\.(?:{{static_extensions}})(?=\?|&|$)") {
                     # it's a static asset
                     set beresp.ttl = {{static_ttl}}s;
                     set beresp.http.Cache-Control = "max-age={{static_ttl}}";
-                } elseif (req.http.X-Varnish-Esi-Method) {
+                } elseif (bereq.http.X-Varnish-Esi-Method) {
                     # it's a ESI request
-                    if (req.http.X-Varnish-Esi-Access == "private" &&
-                            req.http.Cookie ~ "frontend=") {
+                    if (bereq.http.X-Varnish-Esi-Access == "private" &&
+                            bereq.http.Cookie ~ "frontend=") {
                         # set this header so we can ban by session from Turpentine
-                        set beresp.http.X-Varnish-Session = regsub(req.http.Cookie,
+                        set beresp.http.X-Varnish-Session = regsub(bereq.http.Cookie,
                             "^.*?frontend=([^;]*);*.*$", "\1");
                     }
-                    if (req.http.X-Varnish-Esi-Method == "ajax" &&
-                            req.http.X-Varnish-Esi-Access == "public") {
+                    if (bereq.http.X-Varnish-Esi-Method == "ajax" &&
+                            bereq.http.X-Varnish-Esi-Access == "public") {
                         set beresp.http.Cache-Control = "max-age=" + regsub(
-                            req.url, ".*/{{esi_ttl_param}}/(\d+)/.*", "\1");
+                            bereq.url, ".*/{{esi_ttl_param}}/(\d+)/.*", "\1");
                     }
                     set beresp.ttl = std.duration(
                         regsub(
-                            req.url, ".*/{{esi_ttl_param}}/(\d+)/.*", "\1s"),
+                            bereq.url, ".*/{{esi_ttl_param}}/(\d+)/.*", "\1s"),
                         300s);
                     if (beresp.ttl == 0s) {
                         # this is probably faster than bothering with 0 ttl
                         # cache objects
                         set beresp.ttl = {{grace_period}}s;
-                        return (hit_for_pass);
+                        set beresp.uncacheable = true;
+                        return (deliver);
                     }
                 } else {
                     {{url_ttls}}
@@ -356,7 +356,6 @@ sub vcl_fetch {
 sub vcl_deliver {
     if (req.http.X-Varnish-Faked-Session) {
         # need to set the set-cookie header since we just made it out of thin air
-        # call generate_session_expires;
         {{generate_session_expires}}
         set resp.http.Set-Cookie = req.http.X-Varnish-Faked-Session +
             "; expires=" + resp.http.X-Varnish-Cookie-Expires + "; path=/";

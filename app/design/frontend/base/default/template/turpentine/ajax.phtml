@@ -32,6 +32,9 @@ if( $debugEnabled ) {
  * be an issue we'll have to go back to using Ajax.Request so the container
  * block is completely replaced which means no nice appear effect.
  *
+ * The 10 ms delay after page load is to make sure the Ajax call is
+ * executed async so it does not delay DOMContentLoaded. Better for Google.
+ *
  * @link http://prototypejs.org/doc/latest/ajax/index.html
  * @link http://prototypejs.org/doc/latest/ajax/Ajax/Request/index.html
  * @link http://prototypejs.org/doc/latest/dom/Element/replace/index.html
@@ -47,30 +50,34 @@ echo <<<HTML
     <script type="text/javascript">
         (function() {
             var blockTag = {$this->helper('core')->jsonEncode($blockTag)}, esiUrl = {$this->helper('core')->jsonEncode($this->getEsiUrl())};
-            if (typeof Ajax === 'object' && typeof Ajax.Updater === 'function') {
-                new Ajax.Updater(
-                    blockTag,
-                    esiUrl,
-                    {
-                        method: "get",
-                        evalScripts: true,
-                        {$_prototypeFunction}: function() {
-                            $(blockTag).appear({
-                                duration: 0.3
-                            });
+            if (typeof Ajax === 'object' && typeof Ajax.Updater === 'function' && typeof Event === 'function' ) {
+                Event.observe( window, "load", function() { setTimeout( function() {
+                    new Ajax.Updater(
+                        blockTag,
+                        esiUrl,
+                        {
+                            method: "get",
+                            evalScripts: true,
+                            {$_prototypeFunction}: function() {
+                                $(blockTag).appear({
+                                    duration: 0.3
+                                });
+                            }
                         }
-                    }
-                );
+                    );
+                }, 10 ); } );
             } else if (typeof jQuery === 'function') {
-                jQuery.ajax(
-                    {
-                        url: esiUrl,
-                        type: "get",
-                        dataType: "html"
-                    }
-                ).{$_jQueryFunction}(function() {
-                    $(blockTag).fadeIn(300);
-                });
+                jQuery(document).ready( function() { setTimeout( function() {
+                    jQuery.ajax(
+                        {
+                            url: esiUrl,
+                            type: "get",
+                            dataType: "html"
+                        }
+                    ).{$_jQueryFunction}(function(data) {
+                        jQuery('#'+blockTag).html(data).fadeIn(300);
+                    });
+                }, 10 ); } );
             }
         })();
     </script>
