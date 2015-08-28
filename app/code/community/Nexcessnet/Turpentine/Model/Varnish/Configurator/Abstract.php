@@ -213,13 +213,13 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     	foreach( Mage::app()->getStores() as $store ) {
     		$hosts[] = parse_url( $store->getBaseUrl( Mage_Core_Model_Store::URL_TYPE_WEB , false ), PHP_URL_HOST );
     	}
-    	 
+
     	$hosts = array_values(array_unique( $hosts ));
-    	 
+
         $pattern = '('.implode('|', array_map("preg_quote", $hosts)).')';
     	return $pattern;
     }
-    
+
     /**
      * Get the base url path regex
      *
@@ -292,7 +292,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             'first_byte_timeout'    => $timeout . 's',
             'between_bytes_timeout' => $timeout . 's',
         );
-        if ( Mage::getStoreConfigFlag( 'turpentine_vcl/backend/load_balancing' ) ) {
+        if ( Mage::getStoreConfigFlag( 'turpentine_vcl/backend/load_balancing' ) != 'no' ) {
             return $this->_vcl_director( 'default', $default_options );
         } else {
             return $this->_vcl_backend( 'default',
@@ -313,7 +313,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             'first_byte_timeout'    => $timeout . 's',
             'between_bytes_timeout' => $timeout . 's',
         );
-        if ( Mage::getStoreConfigFlag( 'turpentine_vcl/backend/load_balancing' ) ) {
+        if ( Mage::getStoreConfigFlag( 'turpentine_vcl/backend/load_balancing' ) != 'no' ) {
             return $this->_vcl_director( 'admin', $admin_options );
         } else {
             return $this->_vcl_backend( 'admin',
@@ -872,7 +872,7 @@ EOS;
         if( Mage::getStoreConfig( 'turpentine_vcl/normalization/cookie_target' ) ) {
             $vars['normalize_cookie_target'] = $this->_getNormalizeCookieTarget();
         }
-        
+
         $customIncludeFile = $this->_getCustomIncludeFilename();
         if( is_readable( $customIncludeFile ) ) {
             $vars['custom_vcl_include'] = file_get_contents( $customIncludeFile );
