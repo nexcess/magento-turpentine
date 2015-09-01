@@ -345,7 +345,9 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
                 $banner['text'] );
         }
 
-        $this->_version = $this->_determineVersion($banner['text']);
+        if ($this->_version == null) { // If autodetecting
+            $this->_version = $this->_determineVersion($banner['text']);
+        }
 
         return $this->isConnected();
     }
