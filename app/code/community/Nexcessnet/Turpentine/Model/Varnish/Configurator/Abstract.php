@@ -221,6 +221,22 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     }
 
     /**
+     * Get the Host normalization sub routine
+     *
+     * @return string
+     */
+    protected function _vcl_sub_allowed_hosts_regex() {
+        $tpl = <<<EOS
+# if host is not allowed in magento pass to backend
+        if (req.http.host !~ "{{allowed_hosts_regex}}") {
+            return (pass);
+        }
+EOS;
+        return $this->_formatTemplate( $tpl, array(
+            'allowed_hosts_regex' => $this->getAllowedHostsRegex() ) );
+    }
+
+    /**
      * Get the base url path regex
      *
      * ex: base_url: http://example.com/magento/
@@ -857,6 +873,11 @@ EOS;
             'esi_private_ttl'   => Mage::helper( 'turpentine/esi' )
                 ->getDefaultEsiTtl(),
         );
+
+        if( (bool)Mage::getStoreConfig( 'turpentine_vcl/urls/bypass_cache_store_url') ) {
+            $vars['allowed_hosts'] = $this->_vcl_sub_allowed_hosts_regex();
+        }
+
         if( Mage::getStoreConfig( 'turpentine_vcl/normalization/encoding' ) ) {
             $vars['normalize_encoding'] = $this->_vcl_sub_normalize_encoding();
         }
