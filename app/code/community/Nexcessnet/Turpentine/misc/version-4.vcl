@@ -352,6 +352,8 @@ sub vcl_backend_response {
     # else it's not part of Magento so use the default Varnish handling
 }
 
+{{vcl_synth}}
+
 sub vcl_deliver {
     if (req.http.X-Varnish-Faked-Session) {
         # need to set the set-cookie header since we just made it out of thin air
