@@ -299,8 +299,14 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      */
     public function banProductReview( $eventObject ) {
         $patterns = array();
+        /* @var $review \Mage_Review_Model_Review*/
         $review = $eventObject->getObject();
-        $products = $review->getProductCollection()->getItems();
+        
+        /* @var $productCollection \Mage_Review_Model_Resource_Review_Product_Collection*/
+        $productCollection = $review->getProductCollection();
+        
+        $products = $productCollection->addEntityFilter((int)$review->getEntityPkValue())->getItems();
+
         $productIds = array_unique( array_map(
             create_function( '$p', 'return $p->getEntityId();' ),
             $products ) );
