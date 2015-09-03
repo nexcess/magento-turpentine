@@ -503,6 +503,16 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </url_blacklist>
+                        <bypass_cache_store_url translate="label" module="turpentine">
+                            <label>Bypass Varnish if base URL is not found within a store?</label>
+                            <comment>If enabled any URL in the client that does not start with a store URL will bypass the cache</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>turpentine/config_select_toggle</source_model>
+                            <sort_order>11</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </bypass_cache_store_url>
                     </fields>
                 </urls>
                 <params translate="label" module="turpentine">
