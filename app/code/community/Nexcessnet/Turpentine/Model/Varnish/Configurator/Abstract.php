@@ -308,7 +308,7 @@ EOS;
             'first_byte_timeout'    => $timeout . 's',
             'between_bytes_timeout' => $timeout . 's',
         );
-        if ( Mage::getStoreConfigFlag( 'turpentine_vcl/backend/load_balancing' ) != 'no' ) {
+        if ( Mage::getStoreConfig( 'turpentine_vcl/backend/load_balancing' ) != 'no' ) {
             return $this->_vcl_director( 'default', $default_options );
         } else {
             return $this->_vcl_backend( 'default',
@@ -329,7 +329,7 @@ EOS;
             'first_byte_timeout'    => $timeout . 's',
             'between_bytes_timeout' => $timeout . 's',
         );
-        if ( Mage::getStoreConfigFlag( 'turpentine_vcl/backend/load_balancing' ) != 'no' ) {
+        if ( Mage::getStoreConfig( 'turpentine_vcl/backend/load_balancing' ) != 'no' ) {
             return $this->_vcl_director( 'admin', $admin_options );
         } else {
             return $this->_vcl_backend( 'admin',
