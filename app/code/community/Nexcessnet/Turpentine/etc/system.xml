@@ -132,6 +132,28 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </crawler_debug>
+                        <guest_caching_enable translate="label" module="turpentine">
+                            <label>Guest Caching</label>
+                            <comment>Enable to allow Turpentine cache pages where usually customers do not need session. When Enabled all guest customers get frontend=guest-customer-session until they do not hit url that contains "Guest Caching Blacklist Url Part"</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>turpentine/config_select_toggle</source_model>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </guest_caching_enable>
+                        <guest_caching_blacklist translate="label" module="turpentine">
+                            <label>Guest Caching Blacklist Url Parts</label>
+                            <depends>
+                                <guest_caching_enable>1</guest_caching_enable>
+                            </depends>
+                            <frontend_type>textarea</frontend_type>
+                            <comment>If request url matches any string of this list then the customer will get real session and guest caching would not work for this customer.</comment>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </guest_caching_blacklist>
                     </fields>
                 </general>
                 <logging translate="label" module="turpentine">
@@ -530,7 +552,7 @@
                             <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>                        
+                            <show_in_store>0</show_in_store>
                         </get_params>
                         <ignore_get_params translate="label" module="turpentine">
                             <label>Ignore GET Parameters</label>

@@ -73,7 +73,7 @@ sub generate_session {
     } else {
         set req.http.Cookie = req.http.X-Varnish-Faked-Session;
     }
-} 
+}
 
 sub generate_session_expires {
     # sets X-Varnish-Cookie-Expires to now + esi_private_ttl in format:
@@ -169,9 +169,24 @@ sub vcl_recv {
                 # it's a crawler, give it a fake cookie
                 set req.http.Cookie = "frontend=crawler-session";
             } else {
-                # it's a real user, make up a new session for them
-                {{generate_session}}# call generate_session;
-                return (pipe);
+                # it's a real user, make up a new unique session for them
+                if (!{{guest_caching_enable}}) {
+                    {{generate_session}}# call generate_session;
+                    return (pipe);
+                }
+
+                # it's a real user, make up a new guest session aka cookie frontend=guest-customer-session
+                set req.http.X-Varnish-Faked-Session = "frontend=guest-customer-session";
+
+                if (req.http.Cookie) {
+                    # client sent us cookies, just not a frontend cookie. try not to blow
+                    # away the extra cookies
+                    std.collect(req.http.Cookie);
+                    set req.http.Cookie = req.http.X-Varnish-Faked-Session +
+                        "; " + req.http.Cookie;
+                } else {
+                    set req.http.Cookie = req.http.X-Varnish-Faked-Session;
+                }
             }
         }
         if ({{force_cache_static}} &&
@@ -181,6 +196,16 @@ sub vcl_recv {
             unset req.http.X-Varnish-Faked-Session;
             return (lookup);
         }
+
+        # we need to create real session for the guest user
+        if ({{guest_caching_enable}} &&
+                req.http.Cookie ~ "frontend=guest-customer-session" &&
+                req.url ~ "({{guest_caching_blacklist}})") {
+            unset req.http.Cookie;
+            unset req.http.X-Varnish-Faked-Session;
+            return (pipe);
+        }
+
         # this doesn't need a enable_url_excludes because we can be reasonably
         # certain that cron.php at least will always be in it, so it will
         # never be empty
@@ -253,7 +278,7 @@ sub vcl_hash {
             req.http.Cookie ~ "customer_group=") {
         hash_data(regsub(req.http.Cookie, "^.*?customer_group=([^;]*);*.*$", "\1"));
     }
-    
+
     return (hash);
 }
 

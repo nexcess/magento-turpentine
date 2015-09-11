@@ -35,6 +35,12 @@
                 <fix_product_toolbar>0</fix_product_toolbar>
                 <crawler_enable>0</crawler_enable>
                 <crawler_debug>0</crawler_debug>
+                <guest_caching_enable>1</guest_caching_enable>
+                <guest_caching_blacklist><![CDATA[\.html
+customer/
+review/product/
+catalog/product/view/
+checkout/]]></guest_caching_blacklist>
             </general>
             <logging>
                 <use_custom_log_file>0</use_custom_log_file>

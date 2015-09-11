@@ -559,6 +559,27 @@ EOS;
     }
 
     /**
+     * Checks if guest caching should be used
+     *
+     * @return bool
+     */
+    protected function _getGuestCachingFlag()
+    {
+        return Mage::getStoreConfig( 'turpentine_varnish/general/guest_caching_enable' )
+            ? 'true' : 'false';
+    }
+
+    /**
+     * Converts guest caching black list values in format we can use in VCL file
+     *
+     * @return string
+     */
+    protected function _getGuestCachingBlacklist() {
+        $urls = Mage::getStoreConfig( 'turpentine_varnish/general/guest_caching_blacklist' );
+        return implode( '|', Mage::helper( 'turpentine/data' )->cleanExplode( PHP_EOL, $urls ));
+    }
+
+    /**
      * Remove empty and commented out lines from the generated VCL
      *
      * @param  string $dirtyVcl generated vcl
@@ -872,6 +893,8 @@ EOS;
                 $this->_getVclTemplateFilename( self::VCL_CUSTOM_C_CODE_FILE ) ),
             'esi_private_ttl'   => Mage::helper( 'turpentine/esi' )
                 ->getDefaultEsiTtl(),
+            'guest_caching_enable' => $this->_getGuestCachingFlag(),
+            'guest_caching_blacklist' => $this->_getGuestCachingBlacklist(),
         );
 
         if( (bool)Mage::getStoreConfig( 'turpentine_vcl/urls/bypass_cache_store_url') ) {
