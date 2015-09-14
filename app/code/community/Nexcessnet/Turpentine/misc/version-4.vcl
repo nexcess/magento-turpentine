@@ -159,10 +159,7 @@ sub vcl_recv {
                 return (synth(403, "External ESI requests are not allowed"));
             }
         }
-        # if host is not allowed in magento pass to backend
-        if (req.http.host !~ "{{allowed_hosts_regex}}") {
-            return (pass);
-        }
+        {{allowed_hosts}}
         # no frontend cookie was sent to us AND this is not an ESI or AJAX call
         if (req.http.Cookie !~ "frontend=" && !req.http.X-Varnish-Esi-Method) {
             if (client.ip ~ crawler_acl ||
