@@ -121,6 +121,11 @@ sub vcl_recv {
         return (pipe);
     }
 
+    if({{send_unmodified_url}}) {
+        # save the unmodified url
+        set req.http.X-Varnish-Origin-Url = req.url;
+    }
+
     # remove double slashes from the URL, for higher cache hit rate
     set req.url = regsuball(req.url, "(.*)//+(.*)", "\1/\2");
 
@@ -206,6 +211,12 @@ sub vcl_recv {
             set req.url = regsuball(req.url, "(?:(\?)&|\?$)", "\1");
         }
 
+        if({{send_unmodified_url}}) {
+            set req.http.X-Varnish-Cache-Url = req.url;
+            set req.url = req.http.X-Varnish-Origin-Url;
+            unset req.http.X-Varnish-Origin-Url;
+        }
+
         # everything else checks out, try and pull from the cache
         return (hash);
     }
@@ -225,7 +236,13 @@ sub vcl_pipe {
 # }
 
 sub vcl_hash {
-    hash_data(req.url);
+
+    if({{send_unmodified_url}} && req.http.X-Varnish-Cache-Url) {
+        hash_data(req.http.X-Varnish-Cache-Url);
+    } else {
+        hash_data(req.url);
+    }
+
     if (req.http.Host) {
         hash_data(req.http.Host);
     } else {

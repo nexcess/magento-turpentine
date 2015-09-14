@@ -107,6 +107,11 @@ sub vcl_recv {
         }
     }
 
+    if({{send_unmodified_url}}) {
+        # save the unmodified url
+        set req.http.X-Varnish-Origin-Url = req.url;
+    }
+
     # Normalize request data before potentially sending things off to the
     # backend. This ensures all request types get the same information, most
     # notably POST requests getting a normalized user agent string to empower
@@ -202,6 +207,11 @@ sub vcl_recv {
             set req.url = regsuball(req.url, "(?:(\?)&|\?$)", "\1");
         }
 
+        if({{send_unmodified_url}}) {
+            set req.http.X-Varnish-Cache-Url = req.url;
+            set req.url = req.http.X-Varnish-Origin-Url;
+            unset req.http.X-Varnish-Origin-Url;
+        }
 
         # everything else checks out, try and pull from the cache
         return (lookup);
@@ -222,7 +232,12 @@ sub vcl_pipe {
 # }
 
 sub vcl_hash {
-    hash_data(req.url);
+
+    if({{send_unmodified_url}} && req.http.X-Varnish-Cache-Url) {
+        hash_data(req.http.X-Varnish-Cache-Url);
+    } else {
+        hash_data(req.url);
+    }
     if (req.http.Host) {
         hash_data(req.http.Host);
     } else {

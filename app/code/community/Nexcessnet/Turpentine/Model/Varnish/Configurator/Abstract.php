@@ -380,6 +380,14 @@ EOS;
     }
 
     /**
+     * @return boolean
+     */
+    protected function _sendUnModifiedUrlToBackend()
+    {
+        return Mage::getStoreConfigFlag('turpentine_vcl/params/transfer_unmodified_url');
+    }
+
+    /**
      * Get the Generate Session
      *
      * @return string
@@ -844,6 +852,7 @@ EOS;
             'default_ttl'   => $this->_getDefaultTtl(),
             'enable_get_excludes'   => ($this->_getGetParamExcludes() ? 'true' : 'false'),
             'enable_get_ignored' => ($this->_getIgnoreGetParameters() ? 'true' : 'false'),
+            'send_unmodified_url' => ($this->_sendUnModifiedUrlToBackend() ? 'true' : 'false'),
             'debug_headers' => $this->_getEnableDebugHeaders(),
             'grace_period'  => $this->_getGracePeriod(),
             'force_cache_static'    => $this->_getForceCacheStatic(),
