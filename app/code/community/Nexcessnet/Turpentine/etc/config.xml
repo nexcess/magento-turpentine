@@ -80,6 +80,7 @@
             <params>
                 <get_params>__SID,XDEBUG_PROFILE</get_params>
                 <ignore_get_params>utm_source,utm_medium,utm_campaign,utm_content,utm_term,gclid,cx,ie,cof,siteurl</ignore_get_params>
+                <transfer_unmodified_url>0</transfer_unmodified_url>
             </params>
             <static>
                 <force_static>1</force_static>
