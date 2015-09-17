@@ -102,6 +102,8 @@ sub generate_session_expires {
 ## Varnish Subroutines
 
 sub vcl_recv {
+	{{maintenance_allowed_ips}}
+
     # this always needs to be done so it's up at the top
     if (req.restarts == 0) {
         if (req.http.X-Forwarded-For) {
@@ -366,6 +368,8 @@ sub vcl_backend_response {
     }
     # else it's not part of Magento so use the default Varnish handling
 }
+
+{{vcl_synth}}
 
 sub vcl_deliver {
     if (req.http.X-Varnish-Faked-Session) {
