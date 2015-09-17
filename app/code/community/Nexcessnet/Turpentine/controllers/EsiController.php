@@ -194,8 +194,15 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         );
 
         $layoutUpdate = $layout->getUpdate();
-        $layoutUpdate->load( $this->_swapCustomerHandles(
-            $esiData->getLayoutHandles() ) );
+        $layoutUpdate->addHandle($esiData->getLayoutHandles());
+
+        // dispatch event for adding handles to layout update
+        Mage::dispatchEvent(
+            'controller_action_layout_load_before',
+            array('action' => $this, 'layout'=> $layout)
+        );
+
+        $layoutUpdate->load();
         foreach( $esiData->getDummyBlocks() as $blockName ) {
             $layout->createBlock( 'Mage_Core_Block_Template', $blockName );
         }
@@ -270,25 +277,4 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         return $block;
     }
 
-    /**
-     * Swap customer_logged_in and customer_logged_out cached handles based on
-     * actual customer login status. Fixes stale Login/Logout links (and
-     * probably other things).
-     *
-     * This is definitely a hack, need a more general solution to this problem.
-     *
-     * @param  array $handles
-     * @return array
-     */
-    protected function _swapCustomerHandles( $handles ) {
-        if( Mage::helper( 'customer' )->isLoggedIn() ) {
-            $replacement = array( 'customer_logged_out', 'customer_logged_in' );
-        } else {
-            $replacement = array( 'customer_logged_in', 'customer_logged_out' );
-        }
-        if( ( $pos = array_search( $replacement[0], $handles ) ) !== false ) {
-            $handles[$pos] = $replacement[1];
-        }
-        return $handles;
-    }
 }

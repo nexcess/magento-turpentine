@@ -227,9 +227,9 @@
             <core_block_abstract_to_html_before>
                 <observers>
                     <turpentine_esi_core_block_abstract_to_html_before>
-                        <type>singleton</type>
                         <class>turpentine/observer_esi</class>
                         <method>injectEsi</method>
+                        <type>singleton</type>
                     </turpentine_esi_core_block_abstract_to_html_before>
                 </observers>
             </core_block_abstract_to_html_before>
@@ -238,10 +238,12 @@
                     <turpentine_esi_http_response_send_before>
                         <class>turpentine/observer_esi</class>
                         <method>setFlagHeaders</method>
+                        <type>singleton</type>
                     </turpentine_esi_http_response_send_before>
                     <turpentine_esi_replace_form_key_placeholder>
                         <class>turpentine/observer_esi</class>
                         <method>replaceFormKeyPlaceholder</method>
+                        <type>singleton</type>
                     </turpentine_esi_replace_form_key_placeholder>
                 </observers>
             </http_response_send_before>
@@ -250,6 +252,7 @@
                     <turpentine_esi_controller_action_layout_generate_blocks_after>
                         <class>turpentine/observer_esi</class>
                         <method>checkCacheFlag</method>
+                        <type>singleton</type>
                     </turpentine_esi_controller_action_layout_generate_blocks_after>
                 </observers>
             </controller_action_layout_generate_blocks_after>
@@ -279,9 +282,24 @@
                     <turpentine_esi_controller_response_redirect>
                         <class>turpentine/observer_esi</class>
                         <method>checkRedirectUrl</method>
+                        <type>singleton</type>
                     </turpentine_esi_controller_response_redirect>
                 </observers>
             </controller_response_redirect>
+
+            <!--
+            Save handles added by controller
+            This observer should be called first
+            -->
+            <controller_action_layout_load_before>
+                <observers>
+                    <aaaa_turpentine_esi_controller_response_redirect>
+                        <class>turpentine/observer_esi</class>
+                        <method>beforeLoadLayout</method>
+                        <type>singleton</type>
+                    </aaaa_turpentine_esi_controller_response_redirect>
+                </observers>
+            </controller_action_layout_load_before>
 
             <!--
             Load the ESI client cache clear events from stored config at
@@ -292,18 +310,22 @@
                     <turpentine_esi_controller_front_init_before>
                         <class>turpentine/observer_esi</class>
                         <method>loadCacheClearEvents</method>
+                        <type>singleton</type>
                     </turpentine_esi_controller_front_init_before>
                     <turpentine_esi_controller_front_init_before2>
                         <class>turpentine/observer_esi</class>
                         <method>addMessagesBlockRewrite</method>
+                        <type>singleton</type>
                     </turpentine_esi_controller_front_init_before2>
                     <turpentine_varnish_controller_front_init_before>
                         <class>turpentine/observer_varnish</class>
                         <method>addProductListToolbarRewrite</method>
+                        <type>singleton</type>
                     </turpentine_varnish_controller_front_init_before>
                     <turpentine_esi_set_replace_form_key_flag>
                         <class>turpentine/observer_esi</class>
                         <method>setReplaceFormKeyFlag</method>
+                        <type>singleton</type>
                     </turpentine_esi_set_replace_form_key_flag>
                 </observers>
             </controller_front_init_before>
