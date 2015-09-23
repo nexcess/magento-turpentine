@@ -541,7 +541,7 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </ignore_get_params>
-                        <transfer_unmodified_url translate="label" module="extendedvarnish">
+                        <transfer_unmodified_url translate="label" module="turpentine">
                             <label>Transfer unmodified URL to Backend Server</label>
                             <comment>
                                 By default the backend server (webserver / magento) gets a modified URL (without ignored get parameters).
