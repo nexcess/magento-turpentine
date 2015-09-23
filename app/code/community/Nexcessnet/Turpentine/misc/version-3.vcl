@@ -177,8 +177,7 @@ sub vcl_recv {
                 set req.http.Cookie = "frontend=crawler-session";
             } else {
                 # it's a real user, make up a new session for them
-                {{generate_session}}# call generate_session;
-                return (pipe);
+                {{generate_session}}
             }
         }
         if ({{force_cache_static}} &&

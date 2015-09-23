@@ -21,7 +21,7 @@ vcl 4.0;
 ## Custom C Code
 
 C{
-    # @source app/code/community/Nexcessnet/Turpentine/misc/uuid.c
+    // @source app/code/community/Nexcessnet/Turpentine/misc/uuid.c
     {{custom_c_code}}
 }C
 
@@ -175,8 +175,7 @@ sub vcl_recv {
                 set req.http.Cookie = "frontend=crawler-session";
             } else {
                 # it's a real user, make up a new session for them
-                {{generate_session}}# call generate_session;
-                return (pipe);
+                {{generate_session}}
             }
         }
         if ({{force_cache_static}} &&
