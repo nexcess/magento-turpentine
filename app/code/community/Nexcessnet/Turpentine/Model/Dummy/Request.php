@@ -38,6 +38,9 @@ class Nexcessnet_Turpentine_Model_Dummy_Request extends
      * @throws Zend_Controller_Request_Exception when invalid URI passed
      */
     public function __construct( $uri=null ) {
+        // deals with Search Parameters (q) that include ' ' when decoded and passed to this function
+        $uri = str_replace(' ', '+', $uri);
+
         $this->_initFakeSuperGlobals();
         $this->_fixupFakeSuperGlobals( $uri );
         try {
