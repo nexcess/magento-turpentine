@@ -16,7 +16,7 @@ vcl 4.0;
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-## Nexcessnet_Turpentine Varnish v3 VCL Template
+## Nexcessnet_Turpentine Varnish v4 VCL Template
 
 ## Custom C Code
 
