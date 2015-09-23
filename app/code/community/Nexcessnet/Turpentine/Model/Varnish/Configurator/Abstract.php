@@ -414,8 +414,8 @@ EOS;
      * @return string
      */
     protected function _getGenerateSession() {
-        return Mage::getStoreConfig( 'turpentine_varnish/general/vcl_fix' )
-            ? '# call generate_session' : 'call generate_session;';
+        return Mage::getStoreConfigFlag( 'turpentine_varnish/general/vcl_fix' )
+            ? 'return (pipe);' : 'call generate_session;';
     }
 
 
