@@ -359,7 +359,13 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
             Mage::throwException('Varnish versions before 2.1 are not supported');
         }
         if ( count($bannerText)<7 ) {
-            // Varnish before 3.0 does not spit out a version number
+            // Varnish before 3.0.4 does not spit out a version number
+            $resp = $this->_write( 'help' )->_read();
+            if( strpos( $resp['text'], 'ban.url' ) !== false ) {
+                // Varnish versions 3.0 through 3.0.3 do not return a version banner. 
+                // To differentiate between 2.1 and 3.0, we check the existence of the ban.url command.
+                return '3.0';
+            }
             return '2.1';
         } elseif ( preg_match(self::REGEXP_VARNISH_VERSION, $bannerText[4], $matches)===1 ) {
             return $matches['vmajor'] . '.' . $matches['vminor'];

@@ -413,9 +413,9 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 // check if this handle has any block or reference tags that
                 // refer to this block or a child block, unless the handle name
                 // is blank
-                if( $handle !== '' &&
+                if( $handle !== '' && ( strpos($handle, 'THEME') === 0 ||
                     $layoutXml->xpath( sprintf(
-                        '//%s//*[@name=\'%s\']', $handle, $blockName ) ) ) {
+                        '//%s//*[@name=\'%s\']', $handle, $blockName ) ) ) ) {
                     $activeHandles[] = $handle;
                 }
             }
