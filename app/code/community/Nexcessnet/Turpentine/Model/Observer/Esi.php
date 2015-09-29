@@ -32,9 +32,9 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $customer = $eventObject->getCustomer();
         $cookie = Mage::getSingleton('core/cookie');
         if (Mage::getStoreConfig('persistent/options/enabled')) {
-            $cookie->set('customer_group', $customer->getGroupId(), Mage::getStoreConfig('persistent/options/lifetime'));
+            $cookie->set('customer_group', $customer->getGroupId(), Mage::getStoreConfig('persistent/options/lifetime'), '/');
         } else {
-            $cookie->set('customer_group', $customer->getGroupId());
+            $cookie->set('customer_group', $customer->getGroupId(), null, '/');
         }
     }
 
@@ -47,7 +47,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
      * @return null
      */
     public function removeCustomerGroupCookie( $eventObject ) {
-        Mage::getSingleton('core/cookie')->delete('customer_group');
+        Mage::getSingleton('core/cookie')->delete('customer_group', '/');
     }
 
     /**
