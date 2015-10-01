@@ -230,6 +230,11 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         if( $esiHelper->shouldResponseUseEsi() &&
                 $blockObject instanceof Mage_Core_Block_Template &&
                 $esiOptions = $blockObject->getEsiOptions() ) {
+
+            if ((isset($esiOptions['disableEsiInjection'])) && ($esiOptions['disableEsiInjection'] == 1)) { 
+                return;
+            }
+
             if( Mage::app()->getStore()->getCode() == 'admin' ) {
                 // admin blocks are not allowed to be cached for now
                 $debugHelper->logWarn(
