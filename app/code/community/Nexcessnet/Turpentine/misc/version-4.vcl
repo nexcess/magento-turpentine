@@ -16,12 +16,12 @@ vcl 4.0;
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-## Nexcessnet_Turpentine Varnish v3 VCL Template
+## Nexcessnet_Turpentine Varnish v4 VCL Template
 
 ## Custom C Code
 
 C{
-    # @source app/code/community/Nexcessnet/Turpentine/misc/uuid.c
+    // @source app/code/community/Nexcessnet/Turpentine/misc/uuid.c
     {{custom_c_code}}
 }C
 
@@ -102,6 +102,8 @@ sub generate_session_expires {
 ## Varnish Subroutines
 
 sub vcl_recv {
+	{{maintenance_allowed_ips}}
+
     # this always needs to be done so it's up at the top
     if (req.restarts == 0) {
         if (req.http.X-Forwarded-For) {
@@ -119,6 +121,11 @@ sub vcl_recv {
         req.method !~ "^(GET|HEAD|OPTIONS)$" ||
         req.http.Cookie ~ "varnish_bypass={{secret_handshake}}") {
         return (pipe);
+    }
+
+    if({{send_unmodified_url}}) {
+        # save the unmodified url
+        set req.http.X-Varnish-Origin-Url = req.url;
     }
 
     # remove double slashes from the URL, for higher cache hit rate
@@ -168,8 +175,7 @@ sub vcl_recv {
                 set req.http.Cookie = "frontend=crawler-session";
             } else {
                 # it's a real user, make up a new session for them
-                {{generate_session}}# call generate_session;
-                return (pipe);
+                {{generate_session}}
             }
         }
         if ({{force_cache_static}} &&
@@ -206,6 +212,12 @@ sub vcl_recv {
             set req.url = regsuball(req.url, "(?:(\?)&|\?$)", "\1");
         }
 
+        if({{send_unmodified_url}}) {
+            set req.http.X-Varnish-Cache-Url = req.url;
+            set req.url = req.http.X-Varnish-Origin-Url;
+            unset req.http.X-Varnish-Origin-Url;
+        }
+
         # everything else checks out, try and pull from the cache
         return (hash);
     }
@@ -225,7 +237,13 @@ sub vcl_pipe {
 # }
 
 sub vcl_hash {
-    hash_data(req.url);
+
+    if({{send_unmodified_url}} && req.http.X-Varnish-Cache-Url) {
+        hash_data(req.http.X-Varnish-Cache-Url);
+    } else {
+        hash_data(req.url);
+    }
+
     if (req.http.Host) {
         hash_data(req.http.Host);
     } else {
@@ -349,6 +367,8 @@ sub vcl_backend_response {
     }
     # else it's not part of Magento so use the default Varnish handling
 }
+
+{{vcl_synth}}
 
 sub vcl_deliver {
     if (req.http.X-Varnish-Faked-Session) {

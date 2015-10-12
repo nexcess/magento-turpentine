@@ -541,6 +541,20 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </ignore_get_params>
+                        <transfer_unmodified_url translate="label" module="turpentine">
+                            <label>Transfer unmodified URL to Backend Server</label>
+                            <comment>
+                                By default the backend server (webserver / magento) gets a modified URL (without ignored get parameters).
+                                As a result the ignored parameters can not be used by the backend server for uncachable requests, for example a redirect.
+                                By activating this option the backend server gets the the unmodified url, but the cache still uses the modified url for lookups.
+                            </comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>21</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </transfer_unmodified_url>
                     </fields>
                 </params>
                 <static translate="label" module="turpentine">
@@ -575,6 +589,35 @@
                         </exts>
                     </fields>
                 </static>
+                <maintenance translate="label" module="turpentine">
+                    <label>Maintenance mode</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>46</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <enable translate="label" module="turpentine">
+                            <label>Enable Maintenance Mode</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>turpentine/config_select_toggle</source_model>
+                            <comment>If enabled IP's not in 'developer client restrictions' will receive the following error page</comment>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </enable>
+                        <custom_vcl_synth translate="label" module="turpentine">
+                            <label>Custom HTML content of vcl synth (error) sub</label>
+                            <frontend_type>textarea</frontend_type>
+                            <comment>Enter full HTML page content</comment>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </custom_vcl_synth>
+                    </fields>
+                </maintenance>
             </groups>
         </turpentine_vcl>
     </sections>

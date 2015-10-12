@@ -380,6 +380,14 @@ EOS;
     }
 
     /**
+     * @return boolean
+     */
+    protected function _sendUnModifiedUrlToBackend()
+    {
+        return Mage::getStoreConfigFlag('turpentine_vcl/params/transfer_unmodified_url');
+    }
+
+    /**
      * Get the Generate Session
      *
      * @return string
@@ -406,8 +414,8 @@ EOS;
      * @return string
      */
     protected function _getGenerateSession() {
-        return Mage::getStoreConfig( 'turpentine_varnish/general/vcl_fix' )
-            ? '# call generate_session' : 'call generate_session;';
+        return Mage::getStoreConfigFlag( 'turpentine_varnish/general/vcl_fix' )
+            ? 'return (pipe);' : 'call generate_session;';
     }
 
 
@@ -826,6 +834,92 @@ EOS;
     }
 
     /**
+     * Get the allowed IPs when in maintenance mode
+     *
+     * @return string
+     */
+    protected function _vcl_sub_maintenance_allowed_ips() {
+        if((! $this->_getDebugIps()) || ! Mage::getStoreConfig( 'turpentine_vcl/maintenance/custom_vcl_synth' ) ) {
+            return false;
+        }
+
+        switch(Mage::getStoreConfig( 'turpentine_varnish/servers/version' )) {
+            case 4.0:
+                $tpl = <<<EOS
+if (req.http.X-Forwarded-For) {
+    if (req.http.X-Forwarded-For !~ "{{debug_ips}}") {
+        return (synth(999, "Maintenance mode"));
+    }
+}
+else {
+    if (client.ip !~ debug_acl) {
+        return (synth(999, "Maintenance mode"));
+    }
+}
+
+EOS;
+                break;
+            default:
+                $tpl = <<<EOS
+if (req.http.X-Forwarded-For) {
+    if(req.http.X-Forwarded-For !~ "{{debug_ips}}") {
+        error 503;
+    }
+} else {
+    if (client.ip !~ debug_acl) {
+        error 503;
+    }
+}
+EOS;
+        }
+
+        return $this->_formatTemplate( $tpl, array(
+            'debug_ips' => Mage::getStoreConfig( 'dev/restrict/allow_ips' ) ) );
+    }
+
+    /**
+     * Get the allowed IPs when in maintenance mode
+     *
+     * @return string
+     */
+    protected function _vcl_sub_synth()
+    {
+        if ((!$this->_getDebugIps()) || !Mage::getStoreConfig('turpentine_vcl/maintenance/custom_vcl_synth')) {
+            return false;
+        }
+
+        switch (Mage::getStoreConfig('turpentine_varnish/servers/version')) {
+            case 4.0:
+                $tpl = <<<EOS
+sub vcl_synth {
+    if (resp.status == 999) {
+        set resp.status = 404;
+        set resp.http.Content-Type = "text/html; charset=utf-8";
+        synthetic({"{{vcl_synth_content}}"});
+        return (deliver);
+    }
+    return (deliver);
+}
+
+EOS;
+                break;
+            default:
+                $tpl = <<<EOS
+sub vcl_error {
+    set obj.http.Content-Type = "text/html; charset=utf-8";
+    synthetic {"{{vcl_synth_content}}"};
+    return (deliver);
+}
+EOS;
+        }
+
+        return $this->_formatTemplate($tpl, array(
+            'vcl_synth_content' => Mage::getStoreConfig('turpentine_vcl/maintenance/custom_vcl_synth')));
+    }
+
+
+
+    /**
      * Build the list of template variables to apply to the VCL template
      *
      * @return array
@@ -844,6 +938,7 @@ EOS;
             'default_ttl'   => $this->_getDefaultTtl(),
             'enable_get_excludes'   => ($this->_getGetParamExcludes() ? 'true' : 'false'),
             'enable_get_ignored' => ($this->_getIgnoreGetParameters() ? 'true' : 'false'),
+            'send_unmodified_url' => ($this->_sendUnModifiedUrlToBackend() ? 'true' : 'false'),
             'debug_headers' => $this->_getEnableDebugHeaders(),
             'grace_period'  => $this->_getGracePeriod(),
             'force_cache_static'    => $this->_getForceCacheStatic(),
@@ -892,6 +987,13 @@ EOS;
         }
         if( Mage::getStoreConfig( 'turpentine_vcl/normalization/cookie_target' ) ) {
             $vars['normalize_cookie_target'] = $this->_getNormalizeCookieTarget();
+        }
+
+        if( Mage::getStoreConfig( 'turpentine_vcl/maintenance/enable' ) ) {
+            // in vcl_recv set the allowed IPs otherwise load the vcl_error (v3)/vcl_synth (v4)
+            $vars['maintenance_allowed_ips'] = $this->_vcl_sub_maintenance_allowed_ips();
+            // set the vcl_error from Magento database
+            $vars['vcl_synth'] = $this->_vcl_sub_synth();
         }
 
         $customIncludeFile = $this->_getCustomIncludeFilename();

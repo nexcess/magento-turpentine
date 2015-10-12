@@ -413,3 +413,10 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
 
 ### RELEASE-0.6.5
   * Varnish 4 (@aheadley @aricwatson)
+
+### RELEASE-0.6.6
+  * [#923] DetermineVersion 3.0 to 3.0.3 bugfix (@timmuller)  
+  * [#945] Send unmodified url to the backend server (@thampe)  
+  * [#885] Add maintenance mode that will allow debug_ips through to visit the site, all other users get the landing page (@craigcarnell)  
+  * [#955] Include theme specific handles to ESI data (@LyndonHook)  
+  * [#972] Fixed bug with wrong return value of ->getSkinUrl() (@ceckoslab)  
