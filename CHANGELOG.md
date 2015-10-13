@@ -419,4 +419,5 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#945] Send unmodified url to the backend server (@thampe)  
   * [#885] Add maintenance mode that will allow debug_ips through to visit the site, all other users get the landing page (@craigcarnell)  
   * [#955] Include theme specific handles to ESI data (@LyndonHook)  
-  * [#972] Fixed bug with wrong return value of ->getSkinUrl() (@ceckoslab)  
+  * [#972] Fixed bug with wrong return value of ->getSkinUrl() (@ceckoslab)
+  * [#951] Added 'disableEsiInjection' ESI policy option.  
