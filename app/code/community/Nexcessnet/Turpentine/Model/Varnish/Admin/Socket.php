@@ -509,19 +509,19 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
      * @param  string $verb command to check
      * @return string
      */
-    protected function _translateCommandMethod( $verb ) {
-        $command = str_replace( '_', '.', $verb );
-        switch( $this->getVersion() ) {
+    protected function _translateCommandMethod($verb) {
+        $command = str_replace('_', '.', $verb);
+        switch ($this->getVersion()) {
             case '2.1':
-                $command = str_replace( 'ban', 'purge', $command );
+                $command = str_replace('ban', 'purge', $command);
                 break;
             case '4.0':
             case '3.0':
-                $command = str_replace( 'purge', 'ban', $command );
+                $command = str_replace('purge', 'ban', $command);
                 break;
             default:
-                Mage::throwException( 'Unrecognized Varnish version: ' .
-                    $this->_version );
+                Mage::throwException('Unrecognized Varnish version: '.
+                    $this->_version);
         }
         return $command;
     }

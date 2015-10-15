@@ -46,8 +46,10 @@ class Nexcessnet_Turpentine_Model_Shim_Mage_Core_Config extends Mage_Core_Model_
      */
     public function unsetEventAreaCache($area) {
         if (version_compare(Mage::getVersion(), '1.11.0', '>=') // enterprise
-            || version_compare(Mage::getVersion(), '1.6.0', '>=')) // community
+            || version_compare(Mage::getVersion(), '1.6.0', '>=')) {
+            // community
             unset($this->_eventAreas[$area]);
+        }
     }
 
 }

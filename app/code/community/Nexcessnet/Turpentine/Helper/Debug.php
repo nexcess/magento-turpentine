@@ -218,7 +218,7 @@ class Nexcessnet_Turpentine_Helper_Debug extends Mage_Core_Helper_Abstract {
      * @return string
      */
     protected function _getLogFileName() {
-        if ( $this->useCustomLogFile() ) {
+        if ($this->useCustomLogFile()) {
             return $this->getCustomLogFileName();
         }
         return '';
@@ -238,7 +238,7 @@ class Nexcessnet_Turpentine_Helper_Debug extends Mage_Core_Helper_Abstract {
      * @return string
      */
     public function getCustomLogFileName() {
-        return (string)Mage::getStoreConfig(
+        return (string) Mage::getStoreConfig(
             'turpentine_varnish/logging/custom_log_file_name' );
     }
 
