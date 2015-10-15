@@ -96,22 +96,22 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
      */
     public function applyConfig() {
         $result = array();
-        $helper = Mage::helper( 'turpentine' );
-        foreach( Mage::helper( 'turpentine/varnish' )->getSockets() as $socket ) {
-            $cfgr = Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract::getFromSocket( $socket );
+        $helper = Mage::helper('turpentine');
+        foreach (Mage::helper('turpentine/varnish')->getSockets() as $socket) {
+            $cfgr = Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract::getFromSocket($socket);
             $socketName = $socket->getConnectionString();
-            if( is_null( $cfgr ) ) {
+            if (is_null($cfgr)) {
                 $result[$socketName] = 'Failed to load configurator';
             } else {
-                $vcl = $cfgr->generate( $helper->shouldStripVclWhitespace('apply') );
-                $vclName = Mage::helper( 'turpentine/data' )
-                    ->secureHash( microtime() );
+                $vcl = $cfgr->generate($helper->shouldStripVclWhitespace('apply'));
+                $vclName = Mage::helper('turpentine/data')
+                    ->secureHash(microtime());
                 try {
-                    $this->_testEsiSyntaxParam( $socket );
-                    $socket->vcl_inline( $vclName, $vcl );
-                    sleep( 1 ); //this is probably not really needed
-                    $socket->vcl_use( $vclName );
-                } catch( Mage_Core_Exception $e ) {
+                    $this->_testEsiSyntaxParam($socket);
+                    $socket->vcl_inline($vclName, $vcl);
+                    sleep(1); //this is probably not really needed
+                    $socket->vcl_use($vclName);
+                } catch (Mage_Core_Exception $e) {
                     $result[$socketName] = $e->getMessage();
                     continue;
                 }

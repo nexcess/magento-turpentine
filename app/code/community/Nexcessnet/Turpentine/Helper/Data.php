@@ -298,9 +298,9 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
      */
     public function shouldStripVclWhitespace($action) {
         $configValue = $this->getStripVclWhitespace();
-        if ( $configValue==='always' ) {
+        if ($configValue === 'always') {
             return true;
-        } elseif ( $configValue==='apply' && $action==='apply' ) {
+        } elseif ($configValue === 'apply' && $action === 'apply') {
             return true;
         }
         return false;

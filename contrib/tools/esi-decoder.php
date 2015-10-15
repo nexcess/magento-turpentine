@@ -68,33 +68,33 @@ header('Content-Type:text/html; charset=UTF-8');
     <div class="center"><input type="submit" value=" &darr; &darr; &darr; &darr;&nbsp; DECODE &nbsp;&darr; &darr; &darr; &darr; " /></div>
 </form>
 <?php
-if ( $data ):
+if ($data):
     $processData = $data;
-    $esiHelper = Mage::helper( 'turpentine/esi' );
-    $dataPreg = preg_quote( $esiHelper->getEsiDataParam(), '|' );
-    if ( preg_match('|'.$dataPreg.'/([\w\.\-]+=*)|', $data, $matches) ) {
+    $esiHelper = Mage::helper('turpentine/esi');
+    $dataPreg = preg_quote($esiHelper->getEsiDataParam(), '|');
+    if (preg_match('|'.$dataPreg.'/([\w\.\-]+=*)|', $data, $matches)) {
         $processData = $matches[1];
     }
-    $dataHelper = Mage::helper( 'turpentine/data' );
-    $esiDataArray = $dataHelper->thaw( $processData );
-    $showContentUrl = Mage::getUrl( 'turpentine/esi/getBlock',
-        array( 'method' => 'esi',
+    $dataHelper = Mage::helper('turpentine/data');
+    $esiDataArray = $dataHelper->thaw($processData);
+    $showContentUrl = Mage::getUrl('turpentine/esi/getBlock',
+        array('method' => 'esi',
                 'ttl' => 0,
-                'hmac' => $dataHelper->getHmac( $processData ),
-                'data' => $processData ) );
+                'hmac' => $dataHelper->getHmac($processData),
+                'data' => $processData));
     ?>
     <div class="center">=&nbsp; DATA &nbsp;=</div>
     <div class="result">
-        <pre><?php echo htmlentities( var_export( $esiDataArray, 1 ) ); ?></pre>
+        <pre><?php echo htmlentities(var_export($esiDataArray, 1)); ?></pre>
     </div>
 <?php
-    $refPreg = preg_quote( $esiHelper->getEsiReferrerParam(), '|' );
-    if ( preg_match('|'.$refPreg.'/([\w\.\-]+),*|', $data, $matches) ):
+    $refPreg = preg_quote($esiHelper->getEsiReferrerParam(), '|');
+    if (preg_match('|'.$refPreg.'/([\w\.\-]+),*|', $data, $matches)):
         $processData = $matches[1];
         ?>
         <div class="center">=&nbsp; REFERRER &nbsp;=</div>
         <div class="result">
-            <pre><?php echo htmlentities( $dataHelper->urlBase64Decode( $processData ) ); ?></pre>
+            <pre><?php echo htmlentities($dataHelper->urlBase64Decode($processData)); ?></pre>
         </div>
 <?php
     endif; // if preg_match referrer

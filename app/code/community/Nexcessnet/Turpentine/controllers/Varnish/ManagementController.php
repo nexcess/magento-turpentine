@@ -150,23 +150,23 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
      * @return null
      */
     public function saveConfigAction() {
-        $cfgr = Mage::getModel( 'turpentine/varnish_admin' )->getConfigurator();
-        if( is_null( $cfgr ) ) {
+        $cfgr = Mage::getModel('turpentine/varnish_admin')->getConfigurator();
+        if (is_null($cfgr)) {
             $this->_getSession()->addError(
-                $this->__( 'Failed to load configurator' ) );
+                $this->__('Failed to load configurator') );
         } else {
-            Mage::dispatchEvent( 'turpentine_varnish_save_config',
-                array( 'cfgr' => $cfgr ) );
-            $result = $cfgr->save( $cfgr->generate(
-                Mage::helper('turpentine')->shouldStripVclWhitespace('save') ) );
-            if( $result[0] ) {
+            Mage::dispatchEvent('turpentine_varnish_save_config',
+                array('cfgr' => $cfgr));
+            $result = $cfgr->save($cfgr->generate(
+                Mage::helper('turpentine')->shouldStripVclWhitespace('save') ));
+            if ($result[0]) {
                 $this->_getSession()
-                    ->addSuccess( Mage::helper('turpentine')
-                        ->__('The VCL file has been saved.' ) );
+                    ->addSuccess(Mage::helper('turpentine')
+                        ->__('The VCL file has been saved.'));
             } else {
                 $this->_getSession()
-                    ->addError( Mage::helper('turpentine')
-                        ->__('Failed to save the VCL file: ' . $result[1]['message'] ) );
+                    ->addError(Mage::helper('turpentine')
+                        ->__('Failed to save the VCL file: '.$result[1]['message']));
             }
         }
         $this->_redirect('*/cache');
@@ -178,21 +178,21 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
      * @return $this
      */
     public function getConfigAction() {
-        $cfgr = Mage::getModel( 'turpentine/varnish_admin' )
+        $cfgr = Mage::getModel('turpentine/varnish_admin')
             ->getConfigurator();
-        if( is_null( $cfgr ) ) {
-            $this->_getSession()->addError( $this->__( 'Failed to load configurator' ) );
-            $this->_redirect( '*/cache' );
+        if (is_null($cfgr)) {
+            $this->_getSession()->addError($this->__('Failed to load configurator'));
+            $this->_redirect('*/cache');
         } else {
             $vcl = $cfgr->generate(
-                Mage::helper( 'turpentine' )->shouldStripVclWhitespace('download') );
+                Mage::helper('turpentine')->shouldStripVclWhitespace('download') );
             $this->getResponse()
-                ->setHttpResponseCode( 200 )
-                ->setHeader( 'Content-Type', 'text/plain', true )
-                ->setHeader( 'Content-Length', strlen( $vcl ) )
-                ->setHeader( 'Content-Disposition',
-                    'attachment; filename=default.vcl' )
-                ->setBody( $vcl );
+                ->setHttpResponseCode(200)
+                ->setHeader('Content-Type', 'text/plain', true)
+                ->setHeader('Content-Length', strlen($vcl))
+                ->setHeader('Content-Disposition',
+                    'attachment; filename=default.vcl')
+                ->setBody($vcl);
             return $this;
         }
     }

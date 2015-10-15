@@ -254,59 +254,59 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             $scopeParam = $esiHelper->getEsiScopeParam();
             $referrerParam = $esiHelper->getEsiReferrerParam();
 
-            $esiOptions = $this->_getDefaultEsiOptions( $esiOptions );
+            $esiOptions = $this->_getDefaultEsiOptions($esiOptions);
 
             // change the block's template to the stripped down ESI template
-            switch( $esiOptions[$methodParam] ) {
+            switch ($esiOptions[$methodParam]) {
                 case 'ajax':
-                    $blockObject->setTemplate( 'turpentine/ajax.phtml' );
+                    $blockObject->setTemplate('turpentine/ajax.phtml');
                     break;
 
                 case 'esi':
                 default:
-                    $blockObject->setTemplate( 'turpentine/esi.phtml' );
+                    $blockObject->setTemplate('turpentine/esi.phtml');
                     // flag request for ESI processing
-                    Mage::register( 'turpentine_esi_flag', true, true );
+                    Mage::register('turpentine_esi_flag', true, true);
             }
 
             // esi data is the data needed to regenerate the ESI'd block
-            $esiData = $this->_getEsiData( $blockObject, $esiOptions )->toArray();
-            ksort( $esiData );
-            $frozenData = $dataHelper->freeze( $esiData );
+            $esiData = $this->_getEsiData($blockObject, $esiOptions)->toArray();
+            ksort($esiData);
+            $frozenData = $dataHelper->freeze($esiData);
             $urlOptions = array(
                 $methodParam    => $esiOptions[$methodParam],
                 $cacheTypeParam => $esiOptions[$cacheTypeParam],
                 $ttlParam       => $esiOptions[$ttlParam],
-                $hmacParam      => $dataHelper->getHmac( $frozenData ),
+                $hmacParam      => $dataHelper->getHmac($frozenData),
                 $dataParam      => $frozenData,
             );
-            if( $esiOptions[$methodParam] == 'ajax' ) {
+            if ($esiOptions[$methodParam] == 'ajax') {
                 $urlOptions['_secure'] = Mage::app()->getStore()
                     ->isCurrentlySecure();
             }
-            if( $esiOptions[$scopeParam] == 'page' ) {
-                $urlOptions[$referrerParam]	= Mage::helper('core')->urlEncode(
+            if ($esiOptions[$scopeParam] == 'page') {
+                $urlOptions[$referrerParam] = Mage::helper('core')->urlEncode(
                     Mage::getUrl('*/*/*', array('_use_rewrite' => true, '_current' => true))
                 );
             }
 
-            $esiUrl = Mage::getUrl( 'turpentine/esi/getBlock', $urlOptions );
-            if( $esiOptions[$methodParam] == 'esi' ) {
+            $esiUrl = Mage::getUrl('turpentine/esi/getBlock', $urlOptions);
+            if ($esiOptions[$methodParam] == 'esi') {
                 // setting [web/unsecure/base_url] can be https://... but ESI can never be HTTPS
-                $esiUrl = preg_replace( '|^https://|i', 'http://', $esiUrl );
+                $esiUrl = preg_replace('|^https://|i', 'http://', $esiUrl);
             }
-            $blockObject->setEsiUrl( $esiUrl );
+            $blockObject->setEsiUrl($esiUrl);
             // avoid caching the ESI template output to prevent the double-esi-
             // include/"ESI processing not enabled" bug
-            foreach( array( 'lifetime', 'tags', 'key' ) as $dataKey ) {
-                $blockObject->unsetData( 'cache_' . $dataKey );
+            foreach (array('lifetime', 'tags', 'key') as $dataKey) {
+                $blockObject->unsetData('cache_'.$dataKey);
             }
-            if( strlen( $esiUrl ) > 2047 ) {
-                Mage::helper( 'turpentine/debug' )->logWarn(
+            if (strlen($esiUrl) > 2047) {
+                Mage::helper('turpentine/debug')->logWarn(
                     'ESI url is probably too long (%d > 2047 characters): %s',
-                    strlen( $esiUrl ), $esiUrl );
+                    strlen($esiUrl), $esiUrl );
             }
-            Varien_Profiler::stop( 'turpentine::observer::esi::injectEsi' );
+            Varien_Profiler::stop('turpentine::observer::esi::injectEsi');
         } // else handle the block like normal and cache it inline with the page
     }
 
