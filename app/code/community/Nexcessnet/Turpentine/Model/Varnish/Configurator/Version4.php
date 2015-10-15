@@ -37,7 +37,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version4
         return $doClean ? $this->_cleanVcl( $vcl ) : $vcl;
     }
 
-	// TODO: Check this
+    // TODO: Check this
     protected function _getAdvancedSessionValidation() {
         $validation = '';
         foreach( $this->_getAdvancedSessionValidationTargets() as $target ) {

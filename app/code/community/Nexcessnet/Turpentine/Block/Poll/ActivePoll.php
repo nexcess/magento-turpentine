@@ -24,8 +24,8 @@ class Nexcessnet_Turpentine_Block_Poll_Activepoll extends Mage_Poll_Block_Active
     public function setTemplate($template)
     {
         $this->_template = $template;
-        $this->setPollTemplate('turpentine/ajax.phtml', 'poll' );
-        $this->setPollTemplate('turpentine/ajax.phtml', 'results' );         
+        $this->setPollTemplate('turpentine/ajax.phtml', 'poll');
+        $this->setPollTemplate('turpentine/ajax.phtml', 'results');         
         return $this;
     }
 }

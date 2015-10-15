@@ -35,9 +35,9 @@ class Nexcessnet_Turpentine_Model_Shim_Mage_Core_App extends Mage_Core_Model_App
      */
     public function shim_setRequest(Mage_Core_Controller_Request_Http $request) {
         $app = $this->_shim_getApp();
-        if( method_exists( $app, 'setRequest' ) ) {
+        if (method_exists($app, 'setRequest')) {
             // use the real setRequest if it's available
-            $app->setRequest( $request );
+            $app->setRequest($request);
         } else {
             $app->_request = $request;
         }
@@ -55,12 +55,12 @@ class Nexcessnet_Turpentine_Model_Shim_Mage_Core_App extends Mage_Core_Model_App
      * @param string $method name of the method to call
      * @return Nexcessnet_Turpentine_Model_Shim_Mage_Core_App
      */
-    public function shim_addEventObserver( $area, $eventName, $obsName,
-            $type=null, $class=null, $method=null ) {
+    public function shim_addEventObserver($area, $eventName, $obsName,
+            $type = null, $class = null, $method = null) {
         $eventConfig = new Varien_Simplexml_Config();
-        $eventConfig->loadDom( $this->_shim_getEventDom(
-            $area, $eventName, $obsName, $type, $class, $method ) );
-        $this->_shim_getConfig()->extend( $eventConfig, true );
+        $eventConfig->loadDom($this->_shim_getEventDom(
+            $area, $eventName, $obsName, $type, $class, $method ));
+        $this->_shim_getConfig()->extend($eventConfig, true);
         // this wouldn't work if PHP had a sane object model
         $this->_shim_getApp()->_events[$area][$eventName] = null;
         /* clear the event area cache because by the time this gets executed all <global> events have already been
@@ -78,12 +78,12 @@ class Nexcessnet_Turpentine_Model_Shim_Mage_Core_App extends Mage_Core_Model_App
      * @param  string $rewriteTarget    full class name to rewrite to
      * @return Nexcessnet_Turpentine_Model_Shim_Mage_Core_App
      */
-    public function shim_addClassRewrite( $type, $module, $class,
-            $rewriteTarget ) {
+    public function shim_addClassRewrite($type, $module, $class,
+            $rewriteTarget) {
         $rewriteConfig = new Varien_Simplexml_Config();
-        $rewriteConfig->loadDom( $this->_shim_getRewriteDom(
-            $type, $module, $class, $rewriteTarget ) );
-        $this->_shim_getConfig()->extend( $rewriteConfig, true );
+        $rewriteConfig->loadDom($this->_shim_getRewriteDom(
+            $type, $module, $class, $rewriteTarget ));
+        $this->_shim_getConfig()->extend($rewriteConfig, true);
         $this->_shim_getConfigShim()->shim_setClassNameCache(
             $type, $module, $class, $rewriteTarget );
         return $this;
@@ -100,25 +100,25 @@ class Nexcessnet_Turpentine_Model_Shim_Mage_Core_App extends Mage_Core_Model_App
      * @param string $method
      * @return DOMDocument
      */
-    protected function _shim_getEventDom( $area, $eventName, $obsName,
-            $type=null, $class=null, $method=null ) {
-        $dom = new DOMDocument( '1.0' );
-        $config = $dom->createElement( 'config' );
+    protected function _shim_getEventDom($area, $eventName, $obsName,
+            $type = null, $class = null, $method = null) {
+        $dom = new DOMDocument('1.0');
+        $config = $dom->createElement('config');
         $observers = $config
-                ->appendChild( $dom->createElement( $area ) )
-                ->appendChild( $dom->createElement( 'events' ) )
-                ->appendChild( $dom->createElement( $eventName ) )
-                ->appendChild( $dom->createElement( 'observers' ) );
-        $observer = $dom->createElement( $obsName );
-        if( $class && $method ) {
-            if( $type ) {
-                $observer->appendChild( $dom->createElement( 'type', $type ) );
+                ->appendChild($dom->createElement($area))
+                ->appendChild($dom->createElement('events'))
+                ->appendChild($dom->createElement($eventName))
+                ->appendChild($dom->createElement('observers'));
+        $observer = $dom->createElement($obsName);
+        if ($class && $method) {
+            if ($type) {
+                $observer->appendChild($dom->createElement('type', $type));
             }
-            $observer->appendChild( $dom->createElement( 'class', $class ) );
-            $observer->appendChild( $dom->createElement( 'method', $method ) );
+            $observer->appendChild($dom->createElement('class', $class));
+            $observer->appendChild($dom->createElement('method', $method));
         }
-        $observers->appendChild( $observer );
-        $dom->appendChild( $config );
+        $observers->appendChild($observer);
+        $dom->appendChild($config);
         return $dom;
     }
 
@@ -131,14 +131,14 @@ class Nexcessnet_Turpentine_Model_Shim_Mage_Core_App extends Mage_Core_Model_App
      * @param  string $className    full class name to rewrite to
      * @return DOMDocument
      */
-    protected function _shim_getRewriteDom( $groupType, $group, $class, $className ) {
-        $dom = new DOMDocument( '1.0' );
-        $dom->appendChild( $dom->createElement( 'config' ) )
-            ->appendChild( $dom->createElement( 'global' ) )
-            ->appendChild( $dom->createElement( $groupType . 's' ) )
-            ->appendChild( $dom->createElement( $group ) )
-            ->appendChild( $dom->createElement( 'rewrite' ) )
-            ->appendChild( $dom->createElement( $class, $className ) );
+    protected function _shim_getRewriteDom($groupType, $group, $class, $className) {
+        $dom = new DOMDocument('1.0');
+        $dom->appendChild($dom->createElement('config'))
+            ->appendChild($dom->createElement('global'))
+            ->appendChild($dom->createElement($groupType.'s'))
+            ->appendChild($dom->createElement($group))
+            ->appendChild($dom->createElement('rewrite'))
+            ->appendChild($dom->createElement($class, $className));
         return $dom;
     }
 
@@ -166,6 +166,6 @@ class Nexcessnet_Turpentine_Model_Shim_Mage_Core_App extends Mage_Core_Model_App
      * @return Nexcessnet_Turpentine_Model_Shim_Mage_Core_Config
      */
     protected function _shim_getConfigShim() {
-        return Mage::getModel( 'turpentine/shim_mage_core_config' );
+        return Mage::getModel('turpentine/shim_mage_core_config');
     }
 }

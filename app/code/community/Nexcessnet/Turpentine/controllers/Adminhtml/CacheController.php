@@ -1,8 +1,8 @@
 <?php
 /**
- * User: damian.pastorini@usestrategery.com
- * Date: 08/01/14
- */
+     * User: damian.pastorini@usestrategery.com
+     * Date: 08/01/14
+     */
 
 require_once Mage::getModuleDir('controllers', 'Mage_Adminhtml').DS.'CacheController.php';
 
@@ -29,10 +29,10 @@ class Nexcessnet_Turpentine_Adminhtml_CacheController extends Mage_Adminhtml_Cac
             if($allTypes['turpentine_pages']==1 || $allTypes['turpentine_esi_blocks']==1)
             {
                 $allTypes['full_page'] = 0;
-		Mage::getSingleton('core/session')->addSuccess(Mage::helper('adminhtml')->__("Full page cache has been disabled since Varnish cache is enabled."));
+        Mage::getSingleton('core/session')->addSuccess(Mage::helper('adminhtml')->__("Full page cache has been disabled since Varnish cache is enabled."));
             } else if ($allTypes['full_page']==1) {
-	        Mage::getSingleton('core/session')->addSuccess(Mage::helper('adminhtml')->__("Turpentine cache has been disabled since Full Page cache is enabled."));
-	    }
+            Mage::getSingleton('core/session')->addSuccess(Mage::helper('adminhtml')->__("Turpentine cache has been disabled since Full Page cache is enabled."));
+        }
             // disable FPC when Varnish cache is enabled.
             Mage::app()->saveUseCache($allTypes);
             $this->_getSession()->addSuccess(Mage::helper('adminhtml')->__("%s cache type(s) enabled.", $updatedTypes));

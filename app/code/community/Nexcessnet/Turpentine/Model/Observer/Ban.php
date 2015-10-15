@@ -29,12 +29,12 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * Cache the varnish admin object
      * @var Nexcessnet_Turpentine_Model_Varnish_Admin
      */
-    protected $_varnishAdmin    = null;
+    protected $_varnishAdmin = null;
     /**
      * Flag to prevent doing the ESI cache clear more than once per request
      * @var boolean
      */
-    protected $_esiClearFlag    = array();
+    protected $_esiClearFlag = array();
 
     /**
      * Clear the ESI block cache for a specific client
@@ -46,23 +46,23 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * @param  Varien_Object $eventObject
      * @return null
      */
-    public function banClientEsiCache( $eventObject ) {
+    public function banClientEsiCache($eventObject) {
         $eventName = $eventObject->getEvent()->getName();
-        if( Mage::helper( 'turpentine/esi' )->getEsiEnabled() &&
-                !in_array( $eventName, $this->_esiClearFlag ) ) {
-            $sessionId = Mage::app()->getRequest()->getCookie( 'frontend' );
-            if( $sessionId ) {
+        if (Mage::helper('turpentine/esi')->getEsiEnabled() &&
+                ! in_array($eventName, $this->_esiClearFlag)) {
+            $sessionId = Mage::app()->getRequest()->getCookie('frontend');
+            if ($sessionId) {
                 $result = $this->_getVarnishAdmin()->flushExpression(
                     'obj.http.X-Varnish-Session', '==', $sessionId,
                     '&&', 'obj.http.X-Turpentine-Flush-Events', '~',
                     $eventName );
-                Mage::dispatchEvent( 'turpentine_ban_client_esi_cache', $result );
-                if( $this->_checkResult( $result ) ) {
-                    Mage::helper( 'turpentine/debug' )
-                        ->logDebug( 'Cleared ESI cache for client (%s) on event: %s',
-                            $sessionId, $eventName );
+                Mage::dispatchEvent('turpentine_ban_client_esi_cache', $result);
+                if ($this->_checkResult($result)) {
+                    Mage::helper('turpentine/debug')
+                        ->logDebug('Cleared ESI cache for client (%s) on event: %s',
+                            $sessionId, $eventName);
                 } else {
-                    Mage::helper( 'turpentine/debug' )
+                    Mage::helper('turpentine/debug')
                         ->logWarn(
                             'Failed to clear Varnish ESI cache for client: %s',
                             $sessionId );
@@ -81,20 +81,20 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * @param  Varien_Object $eventObject
      * @return null
      */
-    public function banProductPageCache( $eventObject ) {
-        if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
-            $banHelper = Mage::helper( 'turpentine/ban' );
+    public function banProductPageCache($eventObject) {
+        if (Mage::helper('turpentine/varnish')->getVarnishEnabled()) {
+            $banHelper = Mage::helper('turpentine/ban');
             $product = $eventObject->getProduct();
-            $urlPattern = $banHelper->getProductBanRegex( $product );
-            $result = $this->_getVarnishAdmin()->flushUrl( $urlPattern );
-            Mage::dispatchEvent( 'turpentine_ban_product_cache', $result );
-            $cronHelper = Mage::helper( 'turpentine/cron' );
-            if( $this->_checkResult( $result ) &&
-                    $cronHelper->getCrawlerEnabled() ) {
-                $cronHelper->addProductToCrawlerQueue( $product );
-                foreach( $banHelper->getParentProducts( $product )
-                        as $parentProduct ) {
-                    $cronHelper->addProductToCrawlerQueue( $parentProduct );
+            $urlPattern = $banHelper->getProductBanRegex($product);
+            $result = $this->_getVarnishAdmin()->flushUrl($urlPattern);
+            Mage::dispatchEvent('turpentine_ban_product_cache', $result);
+            $cronHelper = Mage::helper('turpentine/cron');
+            if ($this->_checkResult($result) &&
+                    $cronHelper->getCrawlerEnabled()) {
+                $cronHelper->addProductToCrawlerQueue($product);
+                foreach ($banHelper->getParentProducts($product)
+                        as $parentProduct) {
+                    $cronHelper->addProductToCrawlerQueue($parentProduct);
                 }
             }
         }
@@ -109,27 +109,27 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * @param  Varien_Object $eventObject
      * @return null
      */
-    public function banProductPageCacheCheckStock( $eventObject ) {
-        if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
+    public function banProductPageCacheCheckStock($eventObject) {
+        if (Mage::helper('turpentine/varnish')->getVarnishEnabled()) {
             $item = $eventObject->getItem();
-            if( $item->getStockStatusChangedAutomatically() ||
-                    ( $item->getOriginalInventoryQty() <= 0 &&
+            if ($item->getStockStatusChangedAutomatically() ||
+                    ($item->getOriginalInventoryQty() <= 0 &&
                         $item->getQty() > 0 &&
-                        $item->getQtyCorrection() > 0 ) ) {
-                $banHelper = Mage::helper( 'turpentine/ban' );
-                $cronHelper = Mage::helper( 'turpentine/cron' );
-                $product = Mage::getModel( 'catalog/product' )
-                    ->load( $item->getProductId() );
-                $urlPattern = $banHelper->getProductBanRegex( $product );
-                $result = $this->_getVarnishAdmin()->flushUrl( $urlPattern );
-                Mage::dispatchEvent( 'turpentine_ban_product_cache_check_stock',
-                    $result );
-                if( $this->_checkResult( $result ) &&
-                        $cronHelper->getCrawlerEnabled() ) {
-                    $cronHelper->addProductToCrawlerQueue( $product );
-                    foreach( $banHelper->getParentProducts( $product )
-                            as $parentProduct ) {
-                        $cronHelper->addProductToCrawlerQueue( $parentProduct );
+                        $item->getQtyCorrection() > 0)) {
+                $banHelper = Mage::helper('turpentine/ban');
+                $cronHelper = Mage::helper('turpentine/cron');
+                $product = Mage::getModel('catalog/product')
+                    ->load($item->getProductId());
+                $urlPattern = $banHelper->getProductBanRegex($product);
+                $result = $this->_getVarnishAdmin()->flushUrl($urlPattern);
+                Mage::dispatchEvent('turpentine_ban_product_cache_check_stock',
+                    $result);
+                if ($this->_checkResult($result) &&
+                        $cronHelper->getCrawlerEnabled()) {
+                    $cronHelper->addProductToCrawlerQueue($product);
+                    foreach ($banHelper->getParentProducts($product)
+                            as $parentProduct) {
+                        $cronHelper->addProductToCrawlerQueue($parentProduct);
                     }
                 }
             }
@@ -145,15 +145,15 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * @param  Varien_Object $eventObject
      * @return null
      */
-    public function banCategoryCache( $eventObject ) {
-        if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
+    public function banCategoryCache($eventObject) {
+        if (Mage::helper('turpentine/varnish')->getVarnishEnabled()) {
             $category = $eventObject->getCategory();
-            $result = $this->_getVarnishAdmin()->flushUrl( $category->getUrlKey() );
-            Mage::dispatchEvent( 'turpentine_ban_category_cache', $result );
-            $cronHelper = Mage::helper( 'turpentine/cron' );
-            if( $this->_checkResult( $result ) &&
-                    $cronHelper->getCrawlerEnabled() ) {
-                $cronHelper->addCategoryToCrawlerQueue( $category );
+            $result = $this->_getVarnishAdmin()->flushUrl($category->getUrlKey());
+            Mage::dispatchEvent('turpentine_ban_category_cache', $result);
+            $cronHelper = Mage::helper('turpentine/cron');
+            if ($this->_checkResult($result) &&
+                    $cronHelper->getCrawlerEnabled()) {
+                $cronHelper->addCategoryToCrawlerQueue($category);
             }
         }
     }
@@ -168,11 +168,11 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * @param  Varien_Object $eventObject
      * @return null
      */
-    public function banMediaCache( $eventObject ) {
-        if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
-            $result = $this->_getVarnishAdmin()->flushUrl( 'media/(?:js|css)/' );
-            Mage::dispatchEvent( 'turpentine_ban_media_cache', $result );
-            $this->_checkResult( $result );
+    public function banMediaCache($eventObject) {
+        if (Mage::helper('turpentine/varnish')->getVarnishEnabled()) {
+            $result = $this->_getVarnishAdmin()->flushUrl('media/(?:js|css)/');
+            Mage::dispatchEvent('turpentine_ban_media_cache', $result);
+            $this->_checkResult($result);
         }
     }
 
@@ -186,12 +186,12 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * @param  Varien_Object $eventObject
      * @return null
      */
-    public function banCatalogImagesCache( $eventObject ) {
-        if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
+    public function banCatalogImagesCache($eventObject) {
+        if (Mage::helper('turpentine/varnish')->getVarnishEnabled()) {
             $result = $this->_getVarnishAdmin()->flushUrl(
                 'media/catalog/product/cache/' );
-            Mage::dispatchEvent( 'turpentine_ban_catalog_images_cache', $result );
-            $this->_checkResult( $result );
+            Mage::dispatchEvent('turpentine_ban_catalog_images_cache', $result);
+            $this->_checkResult($result);
         }
     }
 
@@ -204,15 +204,15 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * @param  Varien_Object $eventObject
      * @return null
      */
-    public function banCmsPageCache( $eventObject ) {
-        if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
+    public function banCmsPageCache($eventObject) {
+        if (Mage::helper('turpentine/varnish')->getVarnishEnabled()) {
             $pageId = $eventObject->getDataObject()->getIdentifier();
-            $result = $this->_getVarnishAdmin()->flushUrl( $pageId . '(?:\.html?)?$' );
-            Mage::dispatchEvent( 'turpentine_ban_cms_page_cache', $result );
-            $cronHelper = Mage::helper( 'turpentine/cron' );
-            if( $this->_checkResult( $result ) &&
-                    $cronHelper->getCrawlerEnabled() ) {
-                $cronHelper->addCmsPageToCrawlerQueue( $pageId );
+            $result = $this->_getVarnishAdmin()->flushUrl($pageId.'(?:\.html?)?$');
+            Mage::dispatchEvent('turpentine_ban_cms_page_cache', $result);
+            $cronHelper = Mage::helper('turpentine/cron');
+            if ($this->_checkResult($result) &&
+                    $cronHelper->getCrawlerEnabled()) {
+                $cronHelper->addCmsPageToCrawlerQueue($pageId);
             }
         }
     }
@@ -226,21 +226,21 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * @return null
      */
     public function banCmsPageRevisionCache($eventObject) {
-        if ( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
+        if (Mage::helper('turpentine/varnish')->getVarnishEnabled()) {
             $pageId = $eventObject->getDataObject()->getPageId();
-            $page = Mage::getModel( 'cms/page' )->load( $pageId );
+            $page = Mage::getModel('cms/page')->load($pageId);
 
             // Don't do anything if the page isn't found.
-            if( !$page ) {
+            if ( ! $page) {
                 return;
             }
             $pageIdentifier = $page->getIdentifier();
-            $result = $this->_getVarnishAdmin()->flushUrl( $pageIdentifier . '(?:\.html?)?$' );
-            Mage::dispatchEvent( 'turpentine_ban_cms_page_cache', $result );
-            $cronHelper = Mage::helper( 'turpentine/cron' );
-            if( $this->_checkResult( $result ) &&
-                $cronHelper->getCrawlerEnabled() ) {
-                $cronHelper->addCmsPageToCrawlerQueue( $pageIdentifier );
+            $result = $this->_getVarnishAdmin()->flushUrl($pageIdentifier.'(?:\.html?)?$');
+            Mage::dispatchEvent('turpentine_ban_cms_page_cache', $result);
+            $cronHelper = Mage::helper('turpentine/cron');
+            if ($this->_checkResult($result) &&
+                $cronHelper->getCrawlerEnabled()) {
+                $cronHelper->addCmsPageToCrawlerQueue($pageIdentifier);
             }
         }
     }
@@ -256,11 +256,11 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * @param  Varien_Object $eventObject
      * @return null
      */
-    public function banAllCache( $eventObject ) {
-        if( Mage::helper( 'turpentine/varnish' )->getVarnishEnabled() ) {
+    public function banAllCache($eventObject) {
+        if (Mage::helper('turpentine/varnish')->getVarnishEnabled()) {
             $result = $this->_getVarnishAdmin()->flushAll();
-            Mage::dispatchEvent( 'turpentine_ban_all_cache', $result );
-            $this->_checkResult( $result );
+            Mage::dispatchEvent('turpentine_ban_all_cache', $result);
+            $this->_checkResult($result);
         }
     }
 
@@ -273,20 +273,20 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * @param  Varien_Object $eventObject
      * @return null
      */
-    public function banCacheType( $eventObject ) {
-        switch( $eventObject->getType() ) {
+    public function banCacheType($eventObject) {
+        switch ($eventObject->getType()) {
             //note this is the name of the container xml tag in config.xml,
             // **NOT** the cache tag name
-            case Mage::helper( 'turpentine/esi' )->getMageCacheName():
-                if( Mage::helper( 'turpentine/esi' )->getEsiEnabled() ) {
+            case Mage::helper('turpentine/esi')->getMageCacheName():
+                if (Mage::helper('turpentine/esi')->getEsiEnabled()) {
                     $result = $this->_getVarnishAdmin()->flushUrl(
                         '/turpentine/esi/getBlock/' );
-                    Mage::dispatchEvent( 'turpentine_ban_esi_cache', $result );
-                    $this->_checkResult( $result );
+                    Mage::dispatchEvent('turpentine_ban_esi_cache', $result);
+                    $this->_checkResult($result);
                 }
                 break;
-            case Mage::helper( 'turpentine/varnish' )->getMageCacheName():
-                $this->banAllCache( $eventObject );
+            case Mage::helper('turpentine/varnish')->getMageCacheName():
+                $this->banAllCache($eventObject);
                 break;
         }
     }
@@ -297,7 +297,7 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * @param  Varien_Object $eventObject
      * @return bool
      */
-    public function banProductReview( $eventObject ) {
+    public function banProductReview($eventObject) {
         $patterns = array();
         /* @var $review \Mage_Review_Model_Review*/
         $review = $eventObject->getObject();
@@ -305,30 +305,30 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
         /* @var $productCollection \Mage_Review_Model_Resource_Review_Product_Collection*/
         $productCollection = $review->getProductCollection();
         
-        $products = $productCollection->addEntityFilter((int)$review->getEntityPkValue())->getItems();
+        $products = $productCollection->addEntityFilter((int) $review->getEntityPkValue())->getItems();
 
-        $productIds = array_unique( array_map(
-            create_function( '$p', 'return $p->getEntityId();' ),
-            $products ) );
-        $patterns[] = sprintf( '/review/product/list/id/(?:%s)/category/',
-            implode( '|', array_unique( $productIds ) ) );
-        $patterns[] = sprintf( '/review/product/view/id/%d/',
-            $review->getEntityId() );
+        $productIds = array_unique(array_map(
+            create_function('$p', 'return $p->getEntityId();'),
+            $products ));
+        $patterns[] = sprintf('/review/product/list/id/(?:%s)/category/',
+            implode('|', array_unique($productIds)));
+        $patterns[] = sprintf('/review/product/view/id/%d/',
+            $review->getEntityId());
         $productPatterns = array();
-        foreach ( $products as $p ) {
-            $urlKey = $p->getUrlModel()->formatUrlKey( $p->getName() );
-            if ( $urlKey ) {
+        foreach ($products as $p) {
+            $urlKey = $p->getUrlModel()->formatUrlKey($p->getName());
+            if ($urlKey) {
                 $productPatterns[] = $urlKey;
             }
         }
-        if ( !empty($productPatterns) ) {
-            $productPatterns = array_unique( $productPatterns );
-            $patterns[] = sprintf( '(?:%s)', implode( '|', $productPatterns ) );
+        if ( ! empty($productPatterns)) {
+            $productPatterns = array_unique($productPatterns);
+            $patterns[] = sprintf('(?:%s)', implode('|', $productPatterns));
         }
-        $urlPattern = implode( '|', $patterns );
+        $urlPattern = implode('|', $patterns);
 
-        $result = $this->_getVarnishAdmin()->flushUrl( $urlPattern );
-        return $this->_checkResult( $result );
+        $result = $this->_getVarnishAdmin()->flushUrl($urlPattern);
+        return $this->_checkResult($result);
     }
 
     /**
@@ -337,11 +337,11 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * @param  array $result stored as $socketName => $result
      * @return bool
      */
-    protected function _checkResult( $result ) {
+    protected function _checkResult($result) {
         $rvalue = true;
-        foreach( $result as $socketName => $value ) {
-            if( $value !== true ) {
-                Mage::helper( 'turpentine/debug' )->logWarn(
+        foreach ($result as $socketName => $value) {
+            if ($value !== true) {
+                Mage::helper('turpentine/debug')->logWarn(
                     'Error in Varnish action result for server [%s]: %s',
                     $socketName, $value );
                 $rvalue = false;
@@ -356,8 +356,8 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * @return Nexcessnet_Turpentine_Model_Varnish_Admin
      */
     protected function _getVarnishAdmin() {
-        if( is_null( $this->_varnishAdmin ) ) {
-            $this->_varnishAdmin = Mage::getModel( 'turpentine/varnish_admin' );
+        if (is_null($this->_varnishAdmin)) {
+            $this->_varnishAdmin = Mage::getModel('turpentine/varnish_admin');
         }
         return $this->_varnishAdmin;
     }

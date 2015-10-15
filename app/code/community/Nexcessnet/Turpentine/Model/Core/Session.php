@@ -20,7 +20,7 @@
  */
 class Nexcessnet_Turpentine_Model_Core_Session extends Mage_Core_Model_Session
 {
-    public function __construct($data=array())
+    public function __construct($data = array())
     {
         $name = isset($data['name']) ? $data['name'] : null;
         $this->init('core', $name);
@@ -34,7 +34,7 @@ class Nexcessnet_Turpentine_Model_Core_Session extends Mage_Core_Model_Session
     public function getFormKey()
     {
         if (Mage::registry('replace_form_key') &&
-                !Mage::app()->getRequest()->getParam('form_key', false)) {
+                ! Mage::app()->getRequest()->getParam('form_key', false)) {
             // flag request for ESI processing
             Mage::register('turpentine_esi_flag', true, true);
             return '{{form_key_esi_placeholder}}';
@@ -45,7 +45,7 @@ class Nexcessnet_Turpentine_Model_Core_Session extends Mage_Core_Model_Session
 
     public function real_getFormKey()
     {
-        if (!$this->getData('_form_key')) {
+        if ( ! $this->getData('_form_key')) {
             $this->setData('_form_key', Mage::helper('core')->getRandomString(16));
         }
         return $this->getData('_form_key');

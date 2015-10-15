@@ -23,7 +23,7 @@ class Nexcessnet_Turpentine_Block_Product_Compared extends Mage_Reports_Block_Pr
 
     protected function _toHtml()
     {
-        if (!$this->getCount()) {
+        if ( ! $this->getCount()) {
             return $this->renderView();
         }
 

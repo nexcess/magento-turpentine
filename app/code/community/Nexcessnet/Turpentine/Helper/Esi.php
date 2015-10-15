@@ -41,7 +41,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return bool
      */
     public function getEsiEnabled() {
-        return Mage::app()->useCache( $this->getMageCacheName() );
+        return Mage::app()->useCache($this->getMageCacheName());
     }
 
     /**
@@ -50,7 +50,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return bool
      */
     public function shouldResponseUseEsi() {
-        return Mage::helper( 'turpentine/varnish' )->shouldResponseUseVarnish() &&
+        return Mage::helper('turpentine/varnish')->shouldResponseUseVarnish() &&
             $this->getEsiEnabled();
     }
 
@@ -60,8 +60,8 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return null
      */
     public function ensureEsiEnabled() {
-        if( !$this->shouldResponseUseEsi() ) {
-            Mage::throwException( 'ESI includes are not enabled' );
+        if ( ! $this->shouldResponseUseEsi()) {
+            Mage::throwException('ESI includes are not enabled');
         }
     }
 
@@ -119,14 +119,14 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
         return self::ESI_HMAC_PARAM;
     }
 
-	/**
-	 * Get referrer param
-	 *
-	 * @return string
-	 */
-	public function getEsiReferrerParam() {
-		return Mage_Core_Controller_Varien_Action::PARAM_NAME_BASE64_URL;
-	}
+    /**
+     * Get referrer param
+     *
+     * @return string
+     */
+    public function getEsiReferrerParam() {
+        return Mage_Core_Controller_Varien_Action::PARAM_NAME_BASE64_URL;
+    }
 
     /**
      * Get whether ESI debugging is enabled or not
@@ -134,7 +134,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return bool
      */
     public function getEsiDebugEnabled() {
-        return Mage::helper( 'turpentine/varnish' )
+        return Mage::helper('turpentine/varnish')
             ->getVarnishDebugEnabled();
     }
 
@@ -144,7 +144,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return bool
      */
     public function getEsiBlockLogEnabled() {
-        return (bool)Mage::getStoreConfig(
+        return (bool) Mage::getStoreConfig(
             'turpentine_varnish/general/block_debug' );
     }
 
@@ -154,7 +154,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return bool
      */
     public function shouldFixFlashMessages() {
-        return Mage::helper( 'turpentine/data' )->useFlashMessagesFix() &&
+        return Mage::helper('turpentine/data')->useFlashMessagesFix() &&
             Mage::app()->getStore()->getCode() !== 'admin';
     }
 
@@ -164,7 +164,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return string
      */
     public function getDummyUrl() {
-        return Mage::getUrl( 'checkout/cart' );
+        return Mage::getUrl('checkout/cart');
     }
 
     /**
@@ -174,11 +174,10 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * turpentine/esi/getBlock while rendering ESI blocks. Not perfect, but may
      * be good enough
      *
-     * @param  string $url=null
      * @return Mage_Core_Controller_Request_Http
      */
-    public function getDummyRequest( $url=null ) {
-        if( $url === null ) {
+    public function getDummyRequest($url = null) {
+        if ($url === null) {
             $url = $this->getDummyUrl();
         }
         $request = Mage::getModel('turpentine/dummy_request', $url);
@@ -198,7 +197,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     /**
      * Get the list of cache clear events to include with every ESI block
      *
-     * @return array
+     * @return string[]
      */
     public function getDefaultCacheClearEvents() {
         $events = array(
@@ -211,19 +210,19 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
     /**
      * Get the list of events that should cause the ESI cache to be cleared
      *
-     * @return array
+     * @return string[]
      */
     public function getCacheClearEvents() {
-        Varien_Profiler::start( 'turpentine::helper::esi::getCacheClearEvents' );
+        Varien_Profiler::start('turpentine::helper::esi::getCacheClearEvents');
         $cacheKey = $this->getCacheClearEventsCacheKey();
-        $events = @unserialize( Mage::app()->loadCache( $cacheKey ) );
-        if( is_null( $events ) || $events === false ) {
+        $events = @unserialize(Mage::app()->loadCache($cacheKey));
+        if (is_null($events) || $events === false) {
             $events = $this->_loadEsiCacheClearEvents();
-            Mage::app()->saveCache( serialize( $events ), $cacheKey,
-                array( 'LAYOUT_GENERAL_CACHE_TAG' ) );
+            Mage::app()->saveCache(serialize($events), $cacheKey,
+                array('LAYOUT_GENERAL_CACHE_TAG'));
         }
-        Varien_Profiler::stop( 'turpentine::helper::esi::getCacheClearEvents' );
-        return array_merge( $this->getDefaultCacheClearEvents(), $events );
+        Varien_Profiler::stop('turpentine::helper::esi::getCacheClearEvents');
+        return array_merge($this->getDefaultCacheClearEvents(), $events);
     }
 
     /**
@@ -232,7 +231,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return string
      */
     public function getDefaultEsiTtl() {
-        return trim( Mage::getStoreConfig( 'web/cookie/cookie_lifetime' ) );
+        return trim(Mage::getStoreConfig('web/cookie/cookie_lifetime'));
     }
 
     /**
@@ -242,18 +241,18 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      *
      * @return string
      */
-    public function getCorsOrigin( $url=null ) {
-        if( is_null( $url ) ) {
+    public function getCorsOrigin($url = null) {
+        if (is_null($url)) {
             $baseUrl = Mage::getBaseUrl();
         } else {
             $baseUrl = $url;
         }
-        $path = parse_url( $baseUrl, PHP_URL_PATH );
-        $domain = parse_url( $baseUrl, PHP_URL_HOST );
+        $path = parse_url($baseUrl, PHP_URL_PATH);
+        $domain = parse_url($baseUrl, PHP_URL_HOST);
         // there has to be a better way to just strip the path off
-        return substr( $baseUrl, 0,
-            strpos( $baseUrl, $path,
-                strpos( $baseUrl, $domain ) ) );
+        return substr($baseUrl, 0,
+            strpos($baseUrl, $path,
+                strpos($baseUrl, $domain)));
     }
 
     /**
@@ -264,23 +263,23 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return Mage_Core_Model_Layout_Element|SimpleXMLElement
      */
     public function getLayoutXml() {
-        Varien_Profiler::start( 'turpentine::helper::esi::getLayoutXml' );
-        if( is_null( $this->_layoutXml ) ) {
-            if( $useCache = Mage::app()->useCache( 'layout' ) ) {
+        Varien_Profiler::start('turpentine::helper::esi::getLayoutXml');
+        if (is_null($this->_layoutXml)) {
+            if ($useCache = Mage::app()->useCache('layout')) {
                 $cacheKey = $this->getFileLayoutUpdatesXmlCacheKey();
                 $this->_layoutXml = simplexml_load_string(
-                    Mage::app()->loadCache( $cacheKey ) );
+                    Mage::app()->loadCache($cacheKey) );
             }
             // this check is redundant if the layout cache is disabled
-            if( !$this->_layoutXml ) {
+            if ( ! $this->_layoutXml) {
                 $this->_layoutXml = $this->_loadLayoutXml();
-                if( $useCache ) {
-                    Mage::app()->saveCache( $this->_layoutXml->asXML(),
-                        $cacheKey, array( 'LAYOUT_GENERAL_CACHE_TAG' ) );
+                if ($useCache) {
+                    Mage::app()->saveCache($this->_layoutXml->asXML(),
+                        $cacheKey, array('LAYOUT_GENERAL_CACHE_TAG'));
                 }
             }
         }
-        Varien_Profiler::stop( 'turpentine::helper::esi::getLayoutXml' );
+        Varien_Profiler::stop('turpentine::helper::esi::getLayoutXml');
         return $this->_layoutXml;
     }
 
@@ -291,14 +290,14 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      */
     public function getCacheClearEventsCacheKey() {
         $design = Mage::getDesign();
-        return Mage::helper( 'turpentine/data' )
-            ->getCacheKeyHash( array(
+        return Mage::helper('turpentine/data')
+            ->getCacheKeyHash(array(
                 'FILE_LAYOUT_ESI_CACHE_EVENTS',
                 $design->getArea(),
                 $design->getPackageName(),
-                $design->getTheme( 'layout' ),
+                $design->getTheme('layout'),
                 Mage::app()->getStore()->getId(),
-            ) );
+            ));
     }
 
     /**
@@ -308,14 +307,14 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      */
     public function getFileLayoutUpdatesXmlCacheKey() {
         $design = Mage::getDesign();
-        return Mage::helper( 'turpentine/data' )
-            ->getCacheKeyHash( array(
+        return Mage::helper('turpentine/data')
+            ->getCacheKeyHash(array(
                 'FILE_LAYOUT_UPDATES_XML',
                 $design->getArea(),
                 $design->getPackageName(),
-                $design->getTheme( 'layout' ),
+                $design->getTheme('layout'),
                 Mage::app()->getStore()->getId(),
-            ) );
+            ));
     }
 
     /**
@@ -327,8 +326,8 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @param  string $url url to pull content from
      * @return string
      */
-    public function buildEsiIncludeFragment( $url ) {
-        return sprintf( '<esi:include src="%s" />', $url );
+    public function buildEsiIncludeFragment($url) {
+        return sprintf('<esi:include src="%s" />', $url);
     }
 
     /**
@@ -341,8 +340,8 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @param  string $content content to be removed
      * @return string
      */
-    public function buildEsiRemoveFragment( $content ) {
-        return sprintf( '<esi:remove>%s</esi>', $content );
+    public function buildEsiRemoveFragment($content) {
+        return sprintf('<esi:remove>%s</esi>', $content);
     }
 
     /**
@@ -357,9 +356,9 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
             $this->getEsiScopeParam()       => 'global',
             $this->getEsiCacheTypeParam()   => 'private',
         );
-        $esiUrl = Mage::getUrl( 'turpentine/esi/getFormKey', $urlOptions );
+        $esiUrl = Mage::getUrl('turpentine/esi/getFormKey', $urlOptions);
         // setting [web/unsecure/base_url] can be https://... but ESI can never be HTTPS
-        $esiUrl = preg_replace( '|^https://|i', 'http://', $esiUrl );
+        $esiUrl = preg_replace('|^https://|i', 'http://', $esiUrl);
         return $esiUrl;
     }
 
@@ -369,19 +368,19 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return array
      */
     protected function _loadEsiCacheClearEvents() {
-        Varien_Profiler::start( 'turpentine::helper::esi::_loadEsiCacheClearEvents' );
+        Varien_Profiler::start('turpentine::helper::esi::_loadEsiCacheClearEvents');
         $layoutXml = $this->getLayoutXml();
         $events = $layoutXml->xpath(
             '//action[@method=\'setEsiOptions\']/params/flush_events/*' );
-        if( $events ) {
-            $events = array_unique( array_map(
-                create_function( '$e',
-                    'return (string)$e->getName();' ),
-                $events ) );
+        if ($events) {
+            $events = array_unique(array_map(
+                create_function('$e',
+                    'return (string)$e->getName();'),
+                $events ));
         } else {
             $events = array();
         }
-        Varien_Profiler::stop( 'turpentine::helper::esi::_loadEsiCacheClearEvents' );
+        Varien_Profiler::stop('turpentine::helper::esi::_loadEsiCacheClearEvents');
         return $events;
     }
 
@@ -391,16 +390,16 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return Mage_Core_Model_Layout_Element
      */
     protected function _loadLayoutXml() {
-        Varien_Profiler::start( 'turpentine::helper::esi::_loadLayoutXml' );
+        Varien_Profiler::start('turpentine::helper::esi::_loadLayoutXml');
         $design = Mage::getDesign();
-        $layoutXml = Mage::getSingleton( 'core/layout' )
+        $layoutXml = Mage::getSingleton('core/layout')
             ->getUpdate()
             ->getFileLayoutUpdatesXml(
                 $design->getArea(),
                 $design->getPackageName(),
-                $design->getTheme( 'layout' ),
+                $design->getTheme('layout'),
                 Mage::app()->getStore()->getId() );
-        Varien_Profiler::stop( 'turpentine::helper::esi::_loadLayoutXml' );
+        Varien_Profiler::stop('turpentine::helper::esi::_loadLayoutXml');
         return $layoutXml;
     }
 }

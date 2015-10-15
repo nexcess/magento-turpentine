@@ -34,7 +34,7 @@ class Nexcessnet_Turpentine_Block_Management
      * @return string
      */
     public function getFlushAllUrl() {
-        return $this->getUrl( '*/varnish_management/flushAll' );
+        return $this->getUrl('*/varnish_management/flushAll');
     }
 
     /**
@@ -43,7 +43,7 @@ class Nexcessnet_Turpentine_Block_Management
      * @return string
      */
     public function getFlushPartialUrl() {
-        return $this->getUrl( '*/varnish_management/flushPartial' );
+        return $this->getUrl('*/varnish_management/flushPartial');
     }
 
     /**
@@ -52,7 +52,7 @@ class Nexcessnet_Turpentine_Block_Management
      * @return string
      */
     public function getFlushContentTypeUrl() {
-        return $this->getUrl( '*/varnish_management/flushContentType' );
+        return $this->getUrl('*/varnish_management/flushContentType');
     }
 
     /**
@@ -61,7 +61,7 @@ class Nexcessnet_Turpentine_Block_Management
      * @return string
      */
     public function getApplyConfigUrl() {
-        return $this->getUrl( '*/varnish_management/applyConfig' );
+        return $this->getUrl('*/varnish_management/applyConfig');
     }
 
     /**
@@ -88,7 +88,7 @@ class Nexcessnet_Turpentine_Block_Management
      * @param string $type
      * @return string
      */
-    public function getSwitchNavigationUrl( $type ) {
+    public function getSwitchNavigationUrl($type) {
         return $this->getUrl('*/varnish_management/switchNavigation', array('type' => $type));
     }
 }
