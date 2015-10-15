@@ -34,7 +34,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version2
         $tplFile = $this->_getVclTemplateFilename( self::VCL_TEMPLATE_FILE );
         $vcl = $this->_formatTemplate( file_get_contents( $tplFile ),
             $this->_getTemplateVars() );
-	    return $doClean ? $this->_cleanVcl( $vcl ) : $vcl;
+        return $doClean ? $this->_cleanVcl( $vcl ) : $vcl;
     }
 
     protected function _getAdvancedSessionValidation() {

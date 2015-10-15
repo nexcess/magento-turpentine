@@ -28,7 +28,7 @@ class Nexcessnet_Turpentine_Model_PageCache_Container_Notices
      * @param string $content
      * @return boolean
      */
-    public function applyWithoutApp( &$content ) {
+    public function applyWithoutApp(&$content) {
         return false;
     }
 
@@ -39,7 +39,7 @@ class Nexcessnet_Turpentine_Model_PageCache_Container_Notices
      */
     protected function _renderBlock() {
         $block = new Nexcessnet_Turpentine_Block_Notices();
-        $block->setTemplate( 'turpentine/notices.phtml' );
+        $block->setTemplate('turpentine/notices.phtml');
 
         return $block->toHtml();
     }
