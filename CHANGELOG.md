@@ -421,3 +421,4 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#955] Include theme specific handles to ESI data (@LyndonHook)  
   * [#972] Fixed bug with wrong return value of ->getSkinUrl() (@ceckoslab)
   * [#951] Added 'disableEsiInjection' ESI policy option.  
+  * [#1005 ]  Invalidating cms pages with url enging with slash. (@sivaschenko)  
