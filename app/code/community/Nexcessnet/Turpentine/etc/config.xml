@@ -468,6 +468,14 @@
                     </add_to_cart_after>
                 </observers>
             </add_to_cart_after-->
+            <wishlist_index_index_before>
+                <observers>
+                    <wishlist_index_index_before>
+                        <class>turpentine/observer_esi</class>
+                        ><method>hookToAddToWishlistBefore</method>
+                    </wishlist_index_index_before>
+                </observers>
+            </wishlist_index_index_before>
         </events>
     </frontend>
     <admin>
