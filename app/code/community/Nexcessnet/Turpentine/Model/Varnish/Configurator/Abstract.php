@@ -440,6 +440,16 @@ EOS;
     }
 
     /**
+     * Get the Force Static Caching option
+     *
+     * @return string
+     */
+    protected function _getSimpleHashStatic() {
+        return Mage::getStoreConfig('turpentine_vcl/static/simple_hash')
+            ? 'true' : 'false';
+    }
+
+    /**
      * Format the list of static cache extensions
      *
      * @return string
@@ -942,6 +952,7 @@ EOS;
             'debug_headers' => $this->_getEnableDebugHeaders(),
             'grace_period'  => $this->_getGracePeriod(),
             'force_cache_static'    => $this->_getForceCacheStatic(),
+            'simple_hash_static'    => $this->_getSimpleHashStatic(),
             'generate_session_expires'    => $this->_getGenerateSessionExpires(),
             'generate_session'    => $this->_getGenerateSession(),
             'generate_session_start'    => $this->_getGenerateSessionStart(),

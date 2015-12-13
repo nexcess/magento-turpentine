@@ -85,6 +85,7 @@
             <static>
                 <force_static>1</force_static>
                 <exts>css,js,jpe?g,png,gif,ico,swf</exts>
+                <simple_hash>1</simple_hash>
             </static>
         </turpentine_vcl>
     </default>
