@@ -100,9 +100,11 @@ sub vcl_recv {
     }
 
     # varnish 2.1 doesn't support bare booleans so we have to add these
-    # as headers to the req so they've available throught the VCL
+    # as headers to the req so they've available through the VCL
     set req.http.X-Opt-Enable-Caching = "{{enable_caching}}";
     set req.http.X-Opt-Force-Static-Caching = "{{force_cache_static}}";
+    set req.http.X-Opt-Simple-Hash-Static = "{{simple_hash_static}}";
+    set req.http.X-Opt-Enable-Get-Ignored = "{{enable_get_ignored}}";
     set req.http.X-Opt-Enable-Get-Excludes = "{{enable_get_excludes}}";
     set req.http.X-Opt-Send-Unmodified-Url = "{{send_unmodified_url}}";
 
@@ -186,6 +188,7 @@ sub vcl_recv {
             # don't need cookies for static assets
             remove req.http.Cookie;
             remove req.http.X-Varnish-Faked-Session;
+            set req.http.X-Varnish-Static = "1";
             return (lookup);
         }
         # this doesn't need a enable_url_excludes because we can be reasonably
@@ -202,7 +205,7 @@ sub vcl_recv {
                 req.url ~ "(?:[?&](?:{{get_param_excludes}})(?=[&=]|$))") {
             return (pass);
         }
-        if ({{enable_get_ignored}} && req.url ~ "[?&]({{get_param_ignored}})=") {
+        if (req.http.X-Opt-Enable-Get-Ignored == "true" && req.url ~ "[?&]({{get_param_ignored}})=") {
             # Strip out ignored GET related parameters
             set req.url = regsuball(req.url, "(?:(\?)?|&)(?:{{get_param_ignored}})=[^&]+", "\1");
             set req.url = regsuball(req.url, "(?:(\?)&|\?$)", "\1");
@@ -234,8 +237,18 @@ sub vcl_pipe {
 # }
 
 sub vcl_hash {
+    # For static files we keep the hash simple and don't add the domain.
+    # This saves memory when a static file is used on multiple domains.
+    if (req.http.X-Opt-Simple-Hash-Static == "true" && req.http.X-Varnish-Static) {
+        set req.hash += req.url;
+        if (req.http.Accept-Encoding) {
+            # make sure we give back the right encoding
+            set req.hash += req.http.Accept-Encoding;
+        }
+        return (hash);
+    }
 
-    if({{send_unmodified_url}} && req.http.X-Varnish-Cache-Url) {
+    if(req.http.X-Opt-Send-Unmodified-Url == "true" && req.http.X-Varnish-Cache-Url) {
         set req.hash += req.http.X-Varnish-Cache-Url;
     } else {
         set req.hash += req.url;
