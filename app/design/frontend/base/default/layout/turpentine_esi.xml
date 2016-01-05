@@ -138,6 +138,16 @@
                 </params>
             </action>
         </reference>
+
+        <reference name="global_cookie_notice">
+            <action method="setEsiOptions">
+                <params>
+                        <access>private</access>
+                        <only_cache_if>no_text</only_cache_if>
+                </params>
+            </action>
+        </reference>
+        
     </default>
 
     <!-- Blocks only visible when logged in -->
