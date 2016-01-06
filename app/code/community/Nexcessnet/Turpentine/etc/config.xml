@@ -302,6 +302,10 @@
                         <class>turpentine/observer_varnish</class>
                         <method>addProductListToolbarRewrite</method>
                     </turpentine_varnish_controller_front_init_before>
+                    <turpentine_varnish_fix_cm_redissession_locks>
+                        <class>turpentine/observer_varnish</class>
+                        <method>fixCmRedisSessionLocks</method>
+                    </turpentine_varnish_fix_cm_redissession_locks>
                     <turpentine_esi_set_replace_form_key_flag>
                         <class>turpentine/observer_esi</class>
                         <method>setReplaceFormKeyFlag</method>

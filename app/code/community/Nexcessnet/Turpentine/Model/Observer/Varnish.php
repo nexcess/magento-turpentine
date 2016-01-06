@@ -56,6 +56,22 @@ class Nexcessnet_Turpentine_Model_Observer_Varnish extends Varien_Event_Observer
     }
 
     /**
+     * Turpentine sets the fake cookie 'frontend=crawler-session' when a crawler is detected.
+     * This causes lock problems with Cm_RedisSession, because all crawler hits are requesting the same session lock.
+     * Cm_RedisSession provides the define CM_REDISSESSION_LOCKING_ENABLED to overrule if locking should be enabled.
+     *
+     * @param $eventObject
+     * @return null
+     */
+    public function fixCmRedisSessionLocks($eventObject) {
+        if (Mage::helper('core')->isModuleEnabled('Cm_RedisSession')) {
+            if (!empty($_COOKIE['frontend']) && 'crawler-session' == $_COOKIE['frontend']) {
+                define('CM_REDISSESSION_LOCKING_ENABLED', false);
+            }
+        }
+    }
+
+    /**
      * Re-apply and save Varnish configuration on config change
      *
      * @param  mixed $eventObject
