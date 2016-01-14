@@ -22,12 +22,12 @@
 class Nexcessnet_Turpentine_Model_Session extends Mage_Core_Model_Session_Abstract {
     protected $_namespace = 'turpentine';
 
-    public function __construct( $data=array() ) {
-        $sessionName = isset( $data['name'] ) ? $data['name'] : null;
-        $this->init( $this->_namespace, $sessionName );
+    public function __construct($data = array()) {
+        $sessionName = isset($data['name']) ? $data['name'] : null;
+        $this->init($this->_namespace, $sessionName);
         Mage::dispatchEvent(
-            sprintf( '%s_session_init', $this->_namespace ),
-            array( sprintf( '%s_session', $this->_namespace ) => $this ) );
+            sprintf('%s_session_init', $this->_namespace),
+            array(sprintf('%s_session', $this->_namespace) => $this) );
     }
 
     /**
@@ -37,11 +37,11 @@ class Nexcessnet_Turpentine_Model_Session extends Mage_Core_Model_Session_Abstra
      * @param  array $messages
      * @return null
      */
-    public function saveMessages( $blockName, $messages ) {
+    public function saveMessages($blockName, $messages) {
         $allMessages = $this->getMessages();
         $allMessages[$blockName] = array_merge(
-            $this->loadMessages( $blockName ), $messages );
-        $this->setMessages( $allMessages );
+            $this->loadMessages($blockName), $messages );
+        $this->setMessages($allMessages);
     }
 
     /**
@@ -50,9 +50,9 @@ class Nexcessnet_Turpentine_Model_Session extends Mage_Core_Model_Session_Abstra
      * @param  string $blockName
      * @return array
      */
-    public function loadMessages( $blockName ) {
+    public function loadMessages($blockName) {
         $messages = $this->getMessages();
-        if( is_array( @$messages[$blockName] ) ) {
+        if (is_array(@$messages[$blockName])) {
             return $messages[$blockName];
         } else {
             return array();
@@ -65,21 +65,20 @@ class Nexcessnet_Turpentine_Model_Session extends Mage_Core_Model_Session_Abstra
      * @param  string $blockName
      * @return null
      */
-    public function clearMessages( $blockName ) {
+    public function clearMessages($blockName) {
         $messages = $this->getMessages();
-        unset( $messages[$blockName] );
-        $this->setMessages( $messages );
+        unset($messages[$blockName]);
+        $this->setMessages($messages);
     }
 
     /**
      * Retrieve the stored messages
      *
-     * @param  boolean $clear=false
      * @return array
      */
-    public function getMessages( $clear=false ) {
-        $messages = $this->getData( 'messages' );
-        if( !is_array( $messages ) ) {
+    public function getMessages($clear = false) {
+        $messages = $this->getData('messages');
+        if ( ! is_array($messages)) {
             $messages = array();
         }
         return $messages;
@@ -90,7 +89,7 @@ class Nexcessnet_Turpentine_Model_Session extends Mage_Core_Model_Session_Abstra
      *
      * @param array $messages
      */
-    public function setMessages( $messages ) {
-        $this->setData( 'messages', $messages );
+    public function setMessages($messages) {
+        $this->setData('messages', $messages);
     }
 }

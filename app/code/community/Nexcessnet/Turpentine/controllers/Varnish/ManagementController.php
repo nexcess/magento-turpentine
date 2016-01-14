@@ -44,20 +44,20 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
      * @return null
      */
     public function flushAllAction() {
-        Mage::dispatchEvent( 'turpentine_varnish_flush_all' );
-        $result = Mage::getModel( 'turpentine/varnish_admin' )->flushAll();
-        foreach( $result as $name => $value ) {
-            if( $value === true ) {
+        Mage::dispatchEvent('turpentine_varnish_flush_all');
+        $result = Mage::getModel('turpentine/varnish_admin')->flushAll();
+        foreach ($result as $name => $value) {
+            if ($value === true) {
                 $this->_getSession()
-                    ->addSuccess( Mage::helper( 'turpentine/data' )
-                        ->__( 'Flushed Varnish cache for: ' ) . $name );
+                    ->addSuccess(Mage::helper('turpentine/data')
+                        ->__('Flushed Varnish cache for: ').$name);
             } else {
                 $this->_getSession()
-                    ->addError( Mage::helper( 'turpentine/data' )
-                        ->__( 'Error flushing Varnish cache on: ' ) . $name );
+                    ->addError(Mage::helper('turpentine/data')
+                        ->__('Error flushing Varnish cache on: ').$name);
             }
         }
-        $this->_redirect( '*/cache' );
+        $this->_redirect('*/cache');
     }
 
     /**
@@ -68,27 +68,27 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
      */
     public function flushPartialAction() {
         $postData = $this->getRequest()->getPost();
-        if( !isset( $postData['pattern'] ) ) {
-            $this->_getSession()->addError( $this->__( 'Missing URL post data' ) );
+        if ( ! isset($postData['pattern'])) {
+            $this->_getSession()->addError($this->__('Missing URL post data'));
         } else {
             $pattern = $postData['pattern'];
-            Mage::dispatchEvent( 'turpentine_varnish_flush_partial',
-                array( 'pattern' => $pattern ) );
-            $result = Mage::getModel( 'turpentine/varnish_admin' )
-                ->flushUrl( $pattern );
-            foreach( $result as $name => $value ) {
-                if( $value === true ) {
+            Mage::dispatchEvent('turpentine_varnish_flush_partial',
+                array('pattern' => $pattern));
+            $result = Mage::getModel('turpentine/varnish_admin')
+                ->flushUrl($pattern);
+            foreach ($result as $name => $value) {
+                if ($value === true) {
                     $this->_getSession()
-                        ->addSuccess( Mage::helper( 'turpentine/data' )
-                            ->__( 'Flushed matching URLs for: ' ) . $name );
+                        ->addSuccess(Mage::helper('turpentine/data')
+                            ->__('Flushed matching URLs for: ').$name);
                 } else {
                     $this->_getSession()
-                        ->addError( Mage::helper( 'turpentine/data' )
-                            ->__( 'Error flushing matching URLs on: ' ) . $name );
+                        ->addError(Mage::helper('turpentine/data')
+                            ->__('Error flushing matching URLs on: ').$name);
                 }
             }
         }
-        $this->_redirect( '*/cache' );
+        $this->_redirect('*/cache');
     }
 
     /**
@@ -98,23 +98,23 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
      */
     public function flushContentTypeAction() {
         $postData = $this->getRequest()->getPost();
-        if( !isset( $postData['ctype'] ) ) {
-            $this->_getSession()->addError( $this->__( 'Missing URL post data' ) );
+        if ( ! isset($postData['ctype'])) {
+            $this->_getSession()->addError($this->__('Missing URL post data'));
         } else {
             $ctype = $postData['ctype'];
-            Mage::dispatchEvent( 'turpentine_varnish_flush_content_type',
-                array( 'ctype' => $ctype ) );
-            $result = Mage::getModel( 'turpentine/varnish_admin' )
-                ->flushContentType( $ctype );
-            foreach( $result as $name => $value ) {
-                if( $value === true ) {
+            Mage::dispatchEvent('turpentine_varnish_flush_content_type',
+                array('ctype' => $ctype));
+            $result = Mage::getModel('turpentine/varnish_admin')
+                ->flushContentType($ctype);
+            foreach ($result as $name => $value) {
+                if ($value === true) {
                     $this->_getSession()
-                        ->addSuccess( Mage::helper( 'turpentine/data' )
-                            ->__( 'Flushed matching content-types for: ' ) . $name );
+                        ->addSuccess(Mage::helper('turpentine/data')
+                            ->__('Flushed matching content-types for: ').$name);
                 } else {
                     $this->_getSession()
-                        ->addError( Mage::helper( 'turpentine/data' )
-                            ->__( 'Error flushing matching content-types on: ' ) . $name );
+                        ->addError(Mage::helper('turpentine/data')
+                            ->__('Error flushing matching content-types on: ').$name);
                 }
             }
         }
@@ -127,18 +127,18 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
      * @return null
      */
     public function applyConfigAction() {
-        Mage::dispatchEvent( 'turpentine_varnish_apply_config' );
-        $result = Mage::getModel( 'turpentine/varnish_admin' )->applyConfig();
-        foreach( $result as $name => $value ) {
-            if( $value === true ) {
+        Mage::dispatchEvent('turpentine_varnish_apply_config');
+        $result = Mage::getModel('turpentine/varnish_admin')->applyConfig();
+        foreach ($result as $name => $value) {
+            if ($value === true) {
                 $this->_getSession()
-                    ->addSuccess( Mage::helper( 'turpentine' )
-                        ->__( 'VCL successfully applied to ' . $name ) );
+                    ->addSuccess(Mage::helper('turpentine')
+                        ->__('VCL successfully applied to '.$name));
             } else {
                 $this->_getSession()
-                    ->addError( Mage::helper( 'turpentine' )
-                        ->__( sprintf( 'Failed to apply the VCL to %s: %s',
-                            $name, $value ) ) );
+                    ->addError(Mage::helper('turpentine')
+                        ->__(sprintf('Failed to apply the VCL to %s: %s',
+                            $name, $value)));
             }
         }
         $this->_redirect('*/cache');
@@ -150,23 +150,23 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
      * @return null
      */
     public function saveConfigAction() {
-        $cfgr = Mage::getModel( 'turpentine/varnish_admin' )->getConfigurator();
-        if( is_null( $cfgr ) ) {
+        $cfgr = Mage::getModel('turpentine/varnish_admin')->getConfigurator();
+        if (is_null($cfgr)) {
             $this->_getSession()->addError(
-                $this->__( 'Failed to load configurator' ) );
+                $this->__('Failed to load configurator') );
         } else {
-            Mage::dispatchEvent( 'turpentine_varnish_save_config',
-                array( 'cfgr' => $cfgr ) );
-            $result = $cfgr->save( $cfgr->generate(
-	            Mage::helper('turpentine')->shouldStripVclWhitespace('save') ) );
-            if( $result[0] ) {
+            Mage::dispatchEvent('turpentine_varnish_save_config',
+                array('cfgr' => $cfgr));
+            $result = $cfgr->save($cfgr->generate(
+                Mage::helper('turpentine')->shouldStripVclWhitespace('save') ));
+            if ($result[0]) {
                 $this->_getSession()
-                    ->addSuccess( Mage::helper('turpentine')
-                        ->__('The VCL file has been saved.' ) );
+                    ->addSuccess(Mage::helper('turpentine')
+                        ->__('The VCL file has been saved.'));
             } else {
                 $this->_getSession()
-                    ->addError( Mage::helper('turpentine')
-                        ->__('Failed to save the VCL file: ' . $result[1]['message'] ) );
+                    ->addError(Mage::helper('turpentine')
+                        ->__('Failed to save the VCL file: '.$result[1]['message']));
             }
         }
         $this->_redirect('*/cache');
@@ -178,21 +178,21 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
      * @return $this
      */
     public function getConfigAction() {
-        $cfgr = Mage::getModel( 'turpentine/varnish_admin' )
+        $cfgr = Mage::getModel('turpentine/varnish_admin')
             ->getConfigurator();
-        if( is_null( $cfgr ) ) {
-            $this->_getSession()->addError( $this->__( 'Failed to load configurator' ) );
-            $this->_redirect( '*/cache' );
+        if (is_null($cfgr)) {
+            $this->_getSession()->addError($this->__('Failed to load configurator'));
+            $this->_redirect('*/cache');
         } else {
             $vcl = $cfgr->generate(
-	            Mage::helper( 'turpentine' )->shouldStripVclWhitespace('download') );
+                Mage::helper('turpentine')->shouldStripVclWhitespace('download') );
             $this->getResponse()
-                ->setHttpResponseCode( 200 )
-                ->setHeader( 'Content-Type', 'text/plain', true )
-                ->setHeader( 'Content-Length', strlen( $vcl ) )
-                ->setHeader( 'Content-Disposition',
-                    'attachment; filename=default.vcl' )
-                ->setBody( $vcl );
+                ->setHttpResponseCode(200)
+                ->setHeader('Content-Type', 'text/plain', true)
+                ->setHeader('Content-Length', strlen($vcl))
+                ->setHeader('Content-Disposition',
+                    'attachment; filename=default.vcl')
+                ->setBody($vcl);
             return $this;
         }
     }
@@ -203,39 +203,39 @@ class Nexcessnet_Turpentine_Varnish_ManagementController
      * @return void
      */
     public function switchNavigationAction() {
-        $type = $this->getRequest()->get( 'type' );
-        if( is_null( $type ) ) {
-            $this->_redirect( 'noRoute' );
+        $type = $this->getRequest()->get('type');
+        if (is_null($type)) {
+            $this->_redirect('noRoute');
             return;
         }
 
-        $cookieName     = Mage::helper( 'turpentine' )->getBypassCookieName();
-        $cookieModel    = Mage::getModel( 'core/cookie' );
-        $adminSession   = Mage::getSingleton( 'adminhtml/session' );
+        $cookieName     = Mage::helper('turpentine')->getBypassCookieName();
+        $cookieModel    = Mage::getModel('core/cookie');
+        $adminSession   = Mage::getSingleton('adminhtml/session');
 
-        switch( $type ) {
+        switch ($type) {
             case 'default':
                 $cookieModel->set(
                     $cookieName,
-                    Mage::helper( 'turpentine/varnish' )->getSecretHandshake(),
+                    Mage::helper('turpentine/varnish')->getSecretHandshake(),
                     null, // period
                     null, // path
                     null, // domain
                     false, // secure
                     true ); // httponly
-                $adminSession->addSuccess( Mage::helper( 'turpentine/data' )
-                    ->__( 'The Varnish bypass cookie has been successfully added.' ) );
+                $adminSession->addSuccess(Mage::helper('turpentine/data')
+                    ->__('The Varnish bypass cookie has been successfully added.'));
             break;
 
             case 'varnish':
-                $cookieModel->delete( $cookieName );
-                $adminSession->addSuccess( Mage::helper( 'turpentine/data' )
-                    ->__( 'The Varnish bypass cookie has been successfully removed.' ) );
+                $cookieModel->delete($cookieName);
+                $adminSession->addSuccess(Mage::helper('turpentine/data')
+                    ->__('The Varnish bypass cookie has been successfully removed.'));
             break;
 
             default:
-                $adminSession->addError( Mage::helper( 'turpentine/data' )
-                    ->__( 'The given navigation type is not supported!' ) );
+                $adminSession->addError(Mage::helper('turpentine/data')
+                    ->__('The given navigation type is not supported!'));
             break;
         }
 
