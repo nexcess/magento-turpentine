@@ -420,10 +420,15 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#885] Add maintenance mode that will allow debug_ips through to visit the site, all other users get the landing page (@craigcarnell)  
   * [#955] Include theme specific handles to ESI data (@LyndonHook)  
   * [#972] Fixed bug with wrong return value of ->getSkinUrl() (@ceckoslab)
+
+### RELEASE-0.6.7
   * [#951] Added 'disableEsiInjection' ESI policy option.  
   * [#1005]  Invalidating cms pages with url enging with slash. (@sivaschenko)  
   * [#1020] Add the form key to wishlist submit to prevent 403 errors. (@paulpartington)
-  * [#1036]  Prime Checkout and Light Checkout Compatibility. (@sprankhub)
+  * [#1036] Prime Checkout and Light Checkout Compatibility. (@sprankhub)
   * [#1050] Use Simple Hash" option for static files. (@jeroenvermeulen) 
   * [#1031] Improved helper function getModelName(). (@jeroenvermeulen) 
+  * [#1066] Fix for crawler lock problem with CM_RedisSession. (@jeroenvermeulen)
 
+### RELEASE-0.6.8
+  * [#1065] Added ESI policy for cookie notice block. (@aricwatson)
