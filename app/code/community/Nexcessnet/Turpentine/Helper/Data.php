@@ -231,16 +231,16 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
      * @param  string|object $model
      * @return string
      */
-    public function getModelName( $model ) {
-        if( is_object( $model ) ) {
-            $model = get_class( $model );
+    public function getModelName($model) {
+        if (is_object($model)) {
+            $model = get_class($model);
         }
         // This guess may work if the extension uses its lowercased name as model group name.
-        $result = strtolower( preg_replace(
-            '~^[^_]+_([^_]+)_Model_(.+)$~', '$1/$2', $model ) );
+        $result = strtolower(preg_replace(
+            '~^[^_]+_([^_]+)_Model_(.+)$~', '$1/$2', $model ));
         // This check is not expensive because the answer should come from Magento's classNameCache
         $checkModel = Mage::getConfig()->getModelClassName($result);
-        if ( 'Mage_' == substr($checkModel,0,5) && !class_exists($result) ) {
+        if ('Mage_' == substr($checkModel, 0, 5) && ! class_exists($result)) {
             // Fallback to full model name.
             $result = $model;
         }
