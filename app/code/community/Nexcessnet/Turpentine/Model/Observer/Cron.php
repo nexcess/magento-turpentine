@@ -49,6 +49,11 @@ class Nexcessnet_Turpentine_Model_Observer_Cron extends Varien_Event_Observer {
             if ($maxRunTime === 0) {
                 $maxRunTime = self::MAX_CRAWL_TIME;
             }
+
+            $batchSize = $helper->getCrawlerBatchSize();
+            $timeout = $helper->getCrawlerWaitPeriod();
+            $crawlCount = 0;
+
             // just in case we have a silly short max_execution_time
             $maxRunTime = abs($maxRunTime - self::EXEC_TIME_BUFFER);
             while (($helper->getRunTime() < $maxRunTime) &&
@@ -57,6 +62,16 @@ class Nexcessnet_Turpentine_Model_Observer_Cron extends Varien_Event_Observer {
                     Mage::helper('turpentine/debug')->logWarn(
                         'Failed to crawl URL: %s', $url );
                 }
+
+                if ($crawlCount > 0
+                    && $timeout > 0
+                    && $batchSize > 0
+                    && $crawlCount%$batchSize == 0
+                ) {
+                    Mage::helper('turpentine/debug')->logDebug('Crawled '.$crawlCount.' urls, sleeping for '.$timeout.' seconds');
+                    sleep($timeout);
+                }
+                $crawlCount++;
             }
         }
     }

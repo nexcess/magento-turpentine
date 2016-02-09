@@ -35,6 +35,8 @@
                 <fix_product_toolbar>0</fix_product_toolbar>
                 <crawler_enable>0</crawler_enable>
                 <crawler_debug>0</crawler_debug>
+                <crawler_batchsize>10</crawler_batchsize>
+                <crawler_batchwait>0</crawler_batchwait>
             </general>
             <logging>
                 <use_custom_log_file>0</use_custom_log_file>

@@ -132,6 +132,30 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </crawler_debug>
+                        <crawler_batchsize translate="label" module="turpentine">
+                            <label>Crawler Batch Size</label>
+                            <comment>Number of URLs to crawl per crawler batch. Set to 0 for unlimited</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <crawler_enable>1</crawler_enable>
+                            </depends>
+                        </crawler_batchsize>
+                        <crawler_batchwait translate="label" module="turpentine">
+                            <label>Crawler Batch Wait</label>
+                            <comment>Time in seconds to wait between URL batches</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <crawler_enable>1</crawler_enable>
+                            </depends>
+                        </crawler_batchwait>
                     </fields>
                 </general>
                 <logging translate="label" module="turpentine">
