@@ -130,10 +130,21 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      *
      * @return string
      */
-    protected function _getCustomIncludeFilename() {
+    protected function _getCustomIncludeBottomFilename() {
         return $this->_formatTemplate(
-            Mage::getStoreConfig('turpentine_varnish/servers/custom_include_file'),
-            array('root_dir' => Mage::getBaseDir()) );
+            Mage::getStoreConfig('turpentine_varnish/servers/custom_include_file_bottom'),
+            array('root_dir' => Mage::getBaseDir()));
+    }
+
+    /**
+     * Get the name of the custom include VCL file
+     *
+     * @return string
+     */
+    protected function _getCustomIncludeTopFilename() {
+        return $this->_formatTemplate(
+            Mage::getStoreConfig('turpentine_varnish/servers/custom_include_file_top'),
+            array('root_dir' => Mage::getBaseDir()));
     }
 
     /**
@@ -1007,9 +1018,14 @@ EOS;
             $vars['vcl_synth'] = $this->_vcl_sub_synth();
         }
 
-        $customIncludeFile = $this->_getCustomIncludeFilename();
-        if (is_readable($customIncludeFile)) {
-            $vars['custom_vcl_include'] = file_get_contents($customIncludeFile);
+        $customIncludeTopFile = $this->_getCustomIncludeTopFilename();
+        if (is_readable($customIncludeTopFile)) {
+            $vars['custom_vcl_include_top'] = file_get_contents($customIncludeTopFile);
+        }
+
+        $customIncludeBottomFile = $this->_getCustomIncludeBottomFilename();
+        if (is_readable($customIncludeBottomFile)) {
+            $vars['custom_vcl_include_bottom'] = file_get_contents($customIncludeBottomFile);
         }
 
         return $vars;

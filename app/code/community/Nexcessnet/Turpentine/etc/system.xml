@@ -209,15 +209,24 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </config_file>
-                        <custom_include_file translate="label" module="turpentine">
-                            <label>Custom VCL File Location</label>
+                        <custom_include_file_top translate="label" module="turpentine">
+                            <label>Top Custom VCL File Location</label>
                             <frontend_type>text</frontend_type>
-                            <comment>Specify where the Varnish VCL customization file should be saved</comment>
+                            <comment>Specify where the Varnish VCL customization file should be saved. Will be included at the top of the generated vcl file</comment>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
-                        </custom_include_file>
+                        </custom_include_file_top>
+                        <custom_include_file_bottom translate="label" module="turpentine">
+                            <label>Bottom Custom VCL File Location</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>Specify where the Varnish VCL customization file should be saved. Will be included at the bottom of the generated vcl file</comment>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </custom_include_file_bottom>
                     </fields>
                 </servers>
             </groups>
