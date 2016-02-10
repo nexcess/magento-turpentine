@@ -66,7 +66,7 @@ class Nexcessnet_Turpentine_Model_Observer_Cron extends Varien_Event_Observer {
                 if ($crawlCount > 0
                     && $timeout > 0
                     && $batchSize > 0
-                    && $crawlCount%$batchSize == 0
+                    && $crawlCount % $batchSize == 0
                 ) {
                     Mage::helper('turpentine/debug')->logDebug('Crawled '.$crawlCount.' urls, sleeping for '.$timeout.' seconds');
                     sleep($timeout);

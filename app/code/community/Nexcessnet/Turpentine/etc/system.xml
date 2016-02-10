@@ -134,7 +134,7 @@
                         </crawler_debug>
                         <crawler_batchsize translate="label" module="turpentine">
                             <label>Crawler Batch Size</label>
-                            <comment>Number of URLs to crawl per crawler batch. Set to 0 for unlimited</comment>
+                            <comment>Number of URLs to crawl per batch, when 0 requests will not be batched</comment>
                             <frontend_type>text</frontend_type>
                             <sort_order>90</sort_order>
                             <show_in_default>1</show_in_default>
@@ -146,7 +146,7 @@
                         </crawler_batchsize>
                         <crawler_batchwait translate="label" module="turpentine">
                             <label>Crawler Batch Wait</label>
-                            <comment>Time in seconds to wait between URL batches</comment>
+                            <comment>Time in seconds to wait between batches</comment>
                             <frontend_type>text</frontend_type>
                             <sort_order>100</sort_order>
                             <show_in_default>1</show_in_default>
