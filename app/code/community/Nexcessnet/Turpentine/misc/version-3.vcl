@@ -30,7 +30,7 @@ import std;
 
 ## Custom VCL Logic
 
-{{custom_vcl_include_bottom}}
+{{custom_vcl_include_top}}
 
 ## Backends
 
