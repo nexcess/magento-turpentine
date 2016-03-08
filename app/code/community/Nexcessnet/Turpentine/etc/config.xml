@@ -20,7 +20,7 @@
 <config>
     <modules>
         <Nexcessnet_Turpentine>
-            <version>0.6.7</version>
+            <version>0.6.8</version>
         </Nexcessnet_Turpentine>
     </modules>
     <default>
@@ -85,6 +85,7 @@
             <static>
                 <force_static>1</force_static>
                 <exts>css,js,jpe?g,png,gif,ico,swf</exts>
+                <simple_hash>1</simple_hash>
             </static>
         </turpentine_vcl>
     </default>
@@ -301,6 +302,10 @@
                         <class>turpentine/observer_varnish</class>
                         <method>addProductListToolbarRewrite</method>
                     </turpentine_varnish_controller_front_init_before>
+                    <turpentine_varnish_fix_cm_redissession_locks>
+                        <class>turpentine/observer_varnish</class>
+                        <method>fixCmRedisSessionLocks</method>
+                    </turpentine_varnish_fix_cm_redissession_locks>
                     <turpentine_esi_set_replace_form_key_flag>
                         <class>turpentine/observer_esi</class>
                         <method>setReplaceFormKeyFlag</method>
@@ -468,6 +473,14 @@
                     </add_to_cart_after>
                 </observers>
             </add_to_cart_after-->
+            <wishlist_index_index_before>
+                <observers>
+                    <wishlist_index_index_before>
+                        <class>turpentine/observer_esi</class>
+                        ><method>hookToAddToWishlistBefore</method>
+                    </wishlist_index_index_before>
+                </observers>
+            </wishlist_index_index_before>
         </events>
     </frontend>
     <admin>

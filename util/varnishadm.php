@@ -20,7 +20,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-require_once( dirname( $_SERVER['argv'][0] ) . '/abstract.php' );
+require_once(dirname($_SERVER['argv'][0]).'/abstract.php');
 
 class Turpentine_Shell_Varnishadm extends Mage_Shell_Abstract {
     /**
@@ -30,16 +30,16 @@ class Turpentine_Shell_Varnishadm extends Mage_Shell_Abstract {
      */
     protected function _parseArgs() {
         $this->_args = array_slice(
-            array_filter( $_SERVER['argv'],
-                create_function( '$e',
-                    'return $e != \'--\';' ) ),
+            array_filter($_SERVER['argv'],
+                create_function('$e',
+                    'return $e != \'--\';')),
             1 );
         return $this;
     }
     
     protected function _write() {
         $args = func_get_args();
-        return call_user_func_array( 'printf', $args );
+        return call_user_func_array('printf', $args);
     }
     
     /**
@@ -48,13 +48,13 @@ class Turpentine_Shell_Varnishadm extends Mage_Shell_Abstract {
      * @return null
      */
     public function run() {
-        $command = str_replace( '.', '_', $this->_args[0] );
-        $params = array_slice( $this->_args, 1 );
-        foreach( Mage::helper( 'turpentine/varnish' )->getSockets() as $socket ) {
-            $response = call_user_func_array( array( $socket, $command ), $params );
-            $this->_write( "=== Result from server [%s]: %d ===\n%s\n",
+        $command = str_replace('.', '_', $this->_args[0]);
+        $params = array_slice($this->_args, 1);
+        foreach (Mage::helper('turpentine/varnish')->getSockets() as $socket) {
+            $response = call_user_func_array(array($socket, $command), $params);
+            $this->_write("=== Result from server [%s]: %d ===\n%s\n",
                 $socket->getConnectionString(), $response['code'],
-                $response['text'] );
+                $response['text']);
         }
     }
     

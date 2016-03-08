@@ -44,6 +44,7 @@
                         <wishlist_item_save_after/>
                         <wishlist_item_delete_after/>
                         <sales_quote_save_after/>
+			<controller_action_layout_render_before_catalogsearch_result_index />
                     </flush_events>
                 </params>
             </action>
@@ -137,6 +138,16 @@
                 </params>
             </action>
         </reference>
+
+        <reference name="global_cookie_notice">
+            <action method="setEsiOptions">
+                <params>
+                        <access>private</access>
+                        <only_cache_if>no_text</only_cache_if>
+                </params>
+            </action>
+        </reference>
+        
     </default>
 
     <!-- Blocks only visible when logged in -->
@@ -281,6 +292,126 @@
     <checkout_onepage_failure>
         <turpentine_cache_flag value="0"/>
     </checkout_onepage_failure>
+
+    <checkout_prime_debug>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_debug>
+
+    <checkout_prime_index>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_index>
+
+    <checkout_prime_login_step_info>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_login_step_info>
+
+    <checkout_prime_payment_step_info>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_payment_step_info>
+
+    <checkout_prime_progress>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_progress>
+
+    <checkout_prime_review>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_review>
+
+    <checkout_prime_savepayment>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_savepayment>
+
+    <checkout_prime_shipping_step_info>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_shipping_step_info>
+
+    <checkout_prime_getstepinfo>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_getstepinfo>
+
+    <checkout_prime_saveorder>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_saveorder>
+
+    <checkout_prime_getaddress>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_getaddress>
+
+    <checkout_prime_savemethod>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_savemethod>
+
+    <checkout_prime_failure>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_failure>
+
+    <checkout_prime_saveshippingmethod>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_saveshippingmethod>
+
+    <checkout_prime_savecoupon>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_savecoupon>
+
+    <checkout_prime_savebilling>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_savebilling>
+
+    <checkout_prime_success>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_success>
+
+    <checkout_prime_saveshipping>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_saveshipping>
+
+    <checkout_prime_shippingmethod>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_shippingmethod>
+
+    <checkout_prime_getadditional>
+        <turpentine_cache_flag value="0"/>
+    </checkout_prime_getadditional>
+
+    <gomage_checkout_onepage_index>
+        <turpentine_cache_flag value="0"/>
+    </gomage_checkout_onepage_index>
+
+    <gomage_checkout_onepage_methods>
+        <turpentine_cache_flag value="0"/>
+    </gomage_checkout_onepage_methods>
+
+    <gomage_checkout_onepage_paymentmethod>
+        <turpentine_cache_flag value="0"/>
+    </gomage_checkout_onepage_paymentmethod>
+
+    <gomage_checkout_onepage_centinel>
+        <turpentine_cache_flag value="0"/>
+    </gomage_checkout_onepage_centinel>
+
+    <gomage_checkout_onepage_review>
+        <turpentine_cache_flag value="0"/>
+    </gomage_checkout_onepage_review>
+
+    <gomage_checkout_onepage_customerlogin>
+        <turpentine_cache_flag value="0"/>
+    </gomage_checkout_onepage_customerlogin>
+
+    <gomage_checkout_onepage_review>
+        <turpentine_cache_flag value="0"/>
+    </gomage_checkout_onepage_review>
+
+    <gomage_checkout_onepage_forgotpassword>
+        <turpentine_cache_flag value="0"/>
+    </gomage_checkout_onepage_forgotpassword>
+
+    <gomage_checkout_onepage_ajax>
+        <turpentine_cache_flag value="0"/>
+    </gomage_checkout_onepage_ajax>
+
+    <gomage_checkout_onepage_save>
+        <turpentine_cache_flag value="0"/>
+    </gomage_checkout_onepage_save>
 
     <!-- End Checkout -->
 

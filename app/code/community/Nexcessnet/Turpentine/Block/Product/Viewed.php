@@ -23,7 +23,7 @@ class Nexcessnet_Turpentine_Block_Product_Viewed extends Mage_Reports_Block_Prod
 
     protected function _toHtml()
     {
-        if (!$this->getCount()) {
+        if ( ! $this->getCount()) {
             return $this->renderView();
         }
         $this->setRecentlyViewedProducts($this->getItemsCollection());

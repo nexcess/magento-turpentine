@@ -30,17 +30,17 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
      * @param bool $doClean if true, VCL will be cleaned (whitespaces stripped, etc.)
      * @return string
      */
-    public function generate($doClean=true) {
-        $tplFile = $this->_getVclTemplateFilename( self::VCL_TEMPLATE_FILE );
-        $vcl = $this->_formatTemplate( file_get_contents( $tplFile ),
-            $this->_getTemplateVars() );
-        return $doClean ? $this->_cleanVcl( $vcl ) : $vcl;
+    public function generate($doClean = true) {
+        $tplFile = $this->_getVclTemplateFilename(self::VCL_TEMPLATE_FILE);
+        $vcl = $this->_formatTemplate(file_get_contents($tplFile),
+            $this->_getTemplateVars());
+        return $doClean ? $this->_cleanVcl($vcl) : $vcl;
     }
 
     protected function _getAdvancedSessionValidation() {
         $validation = '';
-        foreach( $this->_getAdvancedSessionValidationTargets() as $target ) {
-            $validation .= sprintf( 'hash_data(%s);' . PHP_EOL, $target );
+        foreach ($this->_getAdvancedSessionValidationTargets() as $target) {
+            $validation .= sprintf('hash_data(%s);'.PHP_EOL, $target);
         }
         return $validation;
     }
