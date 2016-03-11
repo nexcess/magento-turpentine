@@ -126,6 +126,17 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     }
 
     /**
+     * Get the name of the custom pre-include VCL file
+     *
+     * @return string
+     */
+    protected function _getCustomPreIncludeFilename() {
+        return $this->_formatTemplate(
+            Mage::getStoreConfig('turpentine_varnish/servers/custom_pre_include_file'),
+            array('root_dir' => Mage::getBaseDir()) );
+    }
+
+    /**
      * Get the name of the custom include VCL file
      *
      * @return string
@@ -1005,6 +1016,11 @@ EOS;
             $vars['maintenance_allowed_ips'] = $this->_vcl_sub_maintenance_allowed_ips();
             // set the vcl_error from Magento database
             $vars['vcl_synth'] = $this->_vcl_sub_synth();
+        }
+
+        $customPreIncludeFile = $this->_getCustomPreIncludeFilename();
+        if (is_readable($customPreIncludeFile)) {
+            $vars['custom_pre_vcl_include'] = file_get_contents($customPreIncludeFile);
         }
 
         $customIncludeFile = $this->_getCustomIncludeFilename();
