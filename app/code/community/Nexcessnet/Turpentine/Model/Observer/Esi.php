@@ -527,33 +527,13 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
     protected function _checkIsEsiUrl($url) {
         return ! $this->_checkIsNotEsiUrl($url);
     }
-
-    public function hookToControllerActionPreDispatch($observer) {
-        if (Mage::helper('turpentine/data')->getVclFix() == 0 && $observer->getEvent()->getControllerAction()->getFullActionName() == 'checkout_cart_add') {
-            Mage::dispatchEvent("add_to_cart_before", array('request' => $observer->getControllerAction()->getRequest()));
-        }
-        if ($observer->getEvent()->getControllerAction()->getFullActionName() == 'wishlist_index_index') {
-            Mage::dispatchEvent('wishlist_index_index_before', array('request' => $observer->getControllerAction()->getRequest()));
-        }
-    }
-
-    public function hookToControllerActionPostDispatch($observer) {
-        if ($observer->getEvent()->getControllerAction()->getFullActionName() == 'checkout_cart_add') {
-            Mage::dispatchEvent("add_to_cart_after", array('request' => $observer->getControllerAction()->getRequest()));
-        }
-    }
     
     public function hookToAddToCartBefore($observer) {
-        //Mage::log("hookToAddToCartBefore-antes ".print_r($observer->getEvent()->getRequest()->getParams(),true)." will be added to cart.", null, 'carrinho.log', true);
-        $key = Mage::getSingleton('core/session')->getFormKey();
-        $observer->getEvent()->getRequest()->setParam('form_key', $key);
-        $request = $observer->getEvent()->getRequest()->getParams();
-        //Mage::log("hookToAddToCartBefore ".print_r($request,true)." will be added to cart.", null, 'carrinho.log', true);
-    }
-
-    public function hookToAddToCartAfter($observer) {
-        $request = $observer->getEvent()->getRequest()->getParams();
-        //Mage::log("hookToAddToCartAfter ".print_r($request,true)." is added to cart.", null, 'carrinho.log', true);
+        if (Mage::helper('turpentine/data')->getVclFix() == 0) {
+            $key = Mage::getSingleton('core/session')->getFormKey();
+            $observer->getEvent()->getRequest()->setParam('form_key', $key);
+            $request = $observer->getEvent()->getRequest()->getParams();    
+        }
     }
 
     /**
