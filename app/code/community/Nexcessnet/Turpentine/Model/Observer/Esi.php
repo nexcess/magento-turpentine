@@ -527,26 +527,30 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
     protected function _checkIsEsiUrl($url) {
         return ! $this->_checkIsNotEsiUrl($url);
     }
-    
+
+    /**
+     * Add form key on add-to-cart, unless VCL fix is enabled
+     * @param  $observer
+     * @return Nexcessnet_Turpentine_Model_Observer_Esi
+     */
     public function hookToAddToCartBefore($observer) {
         if (Mage::helper('turpentine/data')->getVclFix() == 0) {
             $key = Mage::getSingleton('core/session')->getFormKey();
-            $observer->getEvent()->getRequest()->setParam('form_key', $key);
-            $request = $observer->getEvent()->getRequest()->getParams();    
+            $observer->getControllerAction()->getRequest()->setParam('form_key', $key);
         }
+        return $this;
     }
 
     /**
-     * Set the form key on the add to wishlist request
+     * Add the form key to the wishlist page request
      *
      * @param $observer
-     *
      * @return Nexcessnet_Turpentine_Model_Observer_Esi
      */
     public function hookToAddToWishlistBefore($observer)
     {
         $key = Mage::getSingleton('core/session')->getFormKey();
-        $observer->getEvent()->getRequest()->setParam('form_key', $key);
+        $observer->getControllerAction()->getRequest()->setParam('form_key', $key);
         return $this;
     }
 }
