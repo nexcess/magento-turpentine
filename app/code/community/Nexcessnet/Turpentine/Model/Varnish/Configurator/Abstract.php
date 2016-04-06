@@ -173,7 +173,11 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      */
     protected function _getAdminFrontname() {
         if (Mage::getStoreConfig('admin/url/use_custom_path')) {
-            return Mage::getStoreConfig('admin/url/custom_path');
+            if(Mage::getStoreConfig('web/url/use_store')) {
+                return Mage::getModel('core/store')->load(0)->getCode() . "/" . Mage::getStoreConfig('admin/url/custom_path');
+            } else {
+                return Mage::getStoreConfig('admin/url/custom_path');
+            }
         } else {
             return (string) Mage::getConfig()->getNode(
                 'admin/routers/adminhtml/args/frontName' );
