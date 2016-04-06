@@ -41,6 +41,10 @@ import std;
 
 {{debug_acl}}
 
+## Custom Pre Include VCL Logic
+
+{{custom_vcl_pre_include}}
+
 ## Custom Subroutines
 
 {{generate_session_start}}

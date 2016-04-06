@@ -40,6 +40,10 @@ C{
 
 {{debug_acl}}
 
+## Custom Pre Include VCL Logic
+
+{{custom_vcl_pre_include}}
+
 ## Custom Subroutines
 
 sub generate_session {
