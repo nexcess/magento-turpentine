@@ -26,7 +26,7 @@
       </email>
    </authors>
    <depends_php_min>5.2.13</depends_php_min>
-   <depends_php_max>6.0.0</depends_php_max>
+   <depends_php_max>7.1.0</depends_php_max>
    <depends>
       <package>
          <name>
