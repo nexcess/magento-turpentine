@@ -432,3 +432,12 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
 
 ### RELEASE-0.6.8
   * [#1065] Added ESI policy for cookie notice block. (@aricwatson)
+  * [#1066] Fix for crawler lock problem with CM_RedisSession (@jeroenvermeulen )
+  * [#1072] Scrutinizer Auto-Fixes. (@miguelbalparda)
+  * [#1078] Fix regex check - blank value passed check. (@aricwatson)
+  * [#1087] Fixed missing '}' typo #1087. (@aricwatson)
+  * [#1117] Fix #1100. (@GLips)
+  * [#1155] Update TECHNICAL_NOTES.md. (@GLips)
+
+### RELEASE-0.6.9
+  
