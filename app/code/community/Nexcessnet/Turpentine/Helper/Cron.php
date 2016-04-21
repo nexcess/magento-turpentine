@@ -146,6 +146,24 @@ class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
     }
 
     /**
+     * Get number of urls to crawl per batch
+     *
+     * @return int
+     */
+    public function getCrawlerBatchSize() {
+        return Mage::getStoreConfig('turpentine_varnish/general/crawler_batchsize');
+    }
+
+    /**
+     * Get time in seconds to wait between url batches
+     *
+     * @return int
+     */
+    public function getCrawlerWaitPeriod() {
+        return Mage::getStoreConfig('turpentine_varnish/general/crawler_batchwait');
+    }
+
+    /**
      * Get the list of all URLs
      *
      * @return array
