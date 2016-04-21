@@ -325,6 +325,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $methodParam = $esiHelper->getEsiMethodParam();
         $esiData = new Varien_Object();
         $esiData->setStoreId(Mage::app()->getStore()->getId());
+        $esiData->setDesignPackage( Mage::getDesign()->getPackageName() );
+        $esiData->setDesignTheme( Mage::getDesign()->getTheme( 'layout' ) );
         $esiData->setNameInLayout($blockObject->getNameInLayout());
         $esiData->setBlockType(get_class($blockObject));
         $esiData->setLayoutHandles($this->_getBlockLayoutHandles($blockObject));
