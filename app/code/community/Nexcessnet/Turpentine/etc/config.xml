@@ -47,6 +47,7 @@
                 <server_list>127.0.0.1:6082</server_list>
                 <config_file>{{root_dir}}/var/default.vcl</config_file>
                 <custom_include_file>{{root_dir}}/app/code/community/Nexcessnet/Turpentine/misc/custom_include.vcl</custom_include_file>
+                <custom_include_file_top>{{root_dir}}/app/code/community/Nexcessnet/Turpentine/misc/custom_include_top.vcl</custom_include_file_top>
             </servers>
         </turpentine_varnish>
         <turpentine_vcl>

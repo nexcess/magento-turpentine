@@ -17,6 +17,10 @@
 
 ## Nexcessnet_Turpentine Varnish v2 VCL Template
 
+## Custom VCL Logic - Top
+
+{{custom_vcl_include_top}}
+
 ## Custom C Code
 
 C{
@@ -24,9 +28,6 @@ C{
     {{custom_c_code}}
 }C
 
-## Custom VCL Logic
-
-{{custom_vcl_include}}
 
 ## Backends
 
@@ -426,3 +427,7 @@ sub vcl_deliver {
     }
     remove resp.http.X-Opt-Debug-Headers;
 }
+
+## Custom VCL Logic - Bottom
+
+{{custom_vcl_include}}

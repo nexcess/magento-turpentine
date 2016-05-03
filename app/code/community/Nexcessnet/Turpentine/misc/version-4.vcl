@@ -18,6 +18,10 @@ vcl 4.0;
 
 ## Nexcessnet_Turpentine Varnish v4 VCL Template
 
+## Custom VCL Logic - Top
+
+{{custom_vcl_include_top}}
+
 ## Custom C Code
 
 C{
@@ -432,6 +436,6 @@ sub vcl_deliver {
     }
 }
 
-## Custom VCL Logic
+## Custom VCL Logic - Bottom
 
 {{custom_vcl_include}}

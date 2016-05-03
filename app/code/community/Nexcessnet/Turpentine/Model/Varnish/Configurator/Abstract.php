@@ -130,9 +130,11 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      *
      * @return string
      */
-    protected function _getCustomIncludeFilename() {
+    protected function _getCustomIncludeFilename($position='') {
+        $key = 'custom_include_file';
+        $key .= ($position) ? '_'.$position : '';
         return $this->_formatTemplate(
-            Mage::getStoreConfig('turpentine_varnish/servers/custom_include_file'),
+            Mage::getStoreConfig('turpentine_varnish/servers/'.$key),
             array('root_dir' => Mage::getBaseDir()) );
     }
 
@@ -1007,9 +1009,13 @@ EOS;
             $vars['vcl_synth'] = $this->_vcl_sub_synth();
         }
 
-        $customIncludeFile = $this->_getCustomIncludeFilename();
-        if (is_readable($customIncludeFile)) {
-            $vars['custom_vcl_include'] = file_get_contents($customIncludeFile);
+        foreach (array('','top') as $position) {
+            $customIncludeFile = $this->_getCustomIncludeFilename($position);
+            if (is_readable($customIncludeFile)) {
+                $key = 'custom_vcl_include';
+                $key .= ($position) ? '_'.$position : '';
+                $vars[$key] = file_get_contents($customIncludeFile);
+            }
         }
 
         return $vars;
