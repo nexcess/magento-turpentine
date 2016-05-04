@@ -270,7 +270,6 @@ EOS;
                     PHP_URL_PATH);
             }
         }
-        $paths[] = "/index.php/";
         $paths = array_unique($paths);
         usort($paths, create_function('$a, $b',
             'return strlen( $b ) - strlen( $a );'));
