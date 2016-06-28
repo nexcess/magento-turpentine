@@ -440,4 +440,11 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#1155] Update TECHNICAL_NOTES.md. (@GLips)
 
 ### RELEASE-0.6.9
+  * [#1162] Support PHP7. (@allardhoeve)
+  * [#1173] Fix load balancing for Varnish 4. (@kleinmann)
+  * [#1182] Update version-3.vcl normalisation. (@gewaechshaus)
+
+### RELEASE-0.7.0
+
+
   
