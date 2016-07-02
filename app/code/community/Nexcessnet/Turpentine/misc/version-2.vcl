@@ -26,7 +26,7 @@ C{
 
 ## Custom VCL Logic
 
-{{custom_vcl_include}}
+{{custom_vcl_include_top}}
 
 ## Backends
 
@@ -426,3 +426,8 @@ sub vcl_deliver {
     }
     remove resp.http.X-Opt-Debug-Headers;
 }
+
+
+## Custom VCL Logic
+
+{{custom_vcl_include_bottom}}

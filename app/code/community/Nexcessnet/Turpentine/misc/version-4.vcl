@@ -30,6 +30,10 @@ C{
 import std;
 import directors;
 
+## Custom VCL Logic
+
+{{custom_vcl_include_top}}
+
 ## Backends
 
 {{default_backend}}
@@ -441,4 +445,4 @@ sub vcl_deliver {
 
 ## Custom VCL Logic
 
-{{custom_vcl_include}}
+{{custom_vcl_include_bottom}}
