@@ -110,8 +110,8 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getVclTemplateFilename($baseFilename) {
-        $extensionDir = Mage::getModuleDir('', 'Nexcessnet_Turpentine');
-        return sprintf('%s/misc/%s', $extensionDir, $baseFilename);
+           $extensionDir = Mage::getModuleDir('', 'Nexcessnet_Turpentine');
+           return sprintf('%s/misc/%s', $extensionDir, $baseFilename);
     }
 
     /**
@@ -135,6 +135,23 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             Mage::getStoreConfig('turpentine_varnish/servers/custom_include_file'),
             array('root_dir' => Mage::getBaseDir()) );
     }
+
+
+    /**
+     * Get the custom VCL template, if it exists
+     * Returns 'null' if the file doesn't exist
+     *
+     * @return string
+     */
+    protected function _getCustomTemplateFilename() {
+        $filePath = $this->_formatTemplate(
+            Mage::getStoreConfig('turpentine_varnish/servers/custom_vcl_template'),
+            array('root_dir' => Mage::getBaseDir())
+        );
+        if (is_file($filePath)) { return $filePath; }
+        else { return null; }
+    }
+
 
     /**
      * Format a template string, replacing {{keys}} with the appropriate values

@@ -254,6 +254,15 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </custom_include_file>
+			<custom_vcl_template>
+                            <label>Custom VCL Template</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>If defined and present, this template will be used instead of the default VCL template appropriate for the version of Varnish.</comment>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store> 
+			</custom_vcl_template>
                     </fields>
                 </servers>
             </groups>
