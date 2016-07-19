@@ -283,6 +283,11 @@ sub vcl_hash {
         {{advanced_session_validation}}
     }
 
+    if (req.http.X-Varnish-Esi-Access == "private" &&
+            req.http.Cookie ~ "persistent_shopping_cart=") {
+        set req.hash += regsub(req.http.Cookie, "^.*?persistent_shopping_cart=([^;]*);*.*$", "\1");
+    }
+
     if (req.http.X-Varnish-Esi-Access == "customer_group" &&
             req.http.Cookie ~ "customer_group=") {
         set req.hash += regsub(req.http.Cookie, "^.*?customer_group=([^;]*);*.*$", "\1");
