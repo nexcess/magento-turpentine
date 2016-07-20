@@ -89,14 +89,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 Mage::app()->setCurrentStore(
                     Mage::app()->getStore($esiData->getStoreId()) );
                 $appShim = Mage::getModel('turpentine/shim_mage_core_app');
-                if ($referer = $this->_getRefererUrl()) {
-                    $referer = htmlspecialchars_decode($referer);
-                    $dummyRequest = Mage::helper('turpentine/esi')
-                        ->getDummyRequest($referer);
-                } else {
-                    $dummyRequest = Mage::helper('turpentine/esi')
-                        ->getDummyRequest();
-                }
+                $dummyRequest = Mage::helper('turpentine/esi')->getDummyRequest($this->_getRequestSourceUrl());
                 $appShim->shim_setRequest($dummyRequest);
                 $block = $this->_getEsiBlock($esiData);
                 if ($block) {
@@ -287,5 +280,25 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             $handles[$pos] = $replacement[1];
         }
         return $handles;
+    }
+    /**
+     * Only rely on r64-param for DummyRequest-Url.
+     *
+     * Don't use the referrer (which may be bad encoded) as the DummyRequest-Url. So it is empty for any global
+     * ESI-Block, as they shouldn't depend on the current url.
+     *
+     * @return string
+     */
+    protected function _getRequestSourceUrl()
+    {
+        $requestUrl = null;
+        if ($url = $this->getRequest()->getParam(self::PARAM_NAME_BASE64_URL)) {
+            $requestUrl = Mage::helper('core')->urlDecodeAndEscape($url);
+        }
+
+        if ($requestUrl && !$this->_isUrlInternal($requestUrl)) {
+            $requestUrl = Mage::app()->getStore()->getBaseUrl();
+        }
+        return $requestUrl;
     }
 }
