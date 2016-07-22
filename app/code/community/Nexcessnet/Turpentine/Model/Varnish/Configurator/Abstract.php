@@ -110,8 +110,8 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getVclTemplateFilename($baseFilename) {
-        $extensionDir = Mage::getModuleDir('', 'Nexcessnet_Turpentine');
-        return sprintf('%s/misc/%s', $extensionDir, $baseFilename);
+           $extensionDir = Mage::getModuleDir('', 'Nexcessnet_Turpentine');
+           return sprintf('%s/misc/%s', $extensionDir, $baseFilename);
     }
 
     /**
@@ -135,6 +135,23 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             Mage::getStoreConfig('turpentine_varnish/servers/custom_include_file'),
             array('root_dir' => Mage::getBaseDir()) );
     }
+
+
+    /**
+     * Get the custom VCL template, if it exists
+     * Returns 'null' if the file doesn't exist
+     *
+     * @return string
+     */
+    protected function _getCustomTemplateFilename() {
+        $filePath = $this->_formatTemplate(
+            Mage::getStoreConfig('turpentine_varnish/servers/custom_vcl_template'),
+            array('root_dir' => Mage::getBaseDir())
+        );
+        if (is_file($filePath)) { return $filePath; }
+        else { return null; }
+    }
+
 
     /**
      * Format a template string, replacing {{keys}} with the appropriate values
@@ -173,7 +190,11 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      */
     protected function _getAdminFrontname() {
         if (Mage::getStoreConfig('admin/url/use_custom_path')) {
-            return Mage::getStoreConfig('admin/url/custom_path');
+            if(Mage::getStoreConfig('web/url/use_store')) {
+                return Mage::getModel('core/store')->load(0)->getCode() . "/" . Mage::getStoreConfig('admin/url/custom_path');
+            } else {
+                return Mage::getStoreConfig('admin/url/custom_path');
+            }
         } else {
             return (string) Mage::getConfig()->getNode(
                 'admin/routers/adminhtml/args/frontName' );
@@ -769,16 +790,6 @@ EOS;
         $tpl = <<<EOS
 if (req.http.User-Agent ~ "iP(?:hone|ad|od)|BlackBerry|Palm|Googlebot-Mobile|Mobile|mobile|mobi|Windows Mobile|Safari Mobile|Android|Opera (?:Mini|Mobi)") {
         set req.http.X-Normalized-User-Agent = "mobile";
-    } else if (req.http.User-Agent ~ "MSIE") {
-        set req.http.X-Normalized-User-Agent = "msie";
-    } else if (req.http.User-Agent ~ "Firefox") {
-        set req.http.X-Normalized-User-Agent = "firefox";
-    } else if (req.http.User-Agent ~ "Chrome") {
-        set req.http.X-Normalized-User-Agent = "chrome";
-    } else if (req.http.User-Agent ~ "Safari") {
-        set req.http.X-Normalized-User-Agent = "safari";
-    } else if (req.http.User-Agent ~ "Opera") {
-        set req.http.X-Normalized-User-Agent = "opera";
     } else {
         set req.http.X-Normalized-User-Agent = "other";
     }
