@@ -824,6 +824,21 @@ EOS;
     }
 
     /**
+     * Get the Host normalization sub routine
+     *
+     * @return string
+     */
+    protected function _vcl_sub_normalize_host_forwarded() {
+        $tpl = <<<EOS
+if (req.http.X-Forwarded-Host)
+{
+    set req.http.Host = req.http.X-Forwarded-Host;
+}
+EOS;
+        return $this->_formatTemplate($tpl, array());
+    }
+
+    /**
      * Get the hostname for cookie normalization
      *
      * @return string
@@ -990,8 +1005,13 @@ EOS;
         if (Mage::getStoreConfig('turpentine_vcl/normalization/user_agent')) {
             $vars['normalize_user_agent'] = $this->_vcl_sub_normalize_user_agent();
         }
-        if (Mage::getStoreConfig('turpentine_vcl/normalization/host')) {
-            $vars['normalize_host'] = $this->_vcl_sub_normalize_host();
+        Mage::log(Mage::getStoreConfig('turpentine_vcl/normalization/host'));
+        if (Mage::getStoreConfig('turpentine_vcl/normalization/host') && Mage::getStoreConfig('turpentine_vcl/normalization/host') != 'no') {
+            if (Mage::getStoreConfig('turpentine_vcl/normalization/host') == "yes_forwarded_host") {
+                $vars['normalize_host'] = $this->_vcl_sub_normalize_host_forwarded();
+            } else {
+                $vars['normalize_host'] = $this->_vcl_sub_normalize_host();
+            }
         }
         if (Mage::getStoreConfig('turpentine_vcl/normalization/cookie_regex')) {
             $vars['normalize_cookie_regex'] = $this->_getNormalizeCookieRegex();
