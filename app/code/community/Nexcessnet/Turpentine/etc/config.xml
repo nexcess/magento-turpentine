@@ -20,7 +20,7 @@
 <config>
     <modules>
         <Nexcessnet_Turpentine>
-            <version>0.6.8</version>
+            <version>0.7.0</version>
         </Nexcessnet_Turpentine>
     </modules>
     <default>
@@ -35,6 +35,8 @@
                 <fix_product_toolbar>0</fix_product_toolbar>
                 <crawler_enable>0</crawler_enable>
                 <crawler_debug>0</crawler_debug>
+                <crawler_batchsize>0</crawler_batchsize>
+                <crawler_batchwait>0</crawler_batchwait>
             </general>
             <logging>
                 <use_custom_log_file>0</use_custom_log_file>
@@ -54,13 +56,13 @@
                 <backend_host>127.0.0.1</backend_host>
                 <backend_port>8080</backend_port>
                 <backend_nodes>127.0.0.1:8080</backend_nodes>
-                <backend_probe_url></backend_probe_url>
+                <backend_probe_url/>
                 <backend_nodes_admin>127.0.0.1:8080</backend_nodes_admin>
-                <backend_probe_url_admin></backend_probe_url_admin>
+                <backend_probe_url_admin/>
                 <frontend_timeout>300</frontend_timeout>
                 <admin_timeout>21600</admin_timeout>
                 <crawlers>127.0.0.1</crawlers>
-                <crawler_user_agents><![CDATA[ApacheBench/.*,.*Googlebot.*,JoeDog/.*Siege.*,magespeedtest\.com,Nexcessnet_Turpentine/.*]]></crawler_user_agents>
+                <crawler_user_agents><![CDATA[ApacheBench/.*,.*Googlebot.*,JoeDog/.*Siege.*,magespeedtest\.com,Nexcessnet_Turpentine/.*,.*PTST.*]]></crawler_user_agents>
             </backend>
             <normalization>
                 <encoding>1</encoding>
@@ -478,7 +480,7 @@
                 <observers>
                     <wishlist_index_index_before>
                         <class>turpentine/observer_esi</class>
-                        ><method>hookToAddToWishlistBefore</method>
+                        <method>hookToAddToWishlistBefore</method>
                     </wishlist_index_index_before>
                 </observers>
             </wishlist_index_index_before>

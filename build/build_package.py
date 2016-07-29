@@ -280,7 +280,7 @@ class Magento_Packager(object):
         min_tag.text = connect_dom.findtext('depends_php_min')
         max_tag = ElementTree.SubElement(php_tag, 'max')
         max_tag.text = connect_dom.findtext('depends_php_max')
-        self._logger.debug('Finished adding dependancies')
+        self._logger.debug('Finished adding dependencies')
         return dependencies_tag
 
     def _get_module_dom(self, ext_name):

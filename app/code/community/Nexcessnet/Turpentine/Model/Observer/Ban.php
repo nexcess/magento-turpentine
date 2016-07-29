@@ -298,37 +298,39 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
      * @return bool
      */
     public function banProductReview($eventObject) {
-        $patterns = array();
-        /* @var $review \Mage_Review_Model_Review*/
-        $review = $eventObject->getObject();
-        
-        /* @var $productCollection \Mage_Review_Model_Resource_Review_Product_Collection*/
-        $productCollection = $review->getProductCollection();
-        
-        $products = $productCollection->addEntityFilter((int) $review->getEntityPkValue())->getItems();
+        if (Mage::helper('turpentine/varnish')->getVarnishEnabled()) {
+            $patterns = array();
+            /* @var $review \Mage_Review_Model_Review*/
+            $review = $eventObject->getObject();
 
-        $productIds = array_unique(array_map(
-            create_function('$p', 'return $p->getEntityId();'),
-            $products ));
-        $patterns[] = sprintf('/review/product/list/id/(?:%s)/category/',
-            implode('|', array_unique($productIds)));
-        $patterns[] = sprintf('/review/product/view/id/%d/',
-            $review->getEntityId());
-        $productPatterns = array();
-        foreach ($products as $p) {
-            $urlKey = $p->getUrlModel()->formatUrlKey($p->getName());
-            if ($urlKey) {
-                $productPatterns[] = $urlKey;
+            /* @var $productCollection \Mage_Review_Model_Resource_Review_Product_Collection*/
+            $productCollection = $review->getProductCollection();
+
+            $products = $productCollection->addEntityFilter((int) $review->getEntityPkValue())->getItems();
+
+            $productIds = array_unique(array_map(
+                create_function('$p', 'return $p->getEntityId();'),
+                $products ));
+            $patterns[] = sprintf('/review/product/list/id/(?:%s)/category/',
+                implode('|', array_unique($productIds)));
+            $patterns[] = sprintf('/review/product/view/id/%d/',
+                $review->getEntityId());
+            $productPatterns = array();
+            foreach ($products as $p) {
+                $urlKey = $p->getUrlModel()->formatUrlKey($p->getName());
+                if ($urlKey) {
+                    $productPatterns[] = $urlKey;
+                }
             }
-        }
-        if ( ! empty($productPatterns)) {
-            $productPatterns = array_unique($productPatterns);
-            $patterns[] = sprintf('(?:%s)', implode('|', $productPatterns));
-        }
-        $urlPattern = implode('|', $patterns);
+            if ( ! empty($productPatterns)) {
+                $productPatterns = array_unique($productPatterns);
+                $patterns[] = sprintf('(?:%s)', implode('|', $productPatterns));
+            }
+            $urlPattern = implode('|', $patterns);
 
-        $result = $this->_getVarnishAdmin()->flushUrl($urlPattern);
-        return $this->_checkResult($result);
+            $result = $this->_getVarnishAdmin()->flushUrl($urlPattern);
+            return $this->_checkResult($result);
+        }
     }
 
     /**

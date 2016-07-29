@@ -120,7 +120,7 @@ sub vcl_recv {
     if (!{{enable_caching}} || req.http.Authorization ||
         req.method !~ "^(GET|HEAD|OPTIONS)$" ||
         req.http.Cookie ~ "varnish_bypass={{secret_handshake}}") {
-        return (pipe);
+        return (pass);
     }
 
     if({{send_unmodified_url}}) {
@@ -394,7 +394,7 @@ sub vcl_deliver {
                 "; domain=" + regsub(req.http.Host, ":\d+$", "");
             } else {
                 # it's a real user, allow sharing of cookies between stores
-                if(req.http.Host ~ "{{normalize_cookie_regex}}") {
+                if (req.http.Host ~ "{{normalize_cookie_regex}}" && "{{normalize_cookie_regex}}" ~ "..") {
                     set resp.http.Set-Cookie = resp.http.Set-Cookie +
                     "; domain={{normalize_cookie_target}}";
                 } else {
