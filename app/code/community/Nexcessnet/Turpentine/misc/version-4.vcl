@@ -29,6 +29,10 @@ C{
 
 import std;
 
+## Custom Pre-VCL Logic
+
+{{custom_pre_vcl_include}}
+
 ## Backends
 
 {{default_backend}}
