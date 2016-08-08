@@ -18,10 +18,6 @@ vcl 4.0;
 
 ## Nexcessnet_Turpentine Varnish v4 VCL Template
 
-## Custom VCL Logic - Top
-
-{{custom_vcl_include_top}}
-
 ## Custom C Code
 
 C{
@@ -33,6 +29,10 @@ C{
 
 import std;
 import directors;
+
+## Custom VCL Logic - Top
+
+{{custom_vcl_include_top}}
 
 ## Backends
 
