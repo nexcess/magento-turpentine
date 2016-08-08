@@ -20,7 +20,7 @@
 <config>
     <modules>
         <Nexcessnet_Turpentine>
-            <version>0.6.9</version>
+            <version>0.7.0</version>
         </Nexcessnet_Turpentine>
     </modules>
     <default>
@@ -48,6 +48,7 @@
                 <config_file>{{root_dir}}/var/default.vcl</config_file>
                 <custom_include_file>{{root_dir}}/app/code/community/Nexcessnet/Turpentine/misc/custom_include.vcl</custom_include_file>
                 <custom_include_file_top>{{root_dir}}/app/code/community/Nexcessnet/Turpentine/misc/custom_include_top.vcl</custom_include_file_top>
+                <custom_vcl_template></custom_vcl_template>
             </servers>
         </turpentine_varnish>
         <turpentine_vcl>

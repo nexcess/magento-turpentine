@@ -31,7 +31,14 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
      * @return string
      */
     public function generate($doClean = true) {
-        $tplFile = $this->_getVclTemplateFilename(self::VCL_TEMPLATE_FILE);
+        // first, check if a custom template is set
+        $customTemplate = $this->_getCustomTemplateFilename();
+        if ($customTemplate) { 
+            $tplFile = $customTemplate;
+        }
+        else { 
+            $tplFile = $this->_getVclTemplateFilename(self::VCL_TEMPLATE_FILE);
+        }
         $vcl = $this->_formatTemplate(file_get_contents($tplFile),
             $this->_getTemplateVars());
         return $doClean ? $this->_cleanVcl($vcl) : $vcl;
