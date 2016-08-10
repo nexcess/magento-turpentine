@@ -44,7 +44,8 @@
                         <wishlist_item_save_after/>
                         <wishlist_item_delete_after/>
                         <sales_quote_save_after/>
-			<controller_action_layout_render_before_catalogsearch_result_index />
+                        <controller_action_layout_render_before_catalogsearch_result_index />
+                        <persistent_session_expired/>
                     </flush_events>
                 </params>
             </action>
