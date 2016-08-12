@@ -806,7 +806,7 @@ EOS;
     protected function _vcl_sub_normalize_encoding() {
         $tpl = <<<EOS
 if (req.http.Accept-Encoding) {
-        if (req.http.Accept-Encoding ~ "gzip") {
+        if (req.http.Accept-Encoding ~ "\*|gzip") {
             set req.http.Accept-Encoding = "gzip";
         } else if (req.http.Accept-Encoding ~ "deflate") {
             set req.http.Accept-Encoding = "deflate";
