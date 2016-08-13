@@ -182,28 +182,22 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 Mage::register($key, $value, true);
             }
         }
+
+
+        /** @var Mage_Core_Model_Layout $layout */
         $layout = Mage::getSingleton('core/layout');
-
-        // dispatch event for adding handles to layout update
-        Mage::dispatchEvent(
-            'controller_action_layout_load_before',
-            array('action'=>$this, 'layout'=>$layout)
+        $layout->getUpdate()->addHandle(
+            $this->_swapCustomerHandles(
+                $esiData->getLayoutHandles()
+            )
         );
+        $this->loadLayoutUpdates();
 
-        $layoutUpdate = $layout->getUpdate();
-        $layoutUpdate->load($this->_swapCustomerHandles(
-            $esiData->getLayoutHandles() ));
         foreach ($esiData->getDummyBlocks() as $blockName) {
             $layout->createBlock('Mage_Core_Block_Template', $blockName);
         }
 
-        if ( ! $this->getFlag('', self::FLAG_NO_DISPATCH_BLOCK_EVENT)) {
-            Mage::dispatchEvent(
-                'controller_action_layout_generate_xml_before',
-                array('action'=>$this, 'layout'=>$layout)
-            );
-        }
-        $layout->generateXml();
+        $this->generateLayoutXml();
 
         /** @var Nexcessnet_Turpentine_Helper_Data $turpentineHelper */
         $turpentineHelper = Mage::helper('turpentine/data')
@@ -239,37 +233,26 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             }
         }
 
-        // dispatch event for adding xml layout elements
-        if ( ! $this->getFlag('', self::FLAG_NO_DISPATCH_BLOCK_EVENT)) {
-            Mage::dispatchEvent(
-                'controller_action_layout_generate_blocks_before',
-                array('action'=>$this, 'layout'=>$layout)
-            );
+        // Global blocks to generate
+        $globalBlocks = array('formkey');
+
+        // Add ignore attribute to all nodes that don't need to be generated
+        foreach ($layout->getNode() as $node) {
+            $attributes = $node->attributes();
+            if ((bool)$attributes->ignore) {
+                continue;
+            } elseif ($node->getName() == 'block' && !in_array($attributes->name, $globalBlocks)) {
+                $node->addAttribute('ignore', true);
+            } elseif ($node->getName() == 'reference' && !in_array($attributes->name, $nodesToGenerate)) {
+                $node->addAttribute('ignore', true);
+            }
         }
 
-        foreach (array_unique($nodesToGenerate) as $nodeName) {
-            foreach ($layout->getNode()->xpath(sprintf(
-                    '//reference[@name=\'%s\']', $nodeName )) as $node) {
-                $layout->generateBlocks($node);
-            }
-        }
-        if ($roots = $layout->getNode()->xpath('//block[@name=\'root\']')) {
-            foreach (array('formkey') as $globalBlock) {
-                if ($blocks = $layout->getNode()->xpath(sprintf('//block[@name=\'%s\']', $globalBlock))) {
-                    $dummy = $roots[0]->addChild('reference');
-                    $dummy->appendChild($blocks[0]);
-                    $layout->generateBlocks($dummy);
-                }
-            }
-        }
+        // Generate layout block that aren't ignored
+        $this->generateLayoutBlocks();
+
+        // Get the requested ESI block
         $block = $layout->getBlock($esiData->getNameInLayout());
-
-        if ( ! $this->getFlag('', self::FLAG_NO_DISPATCH_BLOCK_EVENT)) {
-            Mage::dispatchEvent(
-                'controller_action_layout_generate_blocks_after',
-                array('action'=>$this, 'layout'=>$layout)
-            );
-        }
 
         $this->_isLayoutLoaded = true;
         Varien_Profiler::stop('turpentine::controller::esi::_getEsiBlock');
