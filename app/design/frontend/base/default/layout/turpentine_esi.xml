@@ -269,6 +269,10 @@
         <turpentine_cache_flag value="0"/>
     </checkout_onepage_progress_payment>
 
+    <checkout_onepage_progress_review>
+        <turpentine_cache_flag value="0"/>
+    </checkout_onepage_progress_review>
+
     <checkout_onepage_paymentmethod>
         <turpentine_cache_flag value="0"/>
     </checkout_onepage_paymentmethod>
