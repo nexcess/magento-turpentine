@@ -50,7 +50,9 @@ echo <<<HTML
     <script type="text/javascript">
         (function() {
             var blockTag = {$this->helper('core')->jsonEncode($blockTag)}, esiUrl = {$this->helper('core')->jsonEncode($this->getEsiUrl())};
-            if (typeof Ajax === 'object' && typeof Ajax.Updater === 'function' && typeof Event === 'function' ) {
+            if (typeof Ajax === 'object' && typeof Ajax.Updater === 'function' 
+                && (typeof Event === 'function' || (typeof Event === 'object' && typeof Event.observe === 'function'))
+            ) {
                 Event.observe( window, "load", function() { setTimeout( function() {
                     new Ajax.Updater(
                         blockTag,
