@@ -407,7 +407,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
             $regexp = '~^cli_buffer\s+(\d+)\s+\[bytes\]~';
             if ($this->getVersion() === '4.0') {
                 // Varnish4 supports "16k" style notation
-                $regexp = '~^cli_buffer\s+Value is:\s+(\d+)([k|m|g]{1})?\s+\[bytes\]~';
+                $regexp = '~^cli_buffer\s+Value is:\s+(\d+)([k|m|g|b]{1})?\s+\[bytes\]~';
             }
             if (preg_match($regexp, $cliBufferResponse['text'], $match)) {
                 $realLimit = (int) $match[1];
