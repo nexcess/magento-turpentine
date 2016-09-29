@@ -28,6 +28,7 @@ C{
 ## Imports
 
 import std;
+import directors;
 
 ## Backends
 
@@ -105,6 +106,10 @@ sub vcl_synth {
     }
 }
 
+sub vcl_init {
+    {{directors}}
+}
+
 sub vcl_recv {
 	{{maintenance_allowed_ips}}
 
@@ -147,8 +152,10 @@ sub vcl_recv {
         set req.http.X-Turpentine-Secret-Handshake = "{{secret_handshake}}";
         # use the special admin backend and pipe if it's for the admin section
         if (req.url ~ "{{url_base_regex}}{{admin_frontname}}") {
-            set req.backend_hint = admin;
+            set req.backend_hint = {{admin_backend_hint}};
             return (pipe);
+        } else {
+            {{set_backend_hint}}
         }
         if (req.http.Cookie ~ "\bcurrency=") {
             set req.http.X-Varnish-Currency = regsub(
@@ -244,48 +251,65 @@ sub vcl_pipe {
 # }
 
 sub vcl_hash {
+    std.log("vcl_hash start");
+
     # For static files we keep the hash simple and don't add the domain.
     # This saves memory when a static file is used on multiple domains.
     if ({{simple_hash_static}} && req.http.X-Varnish-Static) {
+        std.log("hash_data static file - req.url: " + req.url);
         hash_data(req.url);
         if (req.http.Accept-Encoding) {
             # make sure we give back the right encoding
+            std.log("hash_data static file - Accept-Encoding: " + req.http.Accept-Encoding);
             hash_data(req.http.Accept-Encoding);
         }
+        std.log("vcl_hash end return lookup");
         return (lookup);
     }
 
+
     if({{send_unmodified_url}} && req.http.X-Varnish-Cache-Url) {
         hash_data(req.http.X-Varnish-Cache-Url);
+        std.log("hash_data - X-Varnish-Cache-Url: " + req.http.X-Varnish-Cache-Url);
     } else {
         hash_data(req.url);
+        std.log("hash_data - req.url: " + req.url );
     }
 
     if (req.http.Host) {
         hash_data(req.http.Host);
+        std.log("hash_data - req.http.Host: " + req.http.Host);
     } else {
         hash_data(server.ip);
     }
+
+    std.log("hash_data - req.http.Ssl-Offloaded: " + req.http.Ssl-Offloaded);
     hash_data(req.http.Ssl-Offloaded);
+
     if (req.http.X-Normalized-User-Agent) {
         hash_data(req.http.X-Normalized-User-Agent);
+        std.log("hash_data - req.http.X-Normalized-User-Agent: " + req.http.X-Normalized-User-Agent);
     }
     if (req.http.Accept-Encoding) {
         # make sure we give back the right encoding
         hash_data(req.http.Accept-Encoding);
+        std.log("hash_data - req.http.Accept-Encoding: " + req.http.Accept-Encoding);
     }
     if (req.http.X-Varnish-Store || req.http.X-Varnish-Currency) {
         # make sure data is for the right store and currency based on the *store*
         # and *currency* cookies
         hash_data("s=" + req.http.X-Varnish-Store + "&c=" + req.http.X-Varnish-Currency);
+        std.log("hash_data - Store and Currency: " + "s=" + req.http.X-Varnish-Store + "&c=" + req.http.X-Varnish-Currency);
     }
 
     if (req.http.X-Varnish-Esi-Access == "private" &&
             req.http.Cookie ~ "frontend=") {
+        std.log("hash_data - frontned cookie: " + regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1"));
         hash_data(regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1"));
         {{advanced_session_validation}}
 
     }
+    std.log("vcl_hash end return lookup");
     return (lookup);
 }
 
