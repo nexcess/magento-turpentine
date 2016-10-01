@@ -412,7 +412,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
             if (preg_match($regexp, $cliBufferResponse['text'], $match)) {
                 $realLimit = (int) $match[1];
                 if (isset($match[2])) {
-                    $factors = array('k'=>1, 'm'=>2, 'g'=>3);
+                    $factors = array('b'=>0, 'k'=>1, 'm'=>2, 'g'=>3);
                     $realLimit *= pow(1024, $factors[$match[2]]);
                 }
             } else {
