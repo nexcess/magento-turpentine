@@ -28,6 +28,10 @@ C{
 
 import std;
 
+## Custom VCL Logic - Top
+
+{{custom_vcl_include_top}}
+
 ## Backends
 
 {{default_backend}}
@@ -389,7 +393,7 @@ sub vcl_deliver {
                 "; domain=" + regsub(req.http.Host, ":\d+$", "");
             } else {
                 # it's a real user, allow sharing of cookies between stores
-                if(req.http.Host ~ "{{normalize_cookie_regex}}") {
+                 if (req.http.Host ~ "{{normalize_cookie_regex}}" && "{{normalize_cookie_regex}}" ~ "..") {
                     set resp.http.Set-Cookie = resp.http.Set-Cookie +
                     "; domain={{normalize_cookie_target}}";
                 } else {
@@ -431,7 +435,7 @@ sub vcl_deliver {
     }
 }
 
-## Custom VCL Logic
+## Custom VCL Logic - Bottom
 
 {{custom_vcl_include}}
 

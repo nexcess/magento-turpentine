@@ -499,6 +499,9 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
                 "Got unexpected response code from Varnish: %d\n%s",
                 $response['code'], $response['text'] ));
         } else {
+            if (Mage::getStoreConfig('turpentine_varnish/general/varnish_log_commands')) { 
+                Mage::helper('turpentine/debug')->logDebug('VARNISH command sent: ' . $data);
+            }
             return $response;
         }
     }
