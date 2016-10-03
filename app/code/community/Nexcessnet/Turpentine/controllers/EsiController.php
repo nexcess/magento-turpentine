@@ -183,6 +183,9 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             }
         }
         $layout = Mage::getSingleton('core/layout');
+        Mage::getSingleton( 'core/design_package' )
+                ->setPackageName( $esiData->getDesignPackage() )
+                ->setTheme( $esiData->getDesignTheme() );
 
         // dispatch event for adding handles to layout update
         Mage::dispatchEvent(
