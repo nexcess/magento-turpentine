@@ -901,6 +901,24 @@ EOS;
     }
 
     /**
+     * When using Varnish as front door listen on port 80 and Nginx/Apache listen on port 443 for HTTPS, the fix will keep the url parameters when redirect from HTTP to HTTPS.
+     *
+     * @return string
+     */
+    protected function _vcl_sub_https_redirect_fix() {
+        $baseUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB);
+        $baseUrl = str_replace(array('http://','https://'), '', $baseUrl);
+        $baseUrl = rtrim($baseUrl,'/');
+        
+        $tpl = <<<EOS
+if ( (req.http.host ~ "^(?i)www.$baseUrl" || req.http.host ~ "^(?i)$baseUrl") && req.http.X-Forwarded-Proto !~ "(?i)https") {
+        return (synth(750, ""));
+    }
+EOS;
+        return $tpl;
+    }
+
+    /**
      * Get the allowed IPs when in maintenance mode
      *
      * @return string
@@ -1018,6 +1036,10 @@ EOS;
             $vars['maintenance_allowed_ips'] = $this->_vcl_sub_maintenance_allowed_ips();
             // set the vcl_error from Magento database
             $vars['vcl_synth'] = $this->_vcl_sub_synth();
+        }
+        
+        if (Mage::getStoreConfig('turpentine_varnish/general/https_redirect_fix')) {
+            $vars['https_redirect'] = $this->_vcl_sub_https_redirect_fix();
         }
 
         foreach (array('','top') as $position) {

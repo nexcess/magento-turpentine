@@ -66,12 +66,22 @@
                             <label>Use VCL fix</label>
                             <comment>When Enable is selected, a VCL fix will be used to prevent formKey issues. If Disable is selected, an observer will be used.</comment>
                             <frontend_type>select</frontend_type>
-                            <sort_order>28</sort_order>
+                            <sort_order>26</sort_order>
                             <source_model>adminhtml/system_config_source_enabledisable</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </vcl_fix>
+                        <https_redirect_fix translate="label comment">
+                            <label>Fix HTTPS redirect</label>
+                            <comment>When using Varnish as front door listen on port 80 and Nginx/Apache listen on port 443 for HTTPS, the fix will keep the url parameters when redirect from HTTP to HTTPS.</comment>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>28</sort_order>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </https_redirect_fix>
                         <varnish_debug translate="label" module="turpentine">
                             <label>Enable Debug Info</label>
                             <comment>It is a major security vulnerability, to leave this enabled on production sites</comment>
