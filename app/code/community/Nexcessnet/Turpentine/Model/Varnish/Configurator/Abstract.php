@@ -130,9 +130,11 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      *
      * @return string
      */
-    protected function _getCustomIncludeFilename() {
+    protected function _getCustomIncludeFilename($position='') {
+        $key = 'custom_include_file';
+        $key .= ($position) ? '_'.$position : '';
         return $this->_formatTemplate(
-            Mage::getStoreConfig('turpentine_varnish/servers/custom_include_file'),
+            Mage::getStoreConfig('turpentine_varnish/servers/'.$key),
             array('root_dir' => Mage::getBaseDir()) );
     }
 
@@ -806,7 +808,7 @@ EOS;
     protected function _vcl_sub_normalize_encoding() {
         $tpl = <<<EOS
 if (req.http.Accept-Encoding) {
-        if (req.http.Accept-Encoding ~ "gzip") {
+        if (req.http.Accept-Encoding ~ "\*|gzip") {
             set req.http.Accept-Encoding = "gzip";
         } else if (req.http.Accept-Encoding ~ "deflate") {
             set req.http.Accept-Encoding = "deflate";
@@ -896,6 +898,24 @@ EOS;
 
         return $this->_formatTemplate($tpl, array(
             'debug_ips' => Mage::getStoreConfig('dev/restrict/allow_ips') ));
+    }
+
+    /**
+     * When using Varnish as front door listen on port 80 and Nginx/Apache listen on port 443 for HTTPS, the fix will keep the url parameters when redirect from HTTP to HTTPS.
+     *
+     * @return string
+     */
+    protected function _vcl_sub_https_redirect_fix() {
+        $baseUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB);
+        $baseUrl = str_replace(array('http://','https://'), '', $baseUrl);
+        $baseUrl = rtrim($baseUrl,'/');
+        
+        $tpl = <<<EOS
+if ( (req.http.host ~ "^(?i)www.$baseUrl" || req.http.host ~ "^(?i)$baseUrl") && req.http.X-Forwarded-Proto !~ "(?i)https") {
+        return (synth(750, ""));
+    }
+EOS;
+        return $tpl;
     }
 
     /**
@@ -1017,10 +1037,18 @@ EOS;
             // set the vcl_error from Magento database
             $vars['vcl_synth'] = $this->_vcl_sub_synth();
         }
+        
+        if (Mage::getStoreConfig('turpentine_varnish/general/https_redirect_fix')) {
+            $vars['https_redirect'] = $this->_vcl_sub_https_redirect_fix();
+        }
 
-        $customIncludeFile = $this->_getCustomIncludeFilename();
-        if (is_readable($customIncludeFile)) {
-            $vars['custom_vcl_include'] = file_get_contents($customIncludeFile);
+        foreach (array('','top') as $position) {
+            $customIncludeFile = $this->_getCustomIncludeFilename($position);
+            if (is_readable($customIncludeFile)) {
+                $key = 'custom_vcl_include';
+                $key .= ($position) ? '_'.$position : '';
+                $vars[$key] = file_get_contents($customIncludeFile);
+            }
         }
 
         return $vars;

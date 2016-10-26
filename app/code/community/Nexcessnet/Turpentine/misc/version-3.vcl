@@ -28,6 +28,10 @@ C{
 
 import std;
 
+## Custom VCL Logic - Top
+
+{{custom_vcl_include_top}}
+
 ## Backends
 
 {{default_backend}}
@@ -92,8 +96,18 @@ sub generate_session_expires {
 {{generate_session_end}}
 ## Varnish Subroutines
 
+sub vcl_synth {
+    if (resp.status == 750) {
+        set resp.status = 301;
+        set resp.http.Location = "https://" + req.http.host + req.url;
+        return(deliver);
+    }
+}
+
 sub vcl_recv {
 	{{maintenance_allowed_ips}}
+
+    {{https_redirect}}
 
     # this always needs to be done so it's up at the top
     if (req.restarts == 0) {
@@ -431,7 +445,7 @@ sub vcl_deliver {
     }
 }
 
-## Custom VCL Logic
+## Custom VCL Logic - Bottom
 
 {{custom_vcl_include}}
 

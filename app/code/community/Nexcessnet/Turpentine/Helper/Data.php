@@ -130,7 +130,7 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
     public function urlBase64Encode($str) {
         return str_replace(
             array('/', '+'),
-            array('.', '-'),
+            array('_', '-'),
             base64_encode($str) );
     }
 
@@ -143,7 +143,7 @@ class Nexcessnet_Turpentine_Helper_Data extends Mage_Core_Helper_Abstract {
     public function urlBase64Decode($str) {
         return base64_decode(
             str_replace(
-                array('.', '-'),
+                array('_', '-'),
                 array('/', '+'),
                 $str ) );
     }
