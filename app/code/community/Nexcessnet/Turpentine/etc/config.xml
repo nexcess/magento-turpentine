@@ -20,7 +20,7 @@
 <config>
     <modules>
         <Nexcessnet_Turpentine>
-            <version>0.7.0</version>
+            <version>0.7.1</version>
         </Nexcessnet_Turpentine>
     </modules>
     <default>
@@ -47,6 +47,8 @@
                 <server_list>127.0.0.1:6082</server_list>
                 <config_file>{{root_dir}}/var/default.vcl</config_file>
                 <custom_include_file>{{root_dir}}/app/code/community/Nexcessnet/Turpentine/misc/custom_include.vcl</custom_include_file>
+                <custom_include_file_top>{{root_dir}}/app/code/community/Nexcessnet/Turpentine/misc/custom_include_top.vcl</custom_include_file_top>
+                <custom_vcl_template></custom_vcl_template>
             </servers>
         </turpentine_varnish>
         <turpentine_vcl>
@@ -61,7 +63,7 @@
                 <frontend_timeout>300</frontend_timeout>
                 <admin_timeout>21600</admin_timeout>
                 <crawlers>127.0.0.1</crawlers>
-                <crawler_user_agents><![CDATA[ApacheBench/.*,.*Googlebot.*,JoeDog/.*Siege.*,magespeedtest\.com,Nexcessnet_Turpentine/.*,.*PTST.*]]></crawler_user_agents>
+                <crawler_user_agents><![CDATA[ApacheBench/.*,.*Googlebot.*,JoeDog/.*,.*Siege/.*,magespeedtest\.com,Nexcessnet_Turpentine/.*,.*PTST.*]]></crawler_user_agents>
             </backend>
             <normalization>
                 <encoding>1</encoding>

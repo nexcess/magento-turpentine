@@ -226,12 +226,19 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             $debugHelper->logInfo(
                 'Checking ESI block candidate: %s',
                 $blockObject->getNameInLayout() ? $blockObject->getNameInLayout() : $blockObject->getModuleName() );
-        }
+
+            $debugHelper->logInfo( "-- block testing: shouldResponseUseEsi = " . $esiHelper->shouldResponseUseEsi());
+            $debugHelper->logInfo( "-- block testing: instanceof Mage_Core_Block_Template = " . $blockObject instanceof Mage_Core_Block_Template );
+            $debugHelper->logInfo( "-- block testing: Esi Options = " . print_r($blockObject->getEsiOptions(), true) );
+        }        
         if ($esiHelper->shouldResponseUseEsi() &&
                 $blockObject instanceof Mage_Core_Block_Template &&
                 $esiOptions = $blockObject->getEsiOptions()) {
 
             if ((isset($esiOptions['disableEsiInjection'])) && ($esiOptions['disableEsiInjection'] == 1)) { 
+                if ($esiHelper->getEsiBlockLogEnabled()) {
+                    $debugHelper->logInfo("-- ESI Injection disabled");
+                }
                 return;
             }
 
@@ -325,6 +332,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $methodParam = $esiHelper->getEsiMethodParam();
         $esiData = new Varien_Object();
         $esiData->setStoreId(Mage::app()->getStore()->getId());
+        $esiData->setDesignPackage( Mage::getDesign()->getPackageName() );
+        $esiData->setDesignTheme( Mage::getDesign()->getTheme( 'layout' ) );
         $esiData->setNameInLayout($blockObject->getNameInLayout());
         $esiData->setBlockType(get_class($blockObject));
         $esiData->setLayoutHandles($this->_getBlockLayoutHandles($blockObject));

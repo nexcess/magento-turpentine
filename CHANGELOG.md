@@ -439,5 +439,34 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#1117] Fix #1100. (@GLips)
   * [#1155] Update TECHNICAL_NOTES.md. (@GLips)
 
-### RELEASE-0.6.9
+### RELEASE-0.6.9 -> 0.7.0
+  * [#1162] Support PHP7. (@allardhoeve)
+  * [#1173] Fix load balancing for Varnish 4. (@kleinmann)
+  * [#1182] Update version-3.vcl normalisation. (@gewaechshaus)
+
+### RELEASE-0.7.1
+
+  * [#1189] Custom Admin Path with Add Store Code to URLs (@miguelbalparda)
+  * [#1195] Fix for issue #1093 - poll still displaying when module output disabled (@aricwatson)
+  * [#1212] Allows Custom VCL template (@aricwatson)
+  * [#1214] Generate global blocks like formkey for ESI-Blocks (@possi)
+  * [#1216] Adds and implements an option to log all commands sent to Varnish (@aricwatson)
+  * [#1225] Enhanced block logging (@aricwatson)
+  * [#1226] Condensed the UA "buckets" down to just "mobile" and "other" (@aricwatson)
+  * [#1232] Adds better logging of hash_data calls in vcl_hash (@aricwatson)
+  * [#1243] Adds more flexibility/options to warm-cache.sh (@aricwatson)
+  * [#1254] Add customer_group caching to varnish 4 template  feature (@jg-development)
+  * [#1258] Fix issue with customer name not being removed from header when clearing persistent cookie (@careysizer)
+  * [#1261] Fixed Crawler UserAgent regexp to match newer Siege versions. (@jeroenvermeulen)
+  * [#1262] Bugfix in "Normalize Encoding" for visitors who accept "*"  (@jeroenvermeulen)
+  * [#1264] #963 Fix the Nginx 403 issue with urls which are starting with a dot (@andreasemer)
+  * [#1266] #878 Add onepage checkout progress review for varnish exclude in config (@jg-development)
+  * [#1271] #1270 Fix: Improve condition to support safari browser Event  feature (@AlexanderPok)
+  * [#1282] Added one more format for configuration regexp  bug (@odi-um)
+  * [#1289] Fix the issue when redirect HTTP to HTTPS  feature (@hmphu)
+  * [#1298] Removed unused code (@nickua)	
+
+
+
+
   

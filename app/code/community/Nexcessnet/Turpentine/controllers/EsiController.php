@@ -183,6 +183,9 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             }
         }
         $layout = Mage::getSingleton('core/layout');
+        Mage::getSingleton( 'core/design_package' )
+                ->setPackageName( $esiData->getDesignPackage() )
+                ->setTheme( $esiData->getDesignTheme() );
 
         // dispatch event for adding handles to layout update
         Mage::dispatchEvent(
@@ -251,6 +254,15 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             foreach ($layout->getNode()->xpath(sprintf(
                     '//reference[@name=\'%s\']', $nodeName )) as $node) {
                 $layout->generateBlocks($node);
+            }
+        }
+        if ($roots = $layout->getNode()->xpath('//block[@name=\'root\']')) {
+            foreach (array('formkey') as $globalBlock) {
+                if ($blocks = $layout->getNode()->xpath(sprintf('//block[@name=\'%s\']', $globalBlock))) {
+                    $dummy = $roots[0]->addChild('reference');
+                    $dummy->appendChild($blocks[0]);
+                    $layout->generateBlocks($dummy);
+                }
             }
         }
         $block = $layout->getBlock($esiData->getNameInLayout());

@@ -24,7 +24,7 @@ class Nexcessnet_Turpentine_Block_Management
 
     public function __construct() {
         $this->_controller = 'varnish_management';
-        // $this->setTemplate( 'turpentine/varnish_management.phtml' );
+        
         parent::__construct();
     }
 

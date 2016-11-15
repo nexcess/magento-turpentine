@@ -66,12 +66,22 @@
                             <label>Use VCL fix</label>
                             <comment>When Enable is selected, a VCL fix will be used to prevent formKey issues. If Disable is selected, an observer will be used.</comment>
                             <frontend_type>select</frontend_type>
-                            <sort_order>28</sort_order>
+                            <sort_order>26</sort_order>
                             <source_model>adminhtml/system_config_source_enabledisable</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </vcl_fix>
+                        <https_redirect_fix translate="label comment">
+                            <label>Fix HTTPS redirect</label>
+                            <comment>When using Varnish as front door listen on port 80 and Nginx/Apache listen on port 443 for HTTPS, the fix will keep the url parameters when redirect from HTTP to HTTPS.</comment>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>28</sort_order>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </https_redirect_fix>
                         <varnish_debug translate="label" module="turpentine">
                             <label>Enable Debug Info</label>
                             <comment>It is a major security vulnerability, to leave this enabled on production sites</comment>
@@ -82,6 +92,16 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </varnish_debug>
+                        <varnish_log_commands translate="label" module="turpentine">
+                            <label>Enable Varnish Command Logging</label>
+                            <comment>Log all commands sent to Varnish by Turpentine in the log specified (custom if enabled). Caution - can cause logs to grow quickly!</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>turpentine/config_select_toggle</source_model>
+                            <sort_order>45</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </varnish_log_commands>
                         <block_debug translate="label" module="turpentine">
                             <label>Enable Block Logging</label>
                             <comment>Log block names for adding ESI, only enable when needed to avoid performance hit</comment>
@@ -92,6 +112,8 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </block_debug>
+
+
                         <ajax_messages translate="label" module="turpentine">
                             <label>Enable AJAX Flash Messages</label>
                             <comment>Enable fixing the messages block to load via AJAX, disable if you already have an extension that does this</comment>
@@ -233,15 +255,33 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </config_file>
-                        <custom_include_file translate="label" module="turpentine">
-                            <label>Custom VCL File Location</label>
+                        <custom_include_file_top translate="label" module="turpentine">
+                            <label>Custom VCL File - Top</label>
                             <frontend_type>text</frontend_type>
-                            <comment>Specify where the Varnish VCL customization file should be saved</comment>
+                            <comment>If this file exists, its content will be prepended to the VCL.</comment>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
+                        </custom_include_file_top>
+                        <custom_include_file translate="label" module="turpentine">
+                            <label>Custom VCL File - Bottom</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>If this file exists, its content will be appended to the VCL.</comment>
+                            <sort_order>41</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
                         </custom_include_file>
+			<custom_vcl_template>
+                            <label>Custom VCL Template</label>
+                            <frontend_type>text</frontend_type>
+                            <comment>If defined and present, this template will be used instead of the default VCL template appropriate for the version of Varnish.</comment>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store> 
+			</custom_vcl_template>
                     </fields>
                 </servers>
             </groups>
