@@ -313,15 +313,12 @@ sub vcl_hash {
         {{advanced_session_validation}}
 
     }
-<<<<<<< HEAD
-    std.log("vcl_hash end return lookup");
-=======
     
     if (req.http.X-Varnish-Esi-Access == "customer_group" &&
             req.http.Cookie ~ "customer_group=") {
         hash_data(regsub(req.http.Cookie, "^.*?customer_group=([^;]*);*.*$", "\1"));
     }
->>>>>>> master
+    std.log("vcl_hash end return lookup");
     return (lookup);
 }
 
