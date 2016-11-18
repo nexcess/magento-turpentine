@@ -147,9 +147,12 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
     protected function _getCustomCookieHash() {
         $keys = Mage::getStoreConfig('turpentine_vcl/cookie/keys');
         if(!empty($keys)){
-            $keys = implode('|',Mage::helper('turpentine/data')->cleanExplode(PHP_EOL, $keys));
-            
-            return 'hash_data(regsub(req.http.Cookie, "^.*?('.$keys.')=([^;]*);*.*$", "\1"));';
+            $tpl = '';
+            $keys = Mage::helper('turpentine/data')->cleanExplode(PHP_EOL, $keys);
+            foreach($keys as $key){
+                $tpl .= 'hash_data(regsub(req.http.Cookie, "^.*?'.$key.'=([^;]*);*.*$", "\1"));'.PHP_EOL;
+            }
+            return $tpl;
         }
         return null;
     }
