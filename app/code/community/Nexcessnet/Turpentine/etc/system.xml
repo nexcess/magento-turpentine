@@ -579,6 +579,25 @@
                         </bypass_cache_store_url>
                     </fields>
                 </urls>
+                <cookie translate="label" module="turpentine">
+                    <label>Cookie-based Caching</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>35</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>0</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <keys translate="label" module="turpentine">
+                            <label>Cookie Keys</label>
+                            <frontend_type>textarea</frontend_type>
+                            <comment>List of cookie keys to include in caching hash key.</comment>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </keys>
+                    </fields>
+                </cookie>
                 <params translate="label" module="turpentine">
                     <label>Parameter-based Caching</label>
                     <frontend_type>text</frontend_type>

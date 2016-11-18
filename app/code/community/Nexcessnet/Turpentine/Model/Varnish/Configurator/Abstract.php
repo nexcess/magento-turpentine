@@ -140,6 +140,22 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
 
 
     /**
+     * Get custom cookie keys and add to varnish hash
+     *
+     * @return string
+     */
+    protected function _getCustomCookieHash() {
+        $keys = Mage::getStoreConfig('turpentine_vcl/cookie/keys');
+        if(!empty($keys)){
+            $keys = implode('|',Mage::helper('turpentine/data')->cleanExplode(PHP_EOL, $keys));
+            
+            return 'hash_data(regsub(req.http.Cookie, "^.*?('.$keys.')=([^;]*);*.*$", "\1"));';
+        }
+        return null;
+    }
+
+
+    /**
      * Get the custom VCL template, if it exists
      * Returns 'null' if the file doesn't exist
      *
@@ -1009,6 +1025,7 @@ EOS;
                 $this->_getVclTemplateFilename(self::VCL_CUSTOM_C_CODE_FILE) ),
             'esi_private_ttl'   => Mage::helper('turpentine/esi')
                 ->getDefaultEsiTtl(),
+            'custom_cookie_hash'    => $this->_getCustomCookieHash(),
         );
 
         if ((bool) Mage::getStoreConfig('turpentine_vcl/urls/bypass_cache_store_url')) {

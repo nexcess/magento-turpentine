@@ -291,6 +291,8 @@ sub vcl_hash {
         hash_data(regsub(req.http.Cookie, "^.*?customer_group=([^;]*);*.*$", "\1"));
     }
     
+    {{custom_cookie_hash}}
+    
     return (hash);
 }
 
