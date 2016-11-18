@@ -150,7 +150,9 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             $tpl = '';
             $keys = Mage::helper('turpentine/data')->cleanExplode(PHP_EOL, $keys);
             foreach($keys as $key){
+                $tpl .= 'if (req.http.Cookie ~ "'.$key.'=") {'.PHP_EOL;
                 $tpl .= 'hash_data(regsub(req.http.Cookie, "^.*?'.$key.'=([^;]*);*.*$", "\1"));'.PHP_EOL;
+                $tpl .= '}'.PHP_EOL;
             }
             return $tpl;
         }
