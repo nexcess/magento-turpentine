@@ -96,10 +96,10 @@ sub generate_session_expires {
 {{generate_session_end}}
 ## Varnish Subroutines
 
-sub vcl_synth {
-    if (resp.status == 750) {
-        set resp.status = 301;
-        set resp.http.Location = "https://" + req.http.host + req.url;
+sub vcl_error {
+    if (obj.status == 750) {
+        set obj.http.Location = obj.response;
+        set obj.status = 301;
         return(deliver);
     }
 }

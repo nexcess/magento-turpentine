@@ -910,11 +910,22 @@ EOS;
         $baseUrl = str_replace(array('http://','https://'), '', $baseUrl);
         $baseUrl = rtrim($baseUrl,'/');
         
-        $tpl = <<<EOS
+        switch (Mage::getStoreConfig('turpentine_varnish/servers/version')) {
+            case 4.0:
+                $tpl = <<<EOS
 if ( (req.http.host ~ "^(?i)www.$baseUrl" || req.http.host ~ "^(?i)$baseUrl") && req.http.X-Forwarded-Proto !~ "(?i)https") {
         return (synth(750, ""));
     }
 EOS;
+                break;
+            default:
+                $tpl = <<<EOS
+if ( (req.http.host ~ "^(?i)www.$baseUrl" || req.http.host ~ "^(?i)$baseUrl") && req.http.X-Forwarded-Proto !~ "(?i)https") {
+        error 750 "https://" + req.http.host + req.url;
+    }
+EOS;
+        }
+
         return $tpl;
     }
 
@@ -956,6 +967,40 @@ EOS;
 
         return $this->_formatTemplate($tpl, array(
             'vcl_synth_content' => Mage::getStoreConfig('turpentine_vcl/maintenance/custom_vcl_synth')));
+    }
+
+    /**
+     * vcl_synth for fixing https
+     *
+     * @return string
+     */
+    protected function _vcl_sub_synth_https_fix()
+    {
+        $tpl = $this->_vcl_sub_synth();
+
+        if(!$tpl){
+            $tpl = <<<EOS
+sub vcl_synth {
+    if (resp.status == 750) {
+        set resp.status = 301;
+        set resp.http.Location = "https://" + req.http.host + req.url;
+        return(deliver);
+    }
+}
+EOS;
+        }else{
+            $tpl_750 = '
+sub vcl_synth {
+    if (resp.status == 750) {
+        set resp.status = 301;
+        set resp.http.Location = "https://" + req.http.host + req.url;
+        return(deliver);
+    }';
+
+        $tpl = str_ireplace('sub vcl_synth {', $tpl_750, $tpl);
+        }
+
+        return $tpl;
     }
 
 
@@ -1040,6 +1085,9 @@ EOS;
         
         if (Mage::getStoreConfig('turpentine_varnish/general/https_redirect_fix')) {
             $vars['https_redirect'] = $this->_vcl_sub_https_redirect_fix();
+            if(Mage::getStoreConfig('turpentine_varnish/servers/version') == '4.0'){
+                $vars['vcl_synth'] = $this->_vcl_sub_synth_https_fix();
+            }
         }
 
         foreach (array('','top') as $position) {
