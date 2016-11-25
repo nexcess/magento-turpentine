@@ -251,11 +251,13 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         }
 
         foreach (array_unique($nodesToGenerate) as $nodeName) {
-            foreach ($layout->getNode()->xpath(sprintf(
-                    '//reference[@name=\'%s\']', $nodeName )) as $node) {
+            $nodes = $layout->getNode()->xpath(sprintf(
+                    '//reference[@name=\'%s\']', $nodeName ));
+            foreach (array_reverse($nodes) as $node) {
                 $layout->generateBlocks($node);
             }
         }
+
         if ($roots = $layout->getNode()->xpath('//block[@name=\'root\']')) {
             foreach (array('formkey') as $globalBlock) {
                 if ($blocks = $layout->getNode()->xpath(sprintf('//block[@name=\'%s\']', $globalBlock))) {
