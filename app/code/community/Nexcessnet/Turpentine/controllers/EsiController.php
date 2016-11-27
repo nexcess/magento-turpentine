@@ -212,9 +212,17 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
         $turpentineHelper = Mage::helper('turpentine/data')
             ->setLayout($layout);
 
-        $blockNode = current($layout->getNode()->xpath(
-                sprintf('//block[@name=\'%s\']', $esiData->getNameInLayout())
+        $blockNodes = $layout->getNode()->xpath(
+            sprintf('//block[@name=\'%s\']', $esiData->getNameInLayout())
+        );
+        $blockNode = current($blockNodes);
+        if (1 < count($blockNodes)) {
+            // there appear to be multiple blocks with the requested name, use extra criteria
+            $blockNode = current($layout->getNode()->xpath(
+                sprintf('//block[@name=\'%s\'][action[@method=\'setEsiOptions\']]',
+                    $esiData->getNameInLayout())
             ));
+        }
 
         if ( ! ($blockNode instanceof Mage_Core_Model_Layout_Element)) {
             Mage::helper('turpentine/debug')->logWarn(
