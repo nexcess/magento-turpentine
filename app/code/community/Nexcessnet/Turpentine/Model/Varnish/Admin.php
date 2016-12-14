@@ -138,7 +138,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
         $result = false;
 
         if ($helper->csrfFixupNeeded()) {
-            if ($socket->getVersion() === '4.0') {
+            if ($socket->getVersion() === '4.0' || $socket->getVersion() === '4.1' ) {
                 $paramName = 'feature';
                 $value = $socket->param_show($paramName);
                 $value = explode("\n", $value['text']);

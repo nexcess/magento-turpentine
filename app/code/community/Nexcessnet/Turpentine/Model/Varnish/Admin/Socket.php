@@ -82,7 +82,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
     // varnish default, can only be changed at Varnish startup time
     // if data to write is over this limit the actual run-time limit is checked
     // and used
-    const CLI_CMD_LENGTH_LIMIT = 8192;
+    const CLI_CMD_LENGTH_LIMIT = 16384;
 
     /**
      * Regexp to detect the varnish version number
@@ -93,7 +93,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
     /**
      * VCL config versions, should match config select values
      */
-    static protected $_VERSIONS = array('2.1', '3.0', '4.0');
+    static protected $_VERSIONS = array('2.1', '3.0', '4.0', '4.1');
 
     /**
      * Varnish socket connection
@@ -405,7 +405,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
         if ($dataLength >= self::CLI_CMD_LENGTH_LIMIT) {
             $cliBufferResponse = $this->param_show('cli_buffer');
             $regexp = '~^cli_buffer\s+(\d+)\s+\[bytes\]~';
-            if ($this->getVersion() === '4.0') {
+            if ($this->getVersion() === '4.0' || $this->getVersion() === '4.1') {
                 // Varnish4 supports "16k" style notation
                 $regexp = '~^cli_buffer\s+Value is:\s+(\d+)([k|m|g|b]{1})?\s+\[bytes\]~';
             }
@@ -518,6 +518,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
             case '2.1':
                 $command = str_replace('ban', 'purge', $command);
                 break;
+            case '4.1':
             case '4.0':
             case '3.0':
                 $command = str_replace('purge', 'ban', $command);
