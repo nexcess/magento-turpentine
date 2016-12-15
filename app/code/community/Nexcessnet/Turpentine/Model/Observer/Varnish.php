@@ -65,7 +65,8 @@ class Nexcessnet_Turpentine_Model_Observer_Varnish extends Varien_Event_Observer
      */
     public function fixCmRedisSessionLocks($eventObject) {
         if (Mage::helper('core')->isModuleEnabled('Cm_RedisSession')) {
-            if ( ! empty($_COOKIE['frontend']) && 'crawler-session' == $_COOKIE['frontend']) {
+            if ( ! empty($_COOKIE['frontend']) && 'crawler-session' == $_COOKIE['frontend'] &&
+                    !defined('CM_REDISSESSION_LOCKING_ENABLED') ) {
                 define('CM_REDISSESSION_LOCKING_ENABLED', false);
             }
         }
