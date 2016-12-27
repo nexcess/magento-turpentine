@@ -373,7 +373,7 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @param string $blockName value of name= attribute in layout XML
      * @return Mage_Core_Model_Layout_Element
      */
-    public function getEsiLayoutBlockNode($layout,$blockName) {
+    public function getEsiLayoutBlockNode($layout, $blockName) {
         // first try very specific by checking for action setEsiOptions inside block
         $blockNode = current($layout->getNode()->xpath(
             sprintf('//block[@name=\'%s\'][action[@method=\'setEsiOptions\']]',

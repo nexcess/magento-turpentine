@@ -111,8 +111,8 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getVclTemplateFilename($baseFilename) {
-           $extensionDir = Mage::getModuleDir('', 'Nexcessnet_Turpentine');
-           return sprintf('%s/misc/%s', $extensionDir, $baseFilename);
+            $extensionDir = Mage::getModuleDir('', 'Nexcessnet_Turpentine');
+            return sprintf('%s/misc/%s', $extensionDir, $baseFilename);
     }
 
     /**
@@ -131,7 +131,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      *
      * @return string
      */
-    protected function _getCustomIncludeFilename($position='') {
+    protected function _getCustomIncludeFilename($position = '') {
         $key = 'custom_include_file';
         $key .= ($position) ? '_'.$position : '';
         return $this->_formatTemplate(
@@ -151,8 +151,7 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             Mage::getStoreConfig('turpentine_varnish/servers/custom_vcl_template'),
             array('root_dir' => Mage::getBaseDir())
         );
-        if (is_file($filePath)) { return $filePath; }
-        else { return null; }
+        if (is_file($filePath)) { return $filePath; } else { return null; }
     }
 
 
@@ -193,8 +192,8 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      */
     protected function _getAdminFrontname() {
         if (Mage::getStoreConfig('admin/url/use_custom_path')) {
-            if(Mage::getStoreConfig('web/url/use_store')) {
-                return Mage::getModel('core/store')->load(0)->getCode() . "/" . Mage::getStoreConfig('admin/url/custom_path');
+            if (Mage::getStoreConfig('web/url/use_store')) {
+                return Mage::getModel('core/store')->load(0)->getCode()."/".Mage::getStoreConfig('admin/url/custom_path');
             } else {
                 return Mage::getStoreConfig('admin/url/custom_path');
             }
@@ -909,8 +908,8 @@ EOS;
      */
     protected function _vcl_sub_https_redirect_fix() {
         $baseUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB);
-        $baseUrl = str_replace(array('http://','https://'), '', $baseUrl);
-        $baseUrl = rtrim($baseUrl,'/');
+        $baseUrl = str_replace(array('http://', 'https://'), '', $baseUrl);
+        $baseUrl = rtrim($baseUrl, '/');
         
         switch (Mage::getStoreConfig('turpentine_varnish/servers/version')) {
             case 4.0:
@@ -982,7 +981,7 @@ EOS;
     {
         $tpl = $this->_vcl_sub_synth();
 
-        if(!$tpl){
+        if ( ! $tpl) {
             $tpl = <<<EOS
 sub vcl_synth {
     if (resp.status == 750) {
@@ -992,7 +991,7 @@ sub vcl_synth {
     }
 }
 EOS;
-        }else{
+        } else{
             $tpl_750 = '
 sub vcl_synth {
     if (resp.status == 750) {
@@ -1089,12 +1088,12 @@ sub vcl_synth {
         
         if (Mage::getStoreConfig('turpentine_varnish/general/https_redirect_fix')) {
             $vars['https_redirect'] = $this->_vcl_sub_https_redirect_fix();
-            if(Mage::getStoreConfig('turpentine_varnish/servers/version') == '4.0' || Mage::getStoreConfig('turpentine_varnish/servers/version') == '4.1'){
+            if (Mage::getStoreConfig('turpentine_varnish/servers/version') == '4.0' || Mage::getStoreConfig('turpentine_varnish/servers/version') == '4.1') {
                 $vars['vcl_synth'] = $this->_vcl_sub_synth_https_fix();
             }
         }
 
-        foreach (array('','top') as $position) {
+        foreach (array('', 'top') as $position) {
             $customIncludeFile = $this->_getCustomIncludeFilename($position);
             if (is_readable($customIncludeFile)) {
                 $key = 'custom_vcl_include';
