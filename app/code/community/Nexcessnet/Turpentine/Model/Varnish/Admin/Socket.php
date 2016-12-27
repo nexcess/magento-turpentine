@@ -500,7 +500,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
                 $response['code'], $response['text'] ));
         } else {
             if (Mage::getStoreConfig('turpentine_varnish/general/varnish_log_commands')) { 
-                Mage::helper('turpentine/debug')->logDebug('VARNISH command sent: ' . $data);
+                Mage::helper('turpentine/debug')->logDebug('VARNISH command sent: '.$data);
             }
             return $response;
         }

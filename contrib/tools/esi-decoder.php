@@ -1,16 +1,16 @@
 <?php
 /**
-     * ESI DECODER
-     *
-     * This tool can be used to decode an ESI request.
-     * You can just paste the whole ESI URL and push the button to decode it.
-     *
-     * Make sure you place this utility on a protected spot on your web server where only authorized users can use it.
-     *
-     * If the URLs you see in "varnishlog" or "varnishncsa" are not working because they are cut off, read this FAQ item:
-     * https://github.com/nexcess/magento-turpentine/wiki/FAQ#im-using-varnishncsa-to-generate-logs-and-the-esi-urls-are-cut-off-how-do-i-get-the-full-url-in-the-logs
-     *
-     */
+ * ESI DECODER
+ *
+ * This tool can be used to decode an ESI request.
+ * You can just paste the whole ESI URL and push the button to decode it.
+ *
+ * Make sure you place this utility on a protected spot on your web server where only authorized users can use it.
+ *
+ * If the URLs you see in "varnishlog" or "varnishncsa" are not working because they are cut off, read this FAQ item:
+ * https://github.com/nexcess/magento-turpentine/wiki/FAQ#im-using-varnishncsa-to-generate-logs-and-the-esi-urls-are-cut-off-how-do-i-get-the-full-url-in-the-logs
+ *
+ */
 
 $tries = 5;
 $dir = dirname(__FILE__);

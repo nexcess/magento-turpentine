@@ -35,8 +35,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version4
         $customTemplate = $this->_getCustomTemplateFilename();
         if ($customTemplate) { 
             $tplFile = $customTemplate;
-        }
-        else { 
+        } else { 
             $tplFile = $this->_getVclTemplateFilename(self::VCL_TEMPLATE_FILE);
         }
         $vcl = $this->_formatTemplate(file_get_contents($tplFile),
@@ -94,13 +93,13 @@ EOS;
         $backendNodes = Mage::helper('turpentine/data')->cleanExplode(PHP_EOL,
             Mage::getStoreConfig('turpentine_vcl/backend/backend_nodes'));
 
-        for($i = 0, $iMax = count($backendNodes); $i < $iMax; $i++) {
+        for ($i = 0, $iMax = count($backendNodes); $i < $iMax; $i++) {
             $tpl .= <<<EOS
     vdir.add_backend(web{$i});
 EOS;
         }
 
-        for($i = 0, $iMax = count($adminBackendNodes); $i < $iMax; $i++) {
+        for ($i = 0, $iMax = count($adminBackendNodes); $i < $iMax; $i++) {
             $tpl .= <<<EOS
     vdir_admin.add_backend(webadmin{$i});
 EOS;
@@ -132,7 +131,7 @@ EOS;
                 Mage::getStoreConfig('turpentine_vcl/backend/backend_nodes'));
             $probeUrl = Mage::getStoreConfig('turpentine_vcl/backend/backend_probe_url');
 
-            if('admin' == $name) {
+            if ('admin' == $name) {
                 $prefix = 'admin';
             } else {
                 $prefix = '';
@@ -145,7 +144,7 @@ EOS;
             $parts = explode(':', $backendNode, 2);
             $host = (empty($parts[0])) ? '127.0.0.1' : $parts[0];
             $port = (empty($parts[1])) ? '80' : $parts[1];
-            $backends .= $this->_vcl_director_backend($host, $port, $prefix . $number, $probeUrl, $backendOptions);
+            $backends .= $this->_vcl_director_backend($host, $port, $prefix.$number, $probeUrl, $backendOptions);
 
             $number++;
         }
