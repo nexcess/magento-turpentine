@@ -127,7 +127,7 @@ sub vcl_recv {
     if (!{{enable_caching}} || req.http.Authorization ||
         req.method !~ "^(GET|HEAD|OPTIONS)$" ||
         req.http.Cookie ~ "varnish_bypass={{secret_handshake}}") {
-        return (pass);
+        return (pipe);
     }
 
     if({{send_unmodified_url}}) {
