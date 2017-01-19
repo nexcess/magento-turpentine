@@ -926,9 +926,6 @@ EOS;
         $baseUrl = str_replace(array('http://', 'https://'), '', $baseUrl);
         $baseUrl = rtrim($baseUrl, '/');
 
-        $baseUrl = str_replace(array('http://','https://'), '', $baseUrl);
-        $baseUrl = rtrim($baseUrl,'/');
-
         switch (Mage::getStoreConfig('turpentine_varnish/servers/version')) {
             case 4.0:
             case 4.1:
