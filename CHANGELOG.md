@@ -464,7 +464,7 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#1271] #1270 Fix: Improve condition to support safari browser Event  feature (@AlexanderPok)
   * [#1282] Added one more format for configuration regexp  bug (@odi-um)
   * [#1289] Fix the issue when redirect HTTP to HTTPS  feature (@hmphu)
-  * [#1298] Removed unused code (@nickua)	
+  * [#1298] Removed unused code (@nickua)
 
 
 
