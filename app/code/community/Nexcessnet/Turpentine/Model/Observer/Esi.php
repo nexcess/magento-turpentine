@@ -33,7 +33,7 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $cookie = Mage::getSingleton('core/cookie');
         $customerGroups = explode(",", Mage::getStoreConfig('turpentine_vcl/customers/customer_group'));
 
-        if(!in_array($customer->getGroupId(), $customerGroups)) {
+        if(!in_array($customer->getGroupId(), $customerGroups) && strlen($customerGroups[0]) > 0) {
             return;
         }
 
