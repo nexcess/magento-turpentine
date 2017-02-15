@@ -302,10 +302,13 @@ sub vcl_hash {
             req.http.Cookie ~ "frontend=") {
         std.log("hash_data - frontned cookie: " + regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1"));
         hash_data(regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1"));
+        if (req.http.Cookie ~ "frontend_cid=") {
+            std.log("hash_data - frontend_cid cookie: " + regsub(req.http.Cookie, "^.*?frontend_cid=([^;]*);*.*$", "\1"));
+            hash_data(regsub(req.http.Cookie, "^.*?frontend_cid=([^;]*);*.*$", "\1"));
+        }
         {{advanced_session_validation}}
-
     }
-    
+
     if (req.http.X-Varnish-Esi-Access == "customer_group" &&
             req.http.Cookie ~ "customer_group=") {
         hash_data(regsub(req.http.Cookie, "^.*?customer_group=([^;]*);*.*$", "\1"));

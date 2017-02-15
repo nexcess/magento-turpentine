@@ -280,6 +280,9 @@ sub vcl_hash {
     if (req.http.X-Varnish-Esi-Access == "private" &&
             req.http.Cookie ~ "frontend=") {
         set req.hash += regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1");
+        if (req.http.Cookie ~ "frontend_cid=") {
+            set req.hash += regsub(req.http.Cookie, "^.*?frontend_cid=([^;]*);*.*$", "\1");
+        }
         {{advanced_session_validation}}
     }
 
