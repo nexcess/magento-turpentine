@@ -111,8 +111,8 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      * @return string
      */
     protected function _getVclTemplateFilename($baseFilename) {
-            $extensionDir = Mage::getModuleDir('', 'Nexcessnet_Turpentine');
-            return sprintf('%s/misc/%s', $extensionDir, $baseFilename);
+        $extensionDir = Mage::getModuleDir('', 'Nexcessnet_Turpentine');
+        return sprintf('%s/misc/%s', $extensionDir, $baseFilename);
     }
 
     /**
