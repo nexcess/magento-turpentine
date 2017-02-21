@@ -35,8 +35,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
         $customTemplate = $this->_getCustomTemplateFilename();
         if ($customTemplate) { 
             $tplFile = $customTemplate;
-        }
-        else { 
+        } else { 
             $tplFile = $this->_getVclTemplateFilename(self::VCL_TEMPLATE_FILE);
         }
         $vcl = $this->_formatTemplate(file_get_contents($tplFile),

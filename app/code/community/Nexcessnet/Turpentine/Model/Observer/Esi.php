@@ -227,9 +227,9 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 'Checking ESI block candidate: %s',
                 $blockObject->getNameInLayout() ? $blockObject->getNameInLayout() : $blockObject->getModuleName() );
 
-            $debugHelper->logInfo( "-- block testing: shouldResponseUseEsi = " . $esiHelper->shouldResponseUseEsi());
-            $debugHelper->logInfo( "-- block testing: instanceof Mage_Core_Block_Template = " . $blockObject instanceof Mage_Core_Block_Template );
-            $debugHelper->logInfo( "-- block testing: Esi Options = " . print_r($blockObject->getEsiOptions(), true) );
+            $debugHelper->logInfo("-- block testing: shouldResponseUseEsi = ".$esiHelper->shouldResponseUseEsi());
+            $debugHelper->logInfo("-- block testing: instanceof Mage_Core_Block_Template = ".$blockObject instanceof Mage_Core_Block_Template);
+            $debugHelper->logInfo("-- block testing: Esi Options = ".print_r($blockObject->getEsiOptions(), true));
         }        
         if ($esiHelper->shouldResponseUseEsi() &&
                 $blockObject instanceof Mage_Core_Block_Template &&
@@ -297,6 +297,11 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 );
             }
 
+            /**
+             * Keep params from original url
+             */
+            $urlOptions['_query'] = Mage::app()->getRequest()->getParams();
+            
             $esiUrl = Mage::getUrl('turpentine/esi/getBlock', $urlOptions);
             if ($esiOptions[$methodParam] == 'esi') {
                 // setting [web/unsecure/base_url] can be https://... but ESI can never be HTTPS
@@ -332,8 +337,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $methodParam = $esiHelper->getEsiMethodParam();
         $esiData = new Varien_Object();
         $esiData->setStoreId(Mage::app()->getStore()->getId());
-        $esiData->setDesignPackage( Mage::getDesign()->getPackageName() );
-        $esiData->setDesignTheme( Mage::getDesign()->getTheme( 'layout' ) );
+        $esiData->setDesignPackage(Mage::getDesign()->getPackageName());
+        $esiData->setDesignTheme(Mage::getDesign()->getTheme('layout'));
         $esiData->setNameInLayout($blockObject->getNameInLayout());
         $esiData->setBlockType(get_class($blockObject));
         $esiData->setLayoutHandles($this->_getBlockLayoutHandles($blockObject));
@@ -415,9 +420,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
         $activeHandles = array();
         // get the xml node representing the block we're working on (from the
         // default handle probably)
-        $blockNode = current($layout->getNode()->xpath(sprintf(
-            '//block[@name=\'%s\']',
-            $block->getNameInLayout() )));
+        $blockNode = Mage::helper('turpentine/esi')->getEsiLayoutBlockNode(
+            $layout, $block->getNameInLayout());
         $childBlocks = Mage::helper('turpentine/data')
             ->getChildBlockNames($blockNode);
         foreach ($childBlocks as $blockName) {
