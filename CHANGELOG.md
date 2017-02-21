@@ -464,9 +464,14 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#1271] #1270 Fix: Improve condition to support safari browser Event  feature (@AlexanderPok)
   * [#1282] Added one more format for configuration regexp  bug (@odi-um)
   * [#1289] Fix the issue when redirect HTTP to HTTPS  feature (@hmphu)
-  * [#1298] Removed unused code (@nickua)	
+  * [#1298] Removed unused code (@nickua) 
 
-
-
-
-  
+### RELEASE-0.7.1
+* [#885] Add maintenance mode that will allow debug_ips through to visit the site, all other users get the landing page @craigcarnell
+* [#1132] use pass instead of pipe on non GET requests to improve performance @andrewkett 
+* [#1334] Small fix for notice when CM_REDISSESSION_LOCKING_ENABLED is already defined @jeroenvermeulen
+* [#1301] Fix for picking the wrong block from the layout when multiple blocks found - v2 @jeroenvermeulen
+* [#1332] varnish 4.1 compatibility @bordeo
+* [#1335] Revert "use pass instead of pipe on non GET requests to improve performance" @miguelbalparda
+* [#1336] Scrutinizer Auto-Fixes @miguelbalparda
+* [#1313] Keep params from original url @hmphu
