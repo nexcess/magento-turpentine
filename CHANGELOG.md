@@ -466,7 +466,7 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
   * [#1289] Fix the issue when redirect HTTP to HTTPS  feature (@hmphu)
   * [#1298] Removed unused code (@nickua) 
 
-### RELEASE-0.7.1
+### RELEASE-0.7.2
 * [#885] Add maintenance mode that will allow debug_ips through to visit the site, all other users get the landing page @craigcarnell
 * [#1132] use pass instead of pipe on non GET requests to improve performance @andrewkett 
 * [#1334] Small fix for notice when CM_REDISSESSION_LOCKING_ENABLED is already defined @jeroenvermeulen
