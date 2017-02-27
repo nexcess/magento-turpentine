@@ -82,6 +82,16 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </https_redirect_fix>
+                        <real_ip translate="label comment">
+                            <label>Use X-Real-IP Header</label>
+                            <comment>If there is a proxy in front of varnish(e.g. https) and it is not using proxy-protocol (varnish 4.1 only) to communicate with varnish, set this to Enable to replace client.ip with IP from X-Real-IP when comparing to ACLs.</comment>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>26</sort_order>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </real_ip>
                         <varnish_debug translate="label" module="turpentine">
                             <label>Enable Debug Info</label>
                             <comment>It is a major security vulnerability, to leave this enabled on production sites</comment>
@@ -153,6 +163,9 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
+                            <depends>
+                                <crawler_enable>1</crawler_enable>
+                            </depends>
                         </crawler_debug>
                         <crawler_batchsize translate="label" module="turpentine">
                             <label>Crawler Batch Size</label>

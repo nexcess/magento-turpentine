@@ -30,6 +30,7 @@
                 <strip_vcl_whitespace>always</strip_vcl_whitespace>
                 <varnish_debug>0</varnish_debug>
                 <vcl_fix>1</vcl_fix>
+                <real_ip>0</real_ip>
                 <block_debug>0</block_debug>
                 <ajax_messages>1</ajax_messages>
                 <fix_product_toolbar>0</fix_product_toolbar>
