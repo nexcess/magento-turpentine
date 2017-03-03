@@ -40,6 +40,21 @@ class Nexcessnet_Turpentine_Model_Dummy_Request extends
     public function __construct($uri = null) {
         $this->_initFakeSuperGlobals();
         $this->_fixupFakeSuperGlobals($uri);
+
+        if (!$uri instanceof Zend_Uri) {
+            try {
+                $uri = Zend_Uri::factory($uri);
+            } catch (Zend_Uri_Exception $e) {
+                Mage::helper('turpentine/debug')->log($e->getMessage() . ' ' . $uri);
+                exit;
+            }
+        }
+
+        if (!$uri->valid()) {
+            Mage::helper('turpentine/debug')->log('Invalid URI provided: ' . $uri);
+            exit;
+        }
+
         try {
             parent::__construct($uri);
         } catch (Exception $e) {
