@@ -453,7 +453,7 @@
                             <label>Normalize Host</label>
                             <comment>Force requests to be for a specific domain name, will probably break most multi-store setups</comment>
                             <frontend_type>select</frontend_type>
-                            <source_model>turpentine/config_select_toggle</source_model>
+                            <source_model>turpentine/config_select_normalizeHost</source_model>
                             <sort_order>30</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
@@ -464,7 +464,7 @@
                             <comment>Domain to force requests to, defaults to the domain in the base URL</comment>
                             <frontend_type>text</frontend_type>
                             <depends>
-                                <host>1</host>
+                                <host>yes</host>
                             </depends>
                             <sort_order>40</sort_order>
                             <show_in_default>1</show_in_default>
