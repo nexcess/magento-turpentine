@@ -761,14 +761,14 @@ EOS;
             $window = Mage::getStoreConfig('turpentine_vcl/backend/backend_probe_window');
             $threshold = Mage::getStoreConfig('turpentine_vcl/backend/backend_probe_threshold');
 
-            return $this->_formatTemplate($tpl, [
+            return $this->_formatTemplate($tpl, array(
                 'probe_host' => $urlParts['host'],
                 'probe_path' => $urlParts['path'],
                 'timeout'    => $timeout,
                 'interval'   => $interval,
                 'window'     => $window,
                 'threshold'  => $threshold,
-            ]);
+            ));
         }
     }
 
