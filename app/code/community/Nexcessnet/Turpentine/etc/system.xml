@@ -359,10 +359,58 @@
                                 <load_balancing separator="|">yes|yes_admin</load_balancing>
                             </depends>
                         </backend_probe_url>
+                        <backend_probe_timeout translate="label comment" module="turpentine">
+                            <label>Backend Probe Timeout</label>
+                            <comment>Maximum timeout for requests. If the request takes longer than the maximum timeout, it will be marked as a failed response.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>24</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <load_balancing separator="|">yes|yes_admin</load_balancing>
+                            </depends>
+                        </backend_probe_timeout>
+                        <backend_probe_interval translate="label comment" module="turpentine">
+                            <label>Backend Probe Interval</label>
+                            <comment>How often to check a backend.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>25</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <load_balancing separator="|">yes|yes_admin</load_balancing>
+                            </depends>
+                        </backend_probe_interval>
+                        <backend_probe_window translate="label comment" module="turpentine">
+                            <label>Backend Probe Window</label>
+                            <comment>Total number of responses in a window of health.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>26</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <load_balancing separator="|">yes|yes_admin</load_balancing>
+                            </depends>
+                        </backend_probe_window>
+                        <backend_probe_threshold translate="label comment" module="turpentine">
+                            <label>Backend Probe Threshold</label>
+                            <comment>Number of needed successful responses in the backend probe window.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>27</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <load_balancing separator="|">yes|yes_admin</load_balancing>
+                            </depends>
+                        </backend_probe_threshold>
                         <backend_nodes_admin translate="label" module="turpentine">
                             <label>Backend Server List for Admin</label>
                             <frontend_type>textarea</frontend_type>
-                            <sort_order>25</sort_order>
+                            <sort_order>28</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
@@ -373,7 +421,7 @@
                         <backend_probe_url_admin translate="label" module="turpentine">
                             <label>Backend Check URL for Admin</label>
                             <frontend_type>text</frontend_type>
-                            <sort_order>27</sort_order>
+                            <sort_order>29</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
