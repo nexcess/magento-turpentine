@@ -118,6 +118,8 @@ sub vcl_recv {
             set req.http.X-Forwarded-For = client.ip;
         }
     }
+    # Set allowed grace period for current request
+    set req.grace = {{grace_period}}s;
 
     if({{send_unmodified_url}}) {
         # save the unmodified url
@@ -308,7 +310,7 @@ sub vcl_hit {
 
 sub vcl_fetch {
     # set the grace period
-    set req.grace = {{grace_period}}s;
+    set beresp.grace = {{grace_period}}s;
 
     # Store the URL in the response object, to be able to do lurker friendly bans later
     set beresp.http.X-Varnish-Host = req.http.host;
