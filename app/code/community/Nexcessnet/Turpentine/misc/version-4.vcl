@@ -103,7 +103,7 @@ sub generate_session_expires {
 ## Varnish Subroutines
 
 sub vcl_init {
-    {{directors}}
+{{directors}}
 }
 
 sub vcl_recv {
@@ -113,7 +113,7 @@ sub vcl_recv {
         {{set_backend_hint}}
     }
 
-       {{maintenance_allowed_ips}}
+    {{maintenance_allowed_ips}}
 
     {{https_redirect}}
 

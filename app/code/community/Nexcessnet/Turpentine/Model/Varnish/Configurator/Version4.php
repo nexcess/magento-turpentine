@@ -80,6 +80,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version4
         $tpl = <<<EOS
     new vdir       = directors.round_robin();
     new vdir_admin = directors.round_robin();
+
 EOS;
 
         if ('yes_admin' == Mage::getStoreConfig('turpentine_vcl/backend/load_balancing')) {
@@ -96,12 +97,14 @@ EOS;
         for ($i = 0, $iMax = count($backendNodes); $i < $iMax; $i++) {
             $tpl .= <<<EOS
     vdir.add_backend(web{$i});
+
 EOS;
         }
 
         for ($i = 0, $iMax = count($adminBackendNodes); $i < $iMax; $i++) {
             $tpl .= <<<EOS
     vdir_admin.add_backend(webadmin{$i});
+
 EOS;
         }
 
