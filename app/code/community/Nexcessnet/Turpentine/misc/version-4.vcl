@@ -102,14 +102,6 @@ sub generate_session_expires {
 {{generate_session_end}}
 ## Varnish Subroutines
 
-sub vcl_synth {
-    if (resp.status == 750) {
-        set resp.status = 301;
-        set resp.http.Location = "https://" + req.http.host + req.url;
-        return(deliver);
-    }
-}
-
 sub vcl_init {
     {{directors}}
 }
@@ -135,7 +127,7 @@ sub vcl_recv {
     if (!{{enable_caching}} || req.http.Authorization ||
         req.method !~ "^(GET|HEAD|OPTIONS)$" ||
         req.http.Cookie ~ "varnish_bypass={{secret_handshake}}") {
-        return (pass);
+        return (pipe);
     }
 
     if({{send_unmodified_url}}) {
@@ -312,6 +304,11 @@ sub vcl_hash {
         hash_data(regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1"));
         {{advanced_session_validation}}
 
+    }
+    
+    if (req.http.X-Varnish-Esi-Access == "customer_group" &&
+            req.http.Cookie ~ "customer_group=") {
+        hash_data(regsub(req.http.Cookie, "^.*?customer_group=([^;]*);*.*$", "\1"));
     }
     std.log("vcl_hash end return lookup");
     return (lookup);
