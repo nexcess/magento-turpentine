@@ -111,16 +111,6 @@ sub vcl_recv {
 
     {{https_redirect}}
 
-    # this always needs to be done so it's up at the top
-    if (req.restarts == 0) {
-        if (req.http.X-Forwarded-For) {
-            set req.http.X-Forwarded-For =
-                req.http.X-Forwarded-For + ", " + client.ip;
-        } else {
-            set req.http.X-Forwarded-For = client.ip;
-        }
-    }
-
     # We only deal with GET and HEAD by default
     # we test this here instead of inside the url base regex section
     # so we can disable caching for the entire site if needed
