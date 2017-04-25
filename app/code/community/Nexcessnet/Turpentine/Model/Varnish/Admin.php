@@ -104,7 +104,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin {
                 $result[$socketName] = 'Failed to load configurator';
             } else {
                 $vcl = $cfgr->generate($helper->shouldStripVclWhitespace('apply'));
-                $vclName = Mage::helper('turpentine/data')
+                $vclName = 'vcl_' . Mage::helper('turpentine/data')
                     ->secureHash(microtime());
                 try {
                     $this->_testEsiSyntaxParam($socket);
