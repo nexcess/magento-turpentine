@@ -109,6 +109,7 @@ sub vcl_init {
 sub vcl_recv {
 	{{maintenance_allowed_ips}}
 
+    {{https_proto_fix}}
     {{https_redirect}}
 
     # this always needs to be done so it's up at the top
