@@ -746,13 +746,18 @@ EOS;
             .probe = {
                 .request =
                     "GET {{probe_path}} HTTP/1.1"
-                    "Host: {{probe_host}}"
+                    "Host: {{probe_host}}"{{probe_https}}
                     "Connection: close";
             }
 EOS;
+            $additionalHeader='';
+            if ($urlParts['scheme']==='https'){
+                $additionalHeader="\n                    \"X-Forwarded-Proto: https\"";
+            }
             $vars = array(
-                'probe_host' => $urlParts['host'],
-                'probe_path' => $urlParts['path']
+                'probe_host'  => $urlParts['host'],
+                'probe_path'  => $urlParts['path'],
+                'probe_https' => $additionalHeader
             );
             return $this->_formatTemplate($tpl, $vars);
         }
@@ -910,7 +915,7 @@ EOS;
         $baseUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB);
         $baseUrl = str_replace(array('http://', 'https://'), '', $baseUrl);
         $baseUrl = rtrim($baseUrl, '/');
-        
+
         switch (Mage::getStoreConfig('turpentine_varnish/servers/version')) {
             case 4.0:
             case 4.1:
@@ -1085,7 +1090,7 @@ sub vcl_synth {
             // set the vcl_error from Magento database
             $vars['vcl_synth'] = $this->_vcl_sub_synth();
         }
-        
+
         if (Mage::getStoreConfig('turpentine_varnish/general/https_redirect_fix')) {
             $vars['https_redirect'] = $this->_vcl_sub_https_redirect_fix();
             if (Mage::getStoreConfig('turpentine_varnish/servers/version') == '4.0' || Mage::getStoreConfig('turpentine_varnish/servers/version') == '4.1') {
