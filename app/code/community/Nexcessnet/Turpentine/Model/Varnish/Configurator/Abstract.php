@@ -1006,7 +1006,42 @@ sub vcl_synth {
         return $tpl;
     }
 
-
+    /**
+     * Get VCL for fixing cookie domain
+     *
+     * @return string
+     */
+    protected function _vcl_sub_set_cookie_domain()
+    {
+        $tpl = '';
+        /** @var Mage_Core_Model_Store $store */
+        $domain2cookie = array();
+        foreach (Mage::app()->getStores() as $store) {
+            $cookieDomain = $store->getConfig(Mage_Core_Model_Cookie::XML_PATH_COOKIE_DOMAIN);
+            if (!$cookieDomain) {
+                continue;
+            }
+            $urlDomainUnsecure = parse_url($store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, false), PHP_URL_HOST);
+            $urlDomainSecure = parse_url($store->getBaseUrl(Mage_Core_Model_Store::URL_TYPE_LINK, true), PHP_URL_HOST);
+            if ($urlDomainUnsecure && $urlDomainUnsecure != $cookieDomain) {
+                $domain2cookie[$urlDomainUnsecure] = $cookieDomain;
+            }
+            if ($urlDomainSecure && $urlDomainSecure != $cookieDomain) {
+                $domain2cookie[$urlDomainSecure] = $cookieDomain;
+            }
+        }
+        $count = 0;
+        foreach ($domain2cookie as $domain => $cookieDomain) {
+            $if = ($count == 0) ? '                    if' : ' elsif';
+            $tpl .= <<<EOS
+$if (resp.http.X-Varnish-CookieDomain == "$domain") {
+                        set resp.http.X-Varnish-CookieDomain = "$cookieDomain";
+                    }
+EOS;
+            $count++;
+        }
+        return $tpl;
+    }
 
     /**
      * Build the list of template variables to apply to the VCL template
@@ -1057,6 +1092,7 @@ sub vcl_synth {
                 $this->_getVclTemplateFilename(self::VCL_CUSTOM_C_CODE_FILE) ),
             'esi_private_ttl'   => Mage::helper('turpentine/esi')
                 ->getDefaultEsiTtl(),
+            'set_cookie_domain' => $this->_vcl_sub_set_cookie_domain(),
         );
 
         if ((bool) Mage::getStoreConfig('turpentine_vcl/urls/bypass_cache_store_url')) {
