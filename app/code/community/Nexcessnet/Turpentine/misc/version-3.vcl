@@ -335,7 +335,7 @@ sub vcl_fetch {
                 unset beresp.http.Set-Cookie;
             }
             # we'll set our own cache headers if we need them
-            unset beresp.http.Cache-Control;
+            # we'll override the "Cache-Control" header if needed
             unset beresp.http.Expires;
             unset beresp.http.Pragma;
             unset beresp.http.Cache;
@@ -346,6 +346,7 @@ sub vcl_fetch {
             }
             if (beresp.http.X-Turpentine-Cache == "0") {
                 set beresp.ttl = {{grace_period}}s;
+                set beresp.http.Cache-Control = "no-store, no-cache, must-revalidate";
                 return (hit_for_pass);
             } else {
                 if ({{force_cache_static}} &&
@@ -374,6 +375,7 @@ sub vcl_fetch {
                         # this is probably faster than bothering with 0 ttl
                         # cache objects
                         set beresp.ttl = {{grace_period}}s;
+                        set beresp.http.Cache-Control = "no-store, no-cache, must-revalidate";
                         return (hit_for_pass);
                     }
                 } else {
