@@ -148,7 +148,7 @@ sub vcl_recv {
     set req.url = regsuball(req.url, "([^:])//+", "\1/");
 
     # check if the request is for part of magento
-    if (req.url ~ "{{url_base_regex}}") {
+    if (req.url ~ "{{url_base_regex}}" || req.url ~ "^/(skin|js)/") {
         # set this so Turpentine can see the request passed through Varnish
         set req.http.X-Turpentine-Secret-Handshake = "{{secret_handshake}}";
         # use the special admin backend and pipe if it's for the admin section
