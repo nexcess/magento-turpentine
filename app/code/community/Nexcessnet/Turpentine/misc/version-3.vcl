@@ -407,8 +407,10 @@ sub vcl_deliver {
                     set resp.http.Set-Cookie = resp.http.Set-Cookie +
                     "; domain={{normalize_cookie_target}}";
                 } else {
+                    set resp.http.X-Varnish-CookieDomain = regsub(req.http.Host, ":\d+$", "");
+{{set_cookie_domain}}
                     set resp.http.Set-Cookie = resp.http.Set-Cookie +
-                    "; domain=" + regsub(req.http.Host, ":\d+$", "");
+                    "; domain=" + resp.http.X-Varnish-CookieDomain;
                 }
             }
         }
@@ -438,6 +440,7 @@ sub vcl_deliver {
         unset resp.http.X-Varnish-Session;
         unset resp.http.X-Varnish-Host;
         unset resp.http.X-Varnish-URL;
+        unset resp.http.X-Varnish-CookieDomain;
         # this header indicates the session that originally generated a cached
         # page. it *must* not be sent to a client in production with lax
         # session validation or that session can be hijacked
