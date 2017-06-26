@@ -329,7 +329,7 @@ sub vcl_fetch {
                 remove beresp.http.Set-Cookie;
             }
             # we'll set our own cache headers if we need them
-            remove beresp.http.Cache-Control;
+            # we'll override the "Cache-Control" header if needed.
             remove beresp.http.Expires;
             remove beresp.http.Pragma;
             remove beresp.http.Cache;
@@ -341,6 +341,7 @@ sub vcl_fetch {
             if (beresp.http.X-Turpentine-Cache == "0") {
                 set beresp.cacheable = false;
                 set beresp.ttl = {{grace_period}}s;
+                set beresp.http.Cache-Control = "no-store, no-cache, must-revalidate";
                 return (pass);
             } else {
                 set beresp.cacheable = true;
@@ -360,6 +361,7 @@ sub vcl_fetch {
                         }
                         if (req.http.X-Varnish-Esi-Method == "ajax") {
                             set beresp.ttl = {{grace_period}}s;
+                            set beresp.http.Cache-Control = "no-store, no-cache, must-revalidate";
                             return (pass);
                         } else {
                             set beresp.ttl = {{esi_private_ttl}}s;

@@ -109,6 +109,7 @@ sub vcl_init {
 sub vcl_recv {
 	{{maintenance_allowed_ips}}
 
+    {{https_proto_fix}}
     {{https_redirect}}
 
     # this always needs to be done so it's up at the top
@@ -355,8 +356,9 @@ sub vcl_backend_response {
                 set beresp.http.X-Varnish-Set-Cookie = beresp.http.Set-Cookie;
                 unset beresp.http.Set-Cookie;
             }
+
             # we'll set our own cache headers if we need them
-            unset beresp.http.Cache-Control;
+            # we'll override the "Cache-Control" header if needed
             unset beresp.http.Expires;
             unset beresp.http.Pragma;
             unset beresp.http.Cache;
@@ -368,6 +370,7 @@ sub vcl_backend_response {
             if (beresp.http.X-Turpentine-Cache == "0") {
                 set beresp.ttl = {{grace_period}}s;
                 set beresp.uncacheable = true;
+                set beresp.http.Cache-Control = "no-store, no-cache, must-revalidate";
                 return (deliver);
             } else {
                 if ({{force_cache_static}} &&
@@ -397,6 +400,7 @@ sub vcl_backend_response {
                         # cache objects
                         set beresp.ttl = {{grace_period}}s;
                         set beresp.uncacheable = true;
+                        set beresp.http.Cache-Control = "no-store, no-cache, must-revalidate";
                         return (deliver);
                     }
                 } else {
