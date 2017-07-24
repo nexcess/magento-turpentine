@@ -684,7 +684,7 @@ EOS;
             $parts = explode(':', $backendNode, 2);
             $host = (empty($parts[0])) ? '127.0.0.1' : $parts[0];
             $port = (empty($parts[1])) ? '80' : $parts[1];
-            $backends .= $this->_vcl_director_backend($host, $port, $probeUrl, $backendOptions);
+            $backends .= $this->_vcl_director_backend($host, $port, $prefix.$number, $probeUrl, $backendOptions);
         }
         $vars = array(
             'name' => $name,
@@ -698,14 +698,15 @@ EOS;
      *
      * @param string $host     backend host
      * @param string $port     backend port
+	 * @param string $descriptor backend descriptor
      * @param string $probeUrl URL to check if backend is up
      * @param array  $options  extra options for backend
      * @return string
      */
-    protected function _vcl_director_backend($host, $port, $probeUrl = '', $options = array()) {
+    protected function _vcl_director_backend($host, $port, $descriptor = '', $probeUrl = '', $options = array()) {
         $tpl = <<<EOS
     {
-        .backend = {
+        .backend {$descriptor} = {
             .host = "{{host}}";
             .port = "{{port}}";
 {{probe}}
@@ -902,6 +903,20 @@ EOS;
     }
 
     /**
+     * When using Varnish on port 80 and Hitch listen on port 443 for HTTPS, the fix will set X-Forwarded-Proto to HTTPS to prevent redirect loop.
+     *
+     * @return string
+     */
+    protected function _vcl_sub_https_proto_fix() {
+        $tpl = <<<EOS
+if (std.port(server.ip) == 443) {
+    set req.http.X-Forwarded-Proto = "https";
+}
+EOS;
+        return $tpl;
+    }
+
+    /**
      * When using Varnish as front door listen on port 80 and Nginx/Apache listen on port 443 for HTTPS, the fix will keep the url parameters when redirect from HTTP to HTTPS.
      *
      * @return string
@@ -1084,6 +1099,10 @@ sub vcl_synth {
             $vars['maintenance_allowed_ips'] = $this->_vcl_sub_maintenance_allowed_ips();
             // set the vcl_error from Magento database
             $vars['vcl_synth'] = $this->_vcl_sub_synth();
+        }
+
+        if (Mage::getStoreConfig('turpentine_varnish/general/https_proto_fix')) {
+            $vars['https_proto_fix'] = $this->_vcl_sub_https_proto_fix();
         }
         
         if (Mage::getStoreConfig('turpentine_varnish/general/https_redirect_fix')) {
