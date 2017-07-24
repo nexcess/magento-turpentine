@@ -20,7 +20,7 @@
 <config>
     <modules>
         <Nexcessnet_Turpentine>
-            <version>0.7.2</version>
+            <version>0.7.3</version>
         </Nexcessnet_Turpentine>
     </modules>
     <default>

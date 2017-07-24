@@ -475,3 +475,9 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
 * [#1335] Revert "use pass instead of pipe on non GET requests to improve performance" @miguelbalparda
 * [#1336] Scrutinizer Auto-Fixes @miguelbalparda
 * [#1313] Keep params from original url @hmphu
+
+### RELEASE-0.7.3
+* [#1400] Use vcl_ prefix in vcl name to avoid invalid character in name error @josh-palan
+* [#1405] When using hitch, we need to set http.X-Forwarded-Proto to HTTPS @craigcarnell
+* [#1410] Fix issue #1409: Solved by keeping Cache-Control header @jeroenvermeulen
+* [#1423] Fixes for #1404 #1361 #1423
