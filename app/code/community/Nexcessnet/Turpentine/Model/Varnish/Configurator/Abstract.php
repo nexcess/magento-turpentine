@@ -684,7 +684,7 @@ EOS;
             $parts = explode(':', $backendNode, 2);
             $host = (empty($parts[0])) ? '127.0.0.1' : $parts[0];
             $port = (empty($parts[1])) ? '80' : $parts[1];
-            $backends .= $this->_vcl_director_backend($host, $port, $probeUrl, $backendOptions);
+            $backends .= $this->_vcl_director_backend($host, $port, $prefix.$number, $probeUrl, $backendOptions);
         }
         $vars = array(
             'name' => $name,
@@ -698,14 +698,15 @@ EOS;
      *
      * @param string $host     backend host
      * @param string $port     backend port
+	 * @param string $descriptor backend descriptor
      * @param string $probeUrl URL to check if backend is up
      * @param array  $options  extra options for backend
      * @return string
      */
-    protected function _vcl_director_backend($host, $port, $probeUrl = '', $options = array()) {
+    protected function _vcl_director_backend($host, $port, $descriptor = '', $probeUrl = '', $options = array()) {
         $tpl = <<<EOS
     {
-        .backend = {
+        .backend {$descriptor} = {
             .host = "{{host}}";
             .port = "{{port}}";
 {{probe}}
