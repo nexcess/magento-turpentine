@@ -23,6 +23,8 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
     extends Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
 
     const VCL_TEMPLATE_FILE = 'version-3.vcl';
+    const VCL_VERSION = '3';
+
 
     /**
      * Generate the Varnish 3.0-compatible VCL
@@ -60,6 +62,13 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version3
         $vars = parent::_getTemplateVars();
         $vars['advanced_session_validation'] =
             $this->_getAdvancedSessionValidation();
+
+        //dispatch event to allow other extensions to add custom vcl template variables
+        Mage::dispatchEvent('turpentine_get_templatevars_after', array(
+            'vars' => &$vars,
+            'vcl_version'=> self::VCL_VERSION
+        ));
+
         return $vars;
     }
 }
