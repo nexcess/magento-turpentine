@@ -930,28 +930,59 @@ EOS;
      * @return string
      */
     protected function _vcl_sub_https_redirect_fix() {
-        $baseUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB);
-        $baseUrl = str_replace(array('http://', 'https://'), '', $baseUrl);
-        $baseUrl = rtrim($baseUrl, '/');
-        
+
+        $hostRegex = array();
+        foreach ($this->_getHostNames() as $host) {
+            $hostRegex[] = 'req.http.host ~ "^(?i)'.$host.'"';
+        }
+        $hostRegex = implode(' || ', $hostRegex);
+
         switch (Mage::getStoreConfig('turpentine_varnish/servers/version')) {
             case 4.0:
             case 4.1:
                 $tpl = <<<EOS
-if ( (req.http.host ~ "^(?i)www.$baseUrl" || req.http.host ~ "^(?i)$baseUrl") && req.http.X-Forwarded-Proto !~ "(?i)https") {
+if ( ($hostRegex) && req.http.X-Forwarded-Proto !~ "(?i)https") {
         return (synth(750, ""));
     }
 EOS;
                 break;
             default:
                 $tpl = <<<EOS
-if ( (req.http.host ~ "^(?i)www.$baseUrl" || req.http.host ~ "^(?i)$baseUrl") && req.http.X-Forwarded-Proto !~ "(?i)https") {
+if ( ($hostRegex) && req.http.X-Forwarded-Proto !~ "(?i)https") {
         error 750 "https://" + req.http.host + req.url;
     }
 EOS;
         }
 
         return $tpl;
+    }
+
+
+    protected function _getHostNames() {
+
+        $baseUrl = $this->_stripHost(Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB));
+        $hosts = array(
+            $baseUrl => $baseUrl
+        );
+
+        foreach (Mage::app()->getWebsites() as $website) {
+            foreach ($website->getGroups() as $group) {
+                $stores = $group->getStores();
+                foreach ($stores as $store) {
+                    $baseUrl = $this->_stripHost(Mage::getStoreConfig('web/unsecure/base_url', $store->getId()));
+                    $secureBaseUrl = $this->_stripHost(Mage::getStoreConfig('web/secure/base_url', $store->getId()));
+
+                    $hosts[$baseUrl] = $baseUrl;
+                    $hosts[$secureBaseUrl] = $secureBaseUrl;
+                }
+            }
+        }
+
+        return $hosts;
+    }
+
+    protected function _stripHost ($baseUrl){
+        return  rtrim(str_replace(array('http://', 'https://'), '', $baseUrl), '/');
     }
 
     /**
