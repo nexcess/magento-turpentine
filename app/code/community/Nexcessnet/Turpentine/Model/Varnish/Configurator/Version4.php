@@ -165,7 +165,7 @@ EOS;
      * @param array  $options    extra options for backend
      * @return string
      */
-    protected function _vcl_director_backend($host, $port, $descriptor, $probeUrl = '', $options = array()) {
+    protected function _vcl_director_backend($host, $port, $descriptor = '', $probeUrl = '', $options = array()) {
         $tpl = <<<EOS
         backend web{$descriptor} {
             .host = "{{host}}";
