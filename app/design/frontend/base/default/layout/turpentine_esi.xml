@@ -455,6 +455,18 @@
         <turpentine_cache_flag value="0"/>
     </customer_account_confirmation>
 
+    <contacts_index_index>
+        <reference name="contactForm">
+            <action method="setEsiOptions">
+                <params>
+                    <method>esi</method>
+                    <access>private</access>
+                    <ttl>0</ttl>
+                </params>
+            </action>
+        </reference>
+    </contacts_index_index>
+
 <!--
     <customer_account_edit>
         <turpentine_cache_flag value="0"/>
