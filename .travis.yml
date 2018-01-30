@@ -1,9 +1,15 @@
 language: php
 php:
-    - 5.3
     - 5.4
     - 5.5
     - 5.6
+
+# precise must be used for PHP 5.3
+# https://docs.travis-ci.com/user/reference/trusty#PHP-images
+matrix:
+  include:
+    - php: 5.3
+      dist: precise
 
 addons:
   apt:
@@ -11,6 +17,7 @@ addons:
     - python-markdown
     - libxml-xpath-perl
     - build-essential
+    - libxml2-utils
 
 script:
     - make all
