@@ -88,7 +88,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Admin_Socket {
      * Regexp to detect the varnish version number
      * @var string
      */
-    const REGEXP_VARNISH_VERSION = '/^varnish\-(?P<vmajor>\d)\.(?P<vminor>\d)\.(?P<vsub>\d) revision (?P<vhash>[0-9a-f]+)$/';
+    const REGEXP_VARNISH_VERSION = '/^varnish\-(?P<vmajor>\d+)\.(?P<vminor>\d+)\.(?P<vsub>\d+) revision (?P<vhash>[0-9a-f]+)$/';
 
     /**
      * VCL config versions, should match config select values
