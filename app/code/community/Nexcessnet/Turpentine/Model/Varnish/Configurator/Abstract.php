@@ -971,7 +971,7 @@ EOS;
                 $tpl = <<<EOS
 sub vcl_synth {
     if (resp.status == 999) {
-        set resp.status = 404;
+        set resp.status = 503;
         set resp.http.Content-Type = "text/html; charset=utf-8";
         synthetic({"{{vcl_synth_content}}"});
         return (deliver);

@@ -455,6 +455,11 @@
         <turpentine_cache_flag value="0"/>
     </customer_account_confirmation>
 
+    <contacts_index_index>
+        <!-- wholepunching the contactForm block is not enough since the form action is wrong in this case -->
+        <turpentine_cache_flag value="0"/>
+    </contacts_index_index>
+
 <!--
     <customer_account_edit>
         <turpentine_cache_flag value="0"/>
