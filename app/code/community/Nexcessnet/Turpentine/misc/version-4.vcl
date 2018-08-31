@@ -122,6 +122,8 @@ sub vcl_recv {
         }
     }
 
+    {{normalize_host}}
+
     # We only deal with GET and HEAD by default
     # we test this here instead of inside the url base regex section
     # so we can disable caching for the entire site if needed
@@ -141,7 +143,6 @@ sub vcl_recv {
 
     {{normalize_encoding}}
     {{normalize_user_agent}}
-    {{normalize_host}}
 
     # check if the request is for part of magento
     if (req.url ~ "{{url_base_regex}}") {
