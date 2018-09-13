@@ -379,15 +379,17 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      */
     public function getEsiLayoutBlockNode($layout, $blockName) {
         // first try very specific by checking for action setEsiOptions inside block
-        $blockNode = end($layout->getNode()->xpath(
+        $blockNodes = $layout->getNode()->xpath(
             sprintf('//block[@name=\'%s\'][action[@method=\'setEsiOptions\']]',
                 $blockName)
-        ));
+        );
+        $blockNode = end($blockNodes);
         // fallback: only match name
         if ( ! ($blockNode instanceof Mage_Core_Model_Layout_Element)) {
-            $blockNode = end($layout->getNode()->xpath(
+            $blockNodes = $layout->getNode()->xpath(
                 sprintf('//block[@name=\'%s\']', $blockName)
-            ));
+            );
+            $blockNode = end($blockNodes);
         }
         return $blockNode;
     }
