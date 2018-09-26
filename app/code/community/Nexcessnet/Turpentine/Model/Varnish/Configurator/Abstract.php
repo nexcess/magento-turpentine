@@ -743,6 +743,7 @@ EOS;
      * Format a VCL probe declaration to put in backend which is in director
      *
      * @param string $probeUrl URL to check if backend is up
+     *
      * @return string
      */
     protected function _vcl_get_probe($probeUrl) {
@@ -753,17 +754,30 @@ EOS;
         } else {
             $tpl = <<<EOS
             .probe = {
+                .timeout = {{timeout}};
+                .interval = {{interval}};
+                .window = {{window}};
+                .threshold = {{threshold}};
                 .request =
                     "GET {{probe_path}} HTTP/1.1"
                     "Host: {{probe_host}}"
                     "Connection: close";
             }
 EOS;
-            $vars = array(
+
+            $timeout = Mage::getStoreConfig('turpentine_vcl/backend/backend_probe_timeout');
+            $interval = Mage::getStoreConfig('turpentine_vcl/backend/backend_probe_interval');
+            $window = Mage::getStoreConfig('turpentine_vcl/backend/backend_probe_window');
+            $threshold = Mage::getStoreConfig('turpentine_vcl/backend/backend_probe_threshold');
+
+            return $this->_formatTemplate($tpl, array(
                 'probe_host' => $urlParts['host'],
-                'probe_path' => $urlParts['path']
-            );
-            return $this->_formatTemplate($tpl, $vars);
+                'probe_path' => $urlParts['path'],
+                'timeout'    => $timeout,
+                'interval'   => $interval,
+                'window'     => $window,
+                'threshold'  => $threshold,
+            ));
         }
     }
 
