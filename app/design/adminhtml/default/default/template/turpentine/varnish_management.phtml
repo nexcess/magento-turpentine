@@ -25,7 +25,7 @@
     <table cellspacing="0">
         <tr>
             <td>
-                <h3><?php echo Mage::helper( 'turpentine/data' )
+                <h3><?php echo Mage::helper('turpentine/data')
                         ->__('Varnish Management') ?></h3>
             </td>
             <td class="form-buttons"></td>
@@ -54,7 +54,7 @@
                 onclick="setLocation('<?php echo $this->getSaveConfigUrl()?>')"
                 type="button"
                 class="scalable save">
-                <span><?php echo Mage::helper( 'turpentine/data' )
+                <span><?php echo Mage::helper('turpentine/data')
                         ->__('Save Varnish Config') ?></span>
             </button>
         </td>
@@ -69,42 +69,42 @@
                 onclick="setLocation('<?php echo $this->getGetConfigUrl()?>')"
                 type="button"
                 class="scalable">
-                <span><?php echo Mage::helper( 'turpentine/data' )
+                <span><?php echo Mage::helper('turpentine/data')
                         ->__('Download Varnish Config') ?></span>
             </button>
         </td>
         <td class="scope-label">
-            <?php echo Mage::helper( 'turpentine/data' )
+            <?php echo Mage::helper('turpentine/data')
                 ->__('Download the generated VCL file.')?>
         </td>
     </tr>
     <tr>
-        <?php if( Mage::helper( 'turpentine/varnish' )->isBypassEnabled() ): ?>
+        <?php if( Mage::helper('turpentine/varnish')->isBypassEnabled()): ?>
             <td class="scope-label">
                 <button
-                    onclick="setLocation('<?php echo $this->getSwitchNavigationUrl( 'varnish' ); ?>')"
+                    onclick="setLocation('<?php echo $this->getSwitchNavigationUrl('varnish'); ?>')"
                     type="button"
                     class="scalable back">
-                    <span><?php echo Mage::helper( 'turpentine/data' )
+                    <span><?php echo Mage::helper('turpentine/data')
                             ->__('Deactivate Varnish Bypass') ?></span>
                 </button>
             </td>
             <td class="scope-label">
-                <?php echo Mage::helper( 'turpentine/data' )
+                <?php echo Mage::helper('turpentine/data')
                     ->__('Remove the bypass cookie and use again Varnish.')?>
             </td>
         <?php else: ?>
             <td class="scope-label">
                 <button
-                    onclick="setLocation('<?php echo $this->getSwitchNavigationUrl( 'default' ); ?>')"
+                    onclick="setLocation('<?php echo $this->getSwitchNavigationUrl('default'); ?>')"
                     type="button"
                     class="scalable delete">
-                    <span><?php echo Mage::helper( 'turpentine/data' )
+                    <span><?php echo Mage::helper('turpentine/data')
                             ->__('Activate Varnish Bypass') ?></span>
                 </button>
             </td>
             <td class="scope-label">
-                <?php echo Mage::helper( 'turpentine/data' )
+                <?php echo Mage::helper('turpentine/data')
                     ->__('Create a cookie to bypass Varnish only for your session.')?>
             </td>
         <?php endif; ?>
@@ -116,14 +116,14 @@
                 <button
                     type="submit"
                     class="scalable delete">
-                    <span><?php echo Mage::helper( 'turpentine/data' )
+                    <span><?php echo Mage::helper('turpentine/data')
                                 ->__('Flush matching URLs') ?></span>
                 </button>
                 <input id="pattern" name="pattern" type="text" style="width: 295px; margin-left: 5px;" class="required-entry" value="" />
             </form>
             <script type="text/javascript">
                 var partialUrlForm = new varienForm('partial_url_form');
-                new Varien.searchForm('partial_url_form', 'pattern', '<?php echo Mage::helper( 'turpentine/data' )
+                new Varien.searchForm('partial_url_form', 'pattern', '<?php echo Mage::helper('turpentine/data')
                         ->__('Enter a (relative) regex to flush matching URLs')?>');
             </script>
         </td>
