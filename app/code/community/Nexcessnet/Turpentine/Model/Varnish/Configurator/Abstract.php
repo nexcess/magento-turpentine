@@ -674,17 +674,25 @@ EOS;
             $backendNodes = Mage::helper('turpentine/data')->cleanExplode(PHP_EOL,
                 Mage::getStoreConfig('turpentine_vcl/backend/backend_nodes_admin'));
             $probeUrl = Mage::getStoreConfig('turpentine_vcl/backend/backend_probe_url_admin');
+            $prefix = 'admin';
         } else {
             $backendNodes = Mage::helper('turpentine/data')->cleanExplode(PHP_EOL,
                 Mage::getStoreConfig('turpentine_vcl/backend/backend_nodes'));
             $probeUrl = Mage::getStoreConfig('turpentine_vcl/backend/backend_probe_url');
+            if ('admin' == $name) {
+                $prefix = 'admin';
+            } else {
+                $prefix = '';
+            }
         }
         $backends = '';
+		$number = 0;
         foreach ($backendNodes as $backendNode) {
             $parts = explode(':', $backendNode, 2);
             $host = (empty($parts[0])) ? '127.0.0.1' : $parts[0];
             $port = (empty($parts[1])) ? '80' : $parts[1];
-            $backends .= $this->_vcl_director_backend($host, $port, $probeUrl, $backendOptions);
+            $backends .= $this->_vcl_director_backend($host, $port, $prefix.$number, $probeUrl, $backendOptions);
+			$number++;
         }
         $vars = array(
             'name' => $name,
@@ -698,14 +706,15 @@ EOS;
      *
      * @param string $host     backend host
      * @param string $port     backend port
+	 * @param string $descriptor backend descriptor
      * @param string $probeUrl URL to check if backend is up
      * @param array  $options  extra options for backend
      * @return string
      */
-    protected function _vcl_director_backend($host, $port, $probeUrl = '', $options = array()) {
+    protected function _vcl_director_backend($host, $port, $descriptor = '', $probeUrl = '', $options = array()) {
         $tpl = <<<EOS
     {
-        .backend = {
+        .backend {$descriptor} = {
             .host = "{{host}}";
             .port = "{{port}}";
 {{probe}}
@@ -734,6 +743,7 @@ EOS;
      * Format a VCL probe declaration to put in backend which is in director
      *
      * @param string $probeUrl URL to check if backend is up
+     *
      * @return string
      */
     protected function _vcl_get_probe($probeUrl) {
@@ -744,17 +754,30 @@ EOS;
         } else {
             $tpl = <<<EOS
             .probe = {
+                .timeout = {{timeout}};
+                .interval = {{interval}};
+                .window = {{window}};
+                .threshold = {{threshold}};
                 .request =
                     "GET {{probe_path}} HTTP/1.1"
                     "Host: {{probe_host}}"
                     "Connection: close";
             }
 EOS;
-            $vars = array(
+
+            $timeout = Mage::getStoreConfig('turpentine_vcl/backend/backend_probe_timeout');
+            $interval = Mage::getStoreConfig('turpentine_vcl/backend/backend_probe_interval');
+            $window = Mage::getStoreConfig('turpentine_vcl/backend/backend_probe_window');
+            $threshold = Mage::getStoreConfig('turpentine_vcl/backend/backend_probe_threshold');
+
+            return $this->_formatTemplate($tpl, array(
                 'probe_host' => $urlParts['host'],
-                'probe_path' => $urlParts['path']
-            );
-            return $this->_formatTemplate($tpl, $vars);
+                'probe_path' => $urlParts['path'],
+                'timeout'    => $timeout,
+                'interval'   => $interval,
+                'window'     => $window,
+                'threshold'  => $threshold,
+            ));
         }
     }
 
@@ -936,28 +959,59 @@ EOS;
      * @return string
      */
     protected function _vcl_sub_https_redirect_fix() {
-        $baseUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB);
-        $baseUrl = str_replace(array('http://', 'https://'), '', $baseUrl);
-        $baseUrl = rtrim($baseUrl, '/');
+
+        $hostRegex = array();
+        foreach ($this->_getHostNames() as $host) {
+            $hostRegex[] = 'req.http.host ~ "^(?i)'.$host.'"';
+        }
+        $hostRegex = implode(' || ', $hostRegex);
 
         switch (Mage::getStoreConfig('turpentine_varnish/servers/version')) {
             case 4.0:
             case 4.1:
                 $tpl = <<<EOS
-if ( (req.http.host ~ "^(?i)www.$baseUrl" || req.http.host ~ "^(?i)$baseUrl") && req.http.X-Forwarded-Proto !~ "(?i)https") {
+if ( ($hostRegex) && req.http.X-Forwarded-Proto !~ "(?i)https") {
         return (synth(750, ""));
     }
 EOS;
                 break;
             default:
                 $tpl = <<<EOS
-if ( (req.http.host ~ "^(?i)www.$baseUrl" || req.http.host ~ "^(?i)$baseUrl") && req.http.X-Forwarded-Proto !~ "(?i)https") {
+if ( ($hostRegex) && req.http.X-Forwarded-Proto !~ "(?i)https") {
         error 750 "https://" + req.http.host + req.url;
     }
 EOS;
         }
 
         return $tpl;
+    }
+
+
+    protected function _getHostNames() {
+
+        $baseUrl = $this->_stripHost(Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB));
+        $hosts = array(
+            $baseUrl => $baseUrl
+        );
+
+        foreach (Mage::app()->getWebsites() as $website) {
+            foreach ($website->getGroups() as $group) {
+                $stores = $group->getStores();
+                foreach ($stores as $store) {
+                    $baseUrl = $this->_stripHost(Mage::getStoreConfig('web/unsecure/base_url', $store->getId()));
+                    $secureBaseUrl = $this->_stripHost(Mage::getStoreConfig('web/secure/base_url', $store->getId()));
+
+                    $hosts[$baseUrl] = $baseUrl;
+                    $hosts[$secureBaseUrl] = $secureBaseUrl;
+                }
+            }
+        }
+
+        return $hosts;
+    }
+
+    protected function _stripHost ($baseUrl){
+        return  rtrim(str_replace(array('http://', 'https://'), '', $baseUrl), '/');
     }
 
     /**
@@ -977,7 +1031,7 @@ EOS;
                 $tpl = <<<EOS
 sub vcl_synth {
     if (resp.status == 999) {
-        set resp.status = 404;
+        set resp.status = 503;
         set resp.http.Content-Type = "text/html; charset=utf-8";
         synthetic({"{{vcl_synth_content}}"});
         return (deliver);

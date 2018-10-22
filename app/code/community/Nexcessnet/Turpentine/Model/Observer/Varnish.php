@@ -83,27 +83,28 @@ class Nexcessnet_Turpentine_Model_Observer_Varnish extends Varien_Event_Observer
                 Mage::helper('turpentine/data')->getAutoApplyOnSave()) {
             $result = Mage::getModel('turpentine/varnish_admin')->applyConfig();
             $session = Mage::getSingleton('core/session');
+            $helper = Mage::helper('turpentine');
             foreach ($result as $name => $value) {
                 if ($value === true) {
-                    $session->addSuccess(Mage::helper('turpentine/data')
+                    $session->addSuccess($helper
                         ->__('VCL successfully applied to: '.$name));
                 } else {
-                    $session->addError(Mage::helper('turpentine/data')
+                    $session->addError($helper
                         ->__(sprintf('Failed to apply the VCL to %s: %s',
                             $name, $value)));
                 }
             }
             $cfgr = Mage::getModel('turpentine/varnish_admin')->getConfigurator();
             if (is_null($cfgr)) {
-                $session->addError(Mage::helper('turpentine/data')
+                $session->addError($helper
                     ->__('Failed to load configurator'));
             } else {
-                $result = $cfgr->save($cfgr->generate());
+                $result = $cfgr->save($cfgr->generate($helper->shouldStripVclWhitespace('save')));
                 if ($result[0]) {
-                    $session->addSuccess(Mage::helper('turpentine/data')
+                    $session->addSuccess($helper
                         ->__('The VCL file has been saved.'));
                 } else {
-                    $session->addError(Mage::helper('turpentine/data')
+                    $session->addError($helper
                         ->__('Failed to save the VCL file: '.$result[1]['message']));
                 }
             }

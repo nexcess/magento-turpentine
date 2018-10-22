@@ -23,6 +23,8 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version4
     extends Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
 
     const VCL_TEMPLATE_FILE = 'version-4.vcl';
+    const VCL_VERSION = '4';
+
 
     /**
      * Generate the Varnish 4.0-compatible VCL
@@ -72,6 +74,12 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version4
             $vars['set_backend_hint']   = '';
         }
 
+        //dispatch event to allow other extensions to add custom vcl template variables
+        Mage::dispatchEvent('turpentine_get_templatevars_after', array(
+            'vars' => &$vars,
+            'vcl_version'=> self::VCL_VERSION
+        ));
+
         return $vars;
     }
 
@@ -80,6 +88,7 @@ class Nexcessnet_Turpentine_Model_Varnish_Configurator_Version4
         $tpl = <<<EOS
     new vdir       = directors.round_robin();
     new vdir_admin = directors.round_robin();
+
 EOS;
 
         if ('yes_admin' == Mage::getStoreConfig('turpentine_vcl/backend/load_balancing')) {
@@ -96,12 +105,14 @@ EOS;
         for ($i = 0, $iMax = count($backendNodes); $i < $iMax; $i++) {
             $tpl .= <<<EOS
     vdir.add_backend(web{$i});
+
 EOS;
         }
 
         for ($i = 0, $iMax = count($adminBackendNodes); $i < $iMax; $i++) {
             $tpl .= <<<EOS
     vdir_admin.add_backend(webadmin{$i});
+
 EOS;
         }
 
@@ -165,7 +176,7 @@ EOS;
      * @param array  $options    extra options for backend
      * @return string
      */
-    protected function _vcl_director_backend($host, $port, $descriptor, $probeUrl = '', $options = array()) {
+    protected function _vcl_director_backend($host, $port, $descriptor = '', $probeUrl = '', $options = array()) {
         $tpl = <<<EOS
         backend web{$descriptor} {
             .host = "{{host}}";

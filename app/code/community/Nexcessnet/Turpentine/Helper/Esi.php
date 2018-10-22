@@ -231,7 +231,11 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      * @return string
      */
     public function getDefaultEsiTtl() {
-        return trim(Mage::getStoreConfig('web/cookie/cookie_lifetime'));
+        $defaultLifeTime = trim(Mage::getStoreConfig('web/cookie/cookie_lifetime'));
+        if ($defaultLifeTime < 60) {
+            $defaultLifeTime = ini_get('session.gc_maxlifetime');
+        }
+        return $defaultLifeTime;
     }
 
     /**
@@ -375,15 +379,17 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
      */
     public function getEsiLayoutBlockNode($layout, $blockName) {
         // first try very specific by checking for action setEsiOptions inside block
-        $blockNode = current($layout->getNode()->xpath(
+        $blockNodes = $layout->getNode()->xpath(
             sprintf('//block[@name=\'%s\'][action[@method=\'setEsiOptions\']]',
                 $blockName)
-        ));
+        );
+        $blockNode = end($blockNodes);
         // fallback: only match name
         if ( ! ($blockNode instanceof Mage_Core_Model_Layout_Element)) {
-            $blockNode = current($layout->getNode()->xpath(
+            $blockNodes = $layout->getNode()->xpath(
                 sprintf('//block[@name=\'%s\']', $blockName)
-            ));
+            );
+            $blockNode = end($blockNodes);
         }
         return $blockNode;
     }

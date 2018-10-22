@@ -316,15 +316,7 @@ class Nexcessnet_Turpentine_Block_Core_Messages extends Mage_Core_Block_Messages
      */
     protected function _real_toHtml() {
         if ( ! $this->_directCall) {
-            switch ($this->getNameInLayout()) {
-                case 'global_messages':
-                    $this->_directCall = 'getHtml';
-                    break;
-                case 'messages':
-                default:
-                    $this->_directCall = 'getGroupedHtml';
-                    break;
-            }
+            $this->_directCall = 'getGroupedHtml';
         }
         switch ($this->_directCall) {
             case 'getHtml':
