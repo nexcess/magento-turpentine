@@ -308,9 +308,9 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
 
             $products = $productCollection->addEntityFilter((int) $review->getEntityPkValue())->getItems();
 
-            $productIds = array_unique(array_map(
-                create_function('$p', 'return $p->getEntityId();'),
-                $products ));
+            $productIds = array_unique(array_map(function ($p) {
+                return $p->getEntityId();
+            }, $products));
             $patterns[] = sprintf('/review/product/list/id/(?:%s)/category/',
                 implode('|', array_unique($productIds)));
             $patterns[] = sprintf('/review/product/view/id/%d/',
