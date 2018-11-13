@@ -304,6 +304,9 @@ sub vcl_hash {
             req.http.Cookie ~ "customer_group=") {
         hash_data(regsub(req.http.Cookie, "^.*?customer_group=([^;]*);*.*$", "\1"));
     }
+
+    {{custom_cookie_hash}}
+
     std.log("vcl_hash end return lookup");
     return (lookup);
 }
