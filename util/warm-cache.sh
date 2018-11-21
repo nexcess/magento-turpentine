@@ -80,7 +80,7 @@ fi
 UA=""
 if [[ $AGENT =~ .. ]]; then 
 	UA="-A '$AGENT'"
-	echo "Warning with User-Agent '$AGENT'"
+	echo "Warming with User-Agent '$AGENT'"
 fi
 
 echo "Warming $(cat $TMP_URL_FILE | wc -l) URLs using $CONC concurrent users..."
