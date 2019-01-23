@@ -174,7 +174,7 @@ sub vcl_recv {
         }
         # no frontend cookie was sent to us
         if (req.http.Cookie !~ "frontend=") {
-            if (client.ip ~ crawler_acl ||
+            if ({{real_ip}} ~ crawler_acl ||
                     req.http.User-Agent ~ "^(?:{{crawler_user_agent_regex}})$") {
                 # it's a crawler, give it a fake cookie
                 set req.http.Cookie = "frontend=crawler-session";
@@ -401,7 +401,7 @@ sub vcl_deliver {
         set resp.http.Cache-Control = "no-cache";
     }
     set resp.http.X-Opt-Debug-Headers = "{{debug_headers}}";
-    if (resp.http.X-Opt-Debug-Headers == "true" || client.ip ~ debug_acl ) {
+    if (resp.http.X-Opt-Debug-Headers == "true" || {{real_ip}} ~ debug_acl ) {
         # debugging is on, give some extra info
         set resp.http.X-Varnish-Hits = obj.hits;
         set resp.http.X-Varnish-Esi-Method = req.http.X-Varnish-Esi-Method;

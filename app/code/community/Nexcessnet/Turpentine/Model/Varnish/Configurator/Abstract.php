@@ -549,6 +549,18 @@ EOS;
     }
 
     /**
+     * Return client.ip or std.ip(X-Real-IP)
+     *
+     * @return string
+     */
+    protected function _getRealIp() {
+        if (Mage::getStoreConfig('turpentine_varnish/general/real_ip')) {
+            return 'std.ip(req.http.x-real-ip, "0.0.0.0")';
+        }
+        return 'client.ip';
+    }
+
+    /**
      * Get the regex formatted list of crawler user agents
      *
      * @return string
@@ -1125,6 +1137,7 @@ sub vcl_synth {
                 $this->_getVclTemplateFilename(self::VCL_CUSTOM_C_CODE_FILE) ),
             'esi_private_ttl'   => Mage::helper('turpentine/esi')
                 ->getDefaultEsiTtl(),
+            'real_ip' => $this->_getRealIp(),
         );
 
         if ((bool) Mage::getStoreConfig('turpentine_vcl/urls/bypass_cache_store_url')) {

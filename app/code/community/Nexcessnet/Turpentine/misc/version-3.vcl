@@ -174,14 +174,14 @@ sub vcl_recv {
             # throw a forbidden error if debugging is off and a esi block is
             # requested by the user (does not apply to ajax blocks)
             if (req.http.X-Varnish-Esi-Method == "esi" && req.esi_level == 0 &&
-                    !({{debug_headers}} || client.ip ~ debug_acl)) {
+                    !({{debug_headers}} || {{real_ip}} ~ debug_acl)) {
                 error 403 "External ESI requests are not allowed";
             }
         }
         {{allowed_hosts}}
         # no frontend cookie was sent to us AND this is not an ESI or AJAX call
         if (req.http.Cookie !~ "frontend=" && !req.http.X-Varnish-Esi-Method) {
-            if (client.ip ~ crawler_acl ||
+            if ({{real_ip}} ~ crawler_acl ||
                     req.http.User-Agent ~ "^(?:{{crawler_user_agent_regex}})$") {
                 # it's a crawler, give it a fake cookie
                 set req.http.Cookie = "frontend=crawler-session";
@@ -420,7 +420,7 @@ sub vcl_deliver {
     if (req.http.X-Varnish-Esi-Method == "ajax" && req.http.X-Varnish-Esi-Access == "private") {
         set resp.http.Cache-Control = "no-cache";
     }
-    if ({{debug_headers}} || client.ip ~ debug_acl) {
+    if ({{debug_headers}} || {{real_ip}} ~ debug_acl) {
         # debugging is on, give some extra info
         set resp.http.X-Varnish-Hits = obj.hits;
         set resp.http.X-Varnish-Esi-Method = req.http.X-Varnish-Esi-Method;
