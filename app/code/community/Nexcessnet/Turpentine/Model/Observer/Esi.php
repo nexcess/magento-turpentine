@@ -31,6 +31,12 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
     public function setCustomerGroupCookie($eventObject) {
         $customer = $eventObject->getCustomer();
         $cookie = Mage::getSingleton('core/cookie');
+        $customerGroups = explode(",", Mage::getStoreConfig('turpentine_vcl/customers/customer_group'));
+
+        if(!in_array($customer->getGroupId(), $customerGroups) && strlen($customerGroups[0]) > 0) {
+            return;
+        }
+
         if (Mage::getStoreConfig('persistent/options/enabled')) {
             $cookie->set('customer_group', $customer->getGroupId(), Mage::getStoreConfig('persistent/options/lifetime'));
         } else {
