@@ -187,31 +187,44 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 ->setPackageName($esiData->getDesignPackage())
                 ->setTheme($esiData->getDesignTheme());
 
-        // dispatch event for adding handles to layout update
+        // This is, (roughly), the start of Action->loadLayout
+        // - Mimicking Action->addActionLayoutHandles (Though we are using the esi data to set)
+        $layout->getUpdate()->addHandle($this->_swapCustomerHandles(
+            $esiData->getLayoutHandles() ));
+
+        // Mimicking Action->loadLayoutUpdates (Event and Layout update load)
+        // - Dispatch event for adding handles to layout update
         Mage::dispatchEvent(
             'controller_action_layout_load_before',
             array('action'=>$this, 'layout'=>$layout)
         );
 
-        $layoutUpdate = $layout->getUpdate();
-        $layoutUpdate->load($this->_swapCustomerHandles(
-            $esiData->getLayoutHandles() ));
+        // - Load the Layout by Update Handles
+        $layout->getUpdate()->load();
+
+        // Custom Block Injection
         foreach ($esiData->getDummyBlocks() as $blockName) {
             $layout->createBlock('Mage_Core_Block_Template', $blockName);
         }
 
+        // Mimicking Action->generateLayoutXml (Event and Layout generate xml)
         if ( ! $this->getFlag('', self::FLAG_NO_DISPATCH_BLOCK_EVENT)) {
             Mage::dispatchEvent(
                 'controller_action_layout_generate_xml_before',
                 array('action'=>$this, 'layout'=>$layout)
             );
         }
+
+        // - Load the Layout Xml
         $layout->generateXml();
 
+        // Custom Fixup Work (Roughly related to generateBlocks)
+        // - Custom cache data for later
         /** @var Nexcessnet_Turpentine_Helper_Data $turpentineHelper */
         $turpentineHelper = Mage::helper('turpentine/data')
             ->setLayout($layout);
 
+        // - Get and ensure this is a proper ESI block
         $blockNode = Mage::helper('turpentine/esi')->getEsiLayoutBlockNode(
             $layout, $esiData->getNameInLayout());
         if ( ! ($blockNode instanceof Mage_Core_Model_Layout_Element)) {
@@ -221,11 +234,14 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             return null;
         }
 
+        // - Find ESI blocks children
         $nodesToGenerate = $turpentineHelper->getChildBlockNames($blockNode);
+
+        // - Create Main ESI block (Is this out of order? Should it be later?)
         Mage::getModel('turpentine/shim_mage_core_layout')
             ->shim_generateFullBlock($blockNode);
 
-        //find addional blocks that aren't defined in the <block/> but via <reference name="%s">
+        //- Find addional blocks that aren't defined in the <block/> but via <reference name="%s">
         $referenceNodes = $layout->getNode()->xpath(sprintf(
             '//reference[@name=\'%s\']',
             $esiData->getNameInLayout() ));
@@ -240,7 +256,8 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             }
         }
 
-        // dispatch event for adding xml layout elements
+        // Mimicking Action->generateLayoutBlocks (Events and Custom Code for Layout generate blocks)
+        // - Dispatch event for adding xml layout elements (Before)
         if ( ! $this->getFlag('', self::FLAG_NO_DISPATCH_BLOCK_EVENT)) {
             Mage::dispatchEvent(
                 'controller_action_layout_generate_blocks_before',
@@ -248,12 +265,15 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             );
         }
 
+        // - Add the additional blocks found above
         foreach (array_unique($nodesToGenerate) as $nodeName) {
             foreach ($layout->getNode()->xpath(sprintf(
                     '//reference[@name=\'%s\']', $nodeName )) as $node) {
                 $layout->generateBlocks($node);
             }
         }
+
+        // - Add the formKey blocks
         if ($roots = $layout->getNode()->xpath('//block[@name=\'root\']')) {
             foreach (array('formkey') as $globalBlock) {
                 if ($blocks = $layout->getNode()->xpath(sprintf('//block[@name=\'%s\']', $globalBlock))) {
@@ -263,8 +283,11 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 }
             }
         }
+
+        // - Create the main ESI block
         $block = $layout->getBlock($esiData->getNameInLayout());
 
+        // - Dispatch event for adding xml layout elements (After)
         if ( ! $this->getFlag('', self::FLAG_NO_DISPATCH_BLOCK_EVENT)) {
             Mage::dispatchEvent(
                 'controller_action_layout_generate_blocks_after',
@@ -272,6 +295,7 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             );
         }
 
+        // This is the end of Action->loadLayout
         $this->_isLayoutLoaded = true;
         Varien_Profiler::stop('turpentine::controller::esi::_getEsiBlock');
         return $block;
