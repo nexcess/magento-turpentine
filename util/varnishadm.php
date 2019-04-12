@@ -29,11 +29,9 @@ class Turpentine_Shell_Varnishadm extends Mage_Shell_Abstract {
      * @return array
      */
     protected function _parseArgs() {
-        $this->_args = array_slice(
-            array_filter($_SERVER['argv'],
-                create_function('$e',
-                    'return $e != \'--\';')),
-            1 );
+        $this->_args = array_slice(array_filter($_SERVER['argv'], function ($e) {
+            return $e != '--';
+        }), 1);
         return $this;
     }
     

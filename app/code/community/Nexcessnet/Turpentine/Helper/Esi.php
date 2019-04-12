@@ -405,10 +405,9 @@ class Nexcessnet_Turpentine_Helper_Esi extends Mage_Core_Helper_Abstract {
         $events = $layoutXml->xpath(
             '//action[@method=\'setEsiOptions\']/params/flush_events/*' );
         if ($events) {
-            $events = array_unique(array_map(
-                create_function('$e',
-                    'return (string)$e->getName();'),
-                $events ));
+            $events = array_unique(array_map(function ($e) {
+                return (string)$e->getName();
+            }, $events));
         } else {
             $events = array();
         }
