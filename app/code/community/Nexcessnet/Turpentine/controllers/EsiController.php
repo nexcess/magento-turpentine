@@ -183,9 +183,17 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
             }
         }
         $layout = Mage::getSingleton('core/layout');
-        Mage::getSingleton('core/design_package')
-                ->setPackageName($esiData->getDesignPackage())
-                ->setTheme($esiData->getDesignTheme());
+        $package = Mage::getSingleton('core/design_package')
+                ->setPackageName($esiData->getDesignPackage());
+        $theme = $esiData->getDesignTheme();
+        if (is_array($theme)) {
+            foreach ($theme as $type => $name) {
+                $package->setTheme($type, $name);
+            }
+        } else {
+            // for backwards compatibility during upgrades
+            $package->setTheme($theme);
+        }
 
         // This is, (roughly), the start of Action->loadLayout
         // - Mimicking Action->addActionLayoutHandles (Though we are using the esi data to set)
