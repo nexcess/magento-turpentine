@@ -497,6 +497,7 @@
                 <args>
                     <modules>
                         <turpentine after="Mage_Adminhtml">Nexcessnet_Turpentine</turpentine>
+                        <turpentine_admin before="Mage_Adminhtml">Nexcessnet_Turpentine_Adminhtml</turpentine_admin>
                     </modules>
                 </args>
             </adminhtml>
