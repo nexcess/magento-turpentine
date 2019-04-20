@@ -8,6 +8,27 @@ require_once Mage::getModuleDir('controllers', 'Mage_Adminhtml').DS.'CacheContro
 
 class Nexcessnet_Turpentine_Adminhtml_CacheController extends Mage_Adminhtml_CacheController
 {
+    public function indexAction()
+    {
+        $allTypes = Mage::app()->useCache();
+
+        $turpentineEnabled = ($allTypes['turpentine_pages'] == 1) || ($allTypes['turpentine_esi_blocks'] == 1);
+        $fullPageEnabled = (array_key_exists('full_page', $allTypes)) && ($allTypes['full_page'] == 1);
+
+        if ($fullPageEnabled && $turpentineEnabled) {
+            $allTypes['full_page'] = 0;
+            Mage::app()->saveUseCache($allTypes);
+
+            Mage::getSingleton('core/session')->addWarning(
+                Mage::helper('adminhtml')->__('Both Varnish and Full Page caches were enabled. Full Page cache has now been disabled.')
+            );
+
+            $this->_redirect('*/*');
+            return;
+        }
+
+        parent::indexAction();
+    }
 
     /**
      * Mass action for cache enabeling
