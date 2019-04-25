@@ -304,6 +304,16 @@ sub vcl_hash {
             req.http.Cookie ~ "customer_group=") {
         hash_data(regsub(req.http.Cookie, "^.*?customer_group=([^;]*);*.*$", "\1"));
     }
+
+    # Some extension controllers serve different results for a single url if the
+    # request is xhr. both prototype and jquery set X-Requested-With headers
+    # on ajax requests so we can add that to the hash so that both variations
+    # are served seperately
+    if (req.http.X-Requested-With) {
+      std.log("hash_data xhr request - X-Requested-With: " + req.http.X-Requested-With);
+      hash_data(req.http.X-Requested-With);
+    }
+    
     std.log("vcl_hash end return lookup");
     return (lookup);
 }
