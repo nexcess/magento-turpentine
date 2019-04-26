@@ -73,6 +73,7 @@
             <normalization>
                 <encoding>1</encoding>
                 <user_agent>0</user_agent>
+                <user_agent_mobile_regexp><![CDATA[iP(?:hone|ad|od)|BlackBerry|Palm|Googlebot-Mobile|Mobile|mobile|mobi|Windows Mobile|Safari Mobile|Android|Opera (?:Mini|Mobi)]]></user_agent_mobile_regexp>
                 <host>0</host>
             </normalization>
             <ttls>

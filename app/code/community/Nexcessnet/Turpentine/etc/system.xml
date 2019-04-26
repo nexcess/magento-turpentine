@@ -520,6 +520,18 @@
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </user_agent>
+                        <user_agent_mobile_regexp translate="label" module="turpentine">
+                            <label>Regexp for Mobile User-Agent</label>
+                            <comment><![CDATA[See for example http://magebase.com/magento-tutorials/magento-design-exceptions-explained/]]></comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>25</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends>
+                                <user_agent>1</user_agent>
+                            </depends>
+                        </user_agent_mobile_regexp>
                         <host translate="label" module="turpentine">
                             <label>Normalize Host</label>
                             <comment>Force requests to be for a specific domain name, will probably break most multi-store setups</comment>
