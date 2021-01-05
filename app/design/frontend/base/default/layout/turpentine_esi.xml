@@ -450,6 +450,10 @@
     <customer_account_resetpassword>
         <turpentine_cache_flag value="0"/>
     </customer_account_resetpassword>
+    
+    <customer_account_changeforgotten>
+        <turpentine_cache_flag value="0"/>
+    </customer_account_changeforgotten>
 
     <customer_account_confirmation>
         <turpentine_cache_flag value="0"/>
